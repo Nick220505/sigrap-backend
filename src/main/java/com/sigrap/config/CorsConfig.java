@@ -22,14 +22,14 @@ public class CorsConfig {
     if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
       Arrays.stream(allowedOrigins.split(","))
           .map(String::trim)
-          .forEach(config::addAllowedOriginPattern);
+          .forEach(config::addAllowedOrigin);
     }
     config.addAllowedHeader("*");
     config.addAllowedMethod("*");
     config.addExposedHeader("Content-Disposition");
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/api/**", config);
+    source.registerCorsConfiguration("/**", config);
     return source;
   }
 }
