@@ -2,24 +2,22 @@ package com.sigrap.config;
 
 import java.util.Arrays;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class CorsConfig {
 
-  @Value("${cors.allowed.origins}")
-  private String allowedOrigins;
-
   @Bean
-  CorsFilter corsFilter() {
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
+  CorsConfigurationSource corsConfigurationSource(Environment environment) {
     CorsConfiguration config = new CorsConfiguration();
+
+    String allowedOrigins = environment.getProperty("cors.allowed.origins");
+
     config.setAllowCredentials(true);
     if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
       Arrays.stream(allowedOrigins.split(","))
@@ -30,7 +28,8 @@ public class CorsConfig {
     config.addAllowedMethod("*");
     config.addExposedHeader("Content-Disposition");
 
-    source.registerCorsConfiguration("/**", config);
-    return new CorsFilter(source);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/api/**", config);
+    return source;
   }
 }
