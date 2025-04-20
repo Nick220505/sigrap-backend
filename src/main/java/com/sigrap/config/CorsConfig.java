@@ -16,10 +16,10 @@ public class CorsConfig {
   private String allowedOrigins;
 
   @Bean
-  public CorsFilter corsFilter() {
+  CorsFilter corsFilter() {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    CorsConfiguration config = new CorsConfiguration();
 
+    CorsConfiguration config = new CorsConfiguration();
     config.setAllowCredentials(true);
     if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
       Arrays.stream(allowedOrigins.split(","))
