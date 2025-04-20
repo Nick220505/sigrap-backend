@@ -43,12 +43,10 @@ public class ProductService {
 
     product.setName(productDetails.getName());
     product.setDescription(productDetails.getDescription());
-    product.setSku(productDetails.getSku());
     product.setCostPrice(productDetails.getCostPrice());
     product.setSalePrice(productDetails.getSalePrice());
     product.setImageUrl(productDetails.getImageUrl());
     product.setActive(productDetails.isActive());
-    product.setBarcode(productDetails.getBarcode());
 
     if (productDetails.getCategory() != null && productDetails.getCategory().getId() != null) {
       product.setCategory(categoryService.getById(productDetails.getCategory().getId()));

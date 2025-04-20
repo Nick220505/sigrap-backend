@@ -24,7 +24,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "PRODUCT")
+@Table(name = "products")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -39,8 +39,6 @@ public class Product {
   private String name;
 
   private String description;
-
-  private String sku;
 
   @NotNull(message = "Cost price cannot be null")
   @PositiveOrZero(message = "Cost price must be zero or positive")
@@ -60,8 +58,6 @@ public class Product {
   private Category category;
 
   private boolean active = true;
-
-  private String barcode;
 
   @Column(name = "deleted")
   private boolean deleted = false;
