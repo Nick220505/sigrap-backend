@@ -59,9 +59,6 @@ public class Product {
 
   private boolean active = true;
 
-  @Column(name = "deleted")
-  private boolean deleted = false;
-
   @CreationTimestamp
   @Column(name = "created_at", updatable = false)
   private LocalDateTime createdAt;

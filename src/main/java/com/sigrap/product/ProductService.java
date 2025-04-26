@@ -19,14 +19,12 @@ public class ProductService {
 
   @Transactional(readOnly = true)
   public List<Product> getAll() {
-    return productRepository.findByDeletedFalse();
+    return productRepository.findAll();
   }
 
   @Transactional(readOnly = true)
   public Product getById(Integer id) {
-    return productRepository.findById(id)
-        .filter(product -> !product.isDeleted())
-        .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + id));
+    return productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
   }
 
   @Transactional
@@ -39,8 +37,7 @@ public class ProductService {
 
   @Transactional
   public Product update(Integer id, Product productDetails) {
-    Product product = getById(id);
-
+    Product product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     product.setName(productDetails.getName());
     product.setDescription(productDetails.getDescription());
     product.setCostPrice(productDetails.getCostPrice());
@@ -59,8 +56,7 @@ public class ProductService {
 
   @Transactional
   public void delete(Integer id) {
-    Product product = getById(id);
-    product.setDeleted(true);
-    productRepository.save(product);
+    Product product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    productRepository.delete(product);
   }
 }

@@ -21,8 +21,7 @@ public class CategoryService {
 
     @Transactional(readOnly = true)
     public Category getById(Integer id) {
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + id));
+        return categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Transactional
@@ -32,7 +31,7 @@ public class CategoryService {
 
     @Transactional
     public Category update(Integer id, Category categoryDetails) {
-        Category category = getById(id);
+        Category category = categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         category.setName(categoryDetails.getName());
         category.setDescription(categoryDetails.getDescription());
         return categoryRepository.save(category);
@@ -40,7 +39,7 @@ public class CategoryService {
 
     @Transactional
     public void delete(Integer id) {
-        Category category = getById(id);
+        Category category = categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         categoryRepository.delete(category);
     }
 }
