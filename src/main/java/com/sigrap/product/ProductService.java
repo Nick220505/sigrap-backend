@@ -37,7 +37,7 @@ public class ProductService {
 
   @Transactional
   public Product update(Integer id, Product productDetails) {
-    Product product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    var product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     product.setName(productDetails.getName());
     product.setDescription(productDetails.getDescription());
     product.setCostPrice(productDetails.getCostPrice());
@@ -55,7 +55,7 @@ public class ProductService {
 
   @Transactional
   public void delete(Integer id) {
-    Product product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    var product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     productRepository.delete(product);
   }
 }
