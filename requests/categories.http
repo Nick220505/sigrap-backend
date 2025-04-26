@@ -1,0 +1,37 @@
+### Variables
+@baseUrl = http://localhost:8080/api
+@categoryId = 1
+
+### Get all categories
+GET {{baseUrl}}/categories
+Accept: application/json
+
+### Get category by ID
+GET {{baseUrl}}/categories/{{categoryId}}
+Accept: application/json
+
+### Create category
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "New Category",
+  "description": "Description for new category"
+}
+
+### Update category
+# @prompt Ensure you have a valid category ID set in @categoryId
+PUT {{baseUrl}}/categories/{{categoryId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Updated Category Name",
+  "description": "Updated category description"
+}
+
+### Delete category
+# @prompt Ensure you have a valid category ID set in @categoryId
+DELETE {{baseUrl}}/categories/{{categoryId}}
+Accept: application/json 

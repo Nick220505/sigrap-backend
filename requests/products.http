@@ -1,0 +1,51 @@
+### Variables
+@baseUrl = http://localhost:8080/api
+@productId = 1
+@categoryIdForProduct = 1 # Ensure this category exists
+
+### Get all products
+GET {{baseUrl}}/products
+Accept: application/json
+
+### Get product by ID
+GET {{baseUrl}}/products/{{productId}}
+Accept: application/json
+
+### Create product
+POST {{baseUrl}}/products
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "New Product",
+  "description": "Description for new product",
+  "costPrice": 10.50,
+  "salePrice": 19.99,
+  "category": {
+    "id": {{categoryIdForProduct}}
+  },
+  "active": true
+}
+
+### Update product
+# @prompt Ensure you have a valid product ID set in @productId
+# @prompt Ensure the category ID exists
+PUT {{baseUrl}}/products/{{productId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Updated Product Name",
+  "description": "Updated product description",
+  "costPrice": 12.00,
+  "salePrice": 24.99,
+  "category": {
+    "id": {{categoryIdForProduct}}
+  },
+  "active": false
+}
+
+### Delete product
+# @prompt Ensure you have a valid product ID set in @productId
+DELETE {{baseUrl}}/products/{{productId}}
+Accept: application/json 
