@@ -50,9 +50,6 @@ public class Product {
   @Column(name = "sale_price", nullable = false)
   private BigDecimal salePrice;
 
-  @Column(name = "image_url")
-  private String imageUrl;
-
   @ManyToOne
   @JoinColumn(name = "category_id")
   private Category category;
