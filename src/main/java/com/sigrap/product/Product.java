@@ -54,8 +54,6 @@ public class Product {
   @JoinColumn(name = "category_id")
   private Category category;
 
-  private boolean active = true;
-
   @CreationTimestamp
   @Column(name = "created_at", updatable = false)
   private LocalDateTime createdAt;

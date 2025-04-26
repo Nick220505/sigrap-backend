@@ -75,7 +75,6 @@ public class DataSeeder implements CommandLineRunner {
       p1.setCostPrice(new BigDecimal("1.50"));
       p1.setSalePrice(new BigDecimal("2.50"));
       p1.setCategory(categories.get(0));
-      p1.setActive(true);
 
       Product p2 = new Product();
       p2.setName("Lápiz HB");
@@ -83,7 +82,6 @@ public class DataSeeder implements CommandLineRunner {
       p2.setCostPrice(new BigDecimal("0.30"));
       p2.setSalePrice(new BigDecimal("0.70"));
       p2.setCategory(categories.get(0));
-      p2.setActive(true);
 
       Product p3 = new Product();
       p3.setName("Grapadora");
@@ -91,7 +89,6 @@ public class DataSeeder implements CommandLineRunner {
       p3.setCostPrice(new BigDecimal("3.50"));
       p3.setSalePrice(new BigDecimal("6.99"));
       p3.setCategory(categories.get(1));
-      p3.setActive(true);
 
       Product p4 = new Product();
       p4.setName("Perforadora");
@@ -99,7 +96,6 @@ public class DataSeeder implements CommandLineRunner {
       p4.setCostPrice(new BigDecimal("4.20"));
       p4.setSalePrice(new BigDecimal("7.50"));
       p4.setCategory(categories.get(1));
-      p4.setActive(true);
 
       Product p5 = new Product();
       p5.setName("Papel Bond A4");
@@ -107,7 +103,6 @@ public class DataSeeder implements CommandLineRunner {
       p5.setCostPrice(new BigDecimal("3.80"));
       p5.setSalePrice(new BigDecimal("5.50"));
       p5.setCategory(categories.get(2));
-      p5.setActive(true);
 
       productRepository.saveAll(List.of(p1, p2, p3, p4, p5));
       log.info("Products seeded.");

@@ -42,7 +42,6 @@ public class ProductService {
     product.setDescription(productDetails.getDescription());
     product.setCostPrice(productDetails.getCostPrice());
     product.setSalePrice(productDetails.getSalePrice());
-    product.setActive(productDetails.isActive());
 
     if (productDetails.getCategory() != null && productDetails.getCategory().getId() != null) {
       product.setCategory(categoryService.getById(productDetails.getCategory().getId()));
