@@ -57,4 +57,14 @@ public class ProductService {
     var product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     productRepository.delete(product);
   }
+
+  @Transactional
+  public void deleteMany(List<Integer> ids) {
+    ids.forEach(id -> {
+      if (!productRepository.existsById(id)) {
+        throw new EntityNotFoundException("Product with id " + id + " not found");
+      }
+    });
+    productRepository.deleteAllById(ids);
+  }
 }

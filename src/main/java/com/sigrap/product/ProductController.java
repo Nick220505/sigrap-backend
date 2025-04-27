@@ -49,4 +49,10 @@ public class ProductController {
   public void delete(@PathVariable Integer id) {
     productService.delete(id);
   }
+
+  @DeleteMapping("/delete-many")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteMany(@RequestBody List<Integer> ids) {
+    productService.deleteMany(ids);
+  }
 }
