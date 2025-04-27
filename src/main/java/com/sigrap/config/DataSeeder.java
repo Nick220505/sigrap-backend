@@ -32,27 +32,27 @@ public class DataSeeder implements CommandLineRunner {
     if (categoryRepository.count() == 0) {
       log.info("Seeding categories...");
 
-      Category cat1 = new Category();
-      cat1.setName("Útiles Escolares");
-      cat1.setDescription("Artículos para estudiantes y actividades escolares.");
+      var c1 = new Category();
+      c1.setName("Útiles Escolares");
+      c1.setDescription("Artículos para estudiantes y actividades escolares.");
 
-      Category cat2 = new Category();
-      cat2.setName("Artículos de Oficina");
-      cat2.setDescription("Suministros básicos para el trabajo de oficina.");
+      var c2 = new Category();
+      c2.setName("Artículos de Oficina");
+      c2.setDescription("Suministros básicos para el trabajo de oficina.");
 
-      Category cat3 = new Category();
-      cat3.setName("Papelería General");
-      cat3.setDescription("Papeles, sobres, cuadernos y otros artículos de papel.");
+      var c3 = new Category();
+      c3.setName("Papelería General");
+      c3.setDescription("Papeles, sobres, cuadernos y otros artículos de papel.");
 
-      Category cat4 = new Category();
-      cat4.setName("Regalos y Detalles");
-      cat4.setDescription("Artículos para regalo, tarjetas y empaques.");
+      var c4 = new Category();
+      c4.setName("Regalos y Detalles");
+      c4.setDescription("Artículos para regalo, tarjetas y empaques.");
 
-      Category cat5 = new Category();
-      cat5.setName("Tecnología Básica");
-      cat5.setDescription("Accesorios de computación básicos y almacenamiento.");
+      var c5 = new Category();
+      c5.setName("Tecnología Básica");
+      c5.setDescription("Accesorios de computación básicos y almacenamiento.");
 
-      categoryRepository.saveAll(List.of(cat1, cat2, cat3, cat4, cat5));
+      categoryRepository.saveAll(List.of(c1, c2, c3, c4, c5));
       log.info("Categories seeded.");
     } else {
       log.info("Categories already exist, skipping seeding.");
@@ -69,35 +69,35 @@ public class DataSeeder implements CommandLineRunner {
         return;
       }
 
-      Product p1 = new Product();
+      var p1 = new Product();
       p1.setName("Cuaderno Universitario");
       p1.setDescription("Cuaderno universitario de 100 hojas, cuadriculado");
       p1.setCostPrice(new BigDecimal("1.50"));
       p1.setSalePrice(new BigDecimal("2.50"));
       p1.setCategory(categories.get(0));
 
-      Product p2 = new Product();
+      var p2 = new Product();
       p2.setName("Lápiz HB");
       p2.setDescription("Lápiz grafito HB, cuerpo hexagonal");
       p2.setCostPrice(new BigDecimal("0.30"));
       p2.setSalePrice(new BigDecimal("0.70"));
       p2.setCategory(categories.get(0));
 
-      Product p3 = new Product();
+      var p3 = new Product();
       p3.setName("Grapadora");
       p3.setDescription("Grapadora metálica de escritorio");
       p3.setCostPrice(new BigDecimal("3.50"));
       p3.setSalePrice(new BigDecimal("6.99"));
       p3.setCategory(categories.get(1));
 
-      Product p4 = new Product();
+      var p4 = new Product();
       p4.setName("Perforadora");
       p4.setDescription("Perforadora de papel de 2 huecos");
       p4.setCostPrice(new BigDecimal("4.20"));
       p4.setSalePrice(new BigDecimal("7.50"));
       p4.setCategory(categories.get(1));
 
-      Product p5 = new Product();
+      var p5 = new Product();
       p5.setName("Papel Bond A4");
       p5.setDescription("Resma de papel bond A4, 75g, 500 hojas");
       p5.setCostPrice(new BigDecimal("3.80"));
