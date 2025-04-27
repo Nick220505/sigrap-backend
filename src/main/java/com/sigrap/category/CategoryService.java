@@ -45,11 +45,11 @@ public class CategoryService {
 
     @Transactional
     public void deleteMany(List<Integer> ids) {
-        for (Integer id : ids) {
+        ids.forEach(id -> {
             if (!categoryRepository.existsById(id)) {
                 throw new EntityNotFoundException("Category with id " + id + " not found");
             }
-        }
+        });
         categoryRepository.deleteAllById(ids);
     }
 }
