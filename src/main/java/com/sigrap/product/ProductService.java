@@ -18,19 +18,19 @@ public class ProductService {
   private final CategoryService categoryService;
 
   @Transactional(readOnly = true)
-  public List<Product> getAll() {
+  public List<Product> findAll() {
     return productRepository.findAll();
   }
 
   @Transactional(readOnly = true)
-  public Product getById(Integer id) {
+  public Product findById(Integer id) {
     return productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
   }
 
   @Transactional
   public Product create(Product product) {
     if (product.getCategory() != null && product.getCategory().getId() != null) {
-      product.setCategory(categoryService.getById(product.getCategory().getId()));
+      product.setCategory(categoryService.findById(product.getCategory().getId()));
     }
     return productRepository.save(product);
   }
@@ -44,7 +44,7 @@ public class ProductService {
     product.setSalePrice(productDetails.getSalePrice());
 
     if (productDetails.getCategory() != null && productDetails.getCategory().getId() != null) {
-      product.setCategory(categoryService.getById(productDetails.getCategory().getId()));
+      product.setCategory(categoryService.findById(productDetails.getCategory().getId()));
     } else {
       product.setCategory(null);
     }
@@ -59,7 +59,7 @@ public class ProductService {
   }
 
   @Transactional
-  public void deleteMany(List<Integer> ids) {
+  public void deleteAllById(List<Integer> ids) {
     ids.forEach(id -> {
       if (!productRepository.existsById(id)) {
         throw new EntityNotFoundException("Product with id " + id + " not found");

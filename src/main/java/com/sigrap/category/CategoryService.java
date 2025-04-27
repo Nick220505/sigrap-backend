@@ -15,12 +15,12 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public List<Category> getAll() {
+    public List<Category> findAll() {
         return categoryRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public Category getById(Integer id) {
+    public Category findById(Integer id) {
         return categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
@@ -44,7 +44,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public void deleteMany(List<Integer> ids) {
+    public void deleteAllById(List<Integer> ids) {
         ids.forEach(id -> {
             if (!categoryRepository.existsById(id)) {
                 throw new EntityNotFoundException("Category with id " + id + " not found");

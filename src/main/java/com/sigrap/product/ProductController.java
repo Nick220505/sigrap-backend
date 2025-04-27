@@ -24,13 +24,13 @@ public class ProductController {
   private final ProductService productService;
 
   @GetMapping
-  public List<Product> getAll() {
-    return productService.getAll();
+  public List<Product> findAll() {
+    return productService.findAll();
   }
 
   @GetMapping("/{id}")
-  public Product getById(@PathVariable Integer id) {
-    return productService.getById(id);
+  public Product findById(@PathVariable Integer id) {
+    return productService.findById(id);
   }
 
   @PostMapping
@@ -52,7 +52,7 @@ public class ProductController {
 
   @DeleteMapping("/delete-many")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteMany(@RequestBody List<Integer> ids) {
-    productService.deleteMany(ids);
+  public void deleteAllById(@RequestBody List<Integer> ids) {
+    productService.deleteAllById(ids);
   }
 }

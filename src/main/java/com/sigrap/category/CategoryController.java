@@ -24,13 +24,13 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<Category> getAll() {
-        return categoryService.getAll();
+    public List<Category> findAll() {
+        return categoryService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Category getById(@PathVariable Integer id) {
-        return categoryService.getById(id);
+    public Category findById(@PathVariable Integer id) {
+        return categoryService.findById(id);
     }
 
     @PostMapping
@@ -52,7 +52,7 @@ public class CategoryController {
 
     @DeleteMapping("/delete-many")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMany(@RequestBody List<Integer> ids) {
-        categoryService.deleteMany(ids);
+    public void deleteAllById(@RequestBody List<Integer> ids) {
+        categoryService.deleteAllById(ids);
     }
 }
