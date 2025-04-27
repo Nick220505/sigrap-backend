@@ -49,4 +49,10 @@ public class CategoryController {
     public void delete(@PathVariable Integer id) {
         categoryService.delete(id);
     }
+
+    @DeleteMapping("/delete-many")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMany(@RequestBody List<Integer> ids) {
+        categoryService.deleteMany(ids);
+    }
 }

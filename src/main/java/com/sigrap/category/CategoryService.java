@@ -42,4 +42,14 @@ public class CategoryService {
         var category = categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         categoryRepository.delete(category);
     }
+
+    @Transactional
+    public void deleteMany(List<Integer> ids) {
+        for (Integer id : ids) {
+            if (!categoryRepository.existsById(id)) {
+                throw new EntityNotFoundException("Category with id " + id + " not found");
+            }
+        }
+        categoryRepository.deleteAllById(ids);
+    }
 }
