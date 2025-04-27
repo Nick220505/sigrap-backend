@@ -72,36 +72,36 @@ public class DataSeeder implements CommandLineRunner {
       var p1 = new Product();
       p1.setName("Cuaderno Universitario");
       p1.setDescription("Cuaderno universitario de 100 hojas, cuadriculado");
-      p1.setCostPrice(new BigDecimal("1.50"));
-      p1.setSalePrice(new BigDecimal("2.50"));
+      p1.setCostPrice(new BigDecimal("3000"));
+      p1.setSalePrice(new BigDecimal("5000"));
       p1.setCategory(categories.get(0));
 
       var p2 = new Product();
       p2.setName("Lápiz HB");
       p2.setDescription("Lápiz grafito HB, cuerpo hexagonal");
-      p2.setCostPrice(new BigDecimal("0.30"));
-      p2.setSalePrice(new BigDecimal("0.70"));
+      p2.setCostPrice(new BigDecimal("500"));
+      p2.setSalePrice(new BigDecimal("1000"));
       p2.setCategory(categories.get(0));
 
       var p3 = new Product();
       p3.setName("Grapadora");
       p3.setDescription("Grapadora metálica de escritorio");
-      p3.setCostPrice(new BigDecimal("3.50"));
-      p3.setSalePrice(new BigDecimal("6.99"));
+      p3.setCostPrice(new BigDecimal("8000"));
+      p3.setSalePrice(new BigDecimal("15000"));
       p3.setCategory(categories.get(1));
 
       var p4 = new Product();
       p4.setName("Perforadora");
       p4.setDescription("Perforadora de papel de 2 huecos");
-      p4.setCostPrice(new BigDecimal("4.20"));
-      p4.setSalePrice(new BigDecimal("7.50"));
+      p4.setCostPrice(new BigDecimal("10000"));
+      p4.setSalePrice(new BigDecimal("18000"));
       p4.setCategory(categories.get(1));
 
       var p5 = new Product();
       p5.setName("Papel Bond A4");
       p5.setDescription("Resma de papel bond A4, 75g, 500 hojas");
-      p5.setCostPrice(new BigDecimal("3.80"));
-      p5.setSalePrice(new BigDecimal("5.50"));
+      p5.setCostPrice(new BigDecimal("12000"));
+      p5.setSalePrice(new BigDecimal("20000"));
       p5.setCategory(categories.get(2));
 
       productRepository.saveAll(List.of(p1, p2, p3, p4, p5));
