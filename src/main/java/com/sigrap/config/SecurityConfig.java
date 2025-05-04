@@ -2,6 +2,8 @@ package com.sigrap.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -29,15 +31,42 @@ public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthFilter;
   private final UserDetailsService userDetailsService;
+  private final Environment environment;
+
+  private static final String[] SWAGGER_WHITELIST = {
+      "/swagger-ui.html",
+      "/swagger-ui/**",
+      "/api-docs/**",
+      "/api-docs",
+      "/v3/api-docs/**",
+      "/swagger-resources/**",
+      "/webjars/**"
+  };
+
+  private static final String[] PUBLIC_ENDPOINTS = {
+      "/api/auth/**",
+      "/h2-console/**",
+      "/actuator/**",
+      "/error"
+  };
 
   @Bean
   SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
     return http
         .cors(cors -> cors.configurationSource(corsConfigurationSource))
         .csrf(AbstractHttpConfigurer::disable)
-        .authorizeHttpRequests(authz -> authz
-            .requestMatchers("/api/auth/**", "/h2-console/**", "/actuator/**", "/error").permitAll()
-            .anyRequest().authenticated())
+        .authorizeHttpRequests(authz -> {
+          authz.requestMatchers(PUBLIC_ENDPOINTS).permitAll();
+          authz.requestMatchers(SWAGGER_WHITELIST).permitAll();
+
+          if (environment.acceptsProfiles(Profiles.of("dev", "test", "default"))) {
+            authz.requestMatchers("/api/**").permitAll();
+          } else {
+            authz.requestMatchers("/api/**").authenticated();
+          }
+
+          authz.anyRequest().authenticated();
+        })
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
@@ -51,7 +80,7 @@ public class SecurityConfig {
 
   @Bean
   AuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    var authProvider = new DaoAuthenticationProvider();
     authProvider.setUserDetailsService(userDetailsService);
     authProvider.setPasswordEncoder(passwordEncoder());
     return authProvider;
