@@ -55,11 +55,12 @@ public class SecurityConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(authz -> {
           authz.requestMatchers(PUBLIC_ENDPOINTS).permitAll();
-          authz.requestMatchers(SWAGGER_WHITELIST).permitAll();
 
           if (environment.acceptsProfiles(Profiles.of("dev", "local"))) {
+            authz.requestMatchers(SWAGGER_WHITELIST).permitAll();
             authz.requestMatchers("/api/**").permitAll();
           } else {
+            authz.requestMatchers(SWAGGER_WHITELIST).authenticated();
             authz.requestMatchers("/api/**").authenticated();
           }
 
