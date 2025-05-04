@@ -23,7 +23,7 @@ public class AuthService {
   private final AuthenticationManager authenticationManager;
   private final UserService userService;
 
-  public AuthenticationResponse register(RegisterRequest request) {
+  public AuthResponse register(RegisterRequest request) {
     if (userRepository.existsByEmail(request.getEmail())) {
       throw new IllegalArgumentException("Email already exists");
     }
@@ -39,14 +39,14 @@ public class AuthService {
     UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
     String jwt = jwtUtil.generateToken(userDetails);
 
-    return AuthenticationResponse.builder()
+    return AuthResponse.builder()
         .token(jwt)
         .email(user.getEmail())
         .name(user.getName())
         .build();
   }
 
-  public AuthenticationResponse authenticate(AuthenticationRequest request) {
+  public AuthResponse authenticate(AuthRequest request) {
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
@@ -56,7 +56,7 @@ public class AuthService {
     UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
     String jwt = jwtUtil.generateToken(userDetails);
 
-    return AuthenticationResponse.builder()
+    return AuthResponse.builder()
         .token(jwt)
         .email(user.getEmail())
         .name(user.getName())
