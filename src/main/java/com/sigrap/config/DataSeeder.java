@@ -121,7 +121,7 @@ public class DataSeeder implements CommandLineRunner {
     if (userRepository.count() == 0) {
       log.info("Seeding users...");
 
-      User adminUser = User.builder()
+      var adminUser = User.builder()
           .name("Admin")
           .email("admin@sigrap.com")
           .password(passwordEncoder.encode("Admin123!"))
