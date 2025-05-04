@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<Map<String, Object>> handleBadCredentialsException(BadCredentialsException ex) {
-    return createErrorResponse(HttpStatus.UNAUTHORIZED, "Credenciales inválidas");
+    return createErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid credentials");
   }
 
   @ExceptionHandler(Exception.class)
