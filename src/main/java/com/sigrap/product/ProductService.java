@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sigrap.category.CategoryService;
+import com.sigrap.category.CategoryRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -15,41 +15,51 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
 
   private final ProductRepository productRepository;
-  private final CategoryService categoryService;
+  private final CategoryRepository categoryRepository;
+  private final ProductMapper productMapper;
 
   @Transactional(readOnly = true)
-  public List<Product> findAll() {
-    return productRepository.findAll();
+  public List<ProductInfo> findAll() {
+    return productRepository.findAll().stream()
+        .map(productMapper::toInfo)
+        .toList();
   }
 
   @Transactional(readOnly = true)
-  public Product findById(Integer id) {
-    return productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-  }
-
-  @Transactional
-  public Product create(Product product) {
-    if (product.getCategory() != null && product.getCategory().getId() != null) {
-      product.setCategory(categoryService.findById(product.getCategory().getId()));
-    }
-    return productRepository.save(product);
-  }
-
-  @Transactional
-  public Product update(Integer id, Product productDetails) {
+  public ProductInfo findById(Integer id) {
     var product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-    product.setName(productDetails.getName());
-    product.setDescription(productDetails.getDescription());
-    product.setCostPrice(productDetails.getCostPrice());
-    product.setSalePrice(productDetails.getSalePrice());
+    return productMapper.toInfo(product);
+  }
 
-    if (productDetails.getCategory() != null && productDetails.getCategory().getId() != null) {
-      product.setCategory(categoryService.findById(productDetails.getCategory().getId()));
+  @Transactional
+  public ProductInfo create(ProductData productData) {
+    var product = productMapper.toEntity(productData);
+
+    if (productData.getCategoryId() != null) {
+      var category = categoryRepository.findById(productData.getCategoryId())
+          .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+      product.setCategory(category);
+    }
+
+    var savedProduct = productRepository.save(product);
+    return productMapper.toInfo(savedProduct);
+  }
+
+  @Transactional
+  public ProductInfo update(Integer id, ProductData productData) {
+    var product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    productMapper.updateEntityFromData(productData, product);
+
+    if (productData.getCategoryId() != null) {
+      var category = categoryRepository.findById(productData.getCategoryId())
+          .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+      product.setCategory(category);
     } else {
       product.setCategory(null);
     }
 
-    return productRepository.save(product);
+    var updatedProduct = productRepository.save(product);
+    return productMapper.toInfo(updatedProduct);
   }
 
   @Transactional

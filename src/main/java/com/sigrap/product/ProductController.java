@@ -24,24 +24,24 @@ public class ProductController {
   private final ProductService productService;
 
   @GetMapping
-  public List<Product> findAll() {
+  public List<ProductInfo> findAll() {
     return productService.findAll();
   }
 
   @GetMapping("/{id}")
-  public Product findById(@PathVariable Integer id) {
+  public ProductInfo findById(@PathVariable Integer id) {
     return productService.findById(id);
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public Product create(@Valid @RequestBody Product product) {
-    return productService.create(product);
+  public ProductInfo create(@Valid @RequestBody ProductData productData) {
+    return productService.create(productData);
   }
 
   @PutMapping("/{id}")
-  public Product update(@PathVariable Integer id, @Valid @RequestBody Product productDetails) {
-    return productService.update(id, productDetails);
+  public ProductInfo update(@PathVariable Integer id, @Valid @RequestBody ProductData productData) {
+    return productService.update(id, productData);
   }
 
   @DeleteMapping("/{id}")

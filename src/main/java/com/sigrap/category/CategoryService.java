@@ -13,28 +13,34 @@ import lombok.RequiredArgsConstructor;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
     @Transactional(readOnly = true)
-    public List<Category> findAll() {
-        return categoryRepository.findAll();
+    public List<CategoryInfo> findAll() {
+        return categoryRepository.findAll().stream()
+                .map(categoryMapper::toInfo)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public Category findById(Integer id) {
-        return categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-    }
-
-    @Transactional
-    public Category create(Category category) {
-        return categoryRepository.save(category);
-    }
-
-    @Transactional
-    public Category update(Integer id, Category categoryDetails) {
+    public CategoryInfo findById(Integer id) {
         var category = categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        category.setName(categoryDetails.getName());
-        category.setDescription(categoryDetails.getDescription());
-        return categoryRepository.save(category);
+        return categoryMapper.toInfo(category);
+    }
+
+    @Transactional
+    public CategoryInfo create(CategoryData categoryData) {
+        var category = categoryMapper.toEntity(categoryData);
+        var savedCategory = categoryRepository.save(category);
+        return categoryMapper.toInfo(savedCategory);
+    }
+
+    @Transactional
+    public CategoryInfo update(Integer id, CategoryData categoryData) {
+        var category = categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        categoryMapper.updateEntityFromData(categoryData, category);
+        var updatedCategory = categoryRepository.save(category);
+        return categoryMapper.toInfo(updatedCategory);
     }
 
     @Transactional

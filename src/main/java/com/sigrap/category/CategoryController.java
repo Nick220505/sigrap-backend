@@ -24,24 +24,24 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<Category> findAll() {
+    public List<CategoryInfo> findAll() {
         return categoryService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Category findById(@PathVariable Integer id) {
+    public CategoryInfo findById(@PathVariable Integer id) {
         return categoryService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Category create(@Valid @RequestBody Category category) {
-        return categoryService.create(category);
+    public CategoryInfo create(@Valid @RequestBody CategoryData categoryData) {
+        return categoryService.create(categoryData);
     }
 
     @PutMapping("/{id}")
-    public Category update(@PathVariable Integer id, @Valid @RequestBody Category categoryDetails) {
-        return categoryService.update(id, categoryDetails);
+    public CategoryInfo update(@PathVariable Integer id, @Valid @RequestBody CategoryData categoryData) {
+        return categoryService.update(id, categoryData);
     }
 
     @DeleteMapping("/{id}")
