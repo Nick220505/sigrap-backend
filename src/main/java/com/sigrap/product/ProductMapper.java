@@ -6,23 +6,21 @@ import org.mapstruct.MappingTarget;
 
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryMapper;
+import com.sigrap.common.mapping.DataToEntity;
+import com.sigrap.common.mapping.EntityToInfo;
 
 @Mapper(componentModel = "spring", uses = CategoryMapper.class)
 public interface ProductMapper {
 
-  @Mapping(target = "category", source = "category")
+  @EntityToInfo
   ProductInfo toInfo(Product product);
 
-  @Mapping(target = "id", ignore = true)
+  @DataToEntity
   @Mapping(target = "category", ignore = true)
-  @Mapping(target = "createdAt", ignore = true)
-  @Mapping(target = "updatedAt", ignore = true)
   Product toEntity(ProductData productData);
 
-  @Mapping(target = "id", ignore = true)
+  @DataToEntity
   @Mapping(target = "category", ignore = true)
-  @Mapping(target = "createdAt", ignore = true)
-  @Mapping(target = "updatedAt", ignore = true)
   void updateEntityFromData(ProductData productData, @MappingTarget Product product);
 
   default Category mapCategory(Integer categoryId) {

@@ -1,24 +1,20 @@
 package com.sigrap.category;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+
+import com.sigrap.common.mapping.DataToEntity;
+import com.sigrap.common.mapping.EntityToInfo;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
 
-  @Mapping(target = "id", source = "id")
-  @Mapping(target = "createdAt", source = "createdAt")
-  @Mapping(target = "updatedAt", source = "updatedAt")
+  @EntityToInfo
   CategoryInfo toInfo(Category category);
 
-  @Mapping(target = "id", ignore = true)
-  @Mapping(target = "createdAt", ignore = true)
-  @Mapping(target = "updatedAt", ignore = true)
+  @DataToEntity
   Category toEntity(CategoryData categoryData);
 
-  @Mapping(target = "id", ignore = true)
-  @Mapping(target = "createdAt", ignore = true)
-  @Mapping(target = "updatedAt", ignore = true)
+  @DataToEntity
   void updateEntityFromData(CategoryData categoryData, @MappingTarget Category category);
 }
