@@ -61,7 +61,7 @@ public class SecurityConfig {
           authz.requestMatchers(PUBLIC_ENDPOINTS).permitAll();
           authz.requestMatchers(SWAGGER_WHITELIST).permitAll();
 
-          if (environment.acceptsProfiles(Profiles.of("dev", "local", "default"))) {
+          if (environment.acceptsProfiles(Profiles.of("dev", "local"))) {
             authz.requestMatchers("/api/**").permitAll();
           } else {
             authz.requestMatchers("/api/**").authenticated();
