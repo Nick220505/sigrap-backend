@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk-jammy AS dev
+FROM bellsoft/liberica-openjdk-debian:24 AS dev
 
 WORKDIR /usr/src/app
 
