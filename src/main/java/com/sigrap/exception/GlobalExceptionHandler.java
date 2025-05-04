@@ -49,6 +49,14 @@ public class GlobalExceptionHandler {
     return createErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid credentials");
   }
 
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
+    if (ex.getMessage().contains("Email already exists")) {
+      return createErrorResponse(HttpStatus.CONFLICT, "Email already exists");
+    }
+    return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+  }
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
     return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
