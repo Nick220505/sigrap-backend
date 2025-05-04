@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
+import com.sigrap.user.UserService;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class AuthService {
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
   private final AuthenticationManager authenticationManager;
-  private final UserDetailsServiceImpl userDetailsService;
+  private final UserService userService;
 
   public AuthenticationResponse register(RegisterRequest request) {
     if (userRepository.existsByEmail(request.getEmail())) {
@@ -35,7 +36,7 @@ public class AuthService {
 
     userRepository.save(user);
 
-    UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+    UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
     String jwt = jwtUtil.generateToken(userDetails);
 
     return AuthenticationResponse.builder()
@@ -52,7 +53,7 @@ public class AuthService {
     User user = userRepository.findByEmail(request.getEmail())
         .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-    UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+    UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
     String jwt = jwtUtil.generateToken(userDetails);
 
     return AuthenticationResponse.builder()

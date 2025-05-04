@@ -6,10 +6,11 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.sigrap.user.UserService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtUtil jwtUtil;
-  private final UserDetailsService userDetailsService;
+  private final UserService userService;
 
   @Override
   protected void doFilterInternal(
@@ -40,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final String userEmail = jwtUtil.extractUsername(jwt);
 
     if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-      UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+      UserDetails userDetails = this.userService.loadUserByUsername(userEmail);
 
       if (Boolean.TRUE.equals(jwtUtil.validateToken(jwt, userDetails))) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
