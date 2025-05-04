@@ -17,7 +17,7 @@ public class WebConfig implements WebMvcConfigurer {
 
   @Override
   public void addViewControllers(@NonNull ViewControllerRegistry registry) {
-    if (environment.acceptsProfiles(Profiles.of("dev", "test", "default"))) {
+    if (environment.acceptsProfiles(Profiles.of("dev", "local", "default"))) {
       registry.addRedirectViewController("/", "/swagger-ui.html");
     } else {
       registry.addViewController("/").setViewName("forward:/api/status");
