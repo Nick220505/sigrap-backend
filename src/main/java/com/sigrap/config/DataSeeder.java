@@ -471,7 +471,7 @@ public class DataSeeder implements CommandLineRunner {
 
       var adminUser = User.builder()
           .name("Rosita González")
-          .email("admin@sigrap.com")
+          .email("rosita@sigrap.com")
           .password(passwordEncoder.encode("Rosita123*"))
           .build();
 
