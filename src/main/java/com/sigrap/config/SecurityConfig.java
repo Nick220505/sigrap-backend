@@ -29,6 +29,15 @@ public class SecurityConfig {
   private final JwtAuthenticationFilter jwtAuthFilter;
   private final Environment environment;
 
+  private static final String[] PUBLIC_ENDPOINTS = {
+      "/",
+      "/api/auth/**",
+      "/h2-console/**",
+      "/actuator/**",
+      "/api/status",
+      "/error"
+  };
+
   private static final String[] SWAGGER_WHITELIST = {
       "/swagger-ui.html",
       "/swagger-ui/**",
@@ -37,15 +46,6 @@ public class SecurityConfig {
       "/v3/api-docs/**",
       "/swagger-resources/**",
       "/webjars/**"
-  };
-
-  private static final String[] PUBLIC_ENDPOINTS = {
-      "/",
-      "/api/auth/**",
-      "/h2-console/**",
-      "/actuator/**",
-      "/api/status",
-      "/error"
   };
 
   @Bean
