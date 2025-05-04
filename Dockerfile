@@ -9,7 +9,7 @@ RUN ./mvnw dependency:go-offline -B
 
 COPY src ./src
 
-RUN apt-get update && apt-get install -y wget curl
+RUN apt-get update && apt-get install -y wget curl && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 8080
 EXPOSE 5005
