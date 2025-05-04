@@ -15,7 +15,6 @@ public class CorsConfig {
   CorsConfigurationSource corsConfigurationSource(Environment environment) {
     CorsConfiguration config = new CorsConfiguration();
 
-    // Set allowed origins based on active profile
     if (environment.acceptsProfiles(Profiles.of("prod"))) {
       config.addAllowedOrigin("https://sigrap.vercel.app");
     } else {
