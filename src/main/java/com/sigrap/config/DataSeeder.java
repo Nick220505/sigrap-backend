@@ -4,12 +4,15 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
 import com.sigrap.product.Product;
 import com.sigrap.product.ProductRepository;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +24,14 @@ public class DataSeeder implements CommandLineRunner {
 
   private final CategoryRepository categoryRepository;
   private final ProductRepository productRepository;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   public void run(String... args) throws Exception {
     seedCategories();
     seedProducts();
+    seedUsers();
   }
 
   private void seedCategories() {
@@ -108,6 +114,23 @@ public class DataSeeder implements CommandLineRunner {
       log.info("Products seeded.");
     } else {
       log.info("Products already exist, skipping seeding.");
+    }
+  }
+
+  private void seedUsers() {
+    if (userRepository.count() == 0) {
+      log.info("Seeding users...");
+
+      User adminUser = User.builder()
+          .name("Admin")
+          .email("admin@sigrap.com")
+          .password(passwordEncoder.encode("Admin123!"))
+          .build();
+
+      userRepository.save(adminUser);
+      log.info("Users seeded.");
+    } else {
+      log.info("Users already exist, skipping seeding.");
     }
   }
 }
