@@ -11,7 +11,7 @@ COPY src ./src
 
 RUN ./mvnw package -DskipTests -Pprod
 
-FROM bellsoft/liberica-openjdk-debian:24-runtime AS production
+FROM bellsoft/liberica-openjdk-debian:24 AS production
 
 WORKDIR /app
 
