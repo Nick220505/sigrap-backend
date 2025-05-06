@@ -95,6 +95,29 @@ class JwtUtilTest {
   }
 
   @Test
+  void validateToken_shouldReturnFalse_forExpiredToken() {
+    String token = jwtUtil.generateToken(userDetails);
+
+    JwtUtil expiredTokenJwtUtil = new JwtUtil() {
+      @Override
+      public Date extractExpiration(String t) {
+        return new Date(System.currentTimeMillis() - 10000L);
+      }
+
+      @Override
+      public String extractUsername(String t) {
+        return userDetails.getUsername();
+      }
+    };
+
+    ReflectionTestUtils.setField(expiredTokenJwtUtil, "secret", "testSecretKey123456789012345678901234567890");
+
+    boolean isValid = expiredTokenJwtUtil.validateToken(token, userDetails);
+
+    assertThat(isValid).isFalse();
+  }
+
+  @Test
   void extractAllClaims_shouldThrowException_forExpiredToken() {
     ReflectionTestUtils.setField(jwtUtil, "expiration", -10000L);
     String expiredToken = jwtUtil.generateToken(userDetails);
@@ -121,6 +144,24 @@ class JwtUtilTest {
     Boolean result = (Boolean) ReflectionTestUtils.invokeMethod(spyJwtUtil, "isTokenExpired", "dummy-token");
 
     assertThat(result).isTrue();
+  }
+
+  @Test
+  void isTokenExpired_shouldReturnFalse_forValidToken() {
+    Date futureDate = new Date(System.currentTimeMillis() + 3600000L);
+
+    JwtUtil spyJwtUtil = new JwtUtil() {
+      @Override
+      public Date extractExpiration(String token) {
+        return futureDate;
+      }
+    };
+
+    ReflectionTestUtils.setField(spyJwtUtil, "secret", "testSecretKey123456789012345678901234567890");
+
+    Boolean result = (Boolean) ReflectionTestUtils.invokeMethod(spyJwtUtil, "isTokenExpired", "dummy-token");
+
+    assertThat(result).isFalse();
   }
 
   @Test

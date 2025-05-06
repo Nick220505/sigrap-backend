@@ -6,6 +6,7 @@ import java.util.Collections;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,6 +15,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -42,6 +45,9 @@ class JwtAuthenticationFilterTest {
 
   @Mock
   private FilterChain filterChain;
+
+  @Mock
+  private SecurityContext securityContext;
 
   @InjectMocks
   private JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -131,5 +137,23 @@ class JwtAuthenticationFilterTest {
     verify(filterChain, times(1)).doFilter(request, response);
     verify(jwtUtil, times(1)).extractUsername("someToken");
     verify(userService, never()).loadUserByUsername(anyString());
+  }
+
+  @Test
+  void doFilterInternal_shouldNotReauthenticate_whenAlreadyAuthenticated() throws ServletException, IOException {
+    when(request.getHeader("Authorization")).thenReturn("Bearer validToken");
+    when(jwtUtil.extractUsername("validToken")).thenReturn("test@example.com");
+
+    Authentication existingAuth = new UsernamePasswordAuthenticationToken(
+        "test@example.com", null, Collections.emptyList());
+
+    SecurityContextHolder.getContext().setAuthentication(existingAuth);
+
+    jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+
+    verify(filterChain, times(1)).doFilter(request, response);
+    verify(jwtUtil, times(1)).extractUsername("validToken");
+    verify(userService, never()).loadUserByUsername(anyString());
+    verify(jwtUtil, never()).validateToken(anyString(), any(UserDetails.class));
   }
 }
