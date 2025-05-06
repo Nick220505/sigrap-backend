@@ -68,7 +68,6 @@ class GlobalExceptionHandlerTest {
 
     @PostMapping("/test/validation")
     public void validateRequest(@Valid @RequestBody TestDto dto) {
-      // This method will trigger MethodArgumentNotValidException if validation fails
     }
   }
 
