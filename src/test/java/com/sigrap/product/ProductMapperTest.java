@@ -1,9 +1,8 @@
 package com.sigrap.product;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.math.BigDecimal;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,6 +43,34 @@ class ProductMapperTest {
   }
 
   @Test
+  void toInfo_shouldReturnNull_whenProductIsNull() {
+    ProductInfo productInfo = productMapper.toInfo(null);
+
+    assertThat(productInfo).isNull();
+  }
+
+  @Test
+  void toInfo_shouldHandleNullCategory_whenMappingProduct() {
+    Product product = new Product();
+    product.setId(1);
+    product.setName("Test Product");
+    product.setDescription("Test Description");
+    product.setCostPrice(new BigDecimal("10.00"));
+    product.setSalePrice(new BigDecimal("15.00"));
+    product.setCategory(null);
+
+    ProductInfo productInfo = productMapper.toInfo(product);
+
+    assertThat(productInfo).isNotNull();
+    assertThat(productInfo.getId()).isEqualTo(1);
+    assertThat(productInfo.getName()).isEqualTo("Test Product");
+    assertThat(productInfo.getDescription()).isEqualTo("Test Description");
+    assertThat(productInfo.getCostPrice()).isEqualByComparingTo(new BigDecimal("10.00"));
+    assertThat(productInfo.getSalePrice()).isEqualByComparingTo(new BigDecimal("15.00"));
+    assertThat(productInfo.getCategory()).isNull();
+  }
+
+  @Test
   void toEntity_shouldMapDataToEntity() {
     ProductData productData = new ProductData();
     productData.setName("Test Product");
@@ -61,6 +88,13 @@ class ProductMapperTest {
     assertThat(product.getCostPrice()).isEqualByComparingTo(new BigDecimal("10.00"));
     assertThat(product.getSalePrice()).isEqualByComparingTo(new BigDecimal("15.00"));
     assertThat(product.getCategory()).isNull();
+  }
+
+  @Test
+  void toEntity_shouldReturnNull_whenProductDataIsNull() {
+    Product product = productMapper.toEntity(null);
+
+    assertThat(product).isNull();
   }
 
   @Test
@@ -110,6 +144,31 @@ class ProductMapperTest {
     assertThat(product.getDescription()).isNull();
     assertThat(product.getCostPrice()).isEqualByComparingTo(new BigDecimal("20.00"));
     assertThat(product.getSalePrice()).isEqualByComparingTo(new BigDecimal("30.00"));
+  }
+
+  @Test
+  void updateEntityFromData_shouldDoNothing_whenProductDataIsNull() {
+    Product product = new Product();
+    product.setId(1);
+    product.setName("Original Name");
+    product.setDescription("Original Description");
+    product.setCostPrice(new BigDecimal("10.00"));
+    product.setSalePrice(new BigDecimal("15.00"));
+
+    Product originalProduct = new Product();
+    originalProduct.setId(1);
+    originalProduct.setName("Original Name");
+    originalProduct.setDescription("Original Description");
+    originalProduct.setCostPrice(new BigDecimal("10.00"));
+    originalProduct.setSalePrice(new BigDecimal("15.00"));
+
+    productMapper.updateEntityFromData(null, product);
+
+    assertThat(product.getId()).isEqualTo(originalProduct.getId());
+    assertThat(product.getName()).isEqualTo(originalProduct.getName());
+    assertThat(product.getDescription()).isEqualTo(originalProduct.getDescription());
+    assertThat(product.getCostPrice()).isEqualByComparingTo(originalProduct.getCostPrice());
+    assertThat(product.getSalePrice()).isEqualByComparingTo(originalProduct.getSalePrice());
   }
 
   @Test
