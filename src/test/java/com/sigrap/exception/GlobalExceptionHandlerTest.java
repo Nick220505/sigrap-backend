@@ -7,17 +7,31 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
 class GlobalExceptionHandlerTest {
 
   private MockMvc mockMvc;
+
+  @Getter
+  @Setter
+  static class TestDto {
+    @NotBlank(message = "Name cannot be blank")
+    private String name;
+  }
 
   @RestController
   static class TestController {
@@ -50,6 +64,11 @@ class GlobalExceptionHandlerTest {
     @GetMapping("/test/generic-exception")
     public void throwGenericException() {
       throw new RuntimeException("Something went wrong");
+    }
+
+    @PostMapping("/test/validation")
+    public void validateRequest(@Valid @RequestBody TestDto dto) {
+      // This method will trigger MethodArgumentNotValidException if validation fails
     }
   }
 
@@ -124,5 +143,21 @@ class GlobalExceptionHandlerTest {
         .andExpect(jsonPath("$.status").value(500))
         .andExpect(jsonPath("$.error").value("Internal Server Error"))
         .andExpect(jsonPath("$.message").value("Something went wrong"));
+  }
+
+  @Test
+  void handleMethodArgumentNotValidException() throws Exception {
+    String requestJson = "{\"name\":\"\"}";
+
+    mockMvc.perform(post("/test/validation")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(requestJson))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.timestamp").exists())
+        .andExpect(jsonPath("$.status").value(400))
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.message").value("Validation failed"))
+        .andExpect(jsonPath("$.errors").exists())
+        .andExpect(jsonPath("$.errors.name").value("Name cannot be blank"));
   }
 }
