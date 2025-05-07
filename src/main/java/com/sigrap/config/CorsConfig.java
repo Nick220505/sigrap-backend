@@ -16,7 +16,7 @@ public class CorsConfig {
     var config = new CorsConfiguration();
 
     if (environment.acceptsProfiles(Profiles.of("prod"))) {
-      config.addAllowedOrigin("https://sigrap.vercel.app");
+      config.addAllowedOriginPattern("https://*sigrap*.vercel.app");
     } else {
       config.addAllowedOrigin("http://localhost:4200");
     }
