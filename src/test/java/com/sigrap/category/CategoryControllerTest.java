@@ -56,24 +56,35 @@ class CategoryControllerTest {
 
   @Test
   void getAll_shouldReturnAllCategories() throws Exception {
+    Integer id1 = 1;
+    Integer id2 = 2;
     List<CategoryInfo> categories = List.of(
-        createCategoryInfo(1, "Category 1"),
-        createCategoryInfo(2, "Category 2"));
+        new CategoryInfo() {
+          {
+            setId(id1);
+            setName("Category 1");
+          }
+        },
+        new CategoryInfo() {
+          {
+            setId(id2);
+            setName("Category 2");
+          }
+        });
     when(categoryService.findAll()).thenReturn(categories);
 
     mockMvc.perform(get("/api/categories"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[0].id").value(id1))
         .andExpect(jsonPath("$[0].name").value("Category 1"))
-        .andExpect(jsonPath("$[1].id").value(2))
+        .andExpect(jsonPath("$[1].id").value(id2))
         .andExpect(jsonPath("$[1].name").value("Category 2"));
   }
 
   @Test
   void getById_shouldReturnCategory_whenExists() throws Exception {
     Integer id = 1;
-    CategoryInfo category = createCategoryInfo(id, "Test Category");
-    when(categoryService.findById(id)).thenReturn(category);
+    when(categoryService.findById(id)).thenReturn(new CategoryInfo(id, "Test Category", null, null, null));
 
     mockMvc.perform(get("/api/categories/{id}", id))
         .andExpect(status().isOk())
@@ -92,22 +103,26 @@ class CategoryControllerTest {
 
   @Test
   void create_shouldCreateCategory() throws Exception {
-    CategoryData categoryData = new CategoryData();
-    categoryData.setName("New Category");
-    categoryData.setDescription("Test Description");
-
-    CategoryInfo createdCategory = new CategoryInfo();
-    createdCategory.setId(1);
-    createdCategory.setName("New Category");
-    createdCategory.setDescription("Test Description");
-
-    when(categoryService.create(any(CategoryData.class))).thenReturn(createdCategory);
+    Integer id = 1;
+    when(categoryService.create(any(CategoryData.class))).thenReturn(
+        new CategoryInfo() {
+          {
+            setId(id);
+            setName("New Category");
+            setDescription("Test Description");
+          }
+        });
 
     mockMvc.perform(post("/api/categories")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(categoryData)))
+        .content(objectMapper.writeValueAsString(new CategoryData() {
+          {
+            setName("New Category");
+            setDescription("Test Description");
+          }
+        })))
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.id").value(1))
+        .andExpect(jsonPath("$.id").value(id))
         .andExpect(jsonPath("$.name").value("New Category"))
         .andExpect(jsonPath("$.description").value("Test Description"));
 
@@ -117,20 +132,23 @@ class CategoryControllerTest {
   @Test
   void update_shouldUpdateCategory_whenExists() throws Exception {
     Integer id = 1;
-    CategoryData categoryData = new CategoryData();
-    categoryData.setName("Updated Category");
-    categoryData.setDescription("Updated Description");
-
-    CategoryInfo updatedCategory = new CategoryInfo();
-    updatedCategory.setId(id);
-    updatedCategory.setName("Updated Category");
-    updatedCategory.setDescription("Updated Description");
-
-    when(categoryService.update(eq(id), any(CategoryData.class))).thenReturn(updatedCategory);
+    when(categoryService.update(eq(id), any(CategoryData.class))).thenReturn(
+        new CategoryInfo() {
+          {
+            setId(id);
+            setName("Updated Category");
+            setDescription("Updated Description");
+          }
+        });
 
     mockMvc.perform(put("/api/categories/{id}", id)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(categoryData)))
+        .content(objectMapper.writeValueAsString(new CategoryData() {
+          {
+            setName("Updated Category");
+            setDescription("Updated Description");
+          }
+        })))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(id))
         .andExpect(jsonPath("$.name").value("Updated Category"))
@@ -142,14 +160,15 @@ class CategoryControllerTest {
   @Test
   void update_shouldReturnNotFound_whenCategoryDoesNotExist() throws Exception {
     Integer id = 1;
-    CategoryData categoryData = new CategoryData();
-    categoryData.setName("Updated Category");
-
     when(categoryService.update(eq(id), any(CategoryData.class))).thenThrow(new EntityNotFoundException());
 
     mockMvc.perform(put("/api/categories/{id}", id)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(categoryData)))
+        .content(objectMapper.writeValueAsString(new CategoryData() {
+          {
+            setName("Updated Category");
+          }
+        })))
         .andExpect(status().isNotFound());
   }
 
@@ -195,12 +214,5 @@ class CategoryControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ids)))
         .andExpect(status().isNotFound());
-  }
-
-  private CategoryInfo createCategoryInfo(Integer id, String name) {
-    CategoryInfo categoryInfo = new CategoryInfo();
-    categoryInfo.setId(id);
-    categoryInfo.setName(name);
-    return categoryInfo;
   }
 }
