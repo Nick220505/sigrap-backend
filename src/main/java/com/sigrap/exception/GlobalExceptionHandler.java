@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
 
 @RestControllerAdvice
@@ -47,6 +48,13 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<Map<String, Object>> handleBadCredentialsException(BadCredentialsException ex) {
     return createErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+  }
+
+  @ExceptionHandler(ExpiredJwtException.class)
+  public ResponseEntity<Map<String, Object>> handleExpiredJwtException(ExpiredJwtException ex) {
+    Map<String, Object> errorResponse = createErrorMap(HttpStatus.UNAUTHORIZED, "Token has expired");
+    errorResponse.put("code", "TOKEN_EXPIRED");
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
