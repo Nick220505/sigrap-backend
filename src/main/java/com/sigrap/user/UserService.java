@@ -18,7 +18,7 @@ public class UserService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    var user = userRepository.findByEmail(email)
+    com.sigrap.user.User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
     return new User(user.getEmail(), user.getPassword(), new ArrayList<>());

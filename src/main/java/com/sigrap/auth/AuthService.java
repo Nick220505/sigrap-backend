@@ -2,6 +2,7 @@ package com.sigrap.auth;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class AuthService {
       throw new IllegalArgumentException("Email already exists");
     }
 
-    var user = User.builder()
+    User user = User.builder()
         .name(request.getName())
         .email(request.getEmail())
         .password(passwordEncoder.encode(request.getPassword()))
@@ -35,7 +36,7 @@ public class AuthService {
 
     userRepository.save(user);
 
-    var userDetails = userService.loadUserByUsername(user.getEmail());
+    UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
     String jwt = jwtUtil.generateToken(userDetails);
 
     return AuthResponse.builder()
@@ -49,10 +50,10 @@ public class AuthService {
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-    var user = userRepository.findByEmail(request.getEmail())
+    User user = userRepository.findByEmail(request.getEmail())
         .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-    var userDetails = userService.loadUserByUsername(user.getEmail());
+    UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
     String jwt = jwtUtil.generateToken(userDetails);
 
     return AuthResponse.builder()

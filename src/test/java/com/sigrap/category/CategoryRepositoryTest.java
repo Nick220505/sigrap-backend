@@ -1,10 +1,9 @@
 package com.sigrap.category;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -35,10 +34,10 @@ class CategoryRepositoryTest {
     category.setDescription("Test Description");
     Category savedCategory = categoryRepository.save(category);
 
-    Optional<Category> result = categoryRepository.findById(savedCategory.getId());
+    Optional<Category> foundCategory = categoryRepository.findById(savedCategory.getId());
 
-    assertThat(result).isPresent();
-    assertThat(result.get().getName()).isEqualTo("Test Category");
+    assertThat(foundCategory).isPresent();
+    assertThat(foundCategory.get().getName()).isEqualTo("Test Category");
   }
 
   @Test
@@ -67,8 +66,8 @@ class CategoryRepositoryTest {
     Category savedCategory = categoryRepository.save(category);
 
     categoryRepository.deleteById(savedCategory.getId());
-    Optional<Category> result = categoryRepository.findById(savedCategory.getId());
+    Optional<Category> deletedCategory = categoryRepository.findById(savedCategory.getId());
 
-    assertThat(result).isEmpty();
+    assertThat(deletedCategory).isEmpty();
   }
 }

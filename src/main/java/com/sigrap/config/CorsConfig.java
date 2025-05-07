@@ -13,7 +13,7 @@ public class CorsConfig {
 
   @Bean
   CorsConfigurationSource corsConfigurationSource(Environment environment) {
-    var config = new CorsConfiguration();
+    CorsConfiguration config = new CorsConfiguration();
 
     if (environment.acceptsProfiles(Profiles.of("prod"))) {
       config.addAllowedOriginPattern("https://*sigrap*.vercel.app");
@@ -26,7 +26,7 @@ public class CorsConfig {
     config.addAllowedMethod("*");
     config.addExposedHeader("Content-Disposition");
 
-    var source = new UrlBasedCorsConfigurationSource();
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", config);
     return source;
   }

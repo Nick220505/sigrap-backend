@@ -24,28 +24,28 @@ public class CategoryService {
 
     @Transactional(readOnly = true)
     public CategoryInfo findById(Integer id) {
-        var category = categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Category category = categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         return categoryMapper.toInfo(category);
     }
 
     @Transactional
     public CategoryInfo create(CategoryData categoryData) {
-        var category = categoryMapper.toEntity(categoryData);
-        var savedCategory = categoryRepository.save(category);
+        Category category = categoryMapper.toEntity(categoryData);
+        Category savedCategory = categoryRepository.save(category);
         return categoryMapper.toInfo(savedCategory);
     }
 
     @Transactional
     public CategoryInfo update(Integer id, CategoryData categoryData) {
-        var category = categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Category category = categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         categoryMapper.updateEntityFromData(categoryData, category);
-        var updatedCategory = categoryRepository.save(category);
+        Category updatedCategory = categoryRepository.save(category);
         return categoryMapper.toInfo(updatedCategory);
     }
 
     @Transactional
     public void delete(Integer id) {
-        var category = categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Category category = categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         categoryRepository.delete(category);
     }
 
