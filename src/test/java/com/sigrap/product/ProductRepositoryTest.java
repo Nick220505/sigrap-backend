@@ -1,11 +1,10 @@
 package com.sigrap.product;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -42,11 +41,11 @@ class ProductRepositoryTest {
     product.setSalePrice(new BigDecimal("15.00"));
     Product savedProduct = productRepository.save(product);
 
-    Optional<Product> result = productRepository.findById(savedProduct.getId());
+    Optional<Product> foundProduct = productRepository.findById(savedProduct.getId());
 
-    assertThat(result).isPresent();
-    assertThat(result.get().getName()).isEqualTo("Test Product");
-    assertThat(result.get().getCostPrice()).isEqualByComparingTo(new BigDecimal("10.00"));
+    assertThat(foundProduct).isPresent();
+    assertThat(foundProduct.get().getName()).isEqualTo("Test Product");
+    assertThat(foundProduct.get().getCostPrice()).isEqualByComparingTo(new BigDecimal("10.00"));
   }
 
   @Test
@@ -81,8 +80,8 @@ class ProductRepositoryTest {
     Product savedProduct = productRepository.save(product);
 
     productRepository.deleteById(savedProduct.getId());
-    Optional<Product> result = productRepository.findById(savedProduct.getId());
+    Optional<Product> deletedProduct = productRepository.findById(savedProduct.getId());
 
-    assertThat(result).isEmpty();
+    assertThat(deletedProduct).isEmpty();
   }
 }

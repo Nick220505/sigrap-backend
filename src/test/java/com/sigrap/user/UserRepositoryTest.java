@@ -25,18 +25,18 @@ class UserRepositoryTest {
 
     userRepository.save(user);
 
-    Optional<User> result = userRepository.findByEmail("test@example.com");
+    Optional<User> foundUser = userRepository.findByEmail("test@example.com");
 
-    assertThat(result).isPresent();
-    assertThat(result.get().getName()).isEqualTo("Test User");
-    assertThat(result.get().getEmail()).isEqualTo("test@example.com");
+    assertThat(foundUser).isPresent();
+    assertThat(foundUser.get().getName()).isEqualTo("Test User");
+    assertThat(foundUser.get().getEmail()).isEqualTo("test@example.com");
   }
 
   @Test
   void findByEmail_shouldReturnEmpty_whenEmailDoesNotExist() {
-    Optional<User> result = userRepository.findByEmail("nonexistent@example.com");
+    Optional<User> foundUser = userRepository.findByEmail("nonexistent@example.com");
 
-    assertThat(result).isEmpty();
+    assertThat(foundUser).isEmpty();
   }
 
   @Test
@@ -49,15 +49,15 @@ class UserRepositoryTest {
 
     userRepository.save(user);
 
-    boolean result = userRepository.existsByEmail("exists@example.com");
+    boolean emailExists = userRepository.existsByEmail("exists@example.com");
 
-    assertThat(result).isTrue();
+    assertThat(emailExists).isTrue();
   }
 
   @Test
   void existsByEmail_shouldReturnFalse_whenEmailDoesNotExist() {
-    boolean result = userRepository.existsByEmail("nonexistent@example.com");
+    boolean emailExists = userRepository.existsByEmail("nonexistent@example.com");
 
-    assertThat(result).isFalse();
+    assertThat(emailExists).isFalse();
   }
 }

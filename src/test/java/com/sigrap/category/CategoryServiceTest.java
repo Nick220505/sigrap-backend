@@ -44,11 +44,11 @@ class CategoryServiceTest {
     when(categoryRepository.findById(id)).thenReturn(Optional.of(category));
     when(categoryMapper.toInfo(category)).thenReturn(categoryInfo);
 
-    CategoryInfo result = categoryService.findById(id);
+    CategoryInfo foundCategoryInfo = categoryService.findById(id);
 
-    assertThat(result).isNotNull();
-    assertThat(result.getId()).isEqualTo(id);
-    assertThat(result.getName()).isEqualTo("Test Category");
+    assertThat(foundCategoryInfo).isNotNull();
+    assertThat(foundCategoryInfo.getId()).isEqualTo(id);
+    assertThat(foundCategoryInfo.getName()).isEqualTo("Test Category");
   }
 
   @Test
@@ -75,11 +75,11 @@ class CategoryServiceTest {
     when(categoryMapper.toInfo(categories.get(0))).thenReturn(categoryInfos.get(0));
     when(categoryMapper.toInfo(categories.get(1))).thenReturn(categoryInfos.get(1));
 
-    List<CategoryInfo> result = categoryService.findAll();
+    List<CategoryInfo> allCategoryInfos = categoryService.findAll();
 
-    assertThat(result).hasSize(2);
-    assertThat(result.get(0).getName()).isEqualTo("Category 1");
-    assertThat(result.get(1).getName()).isEqualTo("Category 2");
+    assertThat(allCategoryInfos).hasSize(2);
+    assertThat(allCategoryInfos.get(0).getName()).isEqualTo("Category 1");
+    assertThat(allCategoryInfos.get(1).getName()).isEqualTo("Category 2");
   }
 
   @Test
@@ -106,12 +106,12 @@ class CategoryServiceTest {
     when(categoryRepository.save(category)).thenReturn(savedCategory);
     when(categoryMapper.toInfo(savedCategory)).thenReturn(categoryInfo);
 
-    CategoryInfo result = categoryService.create(categoryData);
+    CategoryInfo createdCategoryInfo = categoryService.create(categoryData);
 
-    assertThat(result).isNotNull();
-    assertThat(result.getId()).isEqualTo(1);
-    assertThat(result.getName()).isEqualTo("New Category");
-    assertThat(result.getDescription()).isEqualTo("New Description");
+    assertThat(createdCategoryInfo).isNotNull();
+    assertThat(createdCategoryInfo.getId()).isEqualTo(1);
+    assertThat(createdCategoryInfo.getName()).isEqualTo("New Category");
+    assertThat(createdCategoryInfo.getDescription()).isEqualTo("New Description");
     verify(categoryRepository).save(category);
   }
 
@@ -141,11 +141,11 @@ class CategoryServiceTest {
     when(categoryRepository.save(existingCategory)).thenReturn(updatedCategory);
     when(categoryMapper.toInfo(updatedCategory)).thenReturn(categoryInfo);
 
-    CategoryInfo result = categoryService.update(id, categoryData);
+    CategoryInfo updatedCategoryInfo = categoryService.update(id, categoryData);
 
-    assertThat(result).isNotNull();
-    assertThat(result.getId()).isEqualTo(id);
-    assertThat(result.getName()).isEqualTo("Updated Name");
+    assertThat(updatedCategoryInfo).isNotNull();
+    assertThat(updatedCategoryInfo.getId()).isEqualTo(id);
+    assertThat(updatedCategoryInfo.getName()).isEqualTo("Updated Name");
     verify(categoryRepository).save(existingCategory);
   }
 

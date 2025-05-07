@@ -1,21 +1,20 @@
 package com.sigrap.product;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sigrap.category.Category;
@@ -56,12 +55,12 @@ class ProductServiceTest {
     when(productRepository.findById(id)).thenReturn(Optional.of(product));
     when(productMapper.toInfo(product)).thenReturn(productInfo);
 
-    ProductInfo result = productService.findById(id);
+    ProductInfo foundProductInfo = productService.findById(id);
 
-    assertThat(result).isNotNull();
-    assertThat(result.getId()).isEqualTo(id);
-    assertThat(result.getName()).isEqualTo("Test Product");
-    assertThat(result.getCostPrice()).isEqualByComparingTo(new BigDecimal("10.00"));
+    assertThat(foundProductInfo).isNotNull();
+    assertThat(foundProductInfo.getId()).isEqualTo(id);
+    assertThat(foundProductInfo.getName()).isEqualTo("Test Product");
+    assertThat(foundProductInfo.getCostPrice()).isEqualByComparingTo(new BigDecimal("10.00"));
   }
 
   @Test
@@ -88,11 +87,11 @@ class ProductServiceTest {
     when(productMapper.toInfo(products.get(0))).thenReturn(productInfos.get(0));
     when(productMapper.toInfo(products.get(1))).thenReturn(productInfos.get(1));
 
-    List<ProductInfo> result = productService.findAll();
+    List<ProductInfo> allProductInfos = productService.findAll();
 
-    assertThat(result).hasSize(2);
-    assertThat(result.get(0).getName()).isEqualTo("Product 1");
-    assertThat(result.get(1).getName()).isEqualTo("Product 2");
+    assertThat(allProductInfos).hasSize(2);
+    assertThat(allProductInfos.get(0).getName()).isEqualTo("Product 1");
+    assertThat(allProductInfos.get(1).getName()).isEqualTo("Product 2");
   }
 
   @Test
@@ -127,11 +126,11 @@ class ProductServiceTest {
     when(productRepository.save(product)).thenReturn(savedProduct);
     when(productMapper.toInfo(savedProduct)).thenReturn(productInfo);
 
-    ProductInfo result = productService.create(productData);
+    ProductInfo createdProductInfo = productService.create(productData);
 
-    assertThat(result).isNotNull();
-    assertThat(result.getId()).isEqualTo(1);
-    assertThat(result.getName()).isEqualTo("New Product");
+    assertThat(createdProductInfo).isNotNull();
+    assertThat(createdProductInfo.getId()).isEqualTo(1);
+    assertThat(createdProductInfo.getName()).isEqualTo("New Product");
     verify(productRepository).save(product);
   }
 
@@ -172,11 +171,11 @@ class ProductServiceTest {
     when(productRepository.save(product)).thenReturn(savedProduct);
     when(productMapper.toInfo(savedProduct)).thenReturn(productInfo);
 
-    ProductInfo result = productService.create(productData);
+    ProductInfo createdProductInfo = productService.create(productData);
 
-    assertThat(result).isNotNull();
-    assertThat(result.getId()).isEqualTo(1);
-    assertThat(result.getName()).isEqualTo("New Product");
+    assertThat(createdProductInfo).isNotNull();
+    assertThat(createdProductInfo.getId()).isEqualTo(1);
+    assertThat(createdProductInfo.getName()).isEqualTo("New Product");
     verify(productRepository).save(product);
   }
 
@@ -248,11 +247,11 @@ class ProductServiceTest {
     when(productRepository.save(existingProduct)).thenReturn(updatedProduct);
     when(productMapper.toInfo(updatedProduct)).thenReturn(productInfo);
 
-    ProductInfo result = productService.update(id, productData);
+    ProductInfo updatedProductInfo = productService.update(id, productData);
 
-    assertThat(result).isNotNull();
-    assertThat(result.getId()).isEqualTo(id);
-    assertThat(result.getName()).isEqualTo("Updated Product");
+    assertThat(updatedProductInfo).isNotNull();
+    assertThat(updatedProductInfo.getId()).isEqualTo(id);
+    assertThat(updatedProductInfo.getName()).isEqualTo("Updated Product");
     verify(productRepository).save(existingProduct);
   }
 
@@ -291,11 +290,11 @@ class ProductServiceTest {
     when(productRepository.save(existingProduct)).thenReturn(updatedProduct);
     when(productMapper.toInfo(updatedProduct)).thenReturn(productInfo);
 
-    ProductInfo result = productService.update(id, productData);
+    ProductInfo updatedProductInfo = productService.update(id, productData);
 
-    assertThat(result).isNotNull();
-    assertThat(result.getId()).isEqualTo(id);
-    assertThat(result.getName()).isEqualTo("Updated Product");
+    assertThat(updatedProductInfo).isNotNull();
+    assertThat(updatedProductInfo.getId()).isEqualTo(id);
+    assertThat(updatedProductInfo.getName()).isEqualTo("Updated Product");
     assertThat(existingProduct.getCategory()).isNull();
     verify(productRepository).save(existingProduct);
   }
