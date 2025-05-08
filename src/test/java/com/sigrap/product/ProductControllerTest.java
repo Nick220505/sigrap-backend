@@ -1,10 +1,5 @@
 package com.sigrap.product;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -12,9 +7,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,6 +14,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -57,17 +58,19 @@ class ProductControllerTest {
 
   @Test
   void findAll_shouldReturnAllProducts() throws Exception {
-    ProductInfo product1 = new ProductInfo();
-    product1.setId(1);
-    product1.setName("Product 1");
-    product1.setCostPrice(new BigDecimal("10.00"));
-    product1.setSalePrice(new BigDecimal("15.00"));
+    ProductInfo product1 = ProductInfo.builder()
+        .id(1)
+        .name("Product 1")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    ProductInfo product2 = new ProductInfo();
-    product2.setId(2);
-    product2.setName("Product 2");
-    product2.setCostPrice(new BigDecimal("20.00"));
-    product2.setSalePrice(new BigDecimal("30.00"));
+    ProductInfo product2 = ProductInfo.builder()
+        .id(2)
+        .name("Product 2")
+        .costPrice(new BigDecimal("20.00"))
+        .salePrice(new BigDecimal("30.00"))
+        .build();
 
     List<ProductInfo> products = List.of(product1, product2);
     when(productService.findAll()).thenReturn(products);
@@ -85,11 +88,12 @@ class ProductControllerTest {
   @Test
   void findById_shouldReturnProduct_whenExists() throws Exception {
     Integer id = 1;
-    ProductInfo product = new ProductInfo();
-    product.setId(id);
-    product.setName("Test Product");
-    product.setCostPrice(new BigDecimal("10.00"));
-    product.setSalePrice(new BigDecimal("15.00"));
+    ProductInfo product = ProductInfo.builder()
+        .id(id)
+        .name("Test Product")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
     when(productService.findById(id)).thenReturn(product);
 
@@ -112,18 +116,20 @@ class ProductControllerTest {
 
   @Test
   void create_shouldCreateProduct() throws Exception {
-    ProductData productData = new ProductData();
-    productData.setName("New Product");
-    productData.setDescription("Test Description");
-    productData.setCostPrice(new BigDecimal("10.00"));
-    productData.setSalePrice(new BigDecimal("15.00"));
+    ProductData productData = ProductData.builder()
+        .name("New Product")
+        .description("Test Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    ProductInfo createdProduct = new ProductInfo();
-    createdProduct.setId(1);
-    createdProduct.setName("New Product");
-    createdProduct.setDescription("Test Description");
-    createdProduct.setCostPrice(new BigDecimal("10.00"));
-    createdProduct.setSalePrice(new BigDecimal("15.00"));
+    ProductInfo createdProduct = ProductInfo.builder()
+        .id(1)
+        .name("New Product")
+        .description("Test Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
     when(productService.create(any(ProductData.class))).thenReturn(createdProduct);
 
@@ -143,18 +149,20 @@ class ProductControllerTest {
   @Test
   void update_shouldUpdateProduct_whenExists() throws Exception {
     Integer id = 1;
-    ProductData productData = new ProductData();
-    productData.setName("Updated Product");
-    productData.setDescription("Updated Description");
-    productData.setCostPrice(new BigDecimal("15.00"));
-    productData.setSalePrice(new BigDecimal("25.00"));
+    ProductData productData = ProductData.builder()
+        .name("Updated Product")
+        .description("Updated Description")
+        .costPrice(new BigDecimal("15.00"))
+        .salePrice(new BigDecimal("25.00"))
+        .build();
 
-    ProductInfo updatedProduct = new ProductInfo();
-    updatedProduct.setId(id);
-    updatedProduct.setName("Updated Product");
-    updatedProduct.setDescription("Updated Description");
-    updatedProduct.setCostPrice(new BigDecimal("15.00"));
-    updatedProduct.setSalePrice(new BigDecimal("25.00"));
+    ProductInfo updatedProduct = ProductInfo.builder()
+        .id(id)
+        .name("Updated Product")
+        .description("Updated Description")
+        .costPrice(new BigDecimal("15.00"))
+        .salePrice(new BigDecimal("25.00"))
+        .build();
 
     when(productService.update(eq(id), any(ProductData.class))).thenReturn(updatedProduct);
 
@@ -174,10 +182,11 @@ class ProductControllerTest {
   @Test
   void update_shouldReturnNotFound_whenProductDoesNotExist() throws Exception {
     Integer id = 1;
-    ProductData productData = new ProductData();
-    productData.setName("Updated Product");
-    productData.setCostPrice(new BigDecimal("15.00"));
-    productData.setSalePrice(new BigDecimal("25.00"));
+    ProductData productData = ProductData.builder()
+        .name("Updated Product")
+        .costPrice(new BigDecimal("15.00"))
+        .salePrice(new BigDecimal("25.00"))
+        .build();
 
     when(productService.update(eq(id), any(ProductData.class))).thenThrow(new EntityNotFoundException());
 

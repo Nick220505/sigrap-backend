@@ -1,12 +1,13 @@
 package com.sigrap.auth;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -31,7 +32,11 @@ class JwtUtilTest {
     ReflectionTestUtils.setField(jwtUtil, "secret", "testSecretKey123456789012345678901234567890");
     ReflectionTestUtils.setField(jwtUtil, "expiration", 3600000L);
 
-    userDetails = new User("test@example.com", "password", Collections.emptyList());
+    userDetails = User.builder()
+        .username("test@example.com")
+        .password("password")
+        .authorities(Collections.emptyList())
+        .build();
   }
 
   @Test
@@ -88,7 +93,11 @@ class JwtUtilTest {
   void validateToken_shouldReturnFalse_forDifferentUser() {
     String token = jwtUtil.generateToken(userDetails);
 
-    UserDetails differentUser = new User("other@example.com", "password", Collections.emptyList());
+    UserDetails differentUser = User.builder()
+        .username("other@example.com")
+        .password("password")
+        .authorities(Collections.emptyList())
+        .build();
     boolean isValid = jwtUtil.validateToken(token, differentUser);
 
     assertThat(isValid).isFalse();

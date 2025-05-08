@@ -36,10 +36,11 @@ class ErrorHandlingIntegrationTest {
 
   @Test
   void entityNotFound_shouldReturnAppropriateErrorResponse() throws Exception {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName("Error Test User");
-    registerRequest.setEmail("error-handling-test@example.com");
-    registerRequest.setPassword("Password123!");
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .name("Error Test User")
+        .email("error-handling-test@example.com")
+        .password("Password123!")
+        .build();
 
     String registerResponseJson = mockMvc.perform(post("/api/auth/register")
         .contentType(MediaType.APPLICATION_JSON)
@@ -60,10 +61,11 @@ class ErrorHandlingIntegrationTest {
 
   @Test
   void validationErrors_shouldReturnAppropriateErrorResponse() throws Exception {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName("Validation Test User");
-    registerRequest.setEmail("validation-test@example.com");
-    registerRequest.setPassword("Password123!");
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .name("Validation Test User")
+        .email("validation-test@example.com")
+        .password("Password123!")
+        .build();
 
     String registerResponseJson = mockMvc.perform(post("/api/auth/register")
         .contentType(MediaType.APPLICATION_JSON)
@@ -74,9 +76,10 @@ class ErrorHandlingIntegrationTest {
     AuthResponse registerResponse = objectMapper.readValue(registerResponseJson, AuthResponse.class);
     String token = registerResponse.getToken();
 
-    ProductData invalidProduct = new ProductData();
-    invalidProduct.setCostPrice(new BigDecimal("10.00"));
-    invalidProduct.setSalePrice(new BigDecimal("15.00"));
+    ProductData invalidProduct = ProductData.builder()
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
     mockMvc.perform(post("/api/products")
         .header("Authorization", "Bearer " + token)
@@ -92,9 +95,10 @@ class ErrorHandlingIntegrationTest {
 
   @Test
   void badCredentials_shouldReturnAppropriateErrorResponse() throws Exception {
-    AuthRequest invalidLoginRequest = new AuthRequest();
-    invalidLoginRequest.setEmail("nonexistent@example.com");
-    invalidLoginRequest.setPassword("wrongpassword");
+    AuthRequest invalidLoginRequest = AuthRequest.builder()
+        .email("nonexistent@example.com")
+        .password("wrongpassword")
+        .build();
 
     mockMvc.perform(post("/api/auth/login")
         .contentType(MediaType.APPLICATION_JSON)
@@ -107,10 +111,11 @@ class ErrorHandlingIntegrationTest {
 
   @Test
   void businessRuleViolation_shouldReturnAppropriateErrorResponse() throws Exception {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName("Duplicate User");
-    registerRequest.setEmail("duplicate@example.com");
-    registerRequest.setPassword("Password123!");
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .name("Duplicate User")
+        .email("duplicate@example.com")
+        .password("Password123!")
+        .build();
 
     mockMvc.perform(post("/api/auth/register")
         .contentType(MediaType.APPLICATION_JSON)
@@ -128,10 +133,11 @@ class ErrorHandlingIntegrationTest {
 
   @Test
   void invalidInput_shouldReturnAppropriateErrorResponse() throws Exception {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName("Invalid Input Test User");
-    registerRequest.setEmail("invalid-input-test@example.com");
-    registerRequest.setPassword("Password123!");
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .name("Invalid Input Test User")
+        .email("invalid-input-test@example.com")
+        .password("Password123!")
+        .build();
 
     String registerResponseJson = mockMvc.perform(post("/api/auth/register")
         .contentType(MediaType.APPLICATION_JSON)
@@ -142,10 +148,11 @@ class ErrorHandlingIntegrationTest {
     AuthResponse registerResponse = objectMapper.readValue(registerResponseJson, AuthResponse.class);
     String token = registerResponse.getToken();
 
-    ProductData invalidProduct = new ProductData();
-    invalidProduct.setName("Invalid Product");
-    invalidProduct.setCostPrice(new BigDecimal("-10.00"));
-    invalidProduct.setSalePrice(new BigDecimal("15.00"));
+    ProductData invalidProduct = ProductData.builder()
+        .name("Invalid Product")
+        .costPrice(new BigDecimal("-10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
     mockMvc.perform(post("/api/products")
         .header("Authorization", "Bearer " + token)

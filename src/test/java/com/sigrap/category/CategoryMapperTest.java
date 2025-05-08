@@ -1,6 +1,7 @@
 package com.sigrap.category;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,10 +14,11 @@ class CategoryMapperTest {
 
   @Test
   void toInfo_shouldMapEntityToInfo() {
-    Category category = new Category();
-    category.setId(1);
-    category.setName("Test Category");
-    category.setDescription("Test Description");
+    Category category = Category.builder()
+        .id(1)
+        .name("Test Category")
+        .description("Test Description")
+        .build();
 
     CategoryInfo categoryInfo = categoryMapper.toInfo(category);
 
@@ -34,9 +36,10 @@ class CategoryMapperTest {
 
   @Test
   void toEntity_shouldMapDataToEntity() {
-    CategoryData categoryData = new CategoryData();
-    categoryData.setName("Test Category");
-    categoryData.setDescription("Test Description");
+    CategoryData categoryData = CategoryData.builder()
+        .name("Test Category")
+        .description("Test Description")
+        .build();
 
     Category category = categoryMapper.toEntity(categoryData);
 
@@ -54,14 +57,16 @@ class CategoryMapperTest {
 
   @Test
   void updateEntityFromData_shouldUpdateEntityWithDataValues() {
-    Category category = new Category();
-    category.setId(1);
-    category.setName("Old Name");
-    category.setDescription("Old Description");
+    Category category = Category.builder()
+        .id(1)
+        .name("Old Name")
+        .description("Old Description")
+        .build();
 
-    CategoryData categoryData = new CategoryData();
-    categoryData.setName("New Name");
-    categoryData.setDescription("New Description");
+    CategoryData categoryData = CategoryData.builder()
+        .name("New Name")
+        .description("New Description")
+        .build();
 
     categoryMapper.updateEntityFromData(categoryData, category);
 
@@ -72,10 +77,11 @@ class CategoryMapperTest {
 
   @Test
   void updateEntityFromData_shouldDoNothing_whenCategoryDataIsNull() {
-    Category category = new Category();
-    category.setId(1);
-    category.setName("Original Name");
-    category.setDescription("Original Description");
+    Category category = Category.builder()
+        .id(1)
+        .name("Original Name")
+        .description("Original Description")
+        .build();
 
     categoryMapper.updateEntityFromData(null, category);
 
@@ -86,13 +92,15 @@ class CategoryMapperTest {
 
   @Test
   void updateEntityFromData_shouldSetNullValues_whenDataFieldsAreNull() {
-    Category category = new Category();
-    category.setId(1);
-    category.setName("Original Name");
-    category.setDescription("Original Description");
+    Category category = Category.builder()
+        .id(1)
+        .name("Original Name")
+        .description("Original Description")
+        .build();
 
-    CategoryData categoryData = new CategoryData();
-    categoryData.setName("New Name");
+    CategoryData categoryData = CategoryData.builder()
+        .name("New Name")
+        .build();
 
     categoryMapper.updateEntityFromData(categoryData, category);
 

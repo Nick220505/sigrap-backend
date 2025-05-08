@@ -25,17 +25,22 @@ public class TestUtils {
 
   public static void setupTestSecurityContext(String email) {
     List<SimpleGrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
-    UserDetails userDetails = new User(email, "password", authorities);
+    UserDetails userDetails = User.builder()
+        .username(email)
+        .password("password")
+        .authorities(authorities)
+        .build();
     SecurityContextHolder.getContext().setAuthentication(
         new UsernamePasswordAuthenticationToken(userDetails, null, authorities));
   }
 
   public static String registerTestUserAndGetToken(MockMvc mockMvc, ObjectMapper objectMapper,
       String name, String email, String password) throws Exception {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName(name);
-    registerRequest.setEmail(email);
-    registerRequest.setPassword(password);
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .name(name)
+        .email(email)
+        .password(password)
+        .build();
 
     MvcResult registerResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
         .contentType(MediaType.APPLICATION_JSON)

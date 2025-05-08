@@ -35,10 +35,11 @@ class AuthIntegrationTest {
 
   @Test
   void register_thenLogin_shouldSucceed() throws Exception {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName("Integration Test User");
-    registerRequest.setEmail("integration-test@example.com");
-    registerRequest.setPassword("Password123!");
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .name("Integration Test User")
+        .email("integration-test@example.com")
+        .password("Password123!")
+        .build();
 
     MvcResult registerResult = mockMvc.perform(post("/api/auth/register")
         .contentType(MediaType.APPLICATION_JSON)
@@ -56,9 +57,10 @@ class AuthIntegrationTest {
     assertThat(registerResponse.getToken()).isNotNull();
     assertThat(userRepository.findByEmail("integration-test@example.com")).isPresent();
 
-    AuthRequest loginRequest = new AuthRequest();
-    loginRequest.setEmail("integration-test@example.com");
-    loginRequest.setPassword("Password123!");
+    AuthRequest loginRequest = AuthRequest.builder()
+        .email("integration-test@example.com")
+        .password("Password123!")
+        .build();
 
     MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
         .contentType(MediaType.APPLICATION_JSON)
@@ -77,20 +79,22 @@ class AuthIntegrationTest {
 
   @Test
   void register_withExistingEmail_shouldFail() throws Exception {
-    RegisterRequest firstRegisterRequest = new RegisterRequest();
-    firstRegisterRequest.setName("First User");
-    firstRegisterRequest.setEmail("duplicate@example.com");
-    firstRegisterRequest.setPassword("Password123!");
+    RegisterRequest firstRegisterRequest = RegisterRequest.builder()
+        .name("First User")
+        .email("duplicate@example.com")
+        .password("Password123!")
+        .build();
 
     mockMvc.perform(post("/api/auth/register")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(firstRegisterRequest)))
         .andExpect(status().isCreated());
 
-    RegisterRequest duplicateRegisterRequest = new RegisterRequest();
-    duplicateRegisterRequest.setName("Duplicate User");
-    duplicateRegisterRequest.setEmail("duplicate@example.com");
-    duplicateRegisterRequest.setPassword("AnotherPassword123!");
+    RegisterRequest duplicateRegisterRequest = RegisterRequest.builder()
+        .name("Duplicate User")
+        .email("duplicate@example.com")
+        .password("AnotherPassword123!")
+        .build();
 
     mockMvc.perform(post("/api/auth/register")
         .contentType(MediaType.APPLICATION_JSON)
@@ -100,9 +104,10 @@ class AuthIntegrationTest {
 
   @Test
   void login_withInvalidCredentials_shouldFail() throws Exception {
-    AuthRequest invalidLoginRequest = new AuthRequest();
-    invalidLoginRequest.setEmail("nonexistent@example.com");
-    invalidLoginRequest.setPassword("InvalidPassword123!");
+    AuthRequest invalidLoginRequest = AuthRequest.builder()
+        .email("nonexistent@example.com")
+        .password("InvalidPassword123!")
+        .build();
 
     mockMvc.perform(post("/api/auth/login")
         .contentType(MediaType.APPLICATION_JSON)

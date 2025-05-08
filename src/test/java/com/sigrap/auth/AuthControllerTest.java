@@ -55,15 +55,17 @@ class AuthControllerTest {
 
   @Test
   void register_shouldReturnCreated_whenRegistrationIsSuccessful() throws Exception {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName("Test User");
-    registerRequest.setEmail("test@example.com");
-    registerRequest.setPassword("Password123!");
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .name("Test User")
+        .email("test@example.com")
+        .password("Password123!")
+        .build();
 
-    AuthResponse authResponse = new AuthResponse();
-    authResponse.setToken("jwtToken");
-    authResponse.setEmail("test@example.com");
-    authResponse.setName("Test User");
+    AuthResponse authResponse = AuthResponse.builder()
+        .token("jwtToken")
+        .email("test@example.com")
+        .name("Test User")
+        .build();
 
     when(authService.register(any(RegisterRequest.class))).thenReturn(authResponse);
 
@@ -80,10 +82,11 @@ class AuthControllerTest {
 
   @Test
   void register_shouldReturnBadRequest_whenEmailAlreadyExists() throws Exception {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName("Test User");
-    registerRequest.setEmail("existing@example.com");
-    registerRequest.setPassword("Password123!");
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .name("Test User")
+        .email("existing@example.com")
+        .password("Password123!")
+        .build();
 
     doThrow(new IllegalArgumentException("Email already exists"))
         .when(authService).register(any(RegisterRequest.class));
@@ -98,14 +101,16 @@ class AuthControllerTest {
 
   @Test
   void login_shouldReturnOk_whenAuthenticationIsSuccessful() throws Exception {
-    AuthRequest authRequest = new AuthRequest();
-    authRequest.setEmail("test@example.com");
-    authRequest.setPassword("Password123!");
+    AuthRequest authRequest = AuthRequest.builder()
+        .email("test@example.com")
+        .password("Password123!")
+        .build();
 
-    AuthResponse authResponse = new AuthResponse();
-    authResponse.setToken("jwtToken");
-    authResponse.setEmail("test@example.com");
-    authResponse.setName("Test User");
+    AuthResponse authResponse = AuthResponse.builder()
+        .token("jwtToken")
+        .email("test@example.com")
+        .name("Test User")
+        .build();
 
     when(authService.authenticate(any(AuthRequest.class))).thenReturn(authResponse);
 
@@ -122,9 +127,10 @@ class AuthControllerTest {
 
   @Test
   void login_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
-    AuthRequest authRequest = new AuthRequest();
-    authRequest.setEmail("nonexistent@example.com");
-    authRequest.setPassword("Password123!");
+    AuthRequest authRequest = AuthRequest.builder()
+        .email("nonexistent@example.com")
+        .password("Password123!")
+        .build();
 
     doThrow(new EntityNotFoundException("User not found"))
         .when(authService).authenticate(any(AuthRequest.class));

@@ -1,20 +1,21 @@
 package com.sigrap.product;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sigrap.category.Category;
@@ -40,17 +41,19 @@ class ProductServiceTest {
   @Test
   void findById_shouldReturnProductInfo_whenProductExists() {
     Integer id = 1;
-    Product product = new Product();
-    product.setId(id);
-    product.setName("Test Product");
-    product.setCostPrice(new BigDecimal("10.00"));
-    product.setSalePrice(new BigDecimal("15.00"));
+    Product product = Product.builder()
+        .id(id)
+        .name("Test Product")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    ProductInfo productInfo = new ProductInfo();
-    productInfo.setId(id);
-    productInfo.setName("Test Product");
-    productInfo.setCostPrice(new BigDecimal("10.00"));
-    productInfo.setSalePrice(new BigDecimal("15.00"));
+    ProductInfo productInfo = ProductInfo.builder()
+        .id(id)
+        .name("Test Product")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
     when(productRepository.findById(id)).thenReturn(Optional.of(product));
     when(productMapper.toInfo(product)).thenReturn(productInfo);
@@ -75,31 +78,35 @@ class ProductServiceTest {
 
   @Test
   void findAll_shouldReturnAllProductInfos() {
-    Product product1 = new Product();
-    product1.setId(1);
-    product1.setName("Product 1");
-    product1.setCostPrice(new BigDecimal("10.00"));
-    product1.setSalePrice(new BigDecimal("15.00"));
+    Product product1 = Product.builder()
+        .id(1)
+        .name("Product 1")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    Product product2 = new Product();
-    product2.setId(2);
-    product2.setName("Product 2");
-    product2.setCostPrice(new BigDecimal("20.00"));
-    product2.setSalePrice(new BigDecimal("30.00"));
+    Product product2 = Product.builder()
+        .id(2)
+        .name("Product 2")
+        .costPrice(new BigDecimal("20.00"))
+        .salePrice(new BigDecimal("30.00"))
+        .build();
 
     List<Product> products = List.of(product1, product2);
 
-    ProductInfo productInfo1 = new ProductInfo();
-    productInfo1.setId(1);
-    productInfo1.setName("Product 1");
-    productInfo1.setCostPrice(new BigDecimal("10.00"));
-    productInfo1.setSalePrice(new BigDecimal("15.00"));
+    ProductInfo productInfo1 = ProductInfo.builder()
+        .id(1)
+        .name("Product 1")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    ProductInfo productInfo2 = new ProductInfo();
-    productInfo2.setId(2);
-    productInfo2.setName("Product 2");
-    productInfo2.setCostPrice(new BigDecimal("20.00"));
-    productInfo2.setSalePrice(new BigDecimal("30.00"));
+    ProductInfo productInfo2 = ProductInfo.builder()
+        .id(2)
+        .name("Product 2")
+        .costPrice(new BigDecimal("20.00"))
+        .salePrice(new BigDecimal("30.00"))
+        .build();
 
     List<ProductInfo> productInfos = List.of(productInfo1, productInfo2);
 
@@ -116,31 +123,35 @@ class ProductServiceTest {
 
   @Test
   void create_shouldCreateProduct_withoutCategory() {
-    ProductData productData = new ProductData();
-    productData.setName("New Product");
-    productData.setDescription("New Description");
-    productData.setCostPrice(new BigDecimal("10.00"));
-    productData.setSalePrice(new BigDecimal("15.00"));
+    ProductData productData = ProductData.builder()
+        .name("New Product")
+        .description("New Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    Product product = new Product();
-    product.setName("New Product");
-    product.setDescription("New Description");
-    product.setCostPrice(new BigDecimal("10.00"));
-    product.setSalePrice(new BigDecimal("15.00"));
+    Product product = Product.builder()
+        .name("New Product")
+        .description("New Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    Product savedProduct = new Product();
-    savedProduct.setId(1);
-    savedProduct.setName("New Product");
-    savedProduct.setDescription("New Description");
-    savedProduct.setCostPrice(new BigDecimal("10.00"));
-    savedProduct.setSalePrice(new BigDecimal("15.00"));
+    Product savedProduct = Product.builder()
+        .id(1)
+        .name("New Product")
+        .description("New Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    ProductInfo productInfo = new ProductInfo();
-    productInfo.setId(1);
-    productInfo.setName("New Product");
-    productInfo.setDescription("New Description");
-    productInfo.setCostPrice(new BigDecimal("10.00"));
-    productInfo.setSalePrice(new BigDecimal("15.00"));
+    ProductInfo productInfo = ProductInfo.builder()
+        .id(1)
+        .name("New Product")
+        .description("New Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
     when(productMapper.toEntity(productData)).thenReturn(product);
     when(productRepository.save(product)).thenReturn(savedProduct);
@@ -158,33 +169,38 @@ class ProductServiceTest {
   void create_shouldCreateProduct_withCategory() {
     Integer categoryId = 1;
 
-    ProductData productData = new ProductData();
-    productData.setName("New Product");
-    productData.setCostPrice(new BigDecimal("10.00"));
-    productData.setSalePrice(new BigDecimal("15.00"));
-    productData.setCategoryId(categoryId);
+    ProductData productData = ProductData.builder()
+        .name("New Product")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .categoryId(categoryId)
+        .build();
 
-    Product product = new Product();
-    product.setName("New Product");
-    product.setCostPrice(new BigDecimal("10.00"));
-    product.setSalePrice(new BigDecimal("15.00"));
+    Product product = Product.builder()
+        .name("New Product")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    Category category = new Category();
-    category.setId(categoryId);
-    category.setName("Test Category");
+    Category category = Category.builder()
+        .id(categoryId)
+        .name("Test Category")
+        .build();
 
-    Product savedProduct = new Product();
-    savedProduct.setId(1);
-    savedProduct.setName("New Product");
-    savedProduct.setCostPrice(new BigDecimal("10.00"));
-    savedProduct.setSalePrice(new BigDecimal("15.00"));
-    savedProduct.setCategory(category);
+    Product savedProduct = Product.builder()
+        .id(1)
+        .name("New Product")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .category(category)
+        .build();
 
-    ProductInfo productInfo = new ProductInfo();
-    productInfo.setId(1);
-    productInfo.setName("New Product");
-    productInfo.setCostPrice(new BigDecimal("10.00"));
-    productInfo.setSalePrice(new BigDecimal("15.00"));
+    ProductInfo productInfo = ProductInfo.builder()
+        .id(1)
+        .name("New Product")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
     when(productMapper.toEntity(productData)).thenReturn(product);
     when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
@@ -203,16 +219,18 @@ class ProductServiceTest {
   void create_shouldThrowException_whenCategoryDoesNotExist() {
     Integer categoryId = 1;
 
-    ProductData productData = new ProductData();
-    productData.setName("New Product");
-    productData.setCostPrice(new BigDecimal("10.00"));
-    productData.setSalePrice(new BigDecimal("15.00"));
-    productData.setCategoryId(categoryId);
+    ProductData productData = ProductData.builder()
+        .name("New Product")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .categoryId(categoryId)
+        .build();
 
-    Product product = new Product();
-    product.setName("New Product");
-    product.setCostPrice(new BigDecimal("10.00"));
-    product.setSalePrice(new BigDecimal("15.00"));
+    Product product = Product.builder()
+        .name("New Product")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
     when(productMapper.toEntity(productData)).thenReturn(product);
     when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
@@ -229,37 +247,42 @@ class ProductServiceTest {
     Integer id = 1;
     Integer categoryId = 2;
 
-    ProductData productData = new ProductData();
-    productData.setName("Updated Product");
-    productData.setDescription("Updated Description");
-    productData.setCostPrice(new BigDecimal("15.00"));
-    productData.setSalePrice(new BigDecimal("25.00"));
-    productData.setCategoryId(categoryId);
+    ProductData productData = ProductData.builder()
+        .name("Updated Product")
+        .description("Updated Description")
+        .costPrice(new BigDecimal("15.00"))
+        .salePrice(new BigDecimal("25.00"))
+        .categoryId(categoryId)
+        .build();
 
-    Product existingProduct = new Product();
-    existingProduct.setId(id);
-    existingProduct.setName("Old Name");
-    existingProduct.setCostPrice(new BigDecimal("10.00"));
-    existingProduct.setSalePrice(new BigDecimal("15.00"));
+    Product existingProduct = Product.builder()
+        .id(id)
+        .name("Old Name")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    Category category = new Category();
-    category.setId(categoryId);
-    category.setName("Test Category");
+    Category category = Category.builder()
+        .id(categoryId)
+        .name("Test Category")
+        .build();
 
-    Product updatedProduct = new Product();
-    updatedProduct.setId(id);
-    updatedProduct.setName("Updated Product");
-    updatedProduct.setDescription("Updated Description");
-    updatedProduct.setCostPrice(new BigDecimal("15.00"));
-    updatedProduct.setSalePrice(new BigDecimal("25.00"));
-    updatedProduct.setCategory(category);
+    Product updatedProduct = Product.builder()
+        .id(id)
+        .name("Updated Product")
+        .description("Updated Description")
+        .costPrice(new BigDecimal("15.00"))
+        .salePrice(new BigDecimal("25.00"))
+        .category(category)
+        .build();
 
-    ProductInfo productInfo = new ProductInfo();
-    productInfo.setId(id);
-    productInfo.setName("Updated Product");
-    productInfo.setDescription("Updated Description");
-    productInfo.setCostPrice(new BigDecimal("15.00"));
-    productInfo.setSalePrice(new BigDecimal("25.00"));
+    ProductInfo productInfo = ProductInfo.builder()
+        .id(id)
+        .name("Updated Product")
+        .description("Updated Description")
+        .costPrice(new BigDecimal("15.00"))
+        .salePrice(new BigDecimal("25.00"))
+        .build();
 
     when(productRepository.findById(id)).thenReturn(Optional.of(existingProduct));
     doNothing().when(productMapper).updateEntityFromData(productData, existingProduct);
@@ -279,31 +302,35 @@ class ProductServiceTest {
   void update_shouldRemoveCategory_whenCategoryIdIsNull() {
     Integer id = 1;
 
-    ProductData productData = new ProductData();
-    productData.setName("Updated Product");
-    productData.setCostPrice(new BigDecimal("15.00"));
-    productData.setSalePrice(new BigDecimal("25.00"));
-    productData.setCategoryId(null);
+    ProductData productData = ProductData.builder()
+        .name("Updated Product")
+        .costPrice(new BigDecimal("15.00"))
+        .salePrice(new BigDecimal("25.00"))
+        .categoryId(null)
+        .build();
 
-    Product existingProduct = new Product();
-    existingProduct.setId(id);
-    existingProduct.setName("Old Name");
-    existingProduct.setCostPrice(new BigDecimal("10.00"));
-    existingProduct.setSalePrice(new BigDecimal("15.00"));
-    existingProduct.setCategory(new Category());
+    Product existingProduct = Product.builder()
+        .id(id)
+        .name("Old Name")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .category(Category.builder().id(1).build())
+        .build();
 
-    Product updatedProduct = new Product();
-    updatedProduct.setId(id);
-    updatedProduct.setName("Updated Product");
-    updatedProduct.setCostPrice(new BigDecimal("15.00"));
-    updatedProduct.setSalePrice(new BigDecimal("25.00"));
-    updatedProduct.setCategory(null);
+    Product updatedProduct = Product.builder()
+        .id(id)
+        .name("Updated Product")
+        .costPrice(new BigDecimal("15.00"))
+        .salePrice(new BigDecimal("25.00"))
+        .category(null)
+        .build();
 
-    ProductInfo productInfo = new ProductInfo();
-    productInfo.setId(id);
-    productInfo.setName("Updated Product");
-    productInfo.setCostPrice(new BigDecimal("15.00"));
-    productInfo.setSalePrice(new BigDecimal("25.00"));
+    ProductInfo productInfo = ProductInfo.builder()
+        .id(id)
+        .name("Updated Product")
+        .costPrice(new BigDecimal("15.00"))
+        .salePrice(new BigDecimal("25.00"))
+        .build();
 
     when(productRepository.findById(id)).thenReturn(Optional.of(existingProduct));
     doNothing().when(productMapper).updateEntityFromData(productData, existingProduct);
@@ -322,8 +349,9 @@ class ProductServiceTest {
   @Test
   void update_shouldThrowException_whenProductDoesNotExist() {
     Integer id = 1;
-    ProductData productData = new ProductData();
-    productData.setName("Updated Product");
+    ProductData productData = ProductData.builder()
+        .name("Updated Product")
+        .build();
 
     when(productRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -339,13 +367,15 @@ class ProductServiceTest {
     Integer id = 1;
     Integer categoryId = 2;
 
-    ProductData productData = new ProductData();
-    productData.setName("Updated Product");
-    productData.setCategoryId(categoryId);
+    ProductData productData = ProductData.builder()
+        .name("Updated Product")
+        .categoryId(categoryId)
+        .build();
 
-    Product existingProduct = new Product();
-    existingProduct.setId(id);
-    existingProduct.setName("Old Name");
+    Product existingProduct = Product.builder()
+        .id(id)
+        .name("Old Name")
+        .build();
 
     when(productRepository.findById(id)).thenReturn(Optional.of(existingProduct));
     doNothing().when(productMapper).updateEntityFromData(productData, existingProduct);
@@ -361,8 +391,9 @@ class ProductServiceTest {
   @Test
   void delete_shouldDeleteProduct_whenProductExists() {
     Integer id = 1;
-    Product product = new Product();
-    product.setId(id);
+    Product product = Product.builder()
+        .id(id)
+        .build();
 
     when(productRepository.findById(id)).thenReturn(Optional.of(product));
 

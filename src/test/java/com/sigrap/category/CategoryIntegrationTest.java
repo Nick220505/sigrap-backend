@@ -48,16 +48,21 @@ class CategoryIntegrationTest {
     @BeforeEach
     void setup() {
         List<SimpleGrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
-        UserDetails userDetails = new User("test@example.com", "password", authorities);
+        UserDetails userDetails = User.builder()
+                .username("test@example.com")
+                .password("password")
+                .authorities(authorities)
+                .build();
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(userDetails, null, authorities));
     }
 
     @Test
     void crudOperations_shouldSucceed() throws Exception {
-        CategoryData categoryData = new CategoryData();
-        categoryData.setName("Test Category");
-        categoryData.setDescription("This is a test category");
+        CategoryData categoryData = CategoryData.builder()
+                .name("Test Category")
+                .description("This is a test category")
+                .build();
 
         MvcResult createResult = mockMvc.perform(post("/api/categories")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -93,9 +98,10 @@ class CategoryIntegrationTest {
         assertThat(categories).isNotEmpty();
         assertThat(categories.stream().anyMatch(c -> c.getId().equals(categoryId))).isTrue();
 
-        CategoryData updatedData = new CategoryData();
-        updatedData.setName("Updated Category");
-        updatedData.setDescription("This is an updated test category");
+        CategoryData updatedData = CategoryData.builder()
+                .name("Updated Category")
+                .description("This is an updated test category")
+                .build();
 
         mockMvc.perform(put("/api/categories/{id}", categoryId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -124,8 +130,9 @@ class CategoryIntegrationTest {
 
     @Test
     void updateNonExistentCategory_shouldReturnNotFound() throws Exception {
-        CategoryData categoryData = new CategoryData();
-        categoryData.setName("Non-existent Category");
+        CategoryData categoryData = CategoryData.builder()
+                .name("Non-existent Category")
+                .build();
 
         mockMvc.perform(put("/api/categories/999")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -141,14 +148,16 @@ class CategoryIntegrationTest {
 
     @Test
     void deleteMultipleCategories_shouldSucceed() throws Exception {
-        Category category1 = new Category();
-        category1.setName("Category 1");
-        category1.setDescription("Description 1");
+        Category category1 = Category.builder()
+                .name("Category 1")
+                .description("Description 1")
+                .build();
         category1 = categoryRepository.save(category1);
 
-        Category category2 = new Category();
-        category2.setName("Category 2");
-        category2.setDescription("Description 2");
+        Category category2 = Category.builder()
+                .name("Category 2")
+                .description("Description 2")
+                .build();
         category2 = categoryRepository.save(category2);
 
         List<Integer> idsToDelete = Arrays.asList(category1.getId(), category2.getId());

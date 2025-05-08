@@ -52,16 +52,18 @@ class AuthServiceTest {
 
   @Test
   void register_shouldCreateNewUser_andReturnToken() {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName("Test User");
-    registerRequest.setEmail("test@example.com");
-    registerRequest.setPassword("Password123!");
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .name("Test User")
+        .email("test@example.com")
+        .password("Password123!")
+        .build();
 
-    User savedUser = new User();
-    savedUser.setId(1L);
-    savedUser.setName("Test User");
-    savedUser.setEmail("test@example.com");
-    savedUser.setPassword("encodedPassword");
+    User savedUser = User.builder()
+        .id(1L)
+        .name("Test User")
+        .email("test@example.com")
+        .password("encodedPassword")
+        .build();
 
     when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
     when(passwordEncoder.encode("Password123!")).thenReturn("encodedPassword");
@@ -89,8 +91,9 @@ class AuthServiceTest {
 
   @Test
   void register_shouldThrowException_whenEmailExists() {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setEmail("existing@example.com");
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .email("existing@example.com")
+        .build();
 
     when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
 
@@ -103,15 +106,17 @@ class AuthServiceTest {
 
   @Test
   void authenticate_shouldReturnToken_whenCredentialsAreValid() {
-    AuthRequest authRequest = new AuthRequest();
-    authRequest.setEmail("test@example.com");
-    authRequest.setPassword("Password123!");
+    AuthRequest authRequest = AuthRequest.builder()
+        .email("test@example.com")
+        .password("Password123!")
+        .build();
 
-    User user = new User();
-    user.setId(1L);
-    user.setName("Test User");
-    user.setEmail("test@example.com");
-    user.setPassword("encodedPassword");
+    User user = User.builder()
+        .id(1L)
+        .name("Test User")
+        .email("test@example.com")
+        .password("encodedPassword")
+        .build();
 
     UserDetails userDetails = org.springframework.security.core.userdetails.User
         .withUsername("test@example.com")
@@ -137,9 +142,10 @@ class AuthServiceTest {
 
   @Test
   void authenticate_shouldThrowException_whenUserNotFound() {
-    AuthRequest authRequest = new AuthRequest();
-    authRequest.setEmail("nonexistent@example.com");
-    authRequest.setPassword("Password123!");
+    AuthRequest authRequest = AuthRequest.builder()
+        .email("nonexistent@example.com")
+        .password("Password123!")
+        .build();
 
     when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
 

@@ -1,8 +1,9 @@
 package com.sigrap.product;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.math.BigDecimal;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,17 +18,19 @@ class ProductMapperTest {
 
   @Test
   void toInfo_shouldMapEntityToInfo() {
-    Category category = new Category();
-    category.setId(1);
-    category.setName("Test Category");
+    Category category = Category.builder()
+        .id(1)
+        .name("Test Category")
+        .build();
 
-    Product product = new Product();
-    product.setId(1);
-    product.setName("Test Product");
-    product.setDescription("Test Description");
-    product.setCostPrice(new BigDecimal("10.00"));
-    product.setSalePrice(new BigDecimal("15.00"));
-    product.setCategory(category);
+    Product product = Product.builder()
+        .id(1)
+        .name("Test Product")
+        .description("Test Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .category(category)
+        .build();
 
     ProductInfo productInfo = productMapper.toInfo(product);
 
@@ -51,13 +54,14 @@ class ProductMapperTest {
 
   @Test
   void toInfo_shouldHandleNullCategory_whenMappingProduct() {
-    Product product = new Product();
-    product.setId(1);
-    product.setName("Test Product");
-    product.setDescription("Test Description");
-    product.setCostPrice(new BigDecimal("10.00"));
-    product.setSalePrice(new BigDecimal("15.00"));
-    product.setCategory(null);
+    Product product = Product.builder()
+        .id(1)
+        .name("Test Product")
+        .description("Test Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .category(null)
+        .build();
 
     ProductInfo productInfo = productMapper.toInfo(product);
 
@@ -72,12 +76,13 @@ class ProductMapperTest {
 
   @Test
   void toEntity_shouldMapDataToEntity() {
-    ProductData productData = new ProductData();
-    productData.setName("Test Product");
-    productData.setDescription("Test Description");
-    productData.setCostPrice(new BigDecimal("10.00"));
-    productData.setSalePrice(new BigDecimal("15.00"));
-    productData.setCategoryId(1);
+    ProductData productData = ProductData.builder()
+        .name("Test Product")
+        .description("Test Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .categoryId(1)
+        .build();
 
     Product product = productMapper.toEntity(productData);
 
@@ -99,19 +104,21 @@ class ProductMapperTest {
 
   @Test
   void updateEntityFromData_shouldUpdateEntityWithDataValues() {
-    Product product = new Product();
-    product.setId(1);
-    product.setName("Old Name");
-    product.setDescription("Old Description");
-    product.setCostPrice(new BigDecimal("10.00"));
-    product.setSalePrice(new BigDecimal("15.00"));
+    Product product = Product.builder()
+        .id(1)
+        .name("Old Name")
+        .description("Old Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    ProductData productData = new ProductData();
-    productData.setName("New Name");
-    productData.setDescription("New Description");
-    productData.setCostPrice(new BigDecimal("20.00"));
-    productData.setSalePrice(new BigDecimal("30.00"));
-    productData.setCategoryId(1);
+    ProductData productData = ProductData.builder()
+        .name("New Name")
+        .description("New Description")
+        .costPrice(new BigDecimal("20.00"))
+        .salePrice(new BigDecimal("30.00"))
+        .categoryId(1)
+        .build();
 
     productMapper.updateEntityFromData(productData, product);
 
@@ -125,17 +132,19 @@ class ProductMapperTest {
 
   @Test
   void updateEntityFromData_shouldSetNullValues_whenDataFieldsAreNull() {
-    Product product = new Product();
-    product.setId(1);
-    product.setName("Original Name");
-    product.setDescription("Original Description");
-    product.setCostPrice(new BigDecimal("10.00"));
-    product.setSalePrice(new BigDecimal("15.00"));
+    Product product = Product.builder()
+        .id(1)
+        .name("Original Name")
+        .description("Original Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    ProductData productData = new ProductData();
-    productData.setName("New Name");
-    productData.setCostPrice(new BigDecimal("20.00"));
-    productData.setSalePrice(new BigDecimal("30.00"));
+    ProductData productData = ProductData.builder()
+        .name("New Name")
+        .costPrice(new BigDecimal("20.00"))
+        .salePrice(new BigDecimal("30.00"))
+        .build();
 
     productMapper.updateEntityFromData(productData, product);
 
@@ -148,19 +157,21 @@ class ProductMapperTest {
 
   @Test
   void updateEntityFromData_shouldDoNothing_whenProductDataIsNull() {
-    Product product = new Product();
-    product.setId(1);
-    product.setName("Original Name");
-    product.setDescription("Original Description");
-    product.setCostPrice(new BigDecimal("10.00"));
-    product.setSalePrice(new BigDecimal("15.00"));
+    Product product = Product.builder()
+        .id(1)
+        .name("Original Name")
+        .description("Original Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
-    Product originalProduct = new Product();
-    originalProduct.setId(1);
-    originalProduct.setName("Original Name");
-    originalProduct.setDescription("Original Description");
-    originalProduct.setCostPrice(new BigDecimal("10.00"));
-    originalProduct.setSalePrice(new BigDecimal("15.00"));
+    Product originalProduct = Product.builder()
+        .id(1)
+        .name("Original Name")
+        .description("Original Description")
+        .costPrice(new BigDecimal("10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
     productMapper.updateEntityFromData(null, product);
 

@@ -21,6 +21,10 @@ public class UserService implements UserDetailsService {
     com.sigrap.user.User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-    return new User(user.getEmail(), user.getPassword(), new ArrayList<>());
+    return User.builder()
+        .username(user.getEmail())
+        .password(user.getPassword())
+        .authorities(new ArrayList<>())
+        .build();
   }
 }

@@ -1,5 +1,13 @@
 package com.sigrap.config;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -7,14 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import org.mockito.Mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -57,8 +58,9 @@ class DataSeederTest {
 
     List<Category> categories = new ArrayList<>();
     for (int i = 0; i < 12; i++) {
-      Category category = new Category();
-      category.setId(i);
+      Category category = Category.builder()
+          .id(i)
+          .build();
       categories.add(category);
     }
     when(categoryRepository.findAll()).thenReturn(categories);
@@ -116,8 +118,9 @@ class DataSeederTest {
 
     List<Category> categories = new ArrayList<>();
     for (int i = 0; i < 12; i++) {
-      Category category = new Category();
-      category.setId(i);
+      Category category = Category.builder()
+          .id(i)
+          .build();
       categories.add(category);
     }
     when(categoryRepository.findAll()).thenReturn(categories);

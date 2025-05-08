@@ -42,10 +42,11 @@ class SecurityIntegrationTest {
 
   @Test
   void accessProtectedEndpoint_withValidToken_shouldSucceed() throws Exception {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName("Security Test User");
-    registerRequest.setEmail("security-test@example.com");
-    registerRequest.setPassword("Password123!");
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .name("Security Test User")
+        .email("security-test@example.com")
+        .password("Password123!")
+        .build();
 
     String registerResponseJson = mockMvc.perform(post("/api/auth/register")
         .contentType(MediaType.APPLICATION_JSON)
@@ -63,10 +64,11 @@ class SecurityIntegrationTest {
 
   @Test
   void badRequest_shouldReturnAppropriateErrorResponse() throws Exception {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName("Error Test User");
-    registerRequest.setEmail("error-test@example.com");
-    registerRequest.setPassword("Password123!");
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .name("Error Test User")
+        .email("error-test@example.com")
+        .password("Password123!")
+        .build();
 
     String registerResponseJson = mockMvc.perform(post("/api/auth/register")
         .contentType(MediaType.APPLICATION_JSON)
@@ -77,7 +79,7 @@ class SecurityIntegrationTest {
     AuthResponse registerResponse = objectMapper.readValue(registerResponseJson, AuthResponse.class);
     String token = registerResponse.getToken();
 
-    ProductData invalidProduct = new ProductData();
+    ProductData invalidProduct = ProductData.builder().build();
 
     mockMvc.perform(post("/api/products")
         .header("Authorization", "Bearer " + token)
@@ -93,9 +95,10 @@ class SecurityIntegrationTest {
 
   @Test
   void invalidLogin_shouldReturnAppropriateErrorResponse() throws Exception {
-    AuthRequest invalidLoginRequest = new AuthRequest();
-    invalidLoginRequest.setEmail("nonexistent@example.com");
-    invalidLoginRequest.setPassword("wrongpassword");
+    AuthRequest invalidLoginRequest = AuthRequest.builder()
+        .email("nonexistent@example.com")
+        .password("wrongpassword")
+        .build();
 
     mockMvc.perform(post("/api/auth/login")
         .contentType(MediaType.APPLICATION_JSON)
@@ -108,10 +111,11 @@ class SecurityIntegrationTest {
 
   @Test
   void invalidProductData_shouldReturnAppropriateErrorResponse() throws Exception {
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName("Data Test User");
-    registerRequest.setEmail("data-test@example.com");
-    registerRequest.setPassword("Password123!");
+    RegisterRequest registerRequest = RegisterRequest.builder()
+        .name("Data Test User")
+        .email("data-test@example.com")
+        .password("Password123!")
+        .build();
 
     String registerResponseJson = mockMvc.perform(post("/api/auth/register")
         .contentType(MediaType.APPLICATION_JSON)
@@ -122,10 +126,11 @@ class SecurityIntegrationTest {
     AuthResponse registerResponse = objectMapper.readValue(registerResponseJson, AuthResponse.class);
     String token = registerResponse.getToken();
 
-    ProductData invalidProduct = new ProductData();
-    invalidProduct.setName("Invalid Product");
-    invalidProduct.setCostPrice(new BigDecimal("-10.00"));
-    invalidProduct.setSalePrice(new BigDecimal("15.00"));
+    ProductData invalidProduct = ProductData.builder()
+        .name("Invalid Product")
+        .costPrice(new BigDecimal("-10.00"))
+        .salePrice(new BigDecimal("15.00"))
+        .build();
 
     mockMvc.perform(post("/api/products")
         .header("Authorization", "Bearer " + token)

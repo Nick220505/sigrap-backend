@@ -1,9 +1,5 @@
 package com.sigrap.category;
 
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -11,9 +7,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -21,6 +14,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -59,13 +60,15 @@ class CategoryControllerTest {
     Integer id1 = 1;
     Integer id2 = 2;
 
-    CategoryInfo category1 = new CategoryInfo();
-    category1.setId(id1);
-    category1.setName("Category 1");
+    CategoryInfo category1 = CategoryInfo.builder()
+        .id(id1)
+        .name("Category 1")
+        .build();
 
-    CategoryInfo category2 = new CategoryInfo();
-    category2.setId(id2);
-    category2.setName("Category 2");
+    CategoryInfo category2 = CategoryInfo.builder()
+        .id(id2)
+        .name("Category 2")
+        .build();
 
     List<CategoryInfo> categories = List.of(category1, category2);
     when(categoryService.findAll()).thenReturn(categories);
@@ -81,9 +84,10 @@ class CategoryControllerTest {
   @Test
   void getById_shouldReturnCategory_whenExists() throws Exception {
     Integer id = 1;
-    CategoryInfo category = new CategoryInfo();
-    category.setId(id);
-    category.setName("Test Category");
+    CategoryInfo category = CategoryInfo.builder()
+        .id(id)
+        .name("Test Category")
+        .build();
 
     when(categoryService.findById(id)).thenReturn(category);
 
@@ -105,16 +109,18 @@ class CategoryControllerTest {
   @Test
   void create_shouldCreateCategory() throws Exception {
     Integer id = 1;
-    CategoryInfo categoryInfo = new CategoryInfo();
-    categoryInfo.setId(id);
-    categoryInfo.setName("New Category");
-    categoryInfo.setDescription("Test Description");
+    CategoryInfo categoryInfo = CategoryInfo.builder()
+        .id(id)
+        .name("New Category")
+        .description("Test Description")
+        .build();
 
     when(categoryService.create(any(CategoryData.class))).thenReturn(categoryInfo);
 
-    CategoryData requestData = new CategoryData();
-    requestData.setName("New Category");
-    requestData.setDescription("Test Description");
+    CategoryData requestData = CategoryData.builder()
+        .name("New Category")
+        .description("Test Description")
+        .build();
 
     mockMvc.perform(post("/api/categories")
         .contentType(MediaType.APPLICATION_JSON)
@@ -130,16 +136,18 @@ class CategoryControllerTest {
   @Test
   void update_shouldUpdateCategory_whenExists() throws Exception {
     Integer id = 1;
-    CategoryInfo updatedCategory = new CategoryInfo();
-    updatedCategory.setId(id);
-    updatedCategory.setName("Updated Category");
-    updatedCategory.setDescription("Updated Description");
+    CategoryInfo updatedCategory = CategoryInfo.builder()
+        .id(id)
+        .name("Updated Category")
+        .description("Updated Description")
+        .build();
 
     when(categoryService.update(eq(id), any(CategoryData.class))).thenReturn(updatedCategory);
 
-    CategoryData updateRequest = new CategoryData();
-    updateRequest.setName("Updated Category");
-    updateRequest.setDescription("Updated Description");
+    CategoryData updateRequest = CategoryData.builder()
+        .name("Updated Category")
+        .description("Updated Description")
+        .build();
 
     mockMvc.perform(put("/api/categories/{id}", id)
         .contentType(MediaType.APPLICATION_JSON)
@@ -157,8 +165,9 @@ class CategoryControllerTest {
     Integer id = 1;
     when(categoryService.update(eq(id), any(CategoryData.class))).thenThrow(new EntityNotFoundException());
 
-    CategoryData updateRequest = new CategoryData();
-    updateRequest.setName("Updated Category");
+    CategoryData updateRequest = CategoryData.builder()
+        .name("Updated Category")
+        .build();
 
     mockMvc.perform(put("/api/categories/{id}", id)
         .contentType(MediaType.APPLICATION_JSON)

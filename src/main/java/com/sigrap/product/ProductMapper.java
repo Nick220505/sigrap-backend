@@ -27,8 +27,8 @@ public interface ProductMapper {
     if (categoryId == null) {
       return null;
     }
-    Category category = new Category();
-    category.setId(categoryId);
-    return category;
+    return Category.builder()
+        .id(categoryId)
+        .build();
   }
 }

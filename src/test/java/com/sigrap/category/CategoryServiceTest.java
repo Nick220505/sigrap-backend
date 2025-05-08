@@ -1,19 +1,20 @@
 package com.sigrap.category;
 
-import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -33,13 +34,15 @@ class CategoryServiceTest {
   @Test
   void findById_shouldReturnCategoryInfo_whenCategoryExists() {
     Integer id = 1;
-    Category category = new Category();
-    category.setId(id);
-    category.setName("Test Category");
+    Category category = Category.builder()
+        .id(id)
+        .name("Test Category")
+        .build();
 
-    CategoryInfo categoryInfo = new CategoryInfo();
-    categoryInfo.setId(id);
-    categoryInfo.setName("Test Category");
+    CategoryInfo categoryInfo = CategoryInfo.builder()
+        .id(id)
+        .name("Test Category")
+        .build();
 
     when(categoryRepository.findById(id)).thenReturn(Optional.of(category));
     when(categoryMapper.toInfo(category)).thenReturn(categoryInfo);
@@ -63,23 +66,27 @@ class CategoryServiceTest {
 
   @Test
   void findAll_shouldReturnAllCategoryInfos() {
-    Category category1 = new Category();
-    category1.setId(1);
-    category1.setName("Category 1");
+    Category category1 = Category.builder()
+        .id(1)
+        .name("Category 1")
+        .build();
 
-    Category category2 = new Category();
-    category2.setId(2);
-    category2.setName("Category 2");
+    Category category2 = Category.builder()
+        .id(2)
+        .name("Category 2")
+        .build();
 
     List<Category> categories = List.of(category1, category2);
 
-    CategoryInfo categoryInfo1 = new CategoryInfo();
-    categoryInfo1.setId(1);
-    categoryInfo1.setName("Category 1");
+    CategoryInfo categoryInfo1 = CategoryInfo.builder()
+        .id(1)
+        .name("Category 1")
+        .build();
 
-    CategoryInfo categoryInfo2 = new CategoryInfo();
-    categoryInfo2.setId(2);
-    categoryInfo2.setName("Category 2");
+    CategoryInfo categoryInfo2 = CategoryInfo.builder()
+        .id(2)
+        .name("Category 2")
+        .build();
 
     List<CategoryInfo> categoryInfos = List.of(categoryInfo1, categoryInfo2);
 
@@ -96,23 +103,27 @@ class CategoryServiceTest {
 
   @Test
   void create_shouldCreateCategory() {
-    CategoryData categoryData = new CategoryData();
-    categoryData.setName("New Category");
-    categoryData.setDescription("New Description");
+    CategoryData categoryData = CategoryData.builder()
+        .name("New Category")
+        .description("New Description")
+        .build();
 
-    Category category = new Category();
-    category.setName("New Category");
-    category.setDescription("New Description");
+    Category category = Category.builder()
+        .name("New Category")
+        .description("New Description")
+        .build();
 
-    Category savedCategory = new Category();
-    savedCategory.setId(1);
-    savedCategory.setName("New Category");
-    savedCategory.setDescription("New Description");
+    Category savedCategory = Category.builder()
+        .id(1)
+        .name("New Category")
+        .description("New Description")
+        .build();
 
-    CategoryInfo categoryInfo = new CategoryInfo();
-    categoryInfo.setId(1);
-    categoryInfo.setName("New Category");
-    categoryInfo.setDescription("New Description");
+    CategoryInfo categoryInfo = CategoryInfo.builder()
+        .id(1)
+        .name("New Category")
+        .description("New Description")
+        .build();
 
     when(categoryMapper.toEntity(categoryData)).thenReturn(category);
     when(categoryRepository.save(category)).thenReturn(savedCategory);
@@ -130,23 +141,27 @@ class CategoryServiceTest {
   @Test
   void update_shouldUpdateCategory_whenCategoryExists() {
     Integer id = 1;
-    CategoryData categoryData = new CategoryData();
-    categoryData.setName("Updated Name");
-    categoryData.setDescription("Updated Description");
+    CategoryData categoryData = CategoryData.builder()
+        .name("Updated Name")
+        .description("Updated Description")
+        .build();
 
-    Category existingCategory = new Category();
-    existingCategory.setId(id);
-    existingCategory.setName("Old Name");
+    Category existingCategory = Category.builder()
+        .id(id)
+        .name("Old Name")
+        .build();
 
-    Category updatedCategory = new Category();
-    updatedCategory.setId(id);
-    updatedCategory.setName("Updated Name");
-    updatedCategory.setDescription("Updated Description");
+    Category updatedCategory = Category.builder()
+        .id(id)
+        .name("Updated Name")
+        .description("Updated Description")
+        .build();
 
-    CategoryInfo categoryInfo = new CategoryInfo();
-    categoryInfo.setId(id);
-    categoryInfo.setName("Updated Name");
-    categoryInfo.setDescription("Updated Description");
+    CategoryInfo categoryInfo = CategoryInfo.builder()
+        .id(id)
+        .name("Updated Name")
+        .description("Updated Description")
+        .build();
 
     when(categoryRepository.findById(id)).thenReturn(Optional.of(existingCategory));
     doNothing().when(categoryMapper).updateEntityFromData(categoryData, existingCategory);
@@ -164,8 +179,9 @@ class CategoryServiceTest {
   @Test
   void update_shouldThrowException_whenCategoryDoesNotExist() {
     Integer id = 1;
-    CategoryData categoryData = new CategoryData();
-    categoryData.setName("Updated Name");
+    CategoryData categoryData = CategoryData.builder()
+        .name("Updated Name")
+        .build();
 
     when(categoryRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -178,8 +194,9 @@ class CategoryServiceTest {
   @Test
   void delete_shouldDeleteCategory_whenCategoryExists() {
     Integer id = 1;
-    Category category = new Category();
-    category.setId(id);
+    Category category = Category.builder()
+        .id(id)
+        .build();
 
     when(categoryRepository.findById(id)).thenReturn(Optional.of(category));
 
