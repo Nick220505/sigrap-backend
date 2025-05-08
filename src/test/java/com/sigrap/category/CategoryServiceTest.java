@@ -33,19 +33,13 @@ class CategoryServiceTest {
   @Test
   void findById_shouldReturnCategoryInfo_whenCategoryExists() {
     Integer id = 1;
-    Category category = new Category() {
-      {
-        setId(id);
-        setName("Test Category");
-      }
-    };
+    Category category = new Category();
+    category.setId(id);
+    category.setName("Test Category");
 
-    CategoryInfo categoryInfo = new CategoryInfo() {
-      {
-        setId(id);
-        setName("Test Category");
-      }
-    };
+    CategoryInfo categoryInfo = new CategoryInfo();
+    categoryInfo.setId(id);
+    categoryInfo.setName("Test Category");
 
     when(categoryRepository.findById(id)).thenReturn(Optional.of(category));
     when(categoryMapper.toInfo(category)).thenReturn(categoryInfo);
@@ -69,23 +63,25 @@ class CategoryServiceTest {
 
   @Test
   void findAll_shouldReturnAllCategoryInfos() {
-    List<Category> categories = List.of(
-        new Category() {
-          {
-            setId(1);
-            setName("Category 1");
-          }
-        },
-        new Category() {
-          {
-            setId(2);
-            setName("Category 2");
-          }
-        });
+    Category category1 = new Category();
+    category1.setId(1);
+    category1.setName("Category 1");
 
-    List<CategoryInfo> categoryInfos = List.of(
-        new CategoryInfo(1, "Category 1", null, null, null),
-        new CategoryInfo(2, "Category 2", null, null, null));
+    Category category2 = new Category();
+    category2.setId(2);
+    category2.setName("Category 2");
+
+    List<Category> categories = List.of(category1, category2);
+
+    CategoryInfo categoryInfo1 = new CategoryInfo();
+    categoryInfo1.setId(1);
+    categoryInfo1.setName("Category 1");
+
+    CategoryInfo categoryInfo2 = new CategoryInfo();
+    categoryInfo2.setId(2);
+    categoryInfo2.setName("Category 2");
+
+    List<CategoryInfo> categoryInfos = List.of(categoryInfo1, categoryInfo2);
 
     when(categoryRepository.findAll()).thenReturn(categories);
     when(categoryMapper.toInfo(categories.get(0))).thenReturn(categoryInfos.get(0));
@@ -100,35 +96,23 @@ class CategoryServiceTest {
 
   @Test
   void create_shouldCreateCategory() {
-    CategoryData categoryData = new CategoryData() {
-      {
-        setName("New Category");
-        setDescription("New Description");
-      }
-    };
+    CategoryData categoryData = new CategoryData();
+    categoryData.setName("New Category");
+    categoryData.setDescription("New Description");
 
-    Category category = new Category() {
-      {
-        setName("New Category");
-        setDescription("New Description");
-      }
-    };
+    Category category = new Category();
+    category.setName("New Category");
+    category.setDescription("New Description");
 
-    Category savedCategory = new Category() {
-      {
-        setId(1);
-        setName("New Category");
-        setDescription("New Description");
-      }
-    };
+    Category savedCategory = new Category();
+    savedCategory.setId(1);
+    savedCategory.setName("New Category");
+    savedCategory.setDescription("New Description");
 
-    CategoryInfo categoryInfo = new CategoryInfo() {
-      {
-        setId(1);
-        setName("New Category");
-        setDescription("New Description");
-      }
-    };
+    CategoryInfo categoryInfo = new CategoryInfo();
+    categoryInfo.setId(1);
+    categoryInfo.setName("New Category");
+    categoryInfo.setDescription("New Description");
 
     when(categoryMapper.toEntity(categoryData)).thenReturn(category);
     when(categoryRepository.save(category)).thenReturn(savedCategory);
@@ -146,35 +130,23 @@ class CategoryServiceTest {
   @Test
   void update_shouldUpdateCategory_whenCategoryExists() {
     Integer id = 1;
-    CategoryData categoryData = new CategoryData() {
-      {
-        setName("Updated Name");
-        setDescription("Updated Description");
-      }
-    };
+    CategoryData categoryData = new CategoryData();
+    categoryData.setName("Updated Name");
+    categoryData.setDescription("Updated Description");
 
-    Category existingCategory = new Category() {
-      {
-        setId(id);
-        setName("Old Name");
-      }
-    };
+    Category existingCategory = new Category();
+    existingCategory.setId(id);
+    existingCategory.setName("Old Name");
 
-    Category updatedCategory = new Category() {
-      {
-        setId(id);
-        setName("Updated Name");
-        setDescription("Updated Description");
-      }
-    };
+    Category updatedCategory = new Category();
+    updatedCategory.setId(id);
+    updatedCategory.setName("Updated Name");
+    updatedCategory.setDescription("Updated Description");
 
-    CategoryInfo categoryInfo = new CategoryInfo() {
-      {
-        setId(id);
-        setName("Updated Name");
-        setDescription("Updated Description");
-      }
-    };
+    CategoryInfo categoryInfo = new CategoryInfo();
+    categoryInfo.setId(id);
+    categoryInfo.setName("Updated Name");
+    categoryInfo.setDescription("Updated Description");
 
     when(categoryRepository.findById(id)).thenReturn(Optional.of(existingCategory));
     doNothing().when(categoryMapper).updateEntityFromData(categoryData, existingCategory);
@@ -192,11 +164,8 @@ class CategoryServiceTest {
   @Test
   void update_shouldThrowException_whenCategoryDoesNotExist() {
     Integer id = 1;
-    CategoryData categoryData = new CategoryData() {
-      {
-        setName("Updated Name");
-      }
-    };
+    CategoryData categoryData = new CategoryData();
+    categoryData.setName("Updated Name");
 
     when(categoryRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -209,11 +178,8 @@ class CategoryServiceTest {
   @Test
   void delete_shouldDeleteCategory_whenCategoryExists() {
     Integer id = 1;
-    Category category = new Category() {
-      {
-        setId(id);
-      }
-    };
+    Category category = new Category();
+    category.setId(id);
 
     when(categoryRepository.findById(id)).thenReturn(Optional.of(category));
 
