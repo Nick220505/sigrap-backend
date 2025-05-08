@@ -21,5 +21,6 @@ class SigrapBackendApplicationTests {
 	@Test
 	void main() {
 		SigrapBackendApplication.main(new String[] {});
+		assertThat(context).isNotNull();
 	}
 }
