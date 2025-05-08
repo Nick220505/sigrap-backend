@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class ProductData {
 
   @NotBlank(message = "Product name cannot be blank")
-  @Schema(description = "Name of the product", example = "Blue Pen", required = true)
+  @Schema(description = "Name of the product", example = "Blue Pen")
   private String name;
 
   @Schema(description = "Description of the product", example = "High-quality blue ink pen")
@@ -27,12 +27,12 @@ public class ProductData {
 
   @NotNull(message = "Cost price cannot be null")
   @PositiveOrZero(message = "Cost price must be zero or positive")
-  @Schema(description = "Cost price of the product", example = "1.50", required = true)
+  @Schema(description = "Cost price of the product", example = "1.50")
   private BigDecimal costPrice;
 
   @NotNull(message = "Sale price cannot be null")
   @PositiveOrZero(message = "Sale price must be zero or positive")
-  @Schema(description = "Sale price of the product", example = "2.50", required = true)
+  @Schema(description = "Sale price of the product", example = "2.50")
   private BigDecimal salePrice;
 
   @Schema(description = "ID of the category this product belongs to", example = "1")

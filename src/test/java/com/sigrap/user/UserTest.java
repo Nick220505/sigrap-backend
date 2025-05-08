@@ -44,7 +44,7 @@ class UserTest {
 
     Set<ConstraintViolation<User>> violations = validator.validate(user);
     assertThat(violations).hasSize(1);
-    assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("name");
+    assertThat(violations.iterator().next().getPropertyPath()).hasToString("name");
   }
 
   @Test
@@ -57,7 +57,7 @@ class UserTest {
 
     Set<ConstraintViolation<User>> violations = validator.validate(user);
     assertThat(violations).hasSize(1);
-    assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("email");
+    assertThat(violations.iterator().next().getPropertyPath()).hasToString("email");
   }
 
   @Test
@@ -70,7 +70,7 @@ class UserTest {
 
     Set<ConstraintViolation<User>> violations = validator.validate(user);
     assertThat(violations).hasSize(1);
-    assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("email");
+    assertThat(violations.iterator().next().getPropertyPath()).hasToString("email");
   }
 
   @Test
@@ -83,6 +83,6 @@ class UserTest {
 
     Set<ConstraintViolation<User>> violations = validator.validate(user);
     assertThat(violations).hasSize(1);
-    assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("password");
+    assertThat(violations.iterator().next().getPropertyPath()).hasToString("password");
   }
 }

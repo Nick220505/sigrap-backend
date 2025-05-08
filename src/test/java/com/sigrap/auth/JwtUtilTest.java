@@ -44,7 +44,7 @@ class JwtUtilTest {
     String token = jwtUtil.generateToken(userDetails);
 
     assertThat(token).isNotNull();
-    assertThat(token.split("\\.").length).isEqualTo(3);
+    assertThat(token.split("\\.")).hasSize(3);
   }
 
   @Test
@@ -64,8 +64,9 @@ class JwtUtilTest {
 
     Date now = new Date();
     assertThat(expiration).isAfter(now);
-    assertThat(expiration.getTime() - now.getTime()).isLessThan(3600000L + 5000L);
-    assertThat(expiration.getTime() - now.getTime()).isGreaterThan(3600000L - 5000L);
+    assertThat(expiration.getTime() - now.getTime())
+        .isGreaterThan(3600000L - 5000L)
+        .isLessThan(3600000L + 5000L);
   }
 
   @Test

@@ -17,10 +17,10 @@ public class AuthRequest {
 
   @NotBlank(message = "Email cannot be empty")
   @Email(message = "Invalid email format")
-  @Schema(description = "User's email address", example = "user@example.com", required = true)
+  @Schema(description = "User's email address", example = "user@example.com")
   private String email;
 
   @NotBlank(message = "Password cannot be empty")
-  @Schema(description = "User's password", example = "Password123!", required = true)
+  @Schema(description = "User's password", example = "Password123!")
   private String password;
 }
