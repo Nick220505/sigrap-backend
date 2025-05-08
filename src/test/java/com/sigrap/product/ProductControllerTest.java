@@ -1,5 +1,10 @@
 package com.sigrap.product;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -7,6 +12,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -14,15 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
-
-import java.math.BigDecimal;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -58,9 +57,19 @@ class ProductControllerTest {
 
   @Test
   void findAll_shouldReturnAllProducts() throws Exception {
-    List<ProductInfo> products = List.of(
-        createProductInfo(1, "Product 1", new BigDecimal("10.00"), new BigDecimal("15.00")),
-        createProductInfo(2, "Product 2", new BigDecimal("20.00"), new BigDecimal("30.00")));
+    ProductInfo product1 = new ProductInfo();
+    product1.setId(1);
+    product1.setName("Product 1");
+    product1.setCostPrice(new BigDecimal("10.00"));
+    product1.setSalePrice(new BigDecimal("15.00"));
+
+    ProductInfo product2 = new ProductInfo();
+    product2.setId(2);
+    product2.setName("Product 2");
+    product2.setCostPrice(new BigDecimal("20.00"));
+    product2.setSalePrice(new BigDecimal("30.00"));
+
+    List<ProductInfo> products = List.of(product1, product2);
     when(productService.findAll()).thenReturn(products);
 
     mockMvc.perform(get("/api/products"))
@@ -76,7 +85,12 @@ class ProductControllerTest {
   @Test
   void findById_shouldReturnProduct_whenExists() throws Exception {
     Integer id = 1;
-    ProductInfo product = createProductInfo(id, "Test Product", new BigDecimal("10.00"), new BigDecimal("15.00"));
+    ProductInfo product = new ProductInfo();
+    product.setId(id);
+    product.setName("Test Product");
+    product.setCostPrice(new BigDecimal("10.00"));
+    product.setSalePrice(new BigDecimal("15.00"));
+
     when(productService.findById(id)).thenReturn(product);
 
     mockMvc.perform(get("/api/products/{id}", id))
@@ -215,14 +229,5 @@ class ProductControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ids)))
         .andExpect(status().isNotFound());
-  }
-
-  private ProductInfo createProductInfo(Integer id, String name, BigDecimal costPrice, BigDecimal salePrice) {
-    ProductInfo productInfo = new ProductInfo();
-    productInfo.setId(id);
-    productInfo.setName(name);
-    productInfo.setCostPrice(costPrice);
-    productInfo.setSalePrice(salePrice);
-    return productInfo;
   }
 }

@@ -75,13 +75,33 @@ class ProductServiceTest {
 
   @Test
   void findAll_shouldReturnAllProductInfos() {
-    List<Product> products = List.of(
-        createProduct(1, "Product 1", new BigDecimal("10.00"), new BigDecimal("15.00")),
-        createProduct(2, "Product 2", new BigDecimal("20.00"), new BigDecimal("30.00")));
+    Product product1 = new Product();
+    product1.setId(1);
+    product1.setName("Product 1");
+    product1.setCostPrice(new BigDecimal("10.00"));
+    product1.setSalePrice(new BigDecimal("15.00"));
 
-    List<ProductInfo> productInfos = List.of(
-        createProductInfo(1, "Product 1", new BigDecimal("10.00"), new BigDecimal("15.00")),
-        createProductInfo(2, "Product 2", new BigDecimal("20.00"), new BigDecimal("30.00")));
+    Product product2 = new Product();
+    product2.setId(2);
+    product2.setName("Product 2");
+    product2.setCostPrice(new BigDecimal("20.00"));
+    product2.setSalePrice(new BigDecimal("30.00"));
+
+    List<Product> products = List.of(product1, product2);
+
+    ProductInfo productInfo1 = new ProductInfo();
+    productInfo1.setId(1);
+    productInfo1.setName("Product 1");
+    productInfo1.setCostPrice(new BigDecimal("10.00"));
+    productInfo1.setSalePrice(new BigDecimal("15.00"));
+
+    ProductInfo productInfo2 = new ProductInfo();
+    productInfo2.setId(2);
+    productInfo2.setName("Product 2");
+    productInfo2.setCostPrice(new BigDecimal("20.00"));
+    productInfo2.setSalePrice(new BigDecimal("30.00"));
+
+    List<ProductInfo> productInfos = List.of(productInfo1, productInfo2);
 
     when(productRepository.findAll()).thenReturn(products);
     when(productMapper.toInfo(products.get(0))).thenReturn(productInfos.get(0));
@@ -388,23 +408,5 @@ class ProductServiceTest {
     });
 
     verify(productRepository, never()).deleteAllById(any());
-  }
-
-  private Product createProduct(Integer id, String name, BigDecimal costPrice, BigDecimal salePrice) {
-    Product product = new Product();
-    product.setId(id);
-    product.setName(name);
-    product.setCostPrice(costPrice);
-    product.setSalePrice(salePrice);
-    return product;
-  }
-
-  private ProductInfo createProductInfo(Integer id, String name, BigDecimal costPrice, BigDecimal salePrice) {
-    ProductInfo productInfo = new ProductInfo();
-    productInfo.setId(id);
-    productInfo.setName(name);
-    productInfo.setCostPrice(costPrice);
-    productInfo.setSalePrice(salePrice);
-    return productInfo;
   }
 }
