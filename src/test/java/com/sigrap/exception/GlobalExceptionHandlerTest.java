@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -55,6 +56,11 @@ class GlobalExceptionHandlerTest {
     @GetMapping("/test/bad-credentials")
     public void throwBadCredentialsException() {
       throw new BadCredentialsException("Invalid credentials");
+    }
+
+    @GetMapping("/test/expired-jwt")
+    public void throwExpiredJwtException() {
+      throw new ExpiredJwtException(null, null, "Token has expired");
     }
 
     @GetMapping("/test/illegal-argument")
@@ -115,6 +121,18 @@ class GlobalExceptionHandlerTest {
         .andExpect(jsonPath("$.status").value(401))
         .andExpect(jsonPath("$.error").value("Unauthorized"))
         .andExpect(jsonPath("$.message").value("Invalid credentials"));
+  }
+
+  @Test
+  void handleExpiredJwtException() throws Exception {
+    mockMvc.perform(get("/test/expired-jwt")
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.timestamp").exists())
+        .andExpect(jsonPath("$.status").value(401))
+        .andExpect(jsonPath("$.error").value("Unauthorized"))
+        .andExpect(jsonPath("$.message").value("Token has expired"))
+        .andExpect(jsonPath("$.code").value("TOKEN_EXPIRED"));
   }
 
   @Test
