@@ -15,6 +15,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+/**
+ * Configuration component for seeding initial data into the database.
+ * Automatically runs on application startup when enabled.
+ *
+ * <p>This seeder ensures the application has necessary initial data for proper operation.
+ * It only seeds data if the respective tables are empty, preventing duplicate entries.</p>
+ *
+ * <p>The seeder can be disabled using the property 'app.data-seeder.enabled=false'.</p>
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -30,6 +39,13 @@ public class DataSeeder implements CommandLineRunner {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
+  /**
+   * Executes the data seeding process on application startup.
+   * Ensures all required initial data is present in the database.
+   *
+   * @param args Command line arguments (not used)
+   * @throws Exception if any seeding operation fails
+   */
   @Override
   public void run(String... args) throws Exception {
     seedCategories();
@@ -37,6 +53,11 @@ public class DataSeeder implements CommandLineRunner {
     seedUsers();
   }
 
+  /**
+   * Seeds initial product categories into the database.
+   * Creates a comprehensive set of categories covering different types of stationery items.
+   * Only executes if the categories table is empty.
+   */
   private void seedCategories() {
     if (categoryRepository.count() == 0) {
       log.info("Seeding categories...");
@@ -134,6 +155,11 @@ public class DataSeeder implements CommandLineRunner {
     }
   }
 
+  /**
+   * Seeds initial products into the database.
+   * Creates a diverse catalog of products across all categories with realistic pricing.
+   * Only executes if the products table is empty and categories exist.
+   */
   private void seedProducts() {
     if (productRepository.count() == 0) {
       log.info("Seeding products...");
@@ -696,6 +722,11 @@ public class DataSeeder implements CommandLineRunner {
     }
   }
 
+  /**
+   * Seeds initial user accounts into the database.
+   * Creates default administrative and employee accounts with secure passwords.
+   * Only executes if the users table is empty.
+   */
   private void seedUsers() {
     if (userRepository.count() == 0) {
       log.info("Seeding users...");
