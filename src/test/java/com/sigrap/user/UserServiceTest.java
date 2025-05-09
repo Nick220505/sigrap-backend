@@ -25,15 +25,19 @@ class UserServiceTest {
   @Test
   void loadUserByUsername_shouldReturnUserDetails_whenUserExists() {
     User user = User.builder()
-        .id(1L)
-        .name("Test User")
-        .email("test@example.com")
-        .password("encodedPassword")
-        .build();
+      .id(1L)
+      .name("Test User")
+      .email("test@example.com")
+      .password("encodedPassword")
+      .build();
 
-    when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+    when(userRepository.findByEmail("test@example.com")).thenReturn(
+      Optional.of(user)
+    );
 
-    UserDetails userDetails = userService.loadUserByUsername("test@example.com");
+    UserDetails userDetails = userService.loadUserByUsername(
+      "test@example.com"
+    );
 
     assertThat(userDetails).isNotNull();
     assertThat(userDetails.getUsername()).isEqualTo("test@example.com");
@@ -43,7 +47,9 @@ class UserServiceTest {
 
   @Test
   void loadUserByUsername_shouldThrowException_whenUserDoesNotExist() {
-    when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
+    when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(
+      Optional.empty()
+    );
 
     assertThrows(UsernameNotFoundException.class, () -> {
       userService.loadUserByUsername("nonexistent@example.com");

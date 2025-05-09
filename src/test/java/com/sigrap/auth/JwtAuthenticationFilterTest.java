@@ -81,7 +81,8 @@ class JwtAuthenticationFilterTest {
   }
 
   @Test
-  void doFilterInternal_shouldContinueFilterChain_whenNoAuthorizationHeader() throws ServletException, IOException {
+  void doFilterInternal_shouldContinueFilterChain_whenNoAuthorizationHeader()
+    throws ServletException, IOException {
     when(request.getHeader("Authorization")).thenReturn(null);
 
     jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
@@ -92,8 +93,10 @@ class JwtAuthenticationFilterTest {
 
   @Test
   void doFilterInternal_shouldContinueFilterChain_whenAuthorizationHeaderNotBearer()
-      throws ServletException, IOException {
-    when(request.getHeader("Authorization")).thenReturn("Basic dXNlcjpwYXNzd29yZA==");
+    throws ServletException, IOException {
+    when(request.getHeader("Authorization")).thenReturn(
+      "Basic dXNlcjpwYXNzd29yZA=="
+    );
 
     jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
@@ -102,16 +105,19 @@ class JwtAuthenticationFilterTest {
   }
 
   @Test
-  void doFilterInternal_shouldAuthenticate_whenValidToken() throws ServletException, IOException {
+  void doFilterInternal_shouldAuthenticate_whenValidToken()
+    throws ServletException, IOException {
     when(request.getHeader("Authorization")).thenReturn("Bearer validToken");
     when(jwtUtil.extractUsername("validToken")).thenReturn("test@example.com");
 
     UserDetails userDetails = User.withUsername("test@example.com")
-        .password("password")
-        .authorities(Collections.emptyList())
-        .build();
+      .password("password")
+      .authorities(Collections.emptyList())
+      .build();
 
-    when(userService.loadUserByUsername("test@example.com")).thenReturn(userDetails);
+    when(userService.loadUserByUsername("test@example.com")).thenReturn(
+      userDetails
+    );
     when(jwtUtil.validateToken("validToken", userDetails)).thenReturn(true);
 
     jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
@@ -122,16 +128,21 @@ class JwtAuthenticationFilterTest {
   }
 
   @Test
-  void doFilterInternal_shouldNotAuthenticate_whenInvalidToken() throws ServletException, IOException {
+  void doFilterInternal_shouldNotAuthenticate_whenInvalidToken()
+    throws ServletException, IOException {
     when(request.getHeader("Authorization")).thenReturn("Bearer invalidToken");
-    when(jwtUtil.extractUsername("invalidToken")).thenReturn("test@example.com");
+    when(jwtUtil.extractUsername("invalidToken")).thenReturn(
+      "test@example.com"
+    );
 
     UserDetails userDetails = User.withUsername("test@example.com")
-        .password("password")
-        .authorities(Collections.emptyList())
-        .build();
+      .password("password")
+      .authorities(Collections.emptyList())
+      .build();
 
-    when(userService.loadUserByUsername("test@example.com")).thenReturn(userDetails);
+    when(userService.loadUserByUsername("test@example.com")).thenReturn(
+      userDetails
+    );
     when(jwtUtil.validateToken("invalidToken", userDetails)).thenReturn(false);
 
     jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
@@ -142,7 +153,8 @@ class JwtAuthenticationFilterTest {
   }
 
   @Test
-  void doFilterInternal_shouldNotAuthenticate_whenUsernameIsNull() throws ServletException, IOException {
+  void doFilterInternal_shouldNotAuthenticate_whenUsernameIsNull()
+    throws ServletException, IOException {
     when(request.getHeader("Authorization")).thenReturn("Bearer someToken");
     when(jwtUtil.extractUsername("someToken")).thenReturn(null);
 
@@ -154,12 +166,16 @@ class JwtAuthenticationFilterTest {
   }
 
   @Test
-  void doFilterInternal_shouldNotReauthenticate_whenAlreadyAuthenticated() throws ServletException, IOException {
+  void doFilterInternal_shouldNotReauthenticate_whenAlreadyAuthenticated()
+    throws ServletException, IOException {
     when(request.getHeader("Authorization")).thenReturn("Bearer validToken");
     when(jwtUtil.extractUsername("validToken")).thenReturn("test@example.com");
 
     Authentication existingAuth = new UsernamePasswordAuthenticationToken(
-        "test@example.com", null, Collections.emptyList());
+      "test@example.com",
+      null,
+      Collections.emptyList()
+    );
 
     SecurityContextHolder.getContext().setAuthentication(existingAuth);
 
@@ -172,22 +188,34 @@ class JwtAuthenticationFilterTest {
   }
 
   @Test
-  void doFilterInternal_shouldHandleExpiredToken() throws ServletException, IOException {
+  void doFilterInternal_shouldHandleExpiredToken()
+    throws ServletException, IOException {
     when(request.getHeader("Authorization")).thenReturn("Bearer expiredToken");
-    when(jwtUtil.extractUsername("expiredToken"))
-        .thenThrow(new ExpiredJwtException(null, null, "Token has expired"));
+    when(jwtUtil.extractUsername("expiredToken")).thenThrow(
+      new ExpiredJwtException(null, null, "Token has expired")
+    );
     when(response.getOutputStream()).thenReturn(outputStream);
 
     jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
     verify(response).setStatus(HttpStatus.UNAUTHORIZED.value());
     verify(response).setContentType(MediaType.APPLICATION_JSON_VALUE);
-    verify(objectMapper).writeValue(any(ServletOutputStream.class), argThat(map -> map instanceof Map &&
-        ((Map<?, ?>) map).get("status").equals(HttpStatus.UNAUTHORIZED.value()) &&
-        ((Map<?, ?>) map).get("error").equals(HttpStatus.UNAUTHORIZED.getReasonPhrase()) &&
-        ((Map<?, ?>) map).get("message").equals("Token has expired") &&
-        ((Map<?, ?>) map).get("code").equals("TOKEN_EXPIRED") &&
-        ((Map<?, ?>) map).get("timestamp") != null));
+    verify(objectMapper).writeValue(
+      any(ServletOutputStream.class),
+      argThat(
+        map ->
+          map instanceof Map &&
+          ((Map<?, ?>) map).get("status").equals(
+              HttpStatus.UNAUTHORIZED.value()
+            ) &&
+          ((Map<?, ?>) map).get("error").equals(
+              HttpStatus.UNAUTHORIZED.getReasonPhrase()
+            ) &&
+          ((Map<?, ?>) map).get("message").equals("Token has expired") &&
+          ((Map<?, ?>) map).get("code").equals("TOKEN_EXPIRED") &&
+          ((Map<?, ?>) map).get("timestamp") != null
+      )
+    );
     verify(filterChain, never()).doFilter(request, response);
   }
 }

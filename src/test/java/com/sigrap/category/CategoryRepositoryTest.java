@@ -1,10 +1,9 @@
 package com.sigrap.category;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -18,9 +17,9 @@ class CategoryRepositoryTest {
   @Test
   void shouldSaveCategory() {
     Category category = Category.builder()
-        .name("Test Category")
-        .description("Test Description")
-        .build();
+      .name("Test Category")
+      .description("Test Description")
+      .build();
 
     Category savedCategory = categoryRepository.save(category);
 
@@ -32,13 +31,15 @@ class CategoryRepositoryTest {
   @Test
   void shouldFindCategoryById() {
     Category category = Category.builder()
-        .name("Test Category")
-        .description("Test Description")
-        .build();
+      .name("Test Category")
+      .description("Test Description")
+      .build();
 
     Category savedCategory = categoryRepository.save(category);
 
-    Optional<Category> foundCategory = categoryRepository.findById(savedCategory.getId());
+    Optional<Category> foundCategory = categoryRepository.findById(
+      savedCategory.getId()
+    );
 
     assertThat(foundCategory).isPresent();
     assertThat(foundCategory.get().getName()).isEqualTo("Test Category");
@@ -47,14 +48,14 @@ class CategoryRepositoryTest {
   @Test
   void shouldFindAllCategories() {
     Category category1 = Category.builder()
-        .name("Category 1")
-        .description("Description 1")
-        .build();
+      .name("Category 1")
+      .description("Description 1")
+      .build();
 
     Category category2 = Category.builder()
-        .name("Category 2")
-        .description("Description 2")
-        .build();
+      .name("Category 2")
+      .description("Description 2")
+      .build();
 
     categoryRepository.save(category1);
     categoryRepository.save(category2);
@@ -62,19 +63,21 @@ class CategoryRepositoryTest {
     List<Category> categories = categoryRepository.findAll();
 
     assertThat(categories).hasSize(2);
-    assertThat(categories).extracting(Category::getName).contains("Category 1", "Category 2");
+    assertThat(categories)
+      .extracting(Category::getName)
+      .contains("Category 1", "Category 2");
   }
 
   @Test
   void shouldDeleteCategory() {
-    Category category = Category.builder()
-        .name("Test Category")
-        .build();
+    Category category = Category.builder().name("Test Category").build();
 
     Category savedCategory = categoryRepository.save(category);
 
     categoryRepository.deleteById(savedCategory.getId());
-    Optional<Category> deletedCategory = categoryRepository.findById(savedCategory.getId());
+    Optional<Category> deletedCategory = categoryRepository.findById(
+      savedCategory.getId()
+    );
 
     assertThat(deletedCategory).isEmpty();
   }

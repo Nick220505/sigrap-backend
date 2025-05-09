@@ -22,7 +22,10 @@ public class ProductData {
   @Schema(description = "Name of the product", example = "Blue Pen")
   private String name;
 
-  @Schema(description = "Description of the product", example = "High-quality blue ink pen")
+  @Schema(
+    description = "Description of the product",
+    example = "High-quality blue ink pen"
+  )
   private String description;
 
   @NotNull(message = "Cost price cannot be null")
@@ -35,6 +38,9 @@ public class ProductData {
   @Schema(description = "Sale price of the product", example = "2.50")
   private BigDecimal salePrice;
 
-  @Schema(description = "ID of the category this product belongs to", example = "1")
+  @Schema(
+    description = "ID of the category this product belongs to",
+    example = "1"
+  )
   private Integer categoryId;
 }

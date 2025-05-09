@@ -1,13 +1,12 @@
 package com.sigrap.auth;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -29,14 +28,18 @@ class JwtUtilTest {
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
-    ReflectionTestUtils.setField(jwtUtil, "secret", "testSecretKey123456789012345678901234567890");
+    ReflectionTestUtils.setField(
+      jwtUtil,
+      "secret",
+      "testSecretKey123456789012345678901234567890"
+    );
     ReflectionTestUtils.setField(jwtUtil, "expiration", 3600000L);
 
     userDetails = User.builder()
-        .username("test@example.com")
-        .password("password")
-        .authorities(Collections.emptyList())
-        .build();
+      .username("test@example.com")
+      .password("password")
+      .authorities(Collections.emptyList())
+      .build();
   }
 
   @Test
@@ -65,8 +68,8 @@ class JwtUtilTest {
     Date now = new Date();
     assertThat(expiration).isAfter(now);
     assertThat(expiration.getTime() - now.getTime())
-        .isGreaterThan(3600000L - 5000L)
-        .isLessThan(3600000L + 5000L);
+      .isGreaterThan(3600000L - 5000L)
+      .isLessThan(3600000L + 5000L);
   }
 
   @Test
@@ -74,9 +77,16 @@ class JwtUtilTest {
     Map<String, Object> claims = new HashMap<>();
     claims.put("testKey", "testValue");
 
-    String token = (String) ReflectionTestUtils.invokeMethod(jwtUtil, "createToken", claims, userDetails.getUsername());
+    String token = (String) ReflectionTestUtils.invokeMethod(
+      jwtUtil,
+      "createToken",
+      claims,
+      userDetails.getUsername()
+    );
 
-    String customClaim = jwtUtil.extractClaim(token, claimsObj -> claimsObj.get("testKey", String.class));
+    String customClaim = jwtUtil.extractClaim(token, claimsObj ->
+      claimsObj.get("testKey", String.class)
+    );
 
     assertThat(customClaim).isEqualTo("testValue");
   }
@@ -95,10 +105,10 @@ class JwtUtilTest {
     String token = jwtUtil.generateToken(userDetails);
 
     UserDetails differentUser = User.builder()
-        .username("other@example.com")
-        .password("password")
-        .authorities(Collections.emptyList())
-        .build();
+      .username("other@example.com")
+      .password("password")
+      .authorities(Collections.emptyList())
+      .build();
     boolean isValid = jwtUtil.validateToken(token, differentUser);
 
     assertThat(isValid).isFalse();
@@ -120,7 +130,11 @@ class JwtUtilTest {
       }
     };
 
-    ReflectionTestUtils.setField(expiredTokenJwtUtil, "secret", "testSecretKey123456789012345678901234567890");
+    ReflectionTestUtils.setField(
+      expiredTokenJwtUtil,
+      "secret",
+      "testSecretKey123456789012345678901234567890"
+    );
 
     boolean isValid = expiredTokenJwtUtil.validateToken(token, userDetails);
 
@@ -134,8 +148,13 @@ class JwtUtilTest {
 
     ReflectionTestUtils.setField(jwtUtil, "expiration", 3600000L);
 
-    assertThrows(ExpiredJwtException.class,
-        () -> ReflectionTestUtils.invokeMethod(jwtUtil, "extractAllClaims", expiredToken));
+    assertThrows(ExpiredJwtException.class, () ->
+      ReflectionTestUtils.invokeMethod(
+        jwtUtil,
+        "extractAllClaims",
+        expiredToken
+      )
+    );
   }
 
   @Test
@@ -149,9 +168,17 @@ class JwtUtilTest {
       }
     };
 
-    ReflectionTestUtils.setField(spyJwtUtil, "secret", "testSecretKey123456789012345678901234567890");
+    ReflectionTestUtils.setField(
+      spyJwtUtil,
+      "secret",
+      "testSecretKey123456789012345678901234567890"
+    );
 
-    Boolean result = (Boolean) ReflectionTestUtils.invokeMethod(spyJwtUtil, "isTokenExpired", "dummy-token");
+    Boolean result = (Boolean) ReflectionTestUtils.invokeMethod(
+      spyJwtUtil,
+      "isTokenExpired",
+      "dummy-token"
+    );
 
     assertThat(result).isTrue();
   }
@@ -167,9 +194,17 @@ class JwtUtilTest {
       }
     };
 
-    ReflectionTestUtils.setField(spyJwtUtil, "secret", "testSecretKey123456789012345678901234567890");
+    ReflectionTestUtils.setField(
+      spyJwtUtil,
+      "secret",
+      "testSecretKey123456789012345678901234567890"
+    );
 
-    Boolean result = (Boolean) ReflectionTestUtils.invokeMethod(spyJwtUtil, "isTokenExpired", "dummy-token");
+    Boolean result = (Boolean) ReflectionTestUtils.invokeMethod(
+      spyJwtUtil,
+      "isTokenExpired",
+      "dummy-token"
+    );
 
     assertThat(result).isFalse();
   }
@@ -178,7 +213,11 @@ class JwtUtilTest {
   void extractAllClaims_shouldExtractAllClaims() {
     String token = jwtUtil.generateToken(userDetails);
 
-    Claims claims = (Claims) ReflectionTestUtils.invokeMethod(jwtUtil, "extractAllClaims", token);
+    Claims claims = (Claims) ReflectionTestUtils.invokeMethod(
+      jwtUtil,
+      "extractAllClaims",
+      token
+    );
 
     assertThat(claims).isNotNull();
     if (claims != null) {
@@ -189,7 +228,10 @@ class JwtUtilTest {
 
   @Test
   void getSigningKey_shouldCreateValidSigningKey() {
-    Object signingKey = ReflectionTestUtils.invokeMethod(jwtUtil, "getSigningKey");
+    Object signingKey = ReflectionTestUtils.invokeMethod(
+      jwtUtil,
+      "getSigningKey"
+    );
 
     assertThat(signingKey).isNotNull();
   }

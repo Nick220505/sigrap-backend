@@ -11,13 +11,18 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Data transfer object for creating or updating a category")
+@Schema(
+  description = "Data transfer object for creating or updating a category"
+)
 public class CategoryData {
 
   @NotBlank(message = "Category name cannot be blank")
   @Schema(description = "Name of the category", example = "Office Supplies")
   private String name;
 
-  @Schema(description = "Description of the category", example = "Items used in office environments")
+  @Schema(
+    description = "Description of the category",
+    example = "Items used in office environments"
+  )
   private String description;
 }

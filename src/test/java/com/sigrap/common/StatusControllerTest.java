@@ -26,7 +26,8 @@ class StatusControllerTest {
   }
 
   @Test
-  void getStatus_shouldReturnStatusInfo_whenBuildPropertiesExist() throws Exception {
+  void getStatus_shouldReturnStatusInfo_whenBuildPropertiesExist()
+    throws Exception {
     String appName = "SIGRAP API";
     String version = "1.0.0";
     Instant buildTime = Instant.now();
@@ -35,26 +36,29 @@ class StatusControllerTest {
     when(buildProperties.getVersion()).thenReturn(version);
     when(buildProperties.getTime()).thenReturn(buildTime);
 
-    mockMvc.perform(get("/api/status"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.status").value("UP"))
-        .andExpect(jsonPath("$.timestamp").exists())
-        .andExpect(jsonPath("$.application").value(appName))
-        .andExpect(jsonPath("$.version").value(version))
-        .andExpect(jsonPath("$.buildTime").exists());
+    mockMvc
+      .perform(get("/api/status"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.status").value("UP"))
+      .andExpect(jsonPath("$.timestamp").exists())
+      .andExpect(jsonPath("$.application").value(appName))
+      .andExpect(jsonPath("$.version").value(version))
+      .andExpect(jsonPath("$.buildTime").exists());
   }
 
   @Test
-  void getStatus_shouldReturnDefaultInfo_whenBuildPropertiesAreNull() throws Exception {
+  void getStatus_shouldReturnDefaultInfo_whenBuildPropertiesAreNull()
+    throws Exception {
     StatusController controller = new StatusController(null);
     mockMvc = standaloneSetup(controller).build();
 
-    mockMvc.perform(get("/api/status"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.status").value("UP"))
-        .andExpect(jsonPath("$.timestamp").exists())
-        .andExpect(jsonPath("$.application").value("SIGRAP API"))
-        .andExpect(jsonPath("$.version").value("Development"))
-        .andExpect(jsonPath("$.buildTime").doesNotExist());
+    mockMvc
+      .perform(get("/api/status"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.status").value("UP"))
+      .andExpect(jsonPath("$.timestamp").exists())
+      .andExpect(jsonPath("$.application").value("SIGRAP API"))
+      .andExpect(jsonPath("$.version").value("Development"))
+      .andExpect(jsonPath("$.buildTime").doesNotExist());
   }
 }

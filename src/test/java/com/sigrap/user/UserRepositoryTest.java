@@ -1,9 +1,8 @@
 package com.sigrap.user;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -19,10 +18,10 @@ class UserRepositoryTest {
   @Test
   void findByEmail_shouldReturnUser_whenEmailExists() {
     User user = User.builder()
-        .name("Test User")
-        .email("test@example.com")
-        .password("password123")
-        .build();
+      .name("Test User")
+      .email("test@example.com")
+      .password("password123")
+      .build();
 
     userRepository.save(user);
 
@@ -35,7 +34,9 @@ class UserRepositoryTest {
 
   @Test
   void findByEmail_shouldReturnEmpty_whenEmailDoesNotExist() {
-    Optional<User> foundUser = userRepository.findByEmail("nonexistent@example.com");
+    Optional<User> foundUser = userRepository.findByEmail(
+      "nonexistent@example.com"
+    );
 
     assertThat(foundUser).isEmpty();
   }
@@ -43,10 +44,10 @@ class UserRepositoryTest {
   @Test
   void existsByEmail_shouldReturnTrue_whenEmailExists() {
     User user = User.builder()
-        .name("Test User")
-        .email("exists@example.com")
-        .password("password123")
-        .build();
+      .name("Test User")
+      .email("exists@example.com")
+      .password("password123")
+      .build();
 
     userRepository.save(user);
 
@@ -57,7 +58,9 @@ class UserRepositoryTest {
 
   @Test
   void existsByEmail_shouldReturnFalse_whenEmailDoesNotExist() {
-    boolean emailExists = userRepository.existsByEmail("nonexistent@example.com");
+    boolean emailExists = userRepository.existsByEmail(
+      "nonexistent@example.com"
+    );
 
     assertThat(emailExists).isFalse();
   }

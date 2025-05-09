@@ -9,17 +9,17 @@ import org.springframework.context.ApplicationContext;
 @SpringBootTest
 class SigrapBackendApplicationTests {
 
-	@Autowired
-	private ApplicationContext context;
+  @Autowired
+  private ApplicationContext context;
 
-	@Test
-	void contextLoads() {
-		assertThat(context).isNotNull();
-	}
+  @Test
+  void contextLoads() {
+    assertThat(context).isNotNull();
+  }
 
-	@Test
-	void main() {
-		SigrapBackendApplication.main(new String[] {});
-		assertThat(context).isNotNull();
-	}
+  @Test
+  void main() {
+    SigrapBackendApplication.main(new String[] {});
+    assertThat(context).isNotNull();
+  }
 }

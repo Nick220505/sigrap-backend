@@ -20,41 +20,57 @@ import com.sigrap.auth.RegisterRequest;
 
 public class TestUtils {
 
-  private TestUtils() {
-  }
+  private TestUtils() {}
 
   public static void setupTestSecurityContext(String email) {
-    List<SimpleGrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
+    List<SimpleGrantedAuthority> authorities = Arrays.asList(
+      new SimpleGrantedAuthority("ROLE_USER")
+    );
     UserDetails userDetails = User.builder()
-        .username(email)
-        .password("password")
-        .authorities(authorities)
-        .build();
-    SecurityContextHolder.getContext().setAuthentication(
-        new UsernamePasswordAuthenticationToken(userDetails, null, authorities));
+      .username(email)
+      .password("password")
+      .authorities(authorities)
+      .build();
+    SecurityContextHolder.getContext()
+      .setAuthentication(
+        new UsernamePasswordAuthenticationToken(userDetails, null, authorities)
+      );
   }
 
-  public static String registerTestUserAndGetToken(MockMvc mockMvc, ObjectMapper objectMapper,
-      String name, String email, String password) throws Exception {
+  public static String registerTestUserAndGetToken(
+    MockMvc mockMvc,
+    ObjectMapper objectMapper,
+    String name,
+    String email,
+    String password
+  ) throws Exception {
     RegisterRequest registerRequest = RegisterRequest.builder()
-        .name(name)
-        .email(email)
-        .password(password)
-        .build();
+      .name(name)
+      .email(email)
+      .password(password)
+      .build();
 
-    MvcResult registerResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(registerRequest)))
-        .andReturn();
+    MvcResult registerResult = mockMvc
+      .perform(
+        MockMvcRequestBuilders.post("/api/auth/register")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(objectMapper.writeValueAsString(registerRequest))
+      )
+      .andReturn();
 
     AuthResponse registerResponse = objectMapper.readValue(
-        registerResult.getResponse().getContentAsString(),
-        AuthResponse.class);
+      registerResult.getResponse().getContentAsString(),
+      AuthResponse.class
+    );
 
     return registerResponse.getToken();
   }
 
-  public static MockHttpServletRequestBuilder protectedEndpointRequest(String method, String endpoint, String token) {
+  public static MockHttpServletRequestBuilder protectedEndpointRequest(
+    String method,
+    String endpoint,
+    String token
+  ) {
     MockHttpServletRequestBuilder requestBuilder;
 
     switch (method.toUpperCase()) {
@@ -71,7 +87,9 @@ public class TestUtils {
         requestBuilder = MockMvcRequestBuilders.delete(endpoint);
         break;
       default:
-        throw new IllegalArgumentException("Método HTTP no soportado: " + method);
+        throw new IllegalArgumentException(
+          "Método HTTP no soportado: " + method
+        );
     }
 
     return requestBuilder.header("Authorization", "Bearer " + token);

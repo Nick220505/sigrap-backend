@@ -24,7 +24,10 @@ public class ProductInfo {
   @Schema(description = "Name of the product", example = "Blue Pen")
   private String name;
 
-  @Schema(description = "Description of the product", example = "High-quality blue ink pen")
+  @Schema(
+    description = "Description of the product",
+    example = "High-quality blue ink pen"
+  )
   private String description;
 
   @Schema(description = "Cost price of the product", example = "1.50")
@@ -36,9 +39,15 @@ public class ProductInfo {
   @Schema(description = "Category the product belongs to")
   private CategoryInfo category;
 
-  @Schema(description = "Date and time when the product was created", example = "2023-01-15T10:30:00")
+  @Schema(
+    description = "Date and time when the product was created",
+    example = "2023-01-15T10:30:00"
+  )
   private LocalDateTime createdAt;
 
-  @Schema(description = "Date and time when the product was last updated", example = "2023-01-20T14:45:00")
+  @Schema(
+    description = "Date and time when the product was last updated",
+    example = "2023-01-20T14:45:00"
+  )
   private LocalDateTime updatedAt;
 }

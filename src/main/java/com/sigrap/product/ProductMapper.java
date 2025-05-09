@@ -11,7 +11,6 @@ import com.sigrap.common.mapping.EntityToInfo;
 
 @Mapper(componentModel = "spring", uses = CategoryMapper.class)
 public interface ProductMapper {
-
   @EntityToInfo
   ProductInfo toInfo(Product product);
 
@@ -21,14 +20,15 @@ public interface ProductMapper {
 
   @DataToEntity
   @Mapping(target = "category", ignore = true)
-  void updateEntityFromData(ProductData productData, @MappingTarget Product product);
+  void updateEntityFromData(
+    ProductData productData,
+    @MappingTarget Product product
+  );
 
   default Category mapCategory(Integer categoryId) {
     if (categoryId == null) {
       return null;
     }
-    return Category.builder()
-        .id(categoryId)
-        .build();
+    return Category.builder().id(categoryId).build();
   }
 }

@@ -8,7 +8,6 @@ import com.sigrap.common.mapping.EntityToInfo;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
-
   @EntityToInfo
   CategoryInfo toInfo(Category category);
 
@@ -16,5 +15,8 @@ public interface CategoryMapper {
   Category toEntity(CategoryData categoryData);
 
   @DataToEntity
-  void updateEntityFromData(CategoryData categoryData, @MappingTarget Category category);
+  void updateEntityFromData(
+    CategoryData categoryData,
+    @MappingTarget Category category
+  );
 }

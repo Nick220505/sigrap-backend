@@ -1,17 +1,15 @@
 package com.sigrap.auth;
 
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
+import com.sigrap.user.UserService;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.sigrap.user.User;
-import com.sigrap.user.UserRepository;
-import com.sigrap.user.UserService;
-
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -29,10 +27,10 @@ public class AuthService {
     }
 
     User user = User.builder()
-        .name(request.getName())
-        .email(request.getEmail())
-        .password(passwordEncoder.encode(request.getPassword()))
-        .build();
+      .name(request.getName())
+      .email(request.getEmail())
+      .password(passwordEncoder.encode(request.getPassword()))
+      .build();
 
     userRepository.save(user);
 
@@ -40,26 +38,31 @@ public class AuthService {
     String jwt = jwtUtil.generateToken(userDetails);
 
     return AuthResponse.builder()
-        .token(jwt)
-        .email(user.getEmail())
-        .name(user.getName())
-        .build();
+      .token(jwt)
+      .email(user.getEmail())
+      .name(user.getName())
+      .build();
   }
 
   public AuthResponse authenticate(AuthRequest request) {
     authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+      new UsernamePasswordAuthenticationToken(
+        request.getEmail(),
+        request.getPassword()
+      )
+    );
 
-    User user = userRepository.findByEmail(request.getEmail())
-        .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    User user = userRepository
+      .findByEmail(request.getEmail())
+      .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
     UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
     String jwt = jwtUtil.generateToken(userDetails);
 
     return AuthResponse.builder()
-        .token(jwt)
-        .email(user.getEmail())
-        .name(user.getName())
-        .build();
+      .token(jwt)
+      .email(user.getEmail())
+      .name(user.getName())
+      .build();
   }
 }

@@ -48,29 +48,33 @@ class AuthServiceTest {
   @Test
   void register_shouldCreateNewUser_andReturnToken() {
     RegisterRequest registerRequest = RegisterRequest.builder()
-        .name("Test User")
-        .email("test@example.com")
-        .password("Password123!")
-        .build();
+      .name("Test User")
+      .email("test@example.com")
+      .password("Password123!")
+      .build();
 
     User savedUser = User.builder()
-        .id(1L)
-        .name("Test User")
-        .email("test@example.com")
-        .password("encodedPassword")
-        .build();
+      .id(1L)
+      .name("Test User")
+      .email("test@example.com")
+      .password("encodedPassword")
+      .build();
 
     when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
     when(passwordEncoder.encode("Password123!")).thenReturn("encodedPassword");
     when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
-    UserDetails userDetails = org.springframework.security.core.userdetails.User
-        .withUsername("test@example.com")
+    UserDetails userDetails =
+      org.springframework.security.core.userdetails.User.withUsername(
+        "test@example.com"
+      )
         .password("encodedPassword")
         .authorities(java.util.Collections.emptyList())
         .build();
 
-    when(userService.loadUserByUsername("test@example.com")).thenReturn(userDetails);
+    when(userService.loadUserByUsername("test@example.com")).thenReturn(
+      userDetails
+    );
     when(jwtUtil.generateToken(userDetails)).thenReturn("jwtToken");
 
     AuthResponse response = authService.register(registerRequest);
@@ -87,8 +91,8 @@ class AuthServiceTest {
   @Test
   void register_shouldThrowException_whenEmailExists() {
     RegisterRequest registerRequest = RegisterRequest.builder()
-        .email("existing@example.com")
-        .build();
+      .email("existing@example.com")
+      .build();
 
     when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
 
@@ -102,25 +106,31 @@ class AuthServiceTest {
   @Test
   void authenticate_shouldReturnToken_whenCredentialsAreValid() {
     AuthRequest authRequest = AuthRequest.builder()
-        .email("test@example.com")
-        .password("Password123!")
-        .build();
+      .email("test@example.com")
+      .password("Password123!")
+      .build();
 
     User user = User.builder()
-        .id(1L)
-        .name("Test User")
-        .email("test@example.com")
-        .password("encodedPassword")
-        .build();
+      .id(1L)
+      .name("Test User")
+      .email("test@example.com")
+      .password("encodedPassword")
+      .build();
 
-    UserDetails userDetails = org.springframework.security.core.userdetails.User
-        .withUsername("test@example.com")
+    UserDetails userDetails =
+      org.springframework.security.core.userdetails.User.withUsername(
+        "test@example.com"
+      )
         .password("encodedPassword")
         .authorities(java.util.Collections.emptyList())
         .build();
 
-    when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-    when(userService.loadUserByUsername("test@example.com")).thenReturn(userDetails);
+    when(userRepository.findByEmail("test@example.com")).thenReturn(
+      Optional.of(user)
+    );
+    when(userService.loadUserByUsername("test@example.com")).thenReturn(
+      userDetails
+    );
     when(jwtUtil.generateToken(userDetails)).thenReturn("jwtToken");
 
     AuthResponse response = authService.authenticate(authRequest);
@@ -131,18 +141,24 @@ class AuthServiceTest {
     assertThat(response.getName()).isEqualTo("Test User");
 
     verify(authenticationManager).authenticate(
-        new UsernamePasswordAuthenticationToken("test@example.com", "Password123!"));
+      new UsernamePasswordAuthenticationToken(
+        "test@example.com",
+        "Password123!"
+      )
+    );
     verify(jwtUtil).generateToken(any(UserDetails.class));
   }
 
   @Test
   void authenticate_shouldThrowException_whenUserNotFound() {
     AuthRequest authRequest = AuthRequest.builder()
-        .email("nonexistent@example.com")
-        .password("Password123!")
-        .build();
+      .email("nonexistent@example.com")
+      .password("Password123!")
+      .build();
 
-    when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
+    when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(
+      Optional.empty()
+    );
 
     assertThrows(EntityNotFoundException.class, () -> {
       authService.authenticate(authRequest);

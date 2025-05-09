@@ -14,10 +14,10 @@ class CategoryMapperTest {
   @Test
   void toInfo_shouldMapEntityToInfo() {
     Category category = Category.builder()
-        .id(1)
-        .name("Test Category")
-        .description("Test Description")
-        .build();
+      .id(1)
+      .name("Test Category")
+      .description("Test Description")
+      .build();
 
     CategoryInfo categoryInfo = categoryMapper.toInfo(category);
 
@@ -36,9 +36,9 @@ class CategoryMapperTest {
   @Test
   void toEntity_shouldMapDataToEntity() {
     CategoryData categoryData = CategoryData.builder()
-        .name("Test Category")
-        .description("Test Description")
-        .build();
+      .name("Test Category")
+      .description("Test Description")
+      .build();
 
     Category category = categoryMapper.toEntity(categoryData);
 
@@ -57,15 +57,15 @@ class CategoryMapperTest {
   @Test
   void updateEntityFromData_shouldUpdateEntityWithDataValues() {
     Category category = Category.builder()
-        .id(1)
-        .name("Old Name")
-        .description("Old Description")
-        .build();
+      .id(1)
+      .name("Old Name")
+      .description("Old Description")
+      .build();
 
     CategoryData categoryData = CategoryData.builder()
-        .name("New Name")
-        .description("New Description")
-        .build();
+      .name("New Name")
+      .description("New Description")
+      .build();
 
     categoryMapper.updateEntityFromData(categoryData, category);
 
@@ -77,10 +77,10 @@ class CategoryMapperTest {
   @Test
   void updateEntityFromData_shouldDoNothing_whenCategoryDataIsNull() {
     Category category = Category.builder()
-        .id(1)
-        .name("Original Name")
-        .description("Original Description")
-        .build();
+      .id(1)
+      .name("Original Name")
+      .description("Original Description")
+      .build();
 
     categoryMapper.updateEntityFromData(null, category);
 
@@ -92,14 +92,12 @@ class CategoryMapperTest {
   @Test
   void updateEntityFromData_shouldSetNullValues_whenDataFieldsAreNull() {
     Category category = Category.builder()
-        .id(1)
-        .name("Original Name")
-        .description("Original Description")
-        .build();
+      .id(1)
+      .name("Original Name")
+      .description("Original Description")
+      .build();
 
-    CategoryData categoryData = CategoryData.builder()
-        .name("New Name")
-        .build();
+    CategoryData categoryData = CategoryData.builder().name("New Name").build();
 
     categoryMapper.updateEntityFromData(categoryData, category);
 

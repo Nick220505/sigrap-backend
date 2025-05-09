@@ -1,9 +1,8 @@
 package com.sigrap.user;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,10 +24,10 @@ class UserTest {
   @Test
   void shouldValidateValidUser() {
     User user = User.builder()
-        .name("Test User")
-        .email("test@example.com")
-        .password("password123")
-        .build();
+      .name("Test User")
+      .email("test@example.com")
+      .password("password123")
+      .build();
 
     Set<ConstraintViolation<User>> violations = validator.validate(user);
     assertThat(violations).isEmpty();
@@ -37,52 +36,60 @@ class UserTest {
   @Test
   void shouldValidateNameNotBlank() {
     User user = User.builder()
-        .name("")
-        .email("test@example.com")
-        .password("password123")
-        .build();
+      .name("")
+      .email("test@example.com")
+      .password("password123")
+      .build();
 
     Set<ConstraintViolation<User>> violations = validator.validate(user);
     assertThat(violations).hasSize(1);
-    assertThat(violations.iterator().next().getPropertyPath()).hasToString("name");
+    assertThat(violations.iterator().next().getPropertyPath()).hasToString(
+      "name"
+    );
   }
 
   @Test
   void shouldValidateEmailNotBlank() {
     User user = User.builder()
-        .name("Test User")
-        .email("")
-        .password("password123")
-        .build();
+      .name("Test User")
+      .email("")
+      .password("password123")
+      .build();
 
     Set<ConstraintViolation<User>> violations = validator.validate(user);
     assertThat(violations).hasSize(1);
-    assertThat(violations.iterator().next().getPropertyPath()).hasToString("email");
+    assertThat(violations.iterator().next().getPropertyPath()).hasToString(
+      "email"
+    );
   }
 
   @Test
   void shouldValidateEmailFormat() {
     User user = User.builder()
-        .name("Test User")
-        .email("invalid-email")
-        .password("password123")
-        .build();
+      .name("Test User")
+      .email("invalid-email")
+      .password("password123")
+      .build();
 
     Set<ConstraintViolation<User>> violations = validator.validate(user);
     assertThat(violations).hasSize(1);
-    assertThat(violations.iterator().next().getPropertyPath()).hasToString("email");
+    assertThat(violations.iterator().next().getPropertyPath()).hasToString(
+      "email"
+    );
   }
 
   @Test
   void shouldValidatePasswordNotBlank() {
     User user = User.builder()
-        .name("Test User")
-        .email("test@example.com")
-        .password("")
-        .build();
+      .name("Test User")
+      .email("test@example.com")
+      .password("")
+      .build();
 
     Set<ConstraintViolation<User>> violations = validator.validate(user);
     assertThat(violations).hasSize(1);
-    assertThat(violations.iterator().next().getPropertyPath()).hasToString("password");
+    assertThat(violations.iterator().next().getPropertyPath()).hasToString(
+      "password"
+    );
   }
 }

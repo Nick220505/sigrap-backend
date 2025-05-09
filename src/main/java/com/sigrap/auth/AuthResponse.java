@@ -13,7 +13,10 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Response model for successful authentication")
 public class AuthResponse {
 
-  @Schema(description = "JWT authentication token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+  @Schema(
+    description = "JWT authentication token",
+    example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  )
   private String token;
 
   @Schema(description = "User's email address", example = "user@example.com")

@@ -13,7 +13,11 @@ class WebConfigTest {
   @Test
   void addViewControllers_shouldAddSwaggerRedirect_whenDevProfileActive() {
     Environment environment = mock(Environment.class);
-    when(environment.acceptsProfiles(org.springframework.core.env.Profiles.of("dev", "local"))).thenReturn(true);
+    when(
+      environment.acceptsProfiles(
+        org.springframework.core.env.Profiles.of("dev", "local")
+      )
+    ).thenReturn(true);
 
     WebConfig webConfig = new WebConfig(environment);
     ViewControllerRegistry registry = mock(ViewControllerRegistry.class);
@@ -26,11 +30,17 @@ class WebConfigTest {
   @Test
   void addViewControllers_shouldAddApiStatusForward_whenDevProfileNotActive() {
     Environment environment = mock(Environment.class);
-    when(environment.acceptsProfiles(org.springframework.core.env.Profiles.of("dev", "local"))).thenReturn(false);
+    when(
+      environment.acceptsProfiles(
+        org.springframework.core.env.Profiles.of("dev", "local")
+      )
+    ).thenReturn(false);
 
     WebConfig webConfig = new WebConfig(environment);
     ViewControllerRegistry registry = mock(ViewControllerRegistry.class);
-    ViewControllerRegistration registration = mock(ViewControllerRegistration.class);
+    ViewControllerRegistration registration = mock(
+      ViewControllerRegistration.class
+    );
     when(registry.addViewController("/")).thenReturn(registration);
 
     webConfig.addViewControllers(registry);

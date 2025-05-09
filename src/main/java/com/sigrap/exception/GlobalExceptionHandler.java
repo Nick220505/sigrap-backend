@@ -20,25 +20,37 @@ import jakarta.persistence.EntityNotFoundException;
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(EntityNotFoundException.class)
-  public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(EntityNotFoundException ex) {
+  public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(
+    EntityNotFoundException ex
+  ) {
     return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<Map<String, Object>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+  public ResponseEntity<
+    Map<String, Object>
+  > handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
     return createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-    Map<String, Object> errorResponse = createErrorMap(HttpStatus.BAD_REQUEST, "Validation failed");
+  public ResponseEntity<Map<String, Object>> handleValidationExceptions(
+    MethodArgumentNotValidException ex
+  ) {
+    Map<String, Object> errorResponse = createErrorMap(
+      HttpStatus.BAD_REQUEST,
+      "Validation failed"
+    );
     Map<String, String> validationErrors = new HashMap<>();
 
-    ex.getBindingResult().getAllErrors().forEach(error -> {
-      String fieldName = ((FieldError) error).getField();
-      String errorMessage = error.getDefaultMessage();
-      validationErrors.put(fieldName, errorMessage);
-    });
+    ex
+      .getBindingResult()
+      .getAllErrors()
+      .forEach(error -> {
+        String fieldName = ((FieldError) error).getField();
+        String errorMessage = error.getDefaultMessage();
+        validationErrors.put(fieldName, errorMessage);
+      });
 
     errorResponse.put("errors", validationErrors);
 
@@ -46,19 +58,28 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(BadCredentialsException.class)
-  public ResponseEntity<Map<String, Object>> handleBadCredentialsException(BadCredentialsException ex) {
+  public ResponseEntity<Map<String, Object>> handleBadCredentialsException(
+    BadCredentialsException ex
+  ) {
     return createErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid credentials");
   }
 
   @ExceptionHandler(ExpiredJwtException.class)
-  public ResponseEntity<Map<String, Object>> handleExpiredJwtException(ExpiredJwtException ex) {
-    Map<String, Object> errorResponse = createErrorMap(HttpStatus.UNAUTHORIZED, "Token has expired");
+  public ResponseEntity<Map<String, Object>> handleExpiredJwtException(
+    ExpiredJwtException ex
+  ) {
+    Map<String, Object> errorResponse = createErrorMap(
+      HttpStatus.UNAUTHORIZED,
+      "Token has expired"
+    );
     errorResponse.put("code", "TOKEN_EXPIRED");
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
+  public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(
+    IllegalArgumentException ex
+  ) {
     if (ex.getMessage().contains("Email already exists")) {
       return createErrorResponse(HttpStatus.CONFLICT, "Email already exists");
     }
@@ -66,16 +87,27 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
-    return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+  public ResponseEntity<Map<String, Object>> handleGenericException(
+    Exception ex
+  ) {
+    return createErrorResponse(
+      HttpStatus.INTERNAL_SERVER_ERROR,
+      ex.getMessage()
+    );
   }
 
-  private ResponseEntity<Map<String, Object>> createErrorResponse(HttpStatus status, String message) {
+  private ResponseEntity<Map<String, Object>> createErrorResponse(
+    HttpStatus status,
+    String message
+  ) {
     Map<String, Object> errorResponse = createErrorMap(status, message);
     return ResponseEntity.status(status).body(errorResponse);
   }
 
-  private Map<String, Object> createErrorMap(HttpStatus status, String message) {
+  private Map<String, Object> createErrorMap(
+    HttpStatus status,
+    String message
+  ) {
     Map<String, Object> errorResponse = new HashMap<>();
     errorResponse.put("timestamp", LocalDateTime.now().toString());
     errorResponse.put("status", status.value());

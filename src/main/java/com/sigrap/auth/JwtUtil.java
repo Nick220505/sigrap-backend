@@ -40,10 +40,10 @@ public class JwtUtil {
 
   private Claims extractAllClaims(String token) {
     return Jwts.parser()
-        .verifyWith(getSigningKey())
-        .build()
-        .parseSignedClaims(token)
-        .getPayload();
+      .verifyWith(getSigningKey())
+      .build()
+      .parseSignedClaims(token)
+      .getPayload();
   }
 
   private SecretKey getSigningKey() {
@@ -65,16 +65,18 @@ public class JwtUtil {
     Date expiryDate = new Date(now.getTime() + expiration);
 
     return Jwts.builder()
-        .claims(claims)
-        .subject(subject)
-        .issuedAt(now)
-        .expiration(expiryDate)
-        .signWith(getSigningKey())
-        .compact();
+      .claims(claims)
+      .subject(subject)
+      .issuedAt(now)
+      .expiration(expiryDate)
+      .signWith(getSigningKey())
+      .compact();
   }
 
   public Boolean validateToken(String token, UserDetails userDetails) {
     final String username = extractUsername(token);
-    return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    return (
+      username.equals(userDetails.getUsername()) && !isTokenExpired(token)
+    );
   }
 }

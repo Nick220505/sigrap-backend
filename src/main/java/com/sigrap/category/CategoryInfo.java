@@ -21,12 +21,21 @@ public class CategoryInfo {
   @Schema(description = "Name of the category", example = "Office Supplies")
   private String name;
 
-  @Schema(description = "Description of the category", example = "Items used in office environments")
+  @Schema(
+    description = "Description of the category",
+    example = "Items used in office environments"
+  )
   private String description;
 
-  @Schema(description = "Date and time when the category was created", example = "2023-01-15T10:30:00")
+  @Schema(
+    description = "Date and time when the category was created",
+    example = "2023-01-15T10:30:00"
+  )
   private LocalDateTime createdAt;
 
-  @Schema(description = "Date and time when the category was last updated", example = "2023-01-20T14:45:00")
+  @Schema(
+    description = "Date and time when the category was last updated",
+    example = "2023-01-20T14:45:00"
+  )
   private LocalDateTime updatedAt;
 }

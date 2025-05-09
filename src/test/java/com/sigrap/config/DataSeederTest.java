@@ -1,13 +1,5 @@
 package com.sigrap.config;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +7,14 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import org.mockito.Mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -43,11 +42,14 @@ class DataSeederTest {
 
   @BeforeEach
   void setUp() {
-    dataSeeder = spy(new DataSeeder(
+    dataSeeder = spy(
+      new DataSeeder(
         categoryRepository,
         productRepository,
         userRepository,
-        passwordEncoder));
+        passwordEncoder
+      )
+    );
   }
 
   @Test
@@ -58,9 +60,7 @@ class DataSeederTest {
 
     List<Category> categories = new ArrayList<>();
     for (int i = 0; i < 12; i++) {
-      Category category = Category.builder()
-          .id(i)
-          .build();
+      Category category = Category.builder().id(i).build();
       categories.add(category);
     }
     when(categoryRepository.findAll()).thenReturn(categories);
@@ -87,7 +87,8 @@ class DataSeederTest {
   }
 
   @Test
-  void seedProducts_shouldWarnAndReturn_whenNoCategoriesExist() throws Exception {
+  void seedProducts_shouldWarnAndReturn_whenNoCategoriesExist()
+    throws Exception {
     when(categoryRepository.count()).thenReturn(0L);
     when(productRepository.count()).thenReturn(0L);
     when(userRepository.count()).thenReturn(0L);
@@ -100,7 +101,8 @@ class DataSeederTest {
   }
 
   @Test
-  void seedCategories_shouldCreateCategories_whenRepositoryIsEmpty() throws Exception {
+  void seedCategories_shouldCreateCategories_whenRepositoryIsEmpty()
+    throws Exception {
     when(categoryRepository.count()).thenReturn(0L);
     when(productRepository.count()).thenReturn(1L);
     when(userRepository.count()).thenReturn(1L);
@@ -111,16 +113,15 @@ class DataSeederTest {
   }
 
   @Test
-  void seedProducts_shouldCreateProducts_withCorrectCategories() throws Exception {
+  void seedProducts_shouldCreateProducts_withCorrectCategories()
+    throws Exception {
     when(categoryRepository.count()).thenReturn(0L);
     when(productRepository.count()).thenReturn(0L);
     when(userRepository.count()).thenReturn(1L);
 
     List<Category> categories = new ArrayList<>();
     for (int i = 0; i < 12; i++) {
-      Category category = Category.builder()
-          .id(i)
-          .build();
+      Category category = Category.builder().id(i).build();
       categories.add(category);
     }
     when(categoryRepository.findAll()).thenReturn(categories);
@@ -132,7 +133,8 @@ class DataSeederTest {
   }
 
   @Test
-  void seedUsers_shouldCreateDefaultUsers_whenRepositoryIsEmpty() throws Exception {
+  void seedUsers_shouldCreateDefaultUsers_whenRepositoryIsEmpty()
+    throws Exception {
     when(categoryRepository.count()).thenReturn(1L);
     when(productRepository.count()).thenReturn(1L);
     when(userRepository.count()).thenReturn(0L);

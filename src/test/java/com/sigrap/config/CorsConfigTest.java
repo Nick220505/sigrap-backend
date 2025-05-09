@@ -14,7 +14,9 @@ class CorsConfigTest {
 
     CorsConfig corsConfig = new CorsConfig();
 
-    CorsConfigurationSource source = corsConfig.corsConfigurationSource(environment);
+    CorsConfigurationSource source = corsConfig.corsConfigurationSource(
+      environment
+    );
 
     assertNotNull(source);
   }
@@ -26,7 +28,9 @@ class CorsConfigTest {
 
     CorsConfig corsConfig = new CorsConfig();
 
-    CorsConfigurationSource source = corsConfig.corsConfigurationSource(environment);
+    CorsConfigurationSource source = corsConfig.corsConfigurationSource(
+      environment
+    );
 
     assertNotNull(source);
   }
