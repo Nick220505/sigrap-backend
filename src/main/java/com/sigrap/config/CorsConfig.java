@@ -8,9 +8,26 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+/**
+ * Configuration class for Cross-Origin Resource Sharing (CORS) settings.
+ * Provides environment-aware CORS configuration for the application.
+ *
+ * <p>In production, only allows requests from verified Vercel deployments.
+ * In development, allows requests from the local Angular development server.</p>
+ *
+ * <p>This configuration is essential for security and proper functioning of
+ * the frontend-backend communication in both development and production
+ * environments.</p>
+ */
 @Configuration
 public class CorsConfig {
 
+  /**
+   * Creates and configures the CORS configuration source bean.
+   *
+   * @param environment Spring environment to determine the active profile
+   * @return Configured CorsConfigurationSource with appropriate settings
+   */
   @Bean
   CorsConfigurationSource corsConfigurationSource(Environment environment) {
     CorsConfiguration config = new CorsConfiguration();

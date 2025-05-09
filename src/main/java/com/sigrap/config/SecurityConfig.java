@@ -19,6 +19,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+/**
+ * Core security configuration class for the application.
+ * Configures Spring Security with JWT authentication, CORS, CSRF, and other security headers.
+ *
+ * <p>This configuration:
+ * <ul>
+ *   <li>Implements stateless JWT-based authentication</li>
+ *   <li>Configures security headers for XSS protection</li>
+ *   <li>Sets up environment-specific security rules</li>
+ *   <li>Manages public and protected endpoints</li>
+ *   <li>Configures password encoding</li>
+ * </ul></p>
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -46,6 +59,14 @@ public class SecurityConfig {
     "/webjars/**",
   };
 
+  /**
+   * Configures the security filter chain with all security settings.
+   *
+   * @param http HttpSecurity to be configured
+   * @param corsConfigurationSource CORS configuration to be applied
+   * @return Configured SecurityFilterChain
+   * @throws Exception if configuration fails
+   */
   @Bean
   SecurityFilterChain filterChain(
     HttpSecurity http,
@@ -90,11 +111,24 @@ public class SecurityConfig {
       .build();
   }
 
+  /**
+   * Configures the password encoder for the application.
+   * Uses BCrypt with default strength.
+   *
+   * @return Configured BCryptPasswordEncoder
+   */
   @Bean
   PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 
+  /**
+   * Configures the authentication manager.
+   *
+   * @param config Authentication configuration to use
+   * @return Configured AuthenticationManager
+   * @throws Exception if configuration fails
+   */
   @Bean
   AuthenticationManager authenticationManager(
     AuthenticationConfiguration config

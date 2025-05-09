@@ -8,6 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service class for managing product operations.
+ * Handles business logic for creating, reading, updating, and deleting products.
+ * Also manages product-category relationships.
+ */
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -16,6 +21,11 @@ public class ProductService {
   private final CategoryRepository categoryRepository;
   private final ProductMapper productMapper;
 
+  /**
+   * Retrieves all products from the database.
+   *
+   * @return List of all products mapped to ProductInfo objects
+   */
   @Transactional(readOnly = true)
   public List<ProductInfo> findAll() {
     return productRepository
@@ -25,6 +35,13 @@ public class ProductService {
       .toList();
   }
 
+  /**
+   * Finds a product by its ID.
+   *
+   * @param id The ID of the product to find
+   * @return The found product mapped to ProductInfo
+   * @throws EntityNotFoundException if the product is not found
+   */
   @Transactional(readOnly = true)
   public ProductInfo findById(Integer id) {
     Product product = productRepository
@@ -33,6 +50,13 @@ public class ProductService {
     return productMapper.toInfo(product);
   }
 
+  /**
+   * Creates a new product.
+   *
+   * @param productData The data for creating the product
+   * @return The created product mapped to ProductInfo
+   * @throws EntityNotFoundException if the specified category is not found
+   */
   @Transactional
   public ProductInfo create(ProductData productData) {
     Product product = productMapper.toEntity(productData);
@@ -48,6 +72,14 @@ public class ProductService {
     return productMapper.toInfo(savedProduct);
   }
 
+  /**
+   * Updates an existing product.
+   *
+   * @param id The ID of the product to update
+   * @param productData The new data for the product
+   * @return The updated product mapped to ProductInfo
+   * @throws EntityNotFoundException if the product or specified category is not found
+   */
   @Transactional
   public ProductInfo update(Integer id, ProductData productData) {
     Product product = productRepository
@@ -68,6 +100,12 @@ public class ProductService {
     return productMapper.toInfo(updatedProduct);
   }
 
+  /**
+   * Deletes a product by its ID.
+   *
+   * @param id The ID of the product to delete
+   * @throws EntityNotFoundException if the product is not found
+   */
   @Transactional
   public void delete(Integer id) {
     Product product = productRepository
@@ -76,6 +114,13 @@ public class ProductService {
     productRepository.delete(product);
   }
 
+  /**
+   * Deletes multiple products by their IDs.
+   * Validates all IDs exist before performing the deletion.
+   *
+   * @param ids List of product IDs to delete
+   * @throws EntityNotFoundException if any of the products is not found
+   */
   @Transactional
   public void deleteAllById(List<Integer> ids) {
     ids.forEach(id -> {

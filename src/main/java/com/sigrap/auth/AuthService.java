@@ -11,6 +11,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service class handling authentication operations.
+ * Manages user registration and authentication processes, including JWT token generation.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -21,6 +25,14 @@ public class AuthService {
   private final AuthenticationManager authenticationManager;
   private final UserService userService;
 
+  /**
+   * Registers a new user in the system.
+   * Creates a new user account and generates a JWT token for immediate authentication.
+   *
+   * @param request Registration details including name, email, and password
+   * @return AuthResponse containing the JWT token and user information
+   * @throws IllegalArgumentException if the email is already registered
+   */
   public AuthResponse register(RegisterRequest request) {
     if (userRepository.existsByEmail(request.getEmail())) {
       throw new IllegalArgumentException("Email already exists");
@@ -44,6 +56,14 @@ public class AuthService {
       .build();
   }
 
+  /**
+   * Authenticates a user with their credentials.
+   * Validates the credentials and generates a new JWT token upon successful authentication.
+   *
+   * @param request Authentication credentials including email and password
+   * @return AuthResponse containing the JWT token and user information
+   * @throws EntityNotFoundException if the user is not found
+   */
   public AuthResponse authenticate(AuthRequest request) {
     authenticationManager.authenticate(
       new UsernamePasswordAuthenticationToken(
