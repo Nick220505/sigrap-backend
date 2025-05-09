@@ -57,10 +57,34 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
+  /**
+   * Repository for accessing user data in the database.
+   * Used for checking email existence and retrieving user information.
+   */
   private final UserRepository userRepository;
+
+  /**
+   * Encoder for securely hashing user passwords before storage.
+   * Ensures passwords are never stored in plain text.
+   */
   private final PasswordEncoder passwordEncoder;
+
+  /**
+   * Utility for generating and validating JWT tokens.
+   * Creates authentication tokens for authenticated users.
+   */
   private final JwtUtil jwtUtil;
+
+  /**
+   * Spring Security manager for validating user credentials.
+   * Handles the core authentication logic.
+   */
   private final AuthenticationManager authenticationManager;
+
+  /**
+   * Service for loading user details for JWT token generation.
+   * Provides user information in the format required by Spring Security.
+   */
   private final UserService userService;
 
   /**

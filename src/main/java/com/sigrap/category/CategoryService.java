@@ -14,7 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CategoryService {
 
+  /**
+   * Repository for database operations on categories.
+   * Provides CRUD functionality and custom queries for category entities.
+   */
   private final CategoryRepository categoryRepository;
+
+  /**
+   * Mapper for converting between Category entities and DTOs.
+   * Handles object transformation for API responses and database operations.
+   */
   private final CategoryMapper categoryMapper;
 
   /**

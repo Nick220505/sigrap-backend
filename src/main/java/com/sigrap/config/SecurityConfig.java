@@ -37,9 +37,22 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+  /**
+   * JWT authentication filter for processing and validating JWT tokens in requests.
+   * Intercepts incoming requests to extract and validate JWT tokens before processing.
+   */
   private final JwtAuthenticationFilter jwtAuthFilter;
+
+  /**
+   * Environment configuration for accessing application properties and profiles.
+   * Used to determine current runtime environment for conditional security settings.
+   */
   private final Environment environment;
 
+  /**
+   * List of public endpoint paths that do not require authentication.
+   * These endpoints are accessible to all users without a valid JWT token.
+   */
   private static final String[] PUBLIC_ENDPOINTS = {
     "/",
     "/api/auth/**",
@@ -49,6 +62,10 @@ public class SecurityConfig {
     "/error",
   };
 
+  /**
+   * List of Swagger documentation endpoint paths for API documentation.
+   * These are either public or protected based on the current environment profile.
+   */
   private static final String[] SWAGGER_WHITELIST = {
     "/swagger-ui.html",
     "/swagger-ui/**",

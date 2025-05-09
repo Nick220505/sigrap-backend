@@ -52,6 +52,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Status", description = "API status information endpoint")
 public class StatusController {
 
+  /**
+   * Build properties containing application metadata.
+   * Includes information like application name, version, and build timestamp.
+   * May be null in development environments without proper build information.
+   */
   private final BuildProperties buildProperties;
 
   /**

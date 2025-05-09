@@ -69,6 +69,10 @@ import org.springframework.web.bind.annotation.RestController;
 )
 public class CategoryController {
 
+  /**
+   * Service for handling category business logic.
+   * Provides operations for creating, retrieving, updating, and deleting categories.
+   */
   private final CategoryService categoryService;
 
   /**

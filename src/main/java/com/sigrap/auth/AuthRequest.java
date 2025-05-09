@@ -23,11 +23,21 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Request model for user authentication")
 public class AuthRequest {
 
+  /**
+   * The user's email address used for authentication.
+   * Serves as the username in the authentication process.
+   * Must be a valid email format and cannot be blank.
+   */
   @NotBlank(message = "Email cannot be empty")
   @Email(message = "Invalid email format")
   @Schema(description = "User's email address", example = "user@example.com")
   private String email;
 
+  /**
+   * The user's password for authentication.
+   * Must not be blank and is validated against the stored encrypted password.
+   * Never returned in responses for security reasons.
+   */
   @NotBlank(message = "Password cannot be empty")
   @Schema(description = "User's password", example = "Password123!")
   private String password;

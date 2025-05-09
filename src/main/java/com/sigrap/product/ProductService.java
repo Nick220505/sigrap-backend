@@ -17,8 +17,22 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ProductService {
 
+  /**
+   * Repository for database operations on products.
+   * Provides CRUD functionality and custom queries for product entities.
+   */
   private final ProductRepository productRepository;
+
+  /**
+   * Repository for accessing category data.
+   * Used for verifying category existence when creating or updating products.
+   */
   private final CategoryRepository categoryRepository;
+
+  /**
+   * Mapper for converting between Product entities and DTOs.
+   * Handles object transformation for API responses and database operations.
+   */
   private final ProductMapper productMapper;
 
   /**

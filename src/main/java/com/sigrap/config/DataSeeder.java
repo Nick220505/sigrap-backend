@@ -34,9 +34,28 @@ import org.springframework.stereotype.Component;
 )
 public class DataSeeder implements CommandLineRunner {
 
+  /**
+   * Repository for category database operations.
+   * Used to check if categories exist and to save new categories during seeding.
+   */
   private final CategoryRepository categoryRepository;
+
+  /**
+   * Repository for product database operations.
+   * Used to check if products exist and to save new products during seeding.
+   */
   private final ProductRepository productRepository;
+
+  /**
+   * Repository for user database operations.
+   * Used to check if users exist and to save new user accounts during seeding.
+   */
   private final UserRepository userRepository;
+
+  /**
+   * Password encoder for securely hashing user passwords before storing them.
+   * Ensures that seeded user account passwords are properly secured.
+   */
   private final PasswordEncoder passwordEncoder;
 
   /**

@@ -79,6 +79,11 @@ import org.springframework.web.bind.annotation.RestController;
 )
 public class ProductController {
 
+  /**
+   * Service for handling product business logic.
+   * Provides operations for creating, retrieving, updating, and deleting products,
+   * as well as managing product-category relationships.
+   */
   private final ProductService productService;
 
   /**

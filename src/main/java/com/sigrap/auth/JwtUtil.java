@@ -1,20 +1,17 @@
 package com.sigrap.auth;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
 import javax.crypto.SecretKey;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 
 /**
  * Utility class for JWT token operations.
@@ -23,9 +20,18 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil {
 
+  /**
+   * Secret key used for JWT token signing and verification.
+   * This value is injected from application properties for security.
+   */
   @Value("${jwt.secret}")
   private String secret;
 
+  /**
+   * Token expiration time in milliseconds.
+   * This value is injected from application properties and determines
+   * how long a JWT token remains valid after issuance.
+   */
   @Value("${jwt.expiration}")
   private Long expiration;
 

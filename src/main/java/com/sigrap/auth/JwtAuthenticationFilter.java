@@ -32,8 +32,22 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+  /**
+   * Utility for JWT operations such as token validation and data extraction.
+   * Used to process and validate incoming JWT tokens in request headers.
+   */
   private final JwtUtil jwtUtil;
+
+  /**
+   * Service for loading user details during authentication.
+   * Used to retrieve user information based on the subject extracted from JWT tokens.
+   */
   private final UserService userService;
+
+  /**
+   * JSON mapper for converting objects to JSON responses.
+   * Used particularly for formatting error responses when tokens are expired or invalid.
+   */
   private final ObjectMapper objectMapper;
 
   /**
