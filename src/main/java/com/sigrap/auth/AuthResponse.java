@@ -6,6 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data Transfer Object (DTO) for authentication responses.
+ * Contains the authentication result data returned to clients.
+ *
+ * <p>This class represents the successful authentication response,
+ * including the JWT token for subsequent authenticated requests
+ * and basic user information.</p>
+ */
 @Data
 @Builder
 @AllArgsConstructor

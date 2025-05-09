@@ -8,6 +8,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data Transfer Object (DTO) for authentication requests.
+ * Contains the credentials needed for user authentication.
+ *
+ * <p>This class is used to transfer login credentials from clients
+ * to the authentication endpoint. It includes validation to ensure
+ * required fields are provided and properly formatted.</p>
+ */
 @Data
 @Builder
 @AllArgsConstructor
