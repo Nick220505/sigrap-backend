@@ -16,6 +16,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
+  /**
+   * Repository for database operations on users.
+   * Provides functionality for finding users by email and other user-related
+   * queries.
+   */
   private final UserRepository userRepository;
 
   /**
