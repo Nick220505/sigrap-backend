@@ -13,7 +13,7 @@ import io.swagger.v3.oas.models.servers.Server;
 public class OpenApiConfig {
 
   @Bean
-  public OpenAPI openAPI() {
+  OpenAPI openAPI() {
     return new OpenAPI()
       .info(
         new Info()
