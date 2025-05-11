@@ -1,0 +1,23 @@
+### Variables
+@baseUrl = http://localhost:8080/api
+
+### Register a new user
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "New User",
+  "email": "user@example.com",
+  "password": "SecurePassword123!"
+}
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "user@example.com",
+  "password": "SecurePassword123!"
+} 

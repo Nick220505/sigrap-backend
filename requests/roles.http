@@ -1,0 +1,50 @@
+### Variables
+@baseUrl = http://localhost:8080/api
+@roleId = 1
+@userId = 1
+
+### Get all roles
+GET {{baseUrl}}/roles
+Accept: application/json
+
+### Get role by ID
+GET {{baseUrl}}/roles/{{roleId}}
+Accept: application/json
+
+### Create role
+POST {{baseUrl}}/roles
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "EDITOR",
+  "description": "Editor role with limited permissions",
+  "permissionIds": [1, 2, 3]
+}
+
+### Update role
+# @prompt Ensure you have a valid role ID set in @roleId
+PUT {{baseUrl}}/roles/{{roleId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "EDITOR_UPDATED",
+  "description": "Updated editor role with new permissions",
+  "permissionIds": [1, 2, 3, 4]
+}
+
+### Delete role
+# @prompt Ensure you have a valid role ID set in @roleId
+DELETE {{baseUrl}}/roles/{{roleId}}
+Accept: application/json
+
+### Assign role to user
+# @prompt Ensure you have valid role and user IDs set
+POST {{baseUrl}}/roles/{{roleId}}/users/{{userId}}
+Accept: application/json
+
+### Remove role from user
+# @prompt Ensure you have valid role and user IDs set
+DELETE {{baseUrl}}/roles/{{roleId}}/users/{{userId}}
+Accept: application/json 

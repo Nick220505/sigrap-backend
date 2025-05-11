@@ -1,0 +1,118 @@
+### Variables
+@baseUrl = http://localhost:8080/api
+@userId = 1
+@roleId = 1
+
+### Get all users
+GET {{baseUrl}}/users
+Accept: application/json
+
+### Get user by ID
+GET {{baseUrl}}/users/{{userId}}
+Accept: application/json
+
+### Get current user profile
+GET {{baseUrl}}/users/me
+Accept: application/json
+
+### Create user
+POST {{baseUrl}}/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "New User",
+  "email": "user@example.com",
+  "password": "SecurePassword123!",
+  "phone": "1234567890",
+  "status": "ACTIVE",
+  "roleIds": [1]
+}
+
+### Update user
+# @prompt Ensure you have a valid user ID set in @userId
+PUT {{baseUrl}}/users/{{userId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Updated User",
+  "email": "updated@example.com",
+  "phone": "0987654321",
+  "status": "ACTIVE",
+  "roleIds": [1, 2]
+}
+
+### Update current user profile
+PUT {{baseUrl}}/users/me
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "My Updated Profile",
+  "phone": "5551234567"
+}
+
+### Change password
+POST {{baseUrl}}/users/me/change-password
+Content-Type: application/json
+Accept: application/json
+
+{
+  "currentPassword": "OldPassword123!",
+  "newPassword": "NewPassword123!"
+}
+
+### Request password reset
+POST {{baseUrl}}/users/reset-password
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "user@example.com"
+}
+
+### Complete password reset
+POST {{baseUrl}}/users/reset-password/confirm
+Content-Type: application/json
+Accept: application/json
+
+{
+  "token": "reset-token-here",
+  "newPassword": "NewPassword123!"
+}
+
+### Reset user password (admin)
+# @prompt Ensure you have a valid user ID set in @userId
+POST {{baseUrl}}/users/{{userId}}/reset-password
+Content-Type: application/json
+Accept: application/json
+
+{
+  "newPassword": "NewPassword123!"
+}
+
+### Lock user account
+# @prompt Ensure you have a valid user ID set in @userId
+PUT {{baseUrl}}/users/{{userId}}/lock
+Accept: application/json
+
+### Unlock user account
+# @prompt Ensure you have a valid user ID set in @userId
+PUT {{baseUrl}}/users/{{userId}}/unlock
+Accept: application/json
+
+### Assign role to user
+# @prompt Ensure you have valid user and role IDs set
+PUT {{baseUrl}}/users/{{userId}}/roles/{{roleId}}
+Accept: application/json
+
+### Remove role from user
+# @prompt Ensure you have valid user and role IDs set
+DELETE {{baseUrl}}/users/{{userId}}/roles/{{roleId}}
+Accept: application/json
+
+### Delete user
+# @prompt Ensure you have a valid user ID set in @userId
+DELETE {{baseUrl}}/users/{{userId}}
+Accept: application/json 

@@ -1,0 +1,36 @@
+### Variables
+@baseUrl = http://localhost:8080/api
+@userId = 1
+@preferenceId = 1
+
+### Get all notification preferences for a user
+GET {{baseUrl}}/users/{{userId}}/notification-preferences
+Accept: application/json
+
+### Update a specific notification preference
+PUT {{baseUrl}}/users/{{userId}}/notification-preferences/{{preferenceId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userId": {{userId}},
+  "notificationType": "EMAIL_ALERTS",
+  "enabled": true,
+  "channel": "EMAIL"
+}
+
+### Create or update notification preference
+PUT {{baseUrl}}/users/{{userId}}/notification-preferences
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userId": {{userId}},
+  "notificationType": "PRODUCT_UPDATES",
+  "enabled": true,
+  "channel": "SMS"
+}
+
+### Get default notification preferences
+GET {{baseUrl}}/users/{{userId}}/notification-preferences/defaults
+Accept: application/json 

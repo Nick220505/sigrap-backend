@@ -1,0 +1,57 @@
+### Variables
+@baseUrl = http://localhost:8080/api
+@permissionId = 1
+@roleId = 1
+@resource = user
+
+### Get all permissions
+GET {{baseUrl}}/permissions
+Accept: application/json
+
+### Get permissions by resource
+GET {{baseUrl}}/permissions?resource={{resource}}
+Accept: application/json
+
+### Get permission by ID
+GET {{baseUrl}}/permissions/{{permissionId}}
+Accept: application/json
+
+### Create permission
+POST {{baseUrl}}/permissions
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "USER_DELETE",
+  "description": "Permission to delete users",
+  "resource": "USER",
+  "action": "DELETE"
+}
+
+### Update permission
+# @prompt Ensure you have a valid permission ID set in @permissionId
+PUT {{baseUrl}}/permissions/{{permissionId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "USER_DELETE_UPDATED",
+  "description": "Updated permission to delete users",
+  "resource": "USER",
+  "action": "DELETE"
+}
+
+### Delete permission
+# @prompt Ensure you have a valid permission ID set in @permissionId
+DELETE {{baseUrl}}/permissions/{{permissionId}}
+Accept: application/json
+
+### Assign permission to role
+# @prompt Ensure you have valid permission and role IDs set
+POST {{baseUrl}}/permissions/{{permissionId}}/roles/{{roleId}}
+Accept: application/json
+
+### Remove permission from role
+# @prompt Ensure you have valid permission and role IDs set
+DELETE {{baseUrl}}/permissions/{{permissionId}}/roles/{{roleId}}
+Accept: application/json 

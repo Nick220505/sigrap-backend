@@ -1,0 +1,37 @@
+### Variables
+@baseUrl = http://localhost:8080/api
+@auditLogId = 1
+@userId = 1
+@entityName = User
+@entityId = 1
+@action = CREATE
+@startTime = 2024-01-01T00:00:00
+@endTime = 2024-12-31T23:59:59
+
+### Get all audit logs
+GET {{baseUrl}}/audit-logs
+Accept: application/json
+
+### Get audit log by ID
+GET {{baseUrl}}/audit-logs/{{auditLogId}}
+Accept: application/json
+
+### Search audit logs with filters
+GET {{baseUrl}}/audit-logs/search?userId={{userId}}&entityName={{entityName}}&entityId={{entityId}}&action={{action}}&startTime={{startTime}}&endTime={{endTime}}
+Accept: application/json
+
+### Get audit logs by user
+GET {{baseUrl}}/audit-logs/users/{{userId}}
+Accept: application/json
+
+### Get audit logs by entity
+GET {{baseUrl}}/audit-logs/entities/{{entityName}}/{{entityId}}
+Accept: application/json
+
+### Get audit logs by action
+GET {{baseUrl}}/audit-logs/actions/{{action}}
+Accept: application/json
+
+### Get audit logs by time range
+GET {{baseUrl}}/audit-logs/timerange?startTime={{startTime}}&endTime={{endTime}}
+Accept: application/json 

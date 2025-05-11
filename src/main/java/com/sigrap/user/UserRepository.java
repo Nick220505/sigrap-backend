@@ -1,7 +1,6 @@
 package com.sigrap.user;
 
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -26,4 +25,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
    * @return true if a user exists with the email, false otherwise
    */
   boolean existsByEmail(String email);
+
+  /**
+   * Finds a user by their password reset token.
+   *
+   * @param token The password reset token to search for
+   * @return Optional containing the user if found, empty otherwise
+   */
+  Optional<User> findByPasswordResetToken(String token);
 }

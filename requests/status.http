@@ -1,0 +1,6 @@
+### Variables
+@baseUrl = http://localhost:8080/api
+
+### Get API status
+GET {{baseUrl}}/status
+Accept: application/json 
