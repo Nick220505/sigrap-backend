@@ -18,11 +18,15 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Entity class representing a user in the system.
@@ -34,7 +38,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements UserDetails {
 
   /**
    * Unique identifier for the user.
@@ -82,6 +86,7 @@ public class User {
   /**
    * Timestamp of the user's last successful login.
    */
+  @Column(name = "last_login")
   private LocalDateTime lastLogin;
 
   /**
@@ -144,5 +149,38 @@ public class User {
      * User account is inactive and cannot be used for login.
      */
     INACTIVE,
+  }
+
+  @Override
+  public Set<GrantedAuthority> getAuthorities() {
+    return roles
+      .stream()
+      .map(role -> new SimpleGrantedAuthority(role.getName()))
+      .collect(Collectors.toSet());
+  }
+
+  @Override
+  public String getUsername() {
+    return email;
+  }
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return status != UserStatus.LOCKED;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return status == UserStatus.ACTIVE;
   }
 }

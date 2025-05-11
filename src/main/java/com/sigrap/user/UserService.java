@@ -4,6 +4,8 @@ import com.sigrap.role.Role;
 import com.sigrap.role.RoleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -170,6 +172,23 @@ public class UserService implements UserDetailsService {
       throw new EntityNotFoundException("User not found: " + id);
     }
     userRepository.deleteById(id);
+  }
+
+  /**
+   * Deletes multiple users by their IDs.
+   *
+   * @param ids The list of user IDs to delete
+   * @throws EntityNotFoundException if any user is not found
+   */
+  @Transactional
+  public void deleteAllById(List<Long> ids) {
+    // Verify all users exist before deleting any
+    for (Long id : ids) {
+      if (!userRepository.existsById(id)) {
+        throw new EntityNotFoundException("User not found: " + id);
+      }
+    }
+    userRepository.deleteAllById(ids);
   }
 
   /**
@@ -348,13 +367,14 @@ public class UserService implements UserDetailsService {
    */
   @Transactional
   public void registerSuccessfulLogin(String email) {
-    userRepository
+    com.sigrap.user.User user = userRepository
       .findByEmail(email)
-      .ifPresent(user -> {
-        user.setLastLogin(LocalDateTime.now());
-        user.setFailedAttempts(0);
-        userRepository.save(user);
-      });
+      .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+    user.setLastLogin(
+      ZonedDateTime.now(ZoneId.of("America/Bogota")).toLocalDateTime()
+    );
+    userRepository.save(user);
   }
 
   /**

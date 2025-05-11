@@ -3,6 +3,7 @@ package com.sigrap.user;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -141,6 +142,40 @@ public class UserController {
     @Parameter(description = "User ID") @PathVariable Long id
   ) {
     userService.delete(id);
+  }
+
+  /**
+   * Deletes multiple users by their IDs.
+   *
+   * <p>This endpoint:
+   * <ul>
+   *   <li>Validates all user IDs</li>
+   *   <li>Performs bulk deletion</li>
+   * </ul></p>
+   *
+   * <p>Note: This operation:
+   * <ul>
+   *   <li>Is atomic - all users are deleted or none</li>
+   *   <li>Is irreversible - consider archiving if historical data is needed</li>
+   *   <li>Will fail if any user doesn't exist</li>
+   * </ul></p>
+   *
+   * @param ids List of user IDs to delete
+   * @throws EntityNotFoundException if any user not found
+   */
+  @Operation(
+    summary = "Delete multiple users",
+    description = "Deletes multiple users by their IDs"
+  )
+  @DeleteMapping("/delete-many")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteAllById(
+    @Parameter(
+      description = "List of user IDs to delete",
+      required = true
+    ) @RequestBody List<Long> ids
+  ) {
+    userService.deleteAllById(ids);
   }
 
   /**

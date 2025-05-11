@@ -1,5 +1,7 @@
 package com.sigrap.auth;
 
+import java.time.LocalDateTime;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,4 +49,11 @@ public class AuthResponse {
    */
   @Schema(description = "User's full name", example = "John Doe")
   private String name;
+
+  /**
+   * Timestamp of the user's last successful login.
+   * Updated each time the user successfully authenticates.
+   */
+  @Schema(description = "Last login timestamp", example = "2024-01-01T10:30:00")
+  private LocalDateTime lastLogin;
 }

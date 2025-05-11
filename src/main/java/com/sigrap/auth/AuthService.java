@@ -115,6 +115,7 @@ public class AuthService {
       .build();
 
     userRepository.save(user);
+    userService.registerSuccessfulLogin(user.getEmail());
 
     UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
     String jwt = jwtUtil.generateToken(userDetails);
@@ -123,6 +124,7 @@ public class AuthService {
       .token(jwt)
       .email(user.getEmail())
       .name(user.getName())
+      .lastLogin(user.getLastLogin())
       .build();
   }
 
@@ -157,6 +159,8 @@ public class AuthService {
       .findByEmail(request.getEmail())
       .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
+    userService.registerSuccessfulLogin(user.getEmail());
+
     UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
     String jwt = jwtUtil.generateToken(userDetails);
 
@@ -164,6 +168,7 @@ public class AuthService {
       .token(jwt)
       .email(user.getEmail())
       .name(user.getName())
+      .lastLogin(user.getLastLogin())
       .build();
   }
 }
