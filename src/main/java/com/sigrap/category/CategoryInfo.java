@@ -1,8 +1,7 @@
 package com.sigrap.category;
 
-import java.time.LocalDateTime;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -59,7 +58,7 @@ public class CategoryInfo {
    * </ul></p>
    */
   @Schema(description = "Unique identifier of the category", example = "1")
-  private Integer id;
+  private Long id;
 
   /**
    * The name of the category.

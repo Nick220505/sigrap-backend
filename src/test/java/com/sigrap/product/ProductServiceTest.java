@@ -1,26 +1,24 @@
 package com.sigrap.product;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
-
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -72,9 +70,12 @@ class ProductServiceTest {
     Integer id = 1;
     when(productRepository.findById(id)).thenReturn(Optional.empty());
 
-    assertThrows(EntityNotFoundException.class, () -> {
-      productService.findById(id);
-    });
+    EntityNotFoundException exception = assertThrows(
+      EntityNotFoundException.class,
+      () -> productService.findById(id)
+    );
+    assertThat(exception).hasMessage("No value present");
+    verify(productMapper, never()).toInfo(any());
   }
 
   @Test
@@ -168,13 +169,14 @@ class ProductServiceTest {
 
   @Test
   void create_shouldCreateProduct_withCategory() {
-    Integer categoryId = 1;
+    Long categoryId = 1L;
+    Integer productId = 1;
 
     ProductData productData = ProductData.builder()
       .name("New Product")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
-      .categoryId(categoryId)
+      .categoryId(categoryId.intValue())
       .build();
 
     Product product = Product.builder()
@@ -189,7 +191,7 @@ class ProductServiceTest {
       .build();
 
     Product savedProduct = Product.builder()
-      .id(1)
+      .id(productId)
       .name("New Product")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
@@ -197,7 +199,7 @@ class ProductServiceTest {
       .build();
 
     ProductInfo productInfo = ProductInfo.builder()
-      .id(1)
+      .id(productId)
       .name("New Product")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
@@ -213,20 +215,20 @@ class ProductServiceTest {
     ProductInfo createdProductInfo = productService.create(productData);
 
     assertThat(createdProductInfo).isNotNull();
-    assertThat(createdProductInfo.getId()).isEqualTo(1);
+    assertThat(createdProductInfo.getId()).isEqualTo(productId);
     assertThat(createdProductInfo.getName()).isEqualTo("New Product");
     verify(productRepository).save(product);
   }
 
   @Test
   void create_shouldThrowException_whenCategoryDoesNotExist() {
-    Integer categoryId = 1;
+    Long categoryId = 1L;
 
     ProductData productData = ProductData.builder()
       .name("New Product")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
-      .categoryId(categoryId)
+      .categoryId(categoryId.intValue())
       .build();
 
     Product product = Product.builder()
@@ -238,32 +240,28 @@ class ProductServiceTest {
     when(productMapper.toEntity(productData)).thenReturn(product);
     when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
 
-    assertThrows(EntityNotFoundException.class, () -> {
-      productService.create(productData);
-    });
-
+    EntityNotFoundException exception = assertThrows(
+      EntityNotFoundException.class,
+      () -> productService.create(productData)
+    );
+    assertThat(exception).hasMessage("Category not found: " + categoryId);
     verify(productRepository, never()).save(any());
   }
 
   @Test
   void update_shouldUpdateProduct_whenProductExists() {
     Integer id = 1;
-    Integer categoryId = 2;
+    Long categoryId = 2L;
 
     ProductData productData = ProductData.builder()
       .name("Updated Product")
       .description("Updated Description")
       .costPrice(new BigDecimal("15.00"))
       .salePrice(new BigDecimal("25.00"))
-      .categoryId(categoryId)
+      .categoryId(categoryId.intValue())
       .build();
 
-    Product existingProduct = Product.builder()
-      .id(id)
-      .name("Old Name")
-      .costPrice(new BigDecimal("10.00"))
-      .salePrice(new BigDecimal("15.00"))
-      .build();
+    Product existingProduct = Product.builder().id(id).name("Old Name").build();
 
     Category category = Category.builder()
       .id(categoryId)
@@ -323,7 +321,7 @@ class ProductServiceTest {
       .name("Old Name")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
-      .category(Category.builder().id(1).build())
+      .category(Category.builder().id(1L).build())
       .build();
 
     Product updatedProduct = Product.builder()
@@ -362,27 +360,31 @@ class ProductServiceTest {
   @Test
   void update_shouldThrowException_whenProductDoesNotExist() {
     Integer id = 1;
+    Long categoryId = 2L;
+
     ProductData productData = ProductData.builder()
       .name("Updated Product")
+      .categoryId(categoryId.intValue())
       .build();
 
     when(productRepository.findById(id)).thenReturn(Optional.empty());
 
-    assertThrows(EntityNotFoundException.class, () -> {
-      productService.update(id, productData);
-    });
-
+    EntityNotFoundException exception = assertThrows(
+      EntityNotFoundException.class,
+      () -> productService.update(id, productData)
+    );
+    assertThat(exception).hasMessage("No value present");
     verify(productRepository, never()).save(any());
   }
 
   @Test
   void update_shouldThrowException_whenCategoryDoesNotExist() {
     Integer id = 1;
-    Integer categoryId = 2;
+    Long categoryId = 2L;
 
     ProductData productData = ProductData.builder()
       .name("Updated Product")
-      .categoryId(categoryId)
+      .categoryId(categoryId.intValue())
       .build();
 
     Product existingProduct = Product.builder().id(id).name("Old Name").build();
@@ -395,10 +397,11 @@ class ProductServiceTest {
       .updateEntityFromData(productData, existingProduct);
     when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
 
-    assertThrows(EntityNotFoundException.class, () -> {
-      productService.update(id, productData);
-    });
-
+    EntityNotFoundException exception = assertThrows(
+      EntityNotFoundException.class,
+      () -> productService.update(id, productData)
+    );
+    assertThat(exception).hasMessage("Category not found: " + categoryId);
     verify(productRepository, never()).save(any());
   }
 
@@ -419,10 +422,11 @@ class ProductServiceTest {
     Integer id = 1;
     when(productRepository.findById(id)).thenReturn(Optional.empty());
 
-    assertThrows(EntityNotFoundException.class, () -> {
-      productService.delete(id);
-    });
-
+    EntityNotFoundException exception = assertThrows(
+      EntityNotFoundException.class,
+      () -> productService.delete(id)
+    );
+    assertThat(exception).hasMessage("No value present");
     verify(productRepository, never()).delete(any());
   }
 
@@ -446,10 +450,11 @@ class ProductServiceTest {
     when(productRepository.existsById(1)).thenReturn(true);
     when(productRepository.existsById(2)).thenReturn(false);
 
-    assertThrows(EntityNotFoundException.class, () -> {
-      productService.deleteAllById(ids);
-    });
-
+    EntityNotFoundException exception = assertThrows(
+      EntityNotFoundException.class,
+      () -> productService.deleteAllById(ids)
+    );
+    assertThat(exception).hasMessage("Product with id 2 not found");
     verify(productRepository, never()).deleteAllById(any());
   }
 }

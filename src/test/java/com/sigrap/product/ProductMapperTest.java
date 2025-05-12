@@ -17,7 +17,7 @@ class ProductMapperTest {
 
   @Test
   void toInfo_shouldMapEntityToInfo() {
-    Category category = Category.builder().id(1).name("Test Category").build();
+    Category category = Category.builder().id(1L).name("Test Category").build();
 
     Product product = Product.builder()
       .id(1)

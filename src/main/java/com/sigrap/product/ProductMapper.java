@@ -60,6 +60,6 @@ public interface ProductMapper {
     if (categoryId == null) {
       return null;
     }
-    return Category.builder().id(categoryId).build();
+    return Category.builder().id(categoryId.longValue()).build();
   }
 }

@@ -1,22 +1,21 @@
 package com.sigrap.category;
 
-import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
@@ -32,7 +31,7 @@ class CategoryServiceTest {
 
   @Test
   void findById_shouldReturnCategoryInfo_whenCategoryExists() {
-    Integer id = 1;
+    Long id = 1L;
     Category category = Category.builder().id(id).name("Test Category").build();
 
     CategoryInfo categoryInfo = CategoryInfo.builder()
@@ -52,7 +51,7 @@ class CategoryServiceTest {
 
   @Test
   void findById_shouldThrowException_whenCategoryDoesNotExist() {
-    Integer id = 1;
+    Long id = 1L;
     when(categoryRepository.findById(id)).thenReturn(Optional.empty());
 
     assertThrows(EntityNotFoundException.class, () -> {
@@ -62,19 +61,18 @@ class CategoryServiceTest {
 
   @Test
   void findAll_shouldReturnAllCategoryInfos() {
-    Category category1 = Category.builder().id(1).name("Category 1").build();
-
-    Category category2 = Category.builder().id(2).name("Category 2").build();
+    Category category1 = Category.builder().id(1L).name("Category 1").build();
+    Category category2 = Category.builder().id(2L).name("Category 2").build();
 
     List<Category> categories = List.of(category1, category2);
 
     CategoryInfo categoryInfo1 = CategoryInfo.builder()
-      .id(1)
+      .id(1L)
       .name("Category 1")
       .build();
 
     CategoryInfo categoryInfo2 = CategoryInfo.builder()
-      .id(2)
+      .id(2L)
       .name("Category 2")
       .build();
 
@@ -108,13 +106,13 @@ class CategoryServiceTest {
       .build();
 
     Category savedCategory = Category.builder()
-      .id(1)
+      .id(1L)
       .name("New Category")
       .description("New Description")
       .build();
 
     CategoryInfo categoryInfo = CategoryInfo.builder()
-      .id(1)
+      .id(1L)
       .name("New Category")
       .description("New Description")
       .build();
@@ -126,7 +124,7 @@ class CategoryServiceTest {
     CategoryInfo createdCategoryInfo = categoryService.create(categoryData);
 
     assertThat(createdCategoryInfo).isNotNull();
-    assertThat(createdCategoryInfo.getId()).isEqualTo(1);
+    assertThat(createdCategoryInfo.getId()).isEqualTo(1L);
     assertThat(createdCategoryInfo.getName()).isEqualTo("New Category");
     assertThat(createdCategoryInfo.getDescription()).isEqualTo(
       "New Description"
@@ -136,7 +134,7 @@ class CategoryServiceTest {
 
   @Test
   void update_shouldUpdateCategory_whenCategoryExists() {
-    Integer id = 1;
+    Long id = 1L;
     CategoryData categoryData = CategoryData.builder()
       .name("Updated Name")
       .description("Updated Description")
@@ -178,7 +176,7 @@ class CategoryServiceTest {
 
   @Test
   void update_shouldThrowException_whenCategoryDoesNotExist() {
-    Integer id = 1;
+    Long id = 1L;
     CategoryData categoryData = CategoryData.builder()
       .name("Updated Name")
       .build();
@@ -193,7 +191,7 @@ class CategoryServiceTest {
 
   @Test
   void delete_shouldDeleteCategory_whenCategoryExists() {
-    Integer id = 1;
+    Long id = 1L;
     Category category = Category.builder().id(id).build();
 
     when(categoryRepository.findById(id)).thenReturn(Optional.of(category));
@@ -205,7 +203,7 @@ class CategoryServiceTest {
 
   @Test
   void delete_shouldThrowException_whenCategoryDoesNotExist() {
-    Integer id = 1;
+    Long id = 1L;
     when(categoryRepository.findById(id)).thenReturn(Optional.empty());
 
     assertThrows(EntityNotFoundException.class, () -> {
@@ -216,10 +214,10 @@ class CategoryServiceTest {
 
   @Test
   void deleteAllById_shouldDeleteAllCategories_whenAllExist() {
-    List<Integer> ids = List.of(1, 2);
+    List<Long> ids = List.of(1L, 2L);
 
-    when(categoryRepository.existsById(1)).thenReturn(true);
-    when(categoryRepository.existsById(2)).thenReturn(true);
+    when(categoryRepository.existsById(1L)).thenReturn(true);
+    when(categoryRepository.existsById(2L)).thenReturn(true);
     doNothing().when(categoryRepository).deleteAllById(ids);
 
     categoryService.deleteAllById(ids);
@@ -229,10 +227,10 @@ class CategoryServiceTest {
 
   @Test
   void deleteAllById_shouldThrowException_whenAnyCategoryDoesNotExist() {
-    List<Integer> ids = List.of(1, 2);
+    List<Long> ids = List.of(1L, 2L);
 
-    when(categoryRepository.existsById(1)).thenReturn(true);
-    when(categoryRepository.existsById(2)).thenReturn(false);
+    when(categoryRepository.existsById(1L)).thenReturn(true);
+    when(categoryRepository.existsById(2L)).thenReturn(false);
 
     assertThrows(EntityNotFoundException.class, () -> {
       categoryService.deleteAllById(ids);

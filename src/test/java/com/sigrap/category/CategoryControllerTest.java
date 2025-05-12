@@ -1,9 +1,5 @@
 package com.sigrap.category;
 
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -11,9 +7,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -21,13 +14,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.persistence.EntityNotFoundException;
 
 class CategoryControllerTest {
 
@@ -62,8 +60,8 @@ class CategoryControllerTest {
 
   @Test
   void getAll_shouldReturnAllCategories() throws Exception {
-    Integer id1 = 1;
-    Integer id2 = 2;
+    Long id1 = 1L;
+    Long id2 = 2L;
 
     CategoryInfo category1 = CategoryInfo.builder()
       .id(id1)
@@ -89,7 +87,7 @@ class CategoryControllerTest {
 
   @Test
   void getById_shouldReturnCategory_whenExists() throws Exception {
-    Integer id = 1;
+    Long id = 1L;
     CategoryInfo category = CategoryInfo.builder()
       .id(id)
       .name("Test Category")
@@ -107,7 +105,7 @@ class CategoryControllerTest {
   @Test
   void getById_shouldReturnNotFound_whenCategoryDoesNotExist()
     throws Exception {
-    Integer id = 1;
+    Long id = 1L;
     when(categoryService.findById(id)).thenThrow(new EntityNotFoundException());
 
     mockMvc
@@ -117,7 +115,7 @@ class CategoryControllerTest {
 
   @Test
   void create_shouldCreateCategory() throws Exception {
-    Integer id = 1;
+    Long id = 1L;
     CategoryInfo categoryInfo = CategoryInfo.builder()
       .id(id)
       .name("New Category")
@@ -149,7 +147,7 @@ class CategoryControllerTest {
 
   @Test
   void update_shouldUpdateCategory_whenExists() throws Exception {
-    Integer id = 1;
+    Long id = 1L;
     CategoryInfo updatedCategory = CategoryInfo.builder()
       .id(id)
       .name("Updated Category")
@@ -181,7 +179,7 @@ class CategoryControllerTest {
 
   @Test
   void update_shouldReturnNotFound_whenCategoryDoesNotExist() throws Exception {
-    Integer id = 1;
+    Long id = 1L;
     when(categoryService.update(eq(id), any(CategoryData.class))).thenThrow(
       new EntityNotFoundException()
     );
@@ -201,7 +199,7 @@ class CategoryControllerTest {
 
   @Test
   void delete_shouldDeleteCategory_whenExists() throws Exception {
-    Integer id = 1;
+    Long id = 1L;
     doNothing().when(categoryService).delete(id);
 
     mockMvc
@@ -213,7 +211,7 @@ class CategoryControllerTest {
 
   @Test
   void delete_shouldReturnNotFound_whenCategoryDoesNotExist() throws Exception {
-    Integer id = 1;
+    Long id = 1L;
     doThrow(new EntityNotFoundException()).when(categoryService).delete(id);
 
     mockMvc
@@ -223,7 +221,7 @@ class CategoryControllerTest {
 
   @Test
   void deleteMultiple_shouldDeleteCategories() throws Exception {
-    List<Integer> ids = List.of(1, 2);
+    List<Long> ids = List.of(1L, 2L);
     doNothing().when(categoryService).deleteAllById(ids);
 
     mockMvc
@@ -240,7 +238,7 @@ class CategoryControllerTest {
   @Test
   void deleteMultiple_shouldReturnNotFound_whenAnyCategoryDoesNotExist()
     throws Exception {
-    List<Integer> ids = List.of(1, 2);
+    List<Long> ids = List.of(1L, 2L);
     doThrow(new EntityNotFoundException())
       .when(categoryService)
       .deleteAllById(ids);

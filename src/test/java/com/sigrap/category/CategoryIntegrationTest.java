@@ -83,7 +83,7 @@ class CategoryIntegrationTest {
       CategoryInfo.class
     );
 
-    Integer categoryId = createdCategory.getId();
+    Long categoryId = createdCategory.getId();
     assertThat(categoryId).isNotNull();
 
     mockMvc
@@ -184,7 +184,7 @@ class CategoryIntegrationTest {
       .build();
     category2 = categoryRepository.save(category2);
 
-    List<Integer> idsToDelete = Arrays.asList(
+    List<Long> idsToDelete = Arrays.asList(
       category1.getId(),
       category2.getId()
     );

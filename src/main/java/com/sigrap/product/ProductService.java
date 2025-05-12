@@ -76,9 +76,12 @@ public class ProductService {
     Product product = productMapper.toEntity(productData);
 
     if (productData.getCategoryId() != null) {
+      Long categoryId = Long.valueOf(productData.getCategoryId());
       Category category = categoryRepository
-        .findById(productData.getCategoryId())
-        .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+        .findById(categoryId)
+        .orElseThrow(() ->
+          new EntityNotFoundException("Category not found: " + categoryId)
+        );
       product.setCategory(category);
     }
 
@@ -102,9 +105,12 @@ public class ProductService {
     productMapper.updateEntityFromData(productData, product);
 
     if (productData.getCategoryId() != null) {
+      Long categoryId = Long.valueOf(productData.getCategoryId());
       Category category = categoryRepository
-        .findById(productData.getCategoryId())
-        .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+        .findById(categoryId)
+        .orElseThrow(() ->
+          new EntityNotFoundException("Category not found: " + categoryId)
+        );
       product.setCategory(category);
     } else {
       product.setCategory(null);

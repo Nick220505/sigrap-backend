@@ -88,7 +88,9 @@ class DataSeederTest {
 
     List<Category> categories = new ArrayList<>();
     for (int i = 0; i < 12; i++) {
-      categories.add(Category.builder().id(i).name("Category " + i).build());
+      categories.add(
+        Category.builder().id(Long.valueOf(i)).name("Category " + i).build()
+      );
     }
     when(categoryRepository.findAll()).thenReturn(categories);
 

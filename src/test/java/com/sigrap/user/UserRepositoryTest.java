@@ -5,12 +5,20 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+
+import com.sigrap.config.BaseTestConfiguration;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
+@Import(BaseTestConfiguration.class)
 class UserRepositoryTest {
+
+  @Autowired
+  private TestEntityManager entityManager;
 
   @Autowired
   private UserRepository userRepository;
@@ -23,7 +31,8 @@ class UserRepositoryTest {
       .password("password123")
       .build();
 
-    userRepository.save(user);
+    entityManager.persist(user);
+    entityManager.flush();
 
     Optional<User> foundUser = userRepository.findByEmail("test@example.com");
 
@@ -37,7 +46,6 @@ class UserRepositoryTest {
     Optional<User> foundUser = userRepository.findByEmail(
       "nonexistent@example.com"
     );
-
     assertThat(foundUser).isEmpty();
   }
 
@@ -49,10 +57,10 @@ class UserRepositoryTest {
       .password("password123")
       .build();
 
-    userRepository.save(user);
+    entityManager.persist(user);
+    entityManager.flush();
 
     boolean emailExists = userRepository.existsByEmail("exists@example.com");
-
     assertThat(emailExists).isTrue();
   }
 
@@ -61,7 +69,6 @@ class UserRepositoryTest {
     boolean emailExists = userRepository.existsByEmail(
       "nonexistent@example.com"
     );
-
     assertThat(emailExists).isFalse();
   }
 }

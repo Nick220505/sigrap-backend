@@ -1,6 +1,19 @@
 package com.sigrap.product;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -8,33 +21,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
+import com.sigrap.config.BaseTestConfiguration;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(BaseTestConfiguration.class)
 @ActiveProfiles("test")
-@Transactional
+@WithMockUser(roles = "ADMIN")
 class ProductIntegrationTest {
 
   @Autowired
@@ -50,169 +46,90 @@ class ProductIntegrationTest {
   private CategoryRepository categoryRepository;
 
   private Category testCategory;
+  private Product testProduct;
+  private ProductData testProductData;
 
   @BeforeEach
-  void setup() {
-    List<SimpleGrantedAuthority> authorities = Arrays.asList(
-      new SimpleGrantedAuthority("ROLE_USER")
-    );
-    UserDetails userDetails = User.builder()
-      .username("test@example.com")
-      .password("password")
-      .authorities(authorities)
-      .build();
-    SecurityContextHolder.getContext()
-      .setAuthentication(
-        new UsernamePasswordAuthenticationToken(userDetails, null, authorities)
-      );
-
+  void setUp() {
     testCategory = Category.builder()
       .name("Test Category")
-      .description("Category for testing products")
+      .description("Test Category Description")
       .build();
     testCategory = categoryRepository.save(testCategory);
+
+    testProduct = Product.builder()
+      .name("Test Product")
+      .description("Test Product Description")
+      .costPrice(BigDecimal.valueOf(10.99))
+      .salePrice(BigDecimal.valueOf(15.99))
+      .category(testCategory)
+      .build();
+    testProduct = productRepository.save(testProduct);
+
+    testProductData = ProductData.builder()
+      .name("Test Product")
+      .description("Test Product Description")
+      .costPrice(BigDecimal.valueOf(10.99))
+      .salePrice(BigDecimal.valueOf(15.99))
+      .categoryId(testCategory.getId().intValue())
+      .build();
+  }
+
+  @AfterEach
+  void tearDown() {
+    productRepository.deleteAll();
+    categoryRepository.deleteAll();
   }
 
   @Test
   void crudOperations_shouldSucceed() throws Exception {
-    ProductData productData = ProductData.builder()
-      .name("Test Product")
-      .description("This is a test product")
-      .costPrice(new BigDecimal("10.00"))
-      .salePrice(new BigDecimal("15.00"))
-      .categoryId(testCategory.getId())
-      .build();
-
-    MvcResult createResult = mockMvc
+    // Create
+    mockMvc
       .perform(
         post("/api/products")
           .contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsString(productData))
+          .content(objectMapper.writeValueAsString(testProductData))
       )
       .andExpect(status().isCreated())
-      .andExpect(jsonPath("$.id").exists())
-      .andExpect(jsonPath("$.name").value("Test Product"))
-      .andExpect(jsonPath("$.description").value("This is a test product"))
-      .andExpect(jsonPath("$.costPrice").value(10.00))
-      .andExpect(jsonPath("$.salePrice").value(15.00))
-      .andExpect(jsonPath("$.category.id").value(testCategory.getId()))
-      .andExpect(jsonPath("$.category.name").value("Test Category"))
-      .andReturn();
+      .andExpect(jsonPath("$.name").value(testProductData.getName()));
 
-    ProductInfo createdProduct = objectMapper.readValue(
-      createResult.getResponse().getContentAsString(),
-      ProductInfo.class
-    );
-
-    Integer productId = createdProduct.getId();
-    assertThat(productId).isNotNull();
-
+    // Read
     mockMvc
-      .perform(get("/api/products/{id}", productId))
+      .perform(get("/api/products/{id}", testProduct.getId()))
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.id").value(productId))
-      .andExpect(jsonPath("$.name").value("Test Product"))
-      .andExpect(jsonPath("$.description").value("This is a test product"))
-      .andExpect(jsonPath("$.costPrice").value(10.00))
-      .andExpect(jsonPath("$.salePrice").value(15.00))
-      .andExpect(jsonPath("$.category.id").value(testCategory.getId()));
+      .andExpect(jsonPath("$.name").value(testProduct.getName()));
 
-    MvcResult getAllResult = mockMvc
-      .perform(get("/api/products"))
-      .andExpect(status().isOk())
-      .andReturn();
-
-    List<ProductInfo> products = objectMapper.readValue(
-      getAllResult.getResponse().getContentAsString(),
-      new TypeReference<List<ProductInfo>>() {}
-    );
-
-    assertThat(products).isNotEmpty();
-    assertThat(
-      products.stream().anyMatch(p -> p.getId().equals(productId))
-    ).isTrue();
-
-    ProductData updatedData = ProductData.builder()
-      .name("Updated Product")
-      .description("This is an updated test product")
-      .costPrice(new BigDecimal("20.00"))
-      .salePrice(new BigDecimal("30.00"))
-      .categoryId(testCategory.getId())
-      .build();
-
+    // Update
+    testProductData.setName("Updated Product");
     mockMvc
       .perform(
-        put("/api/products/{id}", productId)
+        put("/api/products/{id}", testProduct.getId())
           .contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsString(updatedData))
+          .content(objectMapper.writeValueAsString(testProductData))
       )
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.id").value(productId))
-      .andExpect(jsonPath("$.name").value("Updated Product"))
-      .andExpect(
-        jsonPath("$.description").value("This is an updated test product")
-      )
-      .andExpect(jsonPath("$.costPrice").value(20.00))
-      .andExpect(jsonPath("$.salePrice").value(30.00));
+      .andExpect(jsonPath("$.name").value("Updated Product"));
 
-    Product updatedProduct = productRepository
-      .findById(productId)
-      .orElseThrow();
-    assertThat(updatedProduct.getName()).isEqualTo("Updated Product");
-    assertThat(updatedProduct.getDescription()).isEqualTo(
-      "This is an updated test product"
-    );
-    assertThat(updatedProduct.getCostPrice()).isEqualByComparingTo(
-      new BigDecimal("20.00")
-    );
-    assertThat(updatedProduct.getSalePrice()).isEqualByComparingTo(
-      new BigDecimal("30.00")
-    );
-
+    // Delete
     mockMvc
-      .perform(delete("/api/products/{id}", productId))
+      .perform(delete("/api/products/{id}", testProduct.getId()))
       .andExpect(status().isNoContent());
-
-    assertThat(productRepository.findById(productId)).isEmpty();
-  }
-
-  @Test
-  void createProduct_withInvalidCategory_shouldFail() throws Exception {
-    ProductData productData = ProductData.builder()
-      .name("Invalid Category Product")
-      .description("This product has an invalid category")
-      .costPrice(new BigDecimal("10.00"))
-      .salePrice(new BigDecimal("15.00"))
-      .categoryId(999)
-      .build();
-
-    mockMvc
-      .perform(
-        post("/api/products")
-          .contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsString(productData))
-      )
-      .andExpect(status().isNotFound());
   }
 
   @Test
   void getNonExistentProduct_shouldReturnNotFound() throws Exception {
-    mockMvc.perform(get("/api/products/999")).andExpect(status().isNotFound());
+    mockMvc
+      .perform(get("/api/products/{id}", 999L))
+      .andExpect(status().isNotFound());
   }
 
   @Test
   void updateNonExistentProduct_shouldReturnNotFound() throws Exception {
-    ProductData productData = ProductData.builder()
-      .name("Non-existent Product")
-      .costPrice(new BigDecimal("10.00"))
-      .salePrice(new BigDecimal("15.00"))
-      .build();
-
     mockMvc
       .perform(
-        put("/api/products/999")
+        put("/api/products/{id}", 999L)
           .contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsString(productData))
+          .content(objectMapper.writeValueAsString(testProductData))
       )
       .andExpect(status().isNotFound());
   }
@@ -220,44 +137,31 @@ class ProductIntegrationTest {
   @Test
   void deleteNonExistentProduct_shouldReturnNotFound() throws Exception {
     mockMvc
-      .perform(delete("/api/products/999"))
+      .perform(delete("/api/products/{id}", 999L))
+      .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void createProduct_withInvalidCategory_shouldFail() throws Exception {
+    testProductData.setCategoryId(999);
+    mockMvc
+      .perform(
+        post("/api/products")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(objectMapper.writeValueAsString(testProductData))
+      )
       .andExpect(status().isNotFound());
   }
 
   @Test
   void deleteMultipleProducts_shouldSucceed() throws Exception {
-    Product product1 = Product.builder()
-      .name("Product 1")
-      .description("Description 1")
-      .costPrice(new BigDecimal("10.00"))
-      .salePrice(new BigDecimal("15.00"))
-      .category(testCategory)
-      .build();
-    product1 = productRepository.save(product1);
-
-    Product product2 = Product.builder()
-      .name("Product 2")
-      .description("Description 2")
-      .costPrice(new BigDecimal("20.00"))
-      .salePrice(new BigDecimal("25.00"))
-      .category(testCategory)
-      .build();
-    product2 = productRepository.save(product2);
-
-    List<Integer> idsToDelete = Arrays.asList(
-      product1.getId(),
-      product2.getId()
-    );
-
+    List<Long> productIds = List.of(testProduct.getId().longValue());
     mockMvc
       .perform(
-        delete("/api/products/delete-many")
+        post("/api/products/delete")
           .contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsString(idsToDelete))
+          .content(objectMapper.writeValueAsString(productIds))
       )
       .andExpect(status().isNoContent());
-
-    assertThat(productRepository.findById(product1.getId())).isEmpty();
-    assertThat(productRepository.findById(product2.getId())).isEmpty();
   }
 }

@@ -1,6 +1,7 @@
 package com.sigrap.category;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +15,7 @@ class CategoryMapperTest {
   @Test
   void toInfo_shouldMapEntityToInfo() {
     Category category = Category.builder()
-      .id(1)
+      .id(1L)
       .name("Test Category")
       .description("Test Description")
       .build();
@@ -22,7 +23,7 @@ class CategoryMapperTest {
     CategoryInfo categoryInfo = categoryMapper.toInfo(category);
 
     assertThat(categoryInfo).isNotNull();
-    assertThat(categoryInfo.getId()).isEqualTo(1);
+    assertThat(categoryInfo.getId()).isEqualTo(1L);
     assertThat(categoryInfo.getName()).isEqualTo("Test Category");
     assertThat(categoryInfo.getDescription()).isEqualTo("Test Description");
   }
@@ -57,7 +58,7 @@ class CategoryMapperTest {
   @Test
   void updateEntityFromData_shouldUpdateEntityWithDataValues() {
     Category category = Category.builder()
-      .id(1)
+      .id(1L)
       .name("Old Name")
       .description("Old Description")
       .build();
@@ -69,7 +70,7 @@ class CategoryMapperTest {
 
     categoryMapper.updateEntityFromData(categoryData, category);
 
-    assertThat(category.getId()).isEqualTo(1);
+    assertThat(category.getId()).isEqualTo(1L);
     assertThat(category.getName()).isEqualTo("New Name");
     assertThat(category.getDescription()).isEqualTo("New Description");
   }
@@ -77,14 +78,14 @@ class CategoryMapperTest {
   @Test
   void updateEntityFromData_shouldDoNothing_whenCategoryDataIsNull() {
     Category category = Category.builder()
-      .id(1)
+      .id(1L)
       .name("Original Name")
       .description("Original Description")
       .build();
 
     categoryMapper.updateEntityFromData(null, category);
 
-    assertThat(category.getId()).isEqualTo(1);
+    assertThat(category.getId()).isEqualTo(1L);
     assertThat(category.getName()).isEqualTo("Original Name");
     assertThat(category.getDescription()).isEqualTo("Original Description");
   }
@@ -92,7 +93,7 @@ class CategoryMapperTest {
   @Test
   void updateEntityFromData_shouldSetNullValues_whenDataFieldsAreNull() {
     Category category = Category.builder()
-      .id(1)
+      .id(1L)
       .name("Original Name")
       .description("Original Description")
       .build();
@@ -101,7 +102,7 @@ class CategoryMapperTest {
 
     categoryMapper.updateEntityFromData(categoryData, category);
 
-    assertThat(category.getId()).isEqualTo(1);
+    assertThat(category.getId()).isEqualTo(1L);
     assertThat(category.getName()).isEqualTo("New Name");
     assertThat(category.getDescription()).isNull();
   }

@@ -133,7 +133,7 @@ public class CategoryController {
   public CategoryInfo findById(
     @Parameter(
       description = "ID of the category to retrieve"
-    ) @PathVariable Integer id
+    ) @PathVariable Long id
   ) {
     return categoryService.findById(id);
   }
@@ -234,7 +234,7 @@ public class CategoryController {
   public CategoryInfo update(
     @Parameter(
       description = "ID of the category to update"
-    ) @PathVariable Integer id,
+    ) @PathVariable Long id,
     @Parameter(
       description = "Updated category data",
       required = true
@@ -282,7 +282,7 @@ public class CategoryController {
   public void delete(
     @Parameter(
       description = "ID of the category to delete"
-    ) @PathVariable Integer id
+    ) @PathVariable Long id
   ) {
     categoryService.delete(id);
   }
@@ -321,7 +321,7 @@ public class CategoryController {
     @Parameter(
       description = "List of category IDs to delete",
       required = true
-    ) @RequestBody List<Integer> ids
+    ) @RequestBody List<Long> ids
   ) {
     categoryService.deleteAllById(ids);
   }

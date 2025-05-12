@@ -8,4 +8,4 @@ import org.springframework.stereotype.Repository;
  * Provides basic CRUD operations for managing categories in the database.
  */
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Integer> {}
+public interface CategoryRepository extends JpaRepository<Category, Long> {}

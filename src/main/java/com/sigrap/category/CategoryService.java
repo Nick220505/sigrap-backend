@@ -48,7 +48,7 @@ public class CategoryService {
    * @throws EntityNotFoundException if the category is not found
    */
   @Transactional(readOnly = true)
-  public CategoryInfo findById(Integer id) {
+  public CategoryInfo findById(Long id) {
     Category category = categoryRepository
       .findById(id)
       .orElseThrow(EntityNotFoundException::new);
@@ -77,7 +77,7 @@ public class CategoryService {
    * @throws EntityNotFoundException if the category is not found
    */
   @Transactional
-  public CategoryInfo update(Integer id, CategoryData categoryData) {
+  public CategoryInfo update(Long id, CategoryData categoryData) {
     Category category = categoryRepository
       .findById(id)
       .orElseThrow(EntityNotFoundException::new);
@@ -93,7 +93,7 @@ public class CategoryService {
    * @throws EntityNotFoundException if the category is not found
    */
   @Transactional
-  public void delete(Integer id) {
+  public void delete(Long id) {
     Category category = categoryRepository
       .findById(id)
       .orElseThrow(EntityNotFoundException::new);
@@ -108,7 +108,7 @@ public class CategoryService {
    * @throws EntityNotFoundException if any of the categories is not found
    */
   @Transactional
-  public void deleteAllById(List<Integer> ids) {
+  public void deleteAllById(List<Long> ids) {
     ids.forEach(id -> {
       if (!categoryRepository.existsById(id)) {
         throw new EntityNotFoundException(
