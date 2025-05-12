@@ -2,6 +2,16 @@ package com.sigrap.config;
 
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
+import com.sigrap.employee.ActivityLog;
+import com.sigrap.employee.ActivityLogRepository;
+import com.sigrap.employee.Attendance;
+import com.sigrap.employee.AttendanceRepository;
+import com.sigrap.employee.Employee;
+import com.sigrap.employee.EmployeePerformance;
+import com.sigrap.employee.EmployeePerformanceRepository;
+import com.sigrap.employee.EmployeeRepository;
+import com.sigrap.employee.Schedule;
+import com.sigrap.employee.ScheduleRepository;
 import com.sigrap.permission.Permission;
 import com.sigrap.permission.PermissionRepository;
 import com.sigrap.product.Product;
@@ -18,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -88,6 +99,38 @@ public class DataSeeder implements CommandLineRunner {
   private final PasswordEncoder passwordEncoder;
 
   /**
+   * Repository for employee database operations.
+   * Used to check if employees exist and to save new employees during seeding.
+   */
+  private final EmployeeRepository employeeRepository;
+
+  /**
+   * Repository for schedule database operations.
+   * Used to check if schedules exist and to save new schedules during seeding.
+   */
+  private final ScheduleRepository scheduleRepository;
+
+  /**
+   * Repository for attendance database operations.
+   * Used to check if attendance records exist and to save new attendance records during seeding.
+   */
+  private final AttendanceRepository attendanceRepository;
+
+  /**
+   * Repository for employee performance database operations.
+   * Used to check if employee performance records exist and to save new performance records during seeding.
+   */
+  private final EmployeePerformanceRepository employeePerformanceRepository;
+
+  /**
+   * Repository for activity log database operations.
+   * Used to check if activity logs exist and to save new activity logs during seeding.
+   */
+  private final ActivityLogRepository activityLogRepository;
+
+  private final Random random = new Random();
+
+  /**
    * Executes the data seeding process on application startup.
    * Ensures all required initial data is present in the database.
    *
@@ -96,12 +139,19 @@ public class DataSeeder implements CommandLineRunner {
    */
   @Override
   public void run(String... args) throws Exception {
-    seedPermissions();
-    seedRoles();
+    log.info("Starting data seeding...");
     seedCategories();
     seedProducts();
+    seedPermissions();
+    seedRoles();
     seedUsers();
     seedUserNotificationPreferences();
+    seedEmployees();
+    seedSchedules();
+    seedAttendance();
+    seedEmployeePerformance();
+    seedActivityLogs();
+    log.info("Data seeding completed.");
   }
 
   /**
@@ -979,5 +1029,313 @@ public class DataSeeder implements CommandLineRunner {
         "User notification preferences already exist, skipping seeding."
       );
     }
+  }
+
+  private void seedEmployees() {
+    if (employeeRepository.count() > 0) {
+      log.info("Employees already seeded.");
+      return;
+    }
+
+    log.info("Seeding employees...");
+
+    List<Employee> employees = new ArrayList<>();
+
+    User adminUser = userRepository
+      .findByEmail("rosita@sigrap.com")
+      .orElseThrow(() -> new RuntimeException("Admin user not found"));
+
+    employees.add(
+      Employee.builder()
+        .user(adminUser)
+        .firstName("Rosita")
+        .lastName("González")
+        .documentId("12345678")
+        .phoneNumber("+51987654321")
+        .email(adminUser.getEmail())
+        .position("Gerente General")
+        .department("Administración")
+        .hireDate(LocalDateTime.now().minusYears(2))
+        .status(Employee.EmployeeStatus.ACTIVE)
+        .build()
+    );
+
+    User employeeUser = userRepository
+      .findByEmail("gladys@sigrap.com")
+      .orElseThrow(() -> new RuntimeException("Employee user not found"));
+
+    employees.add(
+      Employee.builder()
+        .user(employeeUser)
+        .firstName("Gladys")
+        .lastName("Mendoza")
+        .documentId("87654321")
+        .phoneNumber("+51987654322")
+        .email(employeeUser.getEmail())
+        .position("Vendedor")
+        .department("Ventas")
+        .hireDate(LocalDateTime.now().minusMonths(6))
+        .status(Employee.EmployeeStatus.ACTIVE)
+        .build()
+    );
+
+    employeeRepository.saveAll(employees);
+    log.info("Employees seeded successfully.");
+  }
+
+  private void seedSchedules() {
+    if (scheduleRepository.count() > 0) {
+      log.info("Schedules already seeded.");
+      return;
+    }
+
+    log.info("Seeding schedules...");
+
+    List<Schedule> schedules = new ArrayList<>();
+    List<Employee> employees = employeeRepository.findAll();
+
+    for (Employee employee : employees) {
+      for (String day : List.of(
+        "MONDAY",
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY",
+        "FRIDAY"
+      )) {
+        schedules.add(
+          Schedule.builder()
+            .employee(employee)
+            .day(day)
+            .startTime(LocalDateTime.now().withHour(8).withMinute(0))
+            .endTime(LocalDateTime.now().withHour(17).withMinute(0))
+            .isActive(true)
+            .build()
+        );
+      }
+
+      if ("Vendedor".equals(employee.getPosition())) {
+        schedules.add(
+          Schedule.builder()
+            .employee(employee)
+            .day("SATURDAY")
+            .startTime(LocalDateTime.now().withHour(8).withMinute(0))
+            .endTime(LocalDateTime.now().withHour(13).withMinute(0))
+            .isActive(true)
+            .build()
+        );
+      }
+    }
+
+    scheduleRepository.saveAll(schedules);
+    log.info("Schedules seeded successfully.");
+  }
+
+  private void seedAttendance() {
+    if (attendanceRepository.count() > 0) {
+      log.info("Attendance records already seeded.");
+      return;
+    }
+
+    log.info("Seeding attendance records...");
+
+    List<Attendance> attendanceRecords = new ArrayList<>();
+    List<Employee> employees = employeeRepository.findAll();
+    LocalDateTime now = LocalDateTime.now();
+
+    for (Employee employee : employees) {
+      for (int i = 0; i < 7; i++) {
+        LocalDateTime date = now.minusDays(i);
+
+        if (
+          date.getDayOfWeek().getValue() > 5 &&
+          !"Vendedor".equals(employee.getPosition())
+        ) {
+          continue;
+        }
+
+        Attendance.AttendanceStatus status =
+          Attendance.AttendanceStatus.PRESENT;
+        String notes = "Asistencia regular";
+
+        if (i == 2) {
+          status = Attendance.AttendanceStatus.LATE;
+          notes = "Llegó 15 minutos tarde debido al tráfico";
+        } else if (i == 5) {
+          status = Attendance.AttendanceStatus.ON_LEAVE;
+          notes = "Permiso por asuntos personales";
+        }
+
+        attendanceRecords.add(
+          Attendance.builder()
+            .employee(employee)
+            .date(date)
+            .clockInTime(date.withHour(8).withMinute(0))
+            .clockOutTime(date.withHour(17).withMinute(0))
+            .status(status)
+            .notes(notes)
+            .build()
+        );
+      }
+    }
+
+    attendanceRepository.saveAll(attendanceRecords);
+    log.info("Attendance records seeded successfully.");
+  }
+
+  private void seedEmployeePerformance() {
+    if (employeePerformanceRepository.count() > 0) {
+      log.info("Performance records already seeded.");
+      return;
+    }
+
+    log.info("Seeding performance records...");
+
+    List<EmployeePerformance> performanceRecords = new ArrayList<>();
+    List<Employee> employees = employeeRepository.findAll();
+    LocalDateTime now = LocalDateTime.now();
+
+    for (Employee employee : employees) {
+      for (int i = 0; i < 3; i++) {
+        LocalDateTime periodStart = now.minusMonths(i).withDayOfMonth(1);
+        LocalDateTime periodEnd = periodStart.plusMonths(1).minusDays(1);
+
+        int salesCount = 0;
+        BigDecimal salesTotal = BigDecimal.ZERO;
+        int rating = 0;
+        String notes = "";
+
+        switch (employee.getPosition()) {
+          case "Vendedor":
+            salesCount = 80 + random.nextInt(40);
+            salesTotal = BigDecimal.valueOf(
+              salesCount * 100 * (1 + random.nextDouble())
+            );
+            rating = 85 + random.nextInt(15);
+            notes = "Excelente desempeño en ventas. Buena atención al cliente.";
+            break;
+          case "Almacenero":
+            salesCount = 150 + random.nextInt(50);
+            salesTotal = BigDecimal.valueOf(salesCount * 50);
+            rating = 80 + random.nextInt(15);
+            notes =
+              "Eficiente manejo de inventario. Mantiene el almacén organizado.";
+            break;
+          case "Gerente General":
+            salesCount = 20 + random.nextInt(10);
+            salesTotal = BigDecimal.valueOf(10000 + random.nextDouble() * 5000);
+            rating = 90 + random.nextInt(10);
+            notes =
+              "Liderazgo efectivo. Cumplimiento de objetivos del departamento.";
+            break;
+        }
+
+        performanceRecords.add(
+          EmployeePerformance.builder()
+            .employee(employee)
+            .periodStart(periodStart)
+            .periodEnd(periodEnd)
+            .salesCount(salesCount)
+            .salesTotal(salesTotal)
+            .rating(rating)
+            .notes(notes)
+            .build()
+        );
+      }
+    }
+
+    employeePerformanceRepository.saveAll(performanceRecords);
+    log.info("Performance records seeded successfully.");
+  }
+
+  private void seedActivityLogs() {
+    if (activityLogRepository.count() > 0) {
+      log.info("Activity logs already seeded.");
+      return;
+    }
+
+    log.info("Seeding activity logs...");
+
+    List<ActivityLog> activityLogs = new ArrayList<>();
+    List<Employee> employees = employeeRepository.findAll();
+    LocalDateTime now = LocalDateTime.now();
+
+    for (Employee employee : employees) {
+      activityLogs.add(
+        ActivityLog.builder()
+          .employee(employee)
+          .timestamp(now.minusDays(1))
+          .actionType(ActivityLog.ActionType.LOGIN)
+          .description("Inicio de sesión exitoso")
+          .moduleName("auth")
+          .ipAddress("192.168.1.100")
+          .build()
+      );
+
+      activityLogs.add(
+        ActivityLog.builder()
+          .employee(employee)
+          .timestamp(now.minusDays(1).plusHours(9))
+          .actionType(ActivityLog.ActionType.VIEW)
+          .description("Consulta de inventario")
+          .moduleName("inventory")
+          .ipAddress("192.168.1.100")
+          .build()
+      );
+
+      if ("Vendedor".equals(employee.getPosition())) {
+        activityLogs.add(
+          ActivityLog.builder()
+            .employee(employee)
+            .timestamp(now.minusDays(1).plusHours(10))
+            .actionType(ActivityLog.ActionType.CREATE)
+            .description("Registro de nueva venta")
+            .moduleName("sales")
+            .entityId("SALE-001")
+            .ipAddress("192.168.1.100")
+            .build()
+        );
+      }
+
+      if ("Almacenero".equals(employee.getPosition())) {
+        activityLogs.add(
+          ActivityLog.builder()
+            .employee(employee)
+            .timestamp(now.minusDays(1).plusHours(11))
+            .actionType(ActivityLog.ActionType.UPDATE)
+            .description("Actualización de stock de producto")
+            .moduleName("inventory")
+            .entityId("PROD-001")
+            .ipAddress("192.168.1.100")
+            .build()
+        );
+      }
+
+      if ("Gerente General".equals(employee.getPosition())) {
+        activityLogs.add(
+          ActivityLog.builder()
+            .employee(employee)
+            .timestamp(now.minusDays(1).plusHours(14))
+            .actionType(ActivityLog.ActionType.EXPORT)
+            .description("Generación de reporte de ventas")
+            .moduleName("reports")
+            .ipAddress("192.168.1.100")
+            .build()
+        );
+      }
+
+      activityLogs.add(
+        ActivityLog.builder()
+          .employee(employee)
+          .timestamp(now.minusDays(1).plusHours(17))
+          .actionType(ActivityLog.ActionType.LOGOUT)
+          .description("Cierre de sesión")
+          .moduleName("auth")
+          .ipAddress("192.168.1.100")
+          .build()
+      );
+    }
+
+    activityLogRepository.saveAll(activityLogs);
+    log.info("Activity logs seeded successfully.");
   }
 }
