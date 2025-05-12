@@ -1,8 +1,14 @@
 package com.sigrap.employee;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,13 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 /**
  * REST controller for employee management operations.
@@ -175,6 +174,45 @@ public class EmployeeController {
     ) @PathVariable Long id
   ) {
     employeeService.delete(id);
+  }
+
+  /**
+   * Deletes multiple employees by their IDs.
+   *
+   * <p>This endpoint:
+   * <ul>
+   *   <li>Validates all employee IDs</li>
+   *   <li>Performs bulk deletion</li>
+   *   <li>Updates employee records</li>
+   * </ul></p>
+   *
+   * <p>Note: This operation:
+   * <ul>
+   *   <li>Is atomic - all employees are deleted or none</li>
+   *   <li>Is irreversible - consider deactivating if historical data is needed</li>
+   *   <li>Will fail if any employee doesn't exist</li>
+   * </ul></p>
+   *
+   * @param ids List of employee IDs to delete
+   * @throws EntityNotFoundException if any employee not found
+   */
+  @DeleteMapping("/delete-many")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(
+    summary = "Delete multiple employees",
+    description = "Deletes multiple employees by their IDs"
+  )
+  @ApiResponse(
+    responseCode = "204",
+    description = "Employees deleted successfully"
+  )
+  public void deleteAllById(
+    @Parameter(
+      description = "List of employee IDs to delete",
+      required = true
+    ) @RequestBody List<Long> ids
+  ) {
+    employeeService.deleteAllById(ids);
   }
 
   /**

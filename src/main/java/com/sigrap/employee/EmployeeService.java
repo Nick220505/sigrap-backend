@@ -133,10 +133,31 @@ public class EmployeeService {
    */
   @Transactional
   public void delete(Long id) {
-    if (!employeeRepository.existsById(id)) {
-      throw new EntityNotFoundException("Employee not found: " + id);
-    }
-    employeeRepository.deleteById(id);
+    Employee employee = employeeRepository
+      .findById(id)
+      .orElseThrow(() ->
+        new EntityNotFoundException("Employee not found: " + id)
+      );
+    employeeRepository.delete(employee);
+  }
+
+  /**
+   * Deletes multiple employees by their IDs.
+   * Validates all IDs exist before performing the deletion.
+   *
+   * @param ids List of employee IDs to delete
+   * @throws EntityNotFoundException if any of the employees is not found
+   */
+  @Transactional
+  public void deleteAllById(List<Long> ids) {
+    ids.forEach(id -> {
+      if (!employeeRepository.existsById(id)) {
+        throw new EntityNotFoundException(
+          "Employee with id " + id + " not found"
+        );
+      }
+    });
+    employeeRepository.deleteAllById(ids);
   }
 
   /**
