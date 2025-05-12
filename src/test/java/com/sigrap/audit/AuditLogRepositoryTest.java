@@ -8,9 +8,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
@@ -110,23 +107,17 @@ class AuditLogRepositoryTest {
 
     auditLogRepository.saveAll(List.of(auditLog1, auditLog2, auditLog3));
 
-    Pageable pageable = PageRequest.of(0, 10);
-    Page<AuditLog> userAuditLogs =
+    List<AuditLog> userAuditLogs =
       auditLogRepository.findByEntityNameAndEntityIdOrderByTimestampDesc(
         "User",
-        "1",
-        pageable
+        "1"
       );
 
-    assertThat(userAuditLogs.getContent()).hasSize(2);
-    assertThat(userAuditLogs.getContent().get(0).getEntityName()).isEqualTo(
-      "User"
-    );
-    assertThat(userAuditLogs.getContent().get(0).getEntityId()).isEqualTo("1");
-    assertThat(userAuditLogs.getContent().get(1).getEntityName()).isEqualTo(
-      "User"
-    );
-    assertThat(userAuditLogs.getContent().get(1).getEntityId()).isEqualTo("1");
+    assertThat(userAuditLogs).hasSize(2);
+    assertThat(userAuditLogs.get(0).getEntityName()).isEqualTo("User");
+    assertThat(userAuditLogs.get(0).getEntityId()).isEqualTo("1");
+    assertThat(userAuditLogs.get(1).getEntityName()).isEqualTo("User");
+    assertThat(userAuditLogs.get(1).getEntityId()).isEqualTo("1");
   }
 
   @Test
@@ -166,17 +157,16 @@ class AuditLogRepositoryTest {
 
     auditLogRepository.saveAll(List.of(auditLog1, auditLog2, auditLog3));
 
-    Pageable pageable = PageRequest.of(0, 10);
-    Page<AuditLog> user1AuditLogs =
-      auditLogRepository.findByUserIdOrderByTimestampDesc(1L, pageable);
+    List<AuditLog> user1AuditLogs =
+      auditLogRepository.findByUserIdOrderByTimestampDesc(1L);
 
-    assertThat(user1AuditLogs.getContent()).hasSize(2);
-    assertThat(user1AuditLogs.getContent().get(0).getUserId()).isEqualTo(1L);
-    assertThat(user1AuditLogs.getContent().get(0).getUsername()).isEqualTo(
+    assertThat(user1AuditLogs).hasSize(2);
+    assertThat(user1AuditLogs.get(0).getUserId()).isEqualTo(1L);
+    assertThat(user1AuditLogs.get(0).getUsername()).isEqualTo(
       "user1@example.com"
     );
-    assertThat(user1AuditLogs.getContent().get(1).getUserId()).isEqualTo(1L);
-    assertThat(user1AuditLogs.getContent().get(1).getUsername()).isEqualTo(
+    assertThat(user1AuditLogs.get(1).getUserId()).isEqualTo(1L);
+    assertThat(user1AuditLogs.get(1).getUsername()).isEqualTo(
       "user1@example.com"
     );
   }
@@ -219,16 +209,11 @@ class AuditLogRepositoryTest {
 
     auditLogRepository.saveAll(List.of(auditLog1, auditLog2, auditLog3));
 
-    Pageable pageable = PageRequest.of(0, 10);
-    Page<AuditLog> createAuditLogs =
-      auditLogRepository.findByActionOrderByTimestampDesc("CREATE", pageable);
+    List<AuditLog> createAuditLogs =
+      auditLogRepository.findByActionOrderByTimestampDesc("CREATE");
 
-    assertThat(createAuditLogs.getContent()).hasSize(2);
-    assertThat(createAuditLogs.getContent().get(0).getAction()).isEqualTo(
-      "CREATE"
-    );
-    assertThat(createAuditLogs.getContent().get(1).getAction()).isEqualTo(
-      "CREATE"
-    );
+    assertThat(createAuditLogs).hasSize(2);
+    assertThat(createAuditLogs.get(0).getAction()).isEqualTo("CREATE");
+    assertThat(createAuditLogs.get(1).getAction()).isEqualTo("CREATE");
   }
 }

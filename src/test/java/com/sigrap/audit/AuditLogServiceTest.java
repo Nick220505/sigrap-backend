@@ -15,9 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class AuditLogServiceTest {
@@ -103,7 +100,6 @@ class AuditLogServiceTest {
 
   @Test
   void findAll_shouldReturnPageOfAuditLogs() {
-    Pageable pageable = Pageable.unpaged();
     AuditLog auditLog = AuditLog.builder()
       .id(1L)
       .userId(1L)
@@ -115,11 +111,6 @@ class AuditLogServiceTest {
       .build();
 
     List<AuditLog> auditLogs = List.of(auditLog);
-    Page<AuditLog> auditLogPage = new PageImpl<>(
-      auditLogs,
-      pageable,
-      auditLogs.size()
-    );
 
     AuditLogInfo auditLogInfo = AuditLogInfo.builder()
       .id(1L)
@@ -131,17 +122,17 @@ class AuditLogServiceTest {
       .timestamp(auditLog.getTimestamp())
       .build();
 
-    when(auditLogRepository.findAll(pageable)).thenReturn(auditLogPage);
+    when(auditLogRepository.findAll()).thenReturn(auditLogs);
     when(auditLogMapper.toInfo(auditLog)).thenReturn(auditLogInfo);
 
-    Page<AuditLogInfo> result = auditLogService.findAll(pageable);
+    List<AuditLogInfo> result = auditLogService.findAll();
 
     assertThat(result).isNotNull();
-    assertThat(result.getContent()).hasSize(1);
-    assertThat(result.getContent().get(0).getId()).isEqualTo(1L);
-    assertThat(result.getContent().get(0).getAction()).isEqualTo("CREATE");
+    assertThat(result).hasSize(1);
+    assertThat(result.get(0).getId()).isEqualTo(1L);
+    assertThat(result.get(0).getAction()).isEqualTo("CREATE");
 
-    verify(auditLogRepository).findAll(pageable);
+    verify(auditLogRepository).findAll();
     verify(auditLogMapper).toInfo(auditLog);
   }
 
