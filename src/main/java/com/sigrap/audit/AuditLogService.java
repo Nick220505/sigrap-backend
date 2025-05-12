@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -65,109 +64,85 @@ public class AuditLogService {
   }
 
   /**
-   * Retrieves all audit logs with pagination.
+   * Retrieves all audit logs.
    *
-   * @param pageable Pagination parameters
-   * @return Page of AuditLogInfo DTOs
+   * @return List of AuditLogInfo DTOs
    */
   @Transactional(readOnly = true)
-  public Page<AuditLogInfo> findAll(Pageable pageable) {
-    return auditLogRepository.findAll(pageable).map(auditLogMapper::toInfo);
+  public List<AuditLogInfo> findAll() {
+    return auditLogRepository
+      .findAllByOrderByTimestampDesc()
+      .stream()
+      .map(auditLogMapper::toInfo)
+      .toList();
   }
 
   /**
-   * Retrieves audit logs for a specific user with pagination.
+   * Retrieves audit logs for a specific user.
    *
    * @param userId The ID of the user to find logs for
-   * @param pageable Pagination parameters
-   * @return Page of AuditLogInfo DTOs
+   * @return List of AuditLogInfo DTOs
    */
   @Transactional(readOnly = true)
-  public Page<AuditLogInfo> findByUserId(Long userId, Pageable pageable) {
+  public List<AuditLogInfo> findByUserId(Long userId) {
     return auditLogRepository
-      .findByUserIdOrderByTimestampDesc(userId, pageable)
-      .map(auditLogMapper::toInfo);
+      .findByUserIdOrderByTimestampDesc(userId)
+      .stream()
+      .map(auditLogMapper::toInfo)
+      .toList();
   }
 
   /**
-   * Retrieves audit logs for a specific entity with pagination.
+   * Retrieves audit logs for a specific entity.
    *
    * @param entityName The name of the entity to find logs for
    * @param entityId The ID of the entity to find logs for
-   * @param pageable Pagination parameters
-   * @return Page of AuditLogInfo DTOs
+   * @return List of AuditLogInfo DTOs
    */
   @Transactional(readOnly = true)
-  public Page<AuditLogInfo> findByEntityNameAndEntityId(
+  public List<AuditLogInfo> findByEntityNameAndEntityId(
     String entityName,
-    String entityId,
-    Pageable pageable
+    String entityId
   ) {
     return auditLogRepository
-      .findByEntityNameAndEntityIdOrderByTimestampDesc(
-        entityName,
-        entityId,
-        pageable
-      )
-      .map(auditLogMapper::toInfo);
+      .findByEntityNameAndEntityIdOrderByTimestampDesc(entityName, entityId)
+      .stream()
+      .map(auditLogMapper::toInfo)
+      .toList();
   }
 
   /**
-   * Retrieves audit logs for a specific action with pagination.
+   * Retrieves audit logs for a specific action.
    *
    * @param action The action to find logs for
-   * @param pageable Pagination parameters
-   * @return Page of AuditLogInfo DTOs
+   * @return List of AuditLogInfo DTOs
    */
   @Transactional(readOnly = true)
-  public Page<AuditLogInfo> findByAction(String action, Pageable pageable) {
+  public List<AuditLogInfo> findByAction(String action) {
     return auditLogRepository
-      .findByActionOrderByTimestampDesc(action, pageable)
-      .map(auditLogMapper::toInfo);
+      .findByActionOrderByTimestampDesc(action)
+      .stream()
+      .map(auditLogMapper::toInfo)
+      .toList();
   }
 
   /**
-   * Retrieves audit logs within a date range with pagination.
+   * Retrieves audit logs within a date range.
    *
    * @param startTime The start of the date range
    * @param endTime The end of the date range
-   * @param pageable Pagination parameters
-   * @return Page of AuditLogInfo DTOs
+   * @return List of AuditLogInfo DTOs
    */
   @Transactional(readOnly = true)
-  public Page<AuditLogInfo> findByDateRange(
+  public List<AuditLogInfo> findByDateRange(
     LocalDateTime startTime,
-    LocalDateTime endTime,
-    Pageable pageable
+    LocalDateTime endTime
   ) {
     return auditLogRepository
-      .findByTimestampBetweenOrderByTimestampDesc(startTime, endTime, pageable)
-      .map(auditLogMapper::toInfo);
-  }
-
-  /**
-   * Searches audit logs based on multiple criteria with pagination.
-   *
-   * @param userId The ID of the user (or null for any user)
-   * @param entityName The name of the entity (or null for any entity)
-   * @param action The action (or null for any action)
-   * @param startTime The start of the time range (or null for no start limit)
-   * @param endTime The end of the time range (or null for no end limit)
-   * @param pageable Pagination parameters
-   * @return Page of AuditLogInfo DTOs
-   */
-  @Transactional(readOnly = true)
-  public Page<AuditLogInfo> search(
-    Long userId,
-    String entityName,
-    String action,
-    LocalDateTime startTime,
-    LocalDateTime endTime,
-    Pageable pageable
-  ) {
-    return auditLogRepository
-      .searchAuditLogs(userId, entityName, action, startTime, endTime, pageable)
-      .map(auditLogMapper::toInfo);
+      .findByTimestampBetweenOrderByTimestampDesc(startTime, endTime)
+      .stream()
+      .map(auditLogMapper::toInfo)
+      .toList();
   }
 
   /**
