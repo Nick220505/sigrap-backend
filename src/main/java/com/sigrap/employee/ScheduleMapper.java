@@ -21,8 +21,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ScheduleMapper {
 
-  private final EmployeeRepository employeeRepository;
-
   /**
    * Converts a Schedule entity to ScheduleInfo DTO.
    *
