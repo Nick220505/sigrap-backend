@@ -1,20 +1,22 @@
 package com.sigrap.audit;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class AuditLogServiceTest {
@@ -122,7 +124,9 @@ class AuditLogServiceTest {
       .timestamp(auditLog.getTimestamp())
       .build();
 
-    when(auditLogRepository.findAll()).thenReturn(auditLogs);
+    when(auditLogRepository.findAllByOrderByTimestampDesc()).thenReturn(
+      auditLogs
+    );
     when(auditLogMapper.toInfo(auditLog)).thenReturn(auditLogInfo);
 
     List<AuditLogInfo> result = auditLogService.findAll();
@@ -132,7 +136,7 @@ class AuditLogServiceTest {
     assertThat(result.get(0).getId()).isEqualTo(1L);
     assertThat(result.get(0).getAction()).isEqualTo("CREATE");
 
-    verify(auditLogRepository).findAll();
+    verify(auditLogRepository).findAllByOrderByTimestampDesc();
     verify(auditLogMapper).toInfo(auditLog);
   }
 

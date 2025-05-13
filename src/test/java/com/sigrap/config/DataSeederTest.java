@@ -1,12 +1,26 @@
 package com.sigrap.config;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
@@ -20,22 +34,10 @@ import com.sigrap.permission.PermissionRepository;
 import com.sigrap.product.ProductRepository;
 import com.sigrap.role.Role;
 import com.sigrap.role.RoleRepository;
+import com.sigrap.supplier.SupplierRepository;
 import com.sigrap.user.User;
 import com.sigrap.user.UserNotificationPreferenceRepository;
 import com.sigrap.user.UserRepository;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class DataSeederTest {
@@ -76,6 +78,9 @@ class DataSeederTest {
   @Mock
   private ActivityLogRepository activityLogRepository;
 
+  @Mock
+  private SupplierRepository supplierRepository;
+
   @InjectMocks
   private DataSeeder dataSeeder;
 
@@ -93,6 +98,7 @@ class DataSeederTest {
     lenient().when(attendanceRepository.count()).thenReturn(2L);
     lenient().when(employeePerformanceRepository.count()).thenReturn(2L);
     lenient().when(activityLogRepository.count()).thenReturn(2L);
+    lenient().when(supplierRepository.count()).thenReturn(2L);
 
     // Mock admin user lookup to avoid "Admin user not found" error
     User mockAdminUser = User.builder()

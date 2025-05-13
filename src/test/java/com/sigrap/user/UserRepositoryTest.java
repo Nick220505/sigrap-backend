@@ -10,11 +10,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.sigrap.config.BaseTestConfiguration;
+import com.sigrap.config.RepositoryTestConfiguration;
 
 @DataJpaTest
 @ActiveProfiles("test")
-@Import(BaseTestConfiguration.class)
+@Import(RepositoryTestConfiguration.class)
 class UserRepositoryTest {
 
   @Autowired

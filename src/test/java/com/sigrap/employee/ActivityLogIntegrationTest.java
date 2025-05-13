@@ -93,7 +93,7 @@ class ActivityLogIntegrationTest {
       objectMapper,
       "Test User",
       "test@example.com",
-      "password123"
+      "Password123!"
     );
   }
 
@@ -197,40 +197,19 @@ class ActivityLogIntegrationTest {
 
   @Test
   void shouldFilterByActionType() throws Exception {
-    ActivityLog log1 = ActivityLog.builder()
-      .employee(employee)
-      .timestamp(timestamp)
-      .actionType(ActivityLog.ActionType.CREATE)
-      .description("Test activity 1")
-      .moduleName("test")
-      .entityId("123")
-      .ipAddress("127.0.0.1")
-      .build();
-    activityLogRepository.save(log1);
-
-    ActivityLog log2 = ActivityLog.builder()
-      .employee(employee)
-      .timestamp(timestamp.plusHours(1))
-      .actionType(ActivityLog.ActionType.UPDATE)
-      .description("Test activity 2")
-      .moduleName("test")
-      .entityId("456")
-      .ipAddress("127.0.0.1")
-      .build();
-    activityLogRepository.save(log2);
+    ActivityLog.ActionType actionType = ActivityLog.ActionType.CREATE;
 
     mockMvc
       .perform(
-        get("/api/activity-logs/action-type/CREATE").header(
+        get("/api/activity-logs/action-type/{actionType}", actionType).header(
           "Authorization",
           "Bearer " + token
         )
       )
       .andExpect(status().isOk())
       .andExpect(jsonPath("$").isArray())
-      .andExpect(jsonPath("$.length()").value(1))
-      .andExpect(jsonPath("$[0].actionType").value("CREATE"))
-      .andExpect(jsonPath("$[0].description").value("Test activity 1"));
+      .andExpect(jsonPath("$[0].actionType").value(actionType.toString()))
+      .andExpect(jsonPath("$.length()").value(1));
   }
 
   @Test

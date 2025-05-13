@@ -1,14 +1,8 @@
 package com.sigrap.audit;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.sigrap.user.User;
-import com.sigrap.user.User.UserStatus;
-import com.sigrap.user.UserRepository;
 import java.time.LocalDateTime;
+
+import static org.hamcrest.Matchers.hasSize;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +13,14 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.sigrap.user.User;
+import com.sigrap.user.User.UserStatus;
+import com.sigrap.user.UserRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -107,10 +108,10 @@ class AuditLogIntegrationTest {
     mockMvc
       .perform(get("/api/audit-logs").contentType(MediaType.APPLICATION_JSON))
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.content", hasSize(2)))
-      .andExpect(jsonPath("$.content[0].id").isNumber())
-      .andExpect(jsonPath("$.content[0].userId").value(testUser.getId()))
-      .andExpect(jsonPath("$.content[0].username").value(testUser.getEmail()));
+      .andExpect(jsonPath("$", hasSize(2)))
+      .andExpect(jsonPath("$[0].id").isNumber())
+      .andExpect(jsonPath("$[0].userId").value(testUser.getId()))
+      .andExpect(jsonPath("$[0].username").value(testUser.getEmail()));
   }
 
   @Test
@@ -141,15 +142,11 @@ class AuditLogIntegrationTest {
         )
       )
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.content", hasSize(2)))
-      .andExpect(jsonPath("$.content[0].entityName").value("User"))
-      .andExpect(
-        jsonPath("$.content[0].entityId").value(testUser.getId().toString())
-      )
-      .andExpect(jsonPath("$.content[1].entityName").value("User"))
-      .andExpect(
-        jsonPath("$.content[1].entityId").value(testUser.getId().toString())
-      );
+      .andExpect(jsonPath("$", hasSize(2)))
+      .andExpect(jsonPath("$[0].entityName").value("User"))
+      .andExpect(jsonPath("$[0].entityId").value(testUser.getId().toString()))
+      .andExpect(jsonPath("$[1].entityName").value("User"))
+      .andExpect(jsonPath("$[1].entityId").value(testUser.getId().toString()));
   }
 
   @Test
@@ -162,11 +159,11 @@ class AuditLogIntegrationTest {
         )
       )
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.content", hasSize(2)))
-      .andExpect(jsonPath("$.content[0].userId").value(testUser.getId()))
-      .andExpect(jsonPath("$.content[0].username").value(testUser.getEmail()))
-      .andExpect(jsonPath("$.content[1].userId").value(testUser.getId()))
-      .andExpect(jsonPath("$.content[1].username").value(testUser.getEmail()));
+      .andExpect(jsonPath("$", hasSize(2)))
+      .andExpect(jsonPath("$[0].userId").value(testUser.getId()))
+      .andExpect(jsonPath("$[0].username").value(testUser.getEmail()))
+      .andExpect(jsonPath("$[1].userId").value(testUser.getId()))
+      .andExpect(jsonPath("$[1].username").value(testUser.getEmail()));
   }
 
   @Test
@@ -179,9 +176,9 @@ class AuditLogIntegrationTest {
         )
       )
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.content", hasSize(1)))
-      .andExpect(jsonPath("$.content[0].id").value(createAuditLog.getId()))
-      .andExpect(jsonPath("$.content[0].action").value("CREATE"));
+      .andExpect(jsonPath("$", hasSize(1)))
+      .andExpect(jsonPath("$[0].id").value(createAuditLog.getId()))
+      .andExpect(jsonPath("$[0].action").value("CREATE"));
 
     mockMvc
       .perform(
@@ -190,8 +187,8 @@ class AuditLogIntegrationTest {
         )
       )
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.content", hasSize(1)))
-      .andExpect(jsonPath("$.content[0].id").value(updateAuditLog.getId()))
-      .andExpect(jsonPath("$.content[0].action").value("UPDATE"));
+      .andExpect(jsonPath("$", hasSize(1)))
+      .andExpect(jsonPath("$[0].id").value(updateAuditLog.getId()))
+      .andExpect(jsonPath("$[0].action").value("UPDATE"));
   }
 }
