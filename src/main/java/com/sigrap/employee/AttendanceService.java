@@ -220,11 +220,7 @@ public class AttendanceService {
 
     attendance.setStatus(status);
     if (notes != null) {
-      attendance.setNotes(
-        attendance.getNotes() != null
-          ? attendance.getNotes() + "; " + notes
-          : notes
-      );
+      attendance.setNotes(notes);
     }
 
     Attendance savedAttendance = attendanceRepository.save(attendance);

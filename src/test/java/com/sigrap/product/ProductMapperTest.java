@@ -216,7 +216,7 @@ class ProductMapperTest {
     Category category = productMapper.mapCategory(categoryId);
 
     assertThat(category).isNotNull();
-    assertThat(category.getId()).isEqualTo(categoryId);
+    assertThat(category.getId()).isEqualTo(Long.valueOf(categoryId));
     assertThat(category.getName()).isNull();
   }
 }

@@ -1,12 +1,15 @@
 package com.sigrap.employee;
 
-import com.sigrap.user.User;
-import com.sigrap.user.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import java.util.Collections;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
+
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Mapper class for converting between Employee entities and DTOs.
@@ -66,7 +69,11 @@ public class EmployeeMapper {
     if (employees == null) {
       return Collections.emptyList();
     }
-    return employees.stream().map(this::toInfo).toList();
+    return employees
+      .stream()
+      .filter(employee -> employee != null)
+      .map(this::toInfo)
+      .toList();
   }
 
   /**

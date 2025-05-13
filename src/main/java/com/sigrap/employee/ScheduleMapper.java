@@ -2,8 +2,10 @@ package com.sigrap.employee;
 
 import java.util.Collections;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Mapper class for converting between Schedule entities and DTOs.
@@ -96,6 +98,9 @@ public class ScheduleMapper {
     }
     entity.setStartTime(data.getStartTime());
     entity.setEndTime(data.getEndTime());
+    if (data.getIsActive() != null) {
+      entity.setIsActive(data.getIsActive());
+    }
   }
 
   private String getFullName(Employee employee) {

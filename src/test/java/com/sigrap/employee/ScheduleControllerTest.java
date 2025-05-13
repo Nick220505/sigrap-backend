@@ -1,63 +1,49 @@
 package com.sigrap.employee;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+@ExtendWith(MockitoExtension.class)
 class ScheduleControllerTest {
 
   private MockMvc mockMvc;
+
+  @Mock
   private ScheduleService scheduleService;
-  private ObjectMapper objectMapper;
 
-  @ControllerAdvice
-  public static class TestExceptionHandler
-    extends ResponseEntityExceptionHandler {
+  @InjectMocks
+  private ScheduleController scheduleController;
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Object> handleEntityNotFound(
-      EntityNotFoundException ex
-    ) {
-      return ResponseEntity.notFound().build();
-    }
-  }
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   private ScheduleInfo testSchedule;
   private ScheduleData testData;
 
   @BeforeEach
   void setUp() {
-    scheduleService = mock(ScheduleService.class);
-    objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new JavaTimeModule());
-
-    ScheduleController controller = new ScheduleController(scheduleService);
-
-    mockMvc = standaloneSetup(controller)
-      .setControllerAdvice(new TestExceptionHandler())
-      .build();
+    mockMvc = MockMvcBuilders.standaloneSetup(scheduleController).build();
+    objectMapper.findAndRegisterModules(); // For LocalDateTime serialization
 
     testSchedule = ScheduleInfo.builder()
       .id(1L)
@@ -66,6 +52,7 @@ class ScheduleControllerTest {
       .startTime(LocalDateTime.now())
       .endTime(LocalDateTime.now().plusHours(8))
       .day("MONDAY")
+      .isActive(true)
       .createdAt(LocalDateTime.now())
       .updatedAt(LocalDateTime.now())
       .build();
@@ -75,6 +62,7 @@ class ScheduleControllerTest {
       .startTime(LocalDateTime.now())
       .endTime(LocalDateTime.now().plusHours(8))
       .day("MONDAY")
+      .isActive(true)
       .build();
   }
 

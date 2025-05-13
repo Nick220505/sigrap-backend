@@ -1,12 +1,12 @@
 package com.sigrap.employee;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -59,7 +59,10 @@ class EmployeePerformanceMapperTest {
     assertEquals(performance.getPeriodEnd(), info.getPeriodEnd());
     assertEquals(performance.getSalesCount(), info.getSalesCount());
     assertEquals(performance.getSalesTotal(), info.getSalesTotal());
-    assertEquals(BigDecimal.valueOf(100), info.getAverageTransactionValue());
+    assertEquals(
+      0,
+      BigDecimal.valueOf(100).compareTo(info.getAverageTransactionValue())
+    );
     assertEquals(performance.getCreatedAt(), info.getCreatedAt());
     assertEquals(performance.getUpdatedAt(), info.getUpdatedAt());
   }
@@ -86,7 +89,10 @@ class EmployeePerformanceMapperTest {
     assertEquals(performance.getPeriodEnd(), info.getPeriodEnd());
     assertEquals(performance.getSalesCount(), info.getSalesCount());
     assertEquals(performance.getSalesTotal(), info.getSalesTotal());
-    assertEquals(BigDecimal.valueOf(100), info.getAverageTransactionValue());
+    assertEquals(
+      0,
+      BigDecimal.valueOf(100).compareTo(info.getAverageTransactionValue())
+    );
     assertEquals(performance.getCreatedAt(), info.getCreatedAt());
     assertEquals(performance.getUpdatedAt(), info.getUpdatedAt());
   }

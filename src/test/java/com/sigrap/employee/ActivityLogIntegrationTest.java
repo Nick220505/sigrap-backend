@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sigrap.common.TestUtils;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
 
 /**
  * Integration tests for the Activity Log feature.
@@ -40,6 +42,9 @@ class ActivityLogIntegrationTest {
   @Autowired
   private EmployeeRepository employeeRepository;
 
+  @Autowired
+  private UserRepository userRepository;
+
   private Employee employee;
   private ActivityLogData activityLogData;
   private String token;
@@ -49,10 +54,27 @@ class ActivityLogIntegrationTest {
   void setUp() throws Exception {
     timestamp = LocalDateTime.now();
 
+    // Generate a unique documentId using timestamp to avoid conflicts
+    String uniqueDocumentId = "DOC" + System.currentTimeMillis();
+
+    // Create a user for the employee first
+    User user = User.builder()
+      .name("John Doe")
+      .email("john" + System.currentTimeMillis() + "@example.com") // Unique email
+      .password("password")
+      .status(User.UserStatus.ACTIVE)
+      .build();
+    user = userRepository.save(user);
+
     employee = Employee.builder()
       .firstName("John")
       .lastName("Doe")
-      .email("john@example.com")
+      .email("john.employee" + System.currentTimeMillis() + "@example.com") // Unique email
+      .documentId(uniqueDocumentId)
+      .department("Sales")
+      .position("Manager")
+      .hireDate(LocalDateTime.now().minusMonths(1))
+      .user(user)
       .build();
     employee = employeeRepository.save(employee);
 

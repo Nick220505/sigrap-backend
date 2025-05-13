@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Mapper class for converting between EmployeePerformance entities and DTOs.
@@ -43,6 +45,7 @@ public class EmployeePerformanceMapper {
       .salesCount(performance.getSalesCount())
       .salesTotal(performance.getSalesTotal())
       .averageTransactionValue(calculateAverageTransactionValue(performance))
+      .rating(performance.getRating())
       .createdAt(performance.getCreatedAt())
       .updatedAt(performance.getUpdatedAt())
       .build();
@@ -104,6 +107,7 @@ public class EmployeePerformanceMapper {
       .periodEnd(data.getPeriodEnd())
       .salesCount(data.getSalesCount())
       .salesTotal(data.getSalesTotal())
+      .rating(data.getRating())
       .build();
   }
 
@@ -125,5 +129,8 @@ public class EmployeePerformanceMapper {
     entity.setPeriodEnd(data.getPeriodEnd());
     entity.setSalesCount(data.getSalesCount());
     entity.setSalesTotal(data.getSalesTotal());
+    if (data.getRating() != null) {
+      entity.setRating(data.getRating());
+    }
   }
 }

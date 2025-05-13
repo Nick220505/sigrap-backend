@@ -1,10 +1,17 @@
 package com.sigrap.employee;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -15,12 +22,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.time.LocalDateTime;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
 class EmployeeControllerTest {
 
@@ -212,7 +213,7 @@ class EmployeeControllerTest {
     when(employeeService.activate(1L)).thenReturn(testEmployeeInfo);
 
     mockMvc
-      .perform(post("/api/employees/{id}/activate", 1L))
+      .perform(put("/api/employees/{id}/activate", 1L))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(testEmployeeInfo.getId()))
       .andExpect(jsonPath("$.userId").value(testEmployeeInfo.getUserId()))
@@ -238,7 +239,7 @@ class EmployeeControllerTest {
     when(employeeService.deactivate(1L)).thenReturn(testEmployeeInfo);
 
     mockMvc
-      .perform(post("/api/employees/{id}/deactivate", 1L))
+      .perform(put("/api/employees/{id}/deactivate", 1L))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(testEmployeeInfo.getId()))
       .andExpect(jsonPath("$.userId").value(testEmployeeInfo.getUserId()))
@@ -264,7 +265,7 @@ class EmployeeControllerTest {
     when(employeeService.terminate(1L)).thenReturn(testEmployeeInfo);
 
     mockMvc
-      .perform(post("/api/employees/{id}/terminate", 1L))
+      .perform(put("/api/employees/{id}/terminate", 1L))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(testEmployeeInfo.getId()))
       .andExpect(jsonPath("$.userId").value(testEmployeeInfo.getUserId()))

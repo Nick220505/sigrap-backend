@@ -1,13 +1,31 @@
 package com.sigrap.role;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sigrap.permission.Permission;
@@ -15,22 +33,6 @@ import com.sigrap.permission.PermissionRepository;
 import com.sigrap.user.User;
 import com.sigrap.user.User.UserStatus;
 import com.sigrap.user.UserRepository;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -53,12 +55,64 @@ class RoleIntegrationTest {
   @Autowired
   private ObjectMapper objectMapper;
 
+  @Autowired
+  private JdbcTemplate jdbcTemplate;
+
   private Role testRole;
   private Permission testPermission;
   private User testUser;
 
   @BeforeEach
   void setUp() {
+    // Create required tables first
+    jdbcTemplate.execute(
+      "CREATE TABLE IF NOT EXISTS users (" +
+      "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+      "name VARCHAR(255), " +
+      "email VARCHAR(255) UNIQUE, " +
+      "password VARCHAR(255), " +
+      "phone VARCHAR(255), " +
+      "failed_attempts INTEGER, " +
+      "last_login TIMESTAMP, " +
+      "password_reset_token VARCHAR(255), " +
+      "password_reset_expiry TIMESTAMP, " +
+      "status VARCHAR(50))"
+    );
+
+    jdbcTemplate.execute(
+      "CREATE TABLE IF NOT EXISTS permissions (" +
+      "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+      "name VARCHAR(255) UNIQUE, " +
+      "resource VARCHAR(255), " +
+      "action VARCHAR(255), " +
+      "description VARCHAR(255), " +
+      "created_at TIMESTAMP, " +
+      "updated_at TIMESTAMP)"
+    );
+
+    jdbcTemplate.execute(
+      "CREATE TABLE IF NOT EXISTS roles (" +
+      "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+      "name VARCHAR(255) UNIQUE, " +
+      "description VARCHAR(255), " +
+      "created_at TIMESTAMP, " +
+      "updated_at TIMESTAMP)"
+    );
+
+    jdbcTemplate.execute(
+      "CREATE TABLE IF NOT EXISTS role_permissions (" +
+      "role_id BIGINT, " +
+      "permission_id BIGINT, " +
+      "PRIMARY KEY (role_id, permission_id))"
+    );
+
+    jdbcTemplate.execute(
+      "CREATE TABLE IF NOT EXISTS user_roles (" +
+      "user_id BIGINT, " +
+      "role_id BIGINT, " +
+      "PRIMARY KEY (user_id, role_id))"
+    );
+
     List<SimpleGrantedAuthority> authorities = Arrays.asList(
       new SimpleGrantedAuthority("ROLE_ADMIN")
     );

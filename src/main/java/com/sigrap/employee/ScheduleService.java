@@ -1,12 +1,14 @@
 package com.sigrap.employee;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Service class for schedule management operations.
@@ -51,7 +53,7 @@ public class ScheduleService {
     Schedule schedule = scheduleRepository
       .findById(id)
       .orElseThrow(() ->
-        new EntityNotFoundException("Schedule not found with id: " + id)
+        new EntityNotFoundException("Schedule not found: " + id)
       );
     return scheduleMapper.toInfo(schedule);
   }
@@ -91,7 +93,7 @@ public class ScheduleService {
     Schedule schedule = scheduleRepository
       .findById(id)
       .orElseThrow(() ->
-        new EntityNotFoundException("Schedule not found with id: " + id)
+        new EntityNotFoundException("Schedule not found: " + id)
       );
 
     scheduleMapper.updateEntity(schedule, data);
@@ -108,7 +110,7 @@ public class ScheduleService {
   @Transactional
   public void delete(Long id) {
     if (!scheduleRepository.existsById(id)) {
-      throw new EntityNotFoundException("Schedule not found with id: " + id);
+      throw new EntityNotFoundException("Schedule not found: " + id);
     }
     scheduleRepository.deleteById(id);
   }
@@ -160,11 +162,24 @@ public class ScheduleService {
     LocalDateTime startTime = data.getStartTime();
     LocalDateTime endTime = data.getEndTime();
 
+    // Days of the week
+    String[] daysOfWeek = {
+      "MONDAY",
+      "TUESDAY",
+      "WEDNESDAY",
+      "THURSDAY",
+      "FRIDAY",
+      "SATURDAY",
+      "SUNDAY",
+    };
+
     for (int i = 0; i < 7; i++) {
       ScheduleData dailyData = ScheduleData.builder()
         .employeeId(employeeId)
+        .day(daysOfWeek[i])
         .startTime(startTime.plusDays(i))
         .endTime(endTime.plusDays(i))
+        .isActive(data.getIsActive())
         .build();
 
       Schedule schedule = scheduleMapper.toEntity(dailyData, employee);

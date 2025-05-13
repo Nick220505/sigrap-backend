@@ -19,6 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -37,6 +39,9 @@ class AttendanceIntegrationTest {
   @Autowired
   private AttendanceRepository attendanceRepository;
 
+  @Autowired
+  private UserRepository userRepository;
+
   private Employee testEmployee;
   private Attendance testAttendance;
   private ClockInData testClockInData;
@@ -44,13 +49,27 @@ class AttendanceIntegrationTest {
 
   @BeforeEach
   void setUp() {
+    // Generate unique IDs for the test
+    String uniqueEmail = "john" + System.currentTimeMillis() + "@example.com";
+    String uniqueDocumentId = "DOC" + System.currentTimeMillis();
+
+    // Create a user for the employee
+    User user = User.builder()
+      .name("John Doe")
+      .email(uniqueEmail)
+      .password("password")
+      .status(User.UserStatus.ACTIVE)
+      .build();
+    userRepository.save(user);
+
     testEmployee = Employee.builder()
       .firstName("John")
       .lastName("Doe")
-      .documentId("123456")
+      .documentId(uniqueDocumentId)
       .position("Sales")
       .department("Sales")
       .hireDate(LocalDateTime.now())
+      .user(user)
       .build();
     employeeRepository.save(testEmployee);
 
@@ -58,8 +77,6 @@ class AttendanceIntegrationTest {
       .employee(testEmployee)
       .date(LocalDateTime.now())
       .clockInTime(LocalDateTime.now())
-      .clockOutTime(LocalDateTime.now().plusHours(8))
-      .totalHours(8.0)
       .status(Attendance.AttendanceStatus.PRESENT)
       .notes("Regular day")
       .build();
@@ -140,9 +157,22 @@ class AttendanceIntegrationTest {
 
   @Test
   void updateStatus_ShouldUpdateAttendanceStatus() throws Exception {
+    // Create a fresh attendance record specifically for this test
+    Attendance freshAttendance = Attendance.builder()
+      .employee(testEmployee)
+      .date(LocalDateTime.now())
+      .clockInTime(LocalDateTime.now())
+      .clockOutTime(LocalDateTime.now().plusHours(8))
+      .totalHours(8.0)
+      .status(Attendance.AttendanceStatus.PRESENT)
+      .notes("") // Empty notes to start with
+      .build();
+
+    attendanceRepository.save(freshAttendance);
+
     mockMvc
       .perform(
-        put("/api/attendance/" + testAttendance.getId() + "/status")
+        put("/api/attendance/" + freshAttendance.getId() + "/status")
           .param("status", Attendance.AttendanceStatus.LATE.toString())
           .param("notes", "Late arrival")
       )
@@ -152,7 +182,7 @@ class AttendanceIntegrationTest {
       );
 
     Attendance updatedAttendance = attendanceRepository
-      .findById(testAttendance.getId())
+      .findById(freshAttendance.getId())
       .orElse(null);
     assertNotNull(updatedAttendance);
     assertEquals(

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import com.sigrap.user.User;
+
 /**
  * Integration tests for the ActivityLogRepository class.
  * Tests the JPA repository functionality with a real database.
@@ -32,10 +34,24 @@ class ActivityLogRepositoryTest {
   void setUp() {
     timestamp = LocalDateTime.now();
 
+    // Create a user first
+    User user = User.builder()
+      .name("John Doe")
+      .email("john@example.com")
+      .password("password")
+      .status(User.UserStatus.ACTIVE)
+      .build();
+    user = entityManager.persist(user);
+
     employee = Employee.builder()
       .firstName("John")
       .lastName("Doe")
       .email("john@example.com")
+      .documentId("12345678")
+      .department("Sales")
+      .position("Manager")
+      .hireDate(LocalDateTime.now().minusMonths(1))
+      .user(user)
       .build();
     employee = entityManager.persist(employee);
 

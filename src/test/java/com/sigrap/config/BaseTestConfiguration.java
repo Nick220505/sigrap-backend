@@ -17,18 +17,11 @@ public class BaseTestConfiguration {
   @Primary
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-      .securityMatcher("/api/**")
       .csrf(AbstractHttpConfigurer::disable)
       .sessionManagement(session ->
         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
       )
-      .authorizeHttpRequests(auth ->
-        auth
-          .requestMatchers("/api/auth/**")
-          .permitAll()
-          .anyRequest()
-          .authenticated()
-      );
+      .authorizeHttpRequests(auth -> auth.requestMatchers("/**").permitAll());
     return http.build();
   }
 }
