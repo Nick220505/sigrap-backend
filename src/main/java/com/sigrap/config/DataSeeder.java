@@ -18,6 +18,10 @@ import com.sigrap.product.Product;
 import com.sigrap.product.ProductRepository;
 import com.sigrap.role.Role;
 import com.sigrap.role.RoleRepository;
+import com.sigrap.supplier.PaymentMethod;
+import com.sigrap.supplier.Supplier;
+import com.sigrap.supplier.SupplierRepository;
+import com.sigrap.supplier.SupplierStatus;
 import com.sigrap.user.User;
 import com.sigrap.user.UserNotificationPreference;
 import com.sigrap.user.UserNotificationPreference.NotificationType;
@@ -128,6 +132,12 @@ public class DataSeeder implements CommandLineRunner {
    */
   private final ActivityLogRepository activityLogRepository;
 
+  /**
+   * Repository for supplier database operations.
+   * Used to check if suppliers exist and to save new suppliers during seeding.
+   */
+  private final SupplierRepository supplierRepository;
+
   private final Random random = new Random();
 
   /**
@@ -151,6 +161,7 @@ public class DataSeeder implements CommandLineRunner {
     seedAttendance();
     seedEmployeePerformance();
     seedActivityLogs();
+    seedSuppliers();
     log.info("Data seeding completed.");
   }
 
@@ -1337,5 +1348,183 @@ public class DataSeeder implements CommandLineRunner {
 
     activityLogRepository.saveAll(activityLogs);
     log.info("Activity logs seeded successfully.");
+  }
+
+  /**
+   * Seeds initial suppliers into the database.
+   * Creates a diverse set of suppliers with realistic business information.
+   * Only executes if the suppliers table is empty.
+   */
+  private void seedSuppliers() {
+    if (supplierRepository.count() == 0) {
+      log.info("Seeding suppliers...");
+
+      List<Supplier> suppliers = new ArrayList<>();
+
+      suppliers.add(
+        Supplier.builder()
+          .name("Office Depot")
+          .taxId("20487965214")
+          .contactPerson("Miguel Sánchez")
+          .email("msanchez@officedepot.com")
+          .phone("(01) 619-2700")
+          .address("Av. Javier Prado Este 2558, San Borja, Lima")
+          .paymentMethod(PaymentMethod.BANK_TRANSFER)
+          .status(SupplierStatus.ACTIVE)
+          .website("https://www.officedepot.com.pe")
+          .paymentTerms("30 días")
+          .notes("Proveedor principal de artículos de oficina y escolares")
+          .build()
+      );
+
+      suppliers.add(
+        Supplier.builder()
+          .name("Tai Loy")
+          .taxId("20100049181")
+          .contactPerson("Ana Campos")
+          .email("acampos@tailoy.com.pe")
+          .phone("(01) 612-3000")
+          .address("Av. Iquitos 799, La Victoria, Lima")
+          .paymentMethod(PaymentMethod.CREDIT_CARD)
+          .status(SupplierStatus.ACTIVE)
+          .website("https://www.tailoy.com.pe")
+          .paymentTerms("15 días")
+          .notes("Distribuidor mayorista de útiles escolares y de oficina")
+          .build()
+      );
+
+      suppliers.add(
+        Supplier.builder()
+          .name("Artesco")
+          .taxId("20100067324")
+          .contactPerson("Roberto Gutiérrez")
+          .email("rgutierrez@artesco.com.pe")
+          .phone("(01) 619-6000")
+          .address("Av. Elmer Faucett 3350, Callao")
+          .paymentMethod(PaymentMethod.BANK_TRANSFER)
+          .status(SupplierStatus.ACTIVE)
+          .website("https://www.artesco.com.pe")
+          .paymentTerms("45 días")
+          .notes("Fabricante de útiles escolares de alta calidad")
+          .build()
+      );
+
+      suppliers.add(
+        Supplier.builder()
+          .name("Layconsa")
+          .taxId("20101308678")
+          .contactPerson("María Elena Torres")
+          .email("metorres@layconsa.com.pe")
+          .phone("(01) 614-2500")
+          .address("Jr. Mariscal Agustín Gamarra 349, Lima")
+          .paymentMethod(PaymentMethod.CHECK)
+          .status(SupplierStatus.ACTIVE)
+          .website("https://www.layconsa.com")
+          .paymentTerms("30 días")
+          .notes("Especialista en materiales artísticos y manualidades")
+          .build()
+      );
+
+      suppliers.add(
+        Supplier.builder()
+          .name("Faber-Castell Perú")
+          .taxId("20100041953")
+          .contactPerson("Jorge Reátegui")
+          .email("jreategui@faber-castell.com.pe")
+          .phone("(01) 611-4800")
+          .address("Av. La Molina 161, La Molina, Lima")
+          .paymentMethod(PaymentMethod.BANK_TRANSFER)
+          .status(SupplierStatus.ACTIVE)
+          .website("https://www.faber-castell.com.pe")
+          .paymentTerms("45 días")
+          .notes("Proveedor global de instrumentos de escritura y dibujo")
+          .build()
+      );
+
+      suppliers.add(
+        Supplier.builder()
+          .name("Pegafan")
+          .taxId("20101613373")
+          .contactPerson("Lucía Pérez")
+          .email("lperez@pegafan.com.pe")
+          .phone("(01) 419-2300")
+          .address("Av. Argentina 2458, Callao")
+          .paymentMethod(PaymentMethod.CASH)
+          .status(SupplierStatus.ACTIVE)
+          .website("https://www.pegafan.com.pe")
+          .paymentTerms("Contado")
+          .notes("Fabricante de pegamentos y adhesivos escolares")
+          .build()
+      );
+
+      suppliers.add(
+        Supplier.builder()
+          .name("Norma")
+          .taxId("20523367057")
+          .contactPerson("Daniel Quispe")
+          .email("dquispe@norma.com.pe")
+          .phone("(01) 415-8000")
+          .address("Jr. Domingo Cueto 370, Lima")
+          .paymentMethod(PaymentMethod.BANK_TRANSFER)
+          .status(SupplierStatus.ACTIVE)
+          .website("https://www.norma.com")
+          .paymentTerms("30 días")
+          .notes("Especialista en cuadernos y productos de papel")
+          .build()
+      );
+
+      suppliers.add(
+        Supplier.builder()
+          .name("Continental")
+          .taxId("20102089635")
+          .contactPerson("Patricia Rojas")
+          .email("projas@continental.com.pe")
+          .phone("(01) 418-1800")
+          .address("Av. Industrial 3422, San Martín de Porres, Lima")
+          .paymentMethod(PaymentMethod.CHECK)
+          .status(SupplierStatus.INACTIVE)
+          .website("https://www.continental.com.pe")
+          .paymentTerms("45 días")
+          .notes("Distribuidor de productos importados para oficina")
+          .build()
+      );
+
+      suppliers.add(
+        Supplier.builder()
+          .name("Pilot Perú")
+          .taxId("20493020618")
+          .contactPerson("Carlos Mendoza")
+          .email("cmendoza@pilotperu.com")
+          .phone("(01) 617-5200")
+          .address("Av. República de Panamá 3563, San Isidro, Lima")
+          .paymentMethod(PaymentMethod.BANK_TRANSFER)
+          .status(SupplierStatus.ACTIVE)
+          .website("https://www.pilotpen.com.pe")
+          .paymentTerms("30 días")
+          .notes("Importador oficial de productos Pilot")
+          .build()
+      );
+
+      suppliers.add(
+        Supplier.builder()
+          .name("Papelera Nacional")
+          .taxId("20100047641")
+          .contactPerson("Fernando Torres")
+          .email("ftorres@papenal.com.pe")
+          .phone("(01) 613-9000")
+          .address("Av. Las Torres 426, Ate, Lima")
+          .paymentMethod(PaymentMethod.BANK_TRANSFER)
+          .status(SupplierStatus.PROBATION)
+          .website("https://www.papeleranacional.com")
+          .paymentTerms("60 días")
+          .notes("Fabricante de productos de papel y cuadernos")
+          .build()
+      );
+
+      supplierRepository.saveAll(suppliers);
+      log.info("Suppliers seeded successfully.");
+    } else {
+      log.info("Suppliers already exist, skipping seeding.");
+    }
   }
 }
