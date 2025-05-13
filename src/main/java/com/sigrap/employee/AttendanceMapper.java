@@ -1,12 +1,11 @@
 package com.sigrap.employee;
 
-import java.time.Duration;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import jakarta.persistence.EntityNotFoundException;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Mapper class for converting between Attendance entities and DTOs.
@@ -63,6 +62,9 @@ public class AttendanceMapper {
    * @return List of AttendanceInfo DTOs
    */
   public List<AttendanceInfo> toInfoList(List<Attendance> attendances) {
+    if (attendances == null || attendances.isEmpty()) {
+      return Collections.emptyList();
+    }
     return attendances.stream().map(this::toInfo).toList();
   }
 

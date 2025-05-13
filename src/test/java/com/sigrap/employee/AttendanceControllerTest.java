@@ -1,39 +1,29 @@
 package com.sigrap.employee;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
-@ExtendWith(MockitoExtension.class)
-@WebMvcTest(AttendanceController.class)
 class AttendanceControllerTest {
 
-  @Autowired
   private MockMvc mockMvc;
-
-  @Autowired
   private ObjectMapper objectMapper;
-
-  @Mock
   private AttendanceService attendanceService;
 
   private AttendanceInfo testAttendanceInfo;
@@ -42,6 +32,21 @@ class AttendanceControllerTest {
 
   @BeforeEach
   void setUp() {
+    // Setup mock service
+    attendanceService = mock(AttendanceService.class);
+
+    // Setup controller with mocked service
+    AttendanceController attendanceController = new AttendanceController(
+      attendanceService
+    );
+
+    // Setup MockMvc
+    mockMvc = standaloneSetup(attendanceController).build();
+
+    // Configure ObjectMapper for handling LocalDateTime
+    objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+
     testAttendanceInfo = AttendanceInfo.builder()
       .id(1L)
       .employeeId(1L)

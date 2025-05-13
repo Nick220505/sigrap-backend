@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sigrap.category.Category;
+import com.sigrap.category.CategoryInfo;
 import com.sigrap.category.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
@@ -74,7 +75,7 @@ class ProductServiceTest {
       EntityNotFoundException.class,
       () -> productService.findById(id)
     );
-    assertThat(exception).hasMessage("No value present");
+    assertThat(exception).hasMessage("Product not found with id: " + id);
     verify(productMapper, never()).toInfo(any());
   }
 
@@ -251,17 +252,78 @@ class ProductServiceTest {
   @Test
   void update_shouldUpdateProduct_whenProductExists() {
     Integer id = 1;
-    Long categoryId = 2L;
-
     ProductData productData = ProductData.builder()
       .name("Updated Product")
       .description("Updated Description")
-      .costPrice(new BigDecimal("15.00"))
-      .salePrice(new BigDecimal("25.00"))
+      .costPrice(new BigDecimal("20.00"))
+      .salePrice(new BigDecimal("30.00"))
+      .build();
+
+    Product existingProduct = Product.builder()
+      .id(id)
+      .name("Original Product")
+      .description("Original Description")
+      .costPrice(new BigDecimal("10.00"))
+      .salePrice(new BigDecimal("15.00"))
+      .build();
+
+    Product updatedProduct = Product.builder()
+      .id(id)
+      .name("Updated Product")
+      .description("Updated Description")
+      .costPrice(new BigDecimal("20.00"))
+      .salePrice(new BigDecimal("30.00"))
+      .build();
+
+    ProductInfo productInfo = ProductInfo.builder()
+      .id(id)
+      .name("Updated Product")
+      .description("Updated Description")
+      .costPrice(new BigDecimal("20.00"))
+      .salePrice(new BigDecimal("30.00"))
+      .build();
+
+    when(productRepository.findById(id)).thenReturn(
+      Optional.of(existingProduct)
+    );
+    when(productRepository.save(existingProduct)).thenReturn(updatedProduct);
+    when(productMapper.toInfo(updatedProduct)).thenReturn(productInfo);
+
+    ProductInfo updatedProductInfo = productService.update(id, productData);
+
+    assertThat(updatedProductInfo).isNotNull();
+    assertThat(updatedProductInfo.getId()).isEqualTo(id);
+    assertThat(updatedProductInfo.getName()).isEqualTo("Updated Product");
+    assertThat(updatedProductInfo.getDescription()).isEqualTo(
+      "Updated Description"
+    );
+    assertThat(updatedProductInfo.getCostPrice()).isEqualByComparingTo(
+      new BigDecimal("20.00")
+    );
+    assertThat(updatedProductInfo.getSalePrice()).isEqualByComparingTo(
+      new BigDecimal("30.00")
+    );
+    verify(productRepository).save(existingProduct);
+  }
+
+  @Test
+  void update_shouldUpdateProductWithCategory_whenProductExists() {
+    Integer id = 1;
+    Long categoryId = 1L;
+
+    ProductData productData = ProductData.builder()
+      .name("Updated Product")
+      .costPrice(new BigDecimal("20.00"))
+      .salePrice(new BigDecimal("30.00"))
       .categoryId(categoryId.intValue())
       .build();
 
-    Product existingProduct = Product.builder().id(id).name("Old Name").build();
+    Product existingProduct = Product.builder()
+      .id(id)
+      .name("Original Product")
+      .costPrice(new BigDecimal("10.00"))
+      .salePrice(new BigDecimal("15.00"))
+      .build();
 
     Category category = Category.builder()
       .id(categoryId)
@@ -271,26 +333,27 @@ class ProductServiceTest {
     Product updatedProduct = Product.builder()
       .id(id)
       .name("Updated Product")
-      .description("Updated Description")
-      .costPrice(new BigDecimal("15.00"))
-      .salePrice(new BigDecimal("25.00"))
+      .costPrice(new BigDecimal("20.00"))
+      .salePrice(new BigDecimal("30.00"))
       .category(category)
+      .build();
+
+    CategoryInfo categoryInfo = CategoryInfo.builder()
+      .id(categoryId)
+      .name("Test Category")
       .build();
 
     ProductInfo productInfo = ProductInfo.builder()
       .id(id)
       .name("Updated Product")
-      .description("Updated Description")
-      .costPrice(new BigDecimal("15.00"))
-      .salePrice(new BigDecimal("25.00"))
+      .costPrice(new BigDecimal("20.00"))
+      .salePrice(new BigDecimal("30.00"))
+      .category(categoryInfo)
       .build();
 
     when(productRepository.findById(id)).thenReturn(
       Optional.of(existingProduct)
     );
-    doNothing()
-      .when(productMapper)
-      .updateEntityFromData(productData, existingProduct);
     when(categoryRepository.findById(categoryId)).thenReturn(
       Optional.of(category)
     );
@@ -302,49 +365,57 @@ class ProductServiceTest {
     assertThat(updatedProductInfo).isNotNull();
     assertThat(updatedProductInfo.getId()).isEqualTo(id);
     assertThat(updatedProductInfo.getName()).isEqualTo("Updated Product");
+    assertThat(updatedProductInfo.getCategory().getId()).isEqualTo(categoryId);
+    assertThat(updatedProductInfo.getCategory().getName()).isEqualTo(
+      "Test Category"
+    );
     verify(productRepository).save(existingProduct);
   }
 
   @Test
   void update_shouldRemoveCategory_whenCategoryIdIsNull() {
     Integer id = 1;
+    Long categoryId = 1L;
 
     ProductData productData = ProductData.builder()
       .name("Updated Product")
-      .costPrice(new BigDecimal("15.00"))
-      .salePrice(new BigDecimal("25.00"))
+      .costPrice(new BigDecimal("20.00"))
+      .salePrice(new BigDecimal("30.00"))
       .categoryId(null)
+      .build();
+
+    Category category = Category.builder()
+      .id(categoryId)
+      .name("Test Category")
       .build();
 
     Product existingProduct = Product.builder()
       .id(id)
-      .name("Old Name")
+      .name("Original Product")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
-      .category(Category.builder().id(1L).build())
+      .category(category)
       .build();
 
     Product updatedProduct = Product.builder()
       .id(id)
       .name("Updated Product")
-      .costPrice(new BigDecimal("15.00"))
-      .salePrice(new BigDecimal("25.00"))
+      .costPrice(new BigDecimal("20.00"))
+      .salePrice(new BigDecimal("30.00"))
       .category(null)
       .build();
 
     ProductInfo productInfo = ProductInfo.builder()
       .id(id)
       .name("Updated Product")
-      .costPrice(new BigDecimal("15.00"))
-      .salePrice(new BigDecimal("25.00"))
+      .costPrice(new BigDecimal("20.00"))
+      .salePrice(new BigDecimal("30.00"))
+      .category(null)
       .build();
 
     when(productRepository.findById(id)).thenReturn(
       Optional.of(existingProduct)
     );
-    doNothing()
-      .when(productMapper)
-      .updateEntityFromData(productData, existingProduct);
     when(productRepository.save(existingProduct)).thenReturn(updatedProduct);
     when(productMapper.toInfo(updatedProduct)).thenReturn(productInfo);
 
@@ -353,18 +424,17 @@ class ProductServiceTest {
     assertThat(updatedProductInfo).isNotNull();
     assertThat(updatedProductInfo.getId()).isEqualTo(id);
     assertThat(updatedProductInfo.getName()).isEqualTo("Updated Product");
-    assertThat(existingProduct.getCategory()).isNull();
+    assertThat(updatedProductInfo.getCategory()).isNull();
     verify(productRepository).save(existingProduct);
   }
 
   @Test
   void update_shouldThrowException_whenProductDoesNotExist() {
     Integer id = 1;
-    Long categoryId = 2L;
-
     ProductData productData = ProductData.builder()
       .name("Updated Product")
-      .categoryId(categoryId.intValue())
+      .costPrice(new BigDecimal("20.00"))
+      .salePrice(new BigDecimal("30.00"))
       .build();
 
     when(productRepository.findById(id)).thenReturn(Optional.empty());
@@ -373,28 +443,32 @@ class ProductServiceTest {
       EntityNotFoundException.class,
       () -> productService.update(id, productData)
     );
-    assertThat(exception).hasMessage("No value present");
+    assertThat(exception).hasMessage("Product not found with id: " + id);
     verify(productRepository, never()).save(any());
   }
 
   @Test
   void update_shouldThrowException_whenCategoryDoesNotExist() {
     Integer id = 1;
-    Long categoryId = 2L;
+    Long categoryId = 1L;
 
     ProductData productData = ProductData.builder()
       .name("Updated Product")
+      .costPrice(new BigDecimal("20.00"))
+      .salePrice(new BigDecimal("30.00"))
       .categoryId(categoryId.intValue())
       .build();
 
-    Product existingProduct = Product.builder().id(id).name("Old Name").build();
+    Product existingProduct = Product.builder()
+      .id(id)
+      .name("Original Product")
+      .costPrice(new BigDecimal("10.00"))
+      .salePrice(new BigDecimal("15.00"))
+      .build();
 
     when(productRepository.findById(id)).thenReturn(
       Optional.of(existingProduct)
     );
-    doNothing()
-      .when(productMapper)
-      .updateEntityFromData(productData, existingProduct);
     when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
 
     EntityNotFoundException exception = assertThrows(
@@ -411,6 +485,7 @@ class ProductServiceTest {
     Product product = Product.builder().id(id).build();
 
     when(productRepository.findById(id)).thenReturn(Optional.of(product));
+    doNothing().when(productRepository).delete(product);
 
     productService.delete(id);
 
@@ -426,35 +501,38 @@ class ProductServiceTest {
       EntityNotFoundException.class,
       () -> productService.delete(id)
     );
-    assertThat(exception).hasMessage("No value present");
+    assertThat(exception).hasMessage("Product not found with id: " + id);
     verify(productRepository, never()).delete(any());
   }
 
   @Test
   void deleteAllById_shouldDeleteAllProducts_whenAllExist() {
     List<Integer> ids = List.of(1, 2);
+    Product product1 = Product.builder().id(1).build();
+    Product product2 = Product.builder().id(2).build();
 
-    when(productRepository.existsById(1)).thenReturn(true);
-    when(productRepository.existsById(2)).thenReturn(true);
-    doNothing().when(productRepository).deleteAllById(ids);
+    when(productRepository.findById(1)).thenReturn(Optional.of(product1));
+    when(productRepository.findById(2)).thenReturn(Optional.of(product2));
+    doNothing().when(productRepository).deleteAll(List.of(product1, product2));
 
     productService.deleteAllById(ids);
 
-    verify(productRepository).deleteAllById(ids);
+    verify(productRepository).deleteAll(List.of(product1, product2));
   }
 
   @Test
   void deleteAllById_shouldThrowException_whenAnyProductDoesNotExist() {
     List<Integer> ids = List.of(1, 2);
+    Product product1 = Product.builder().id(1).build();
 
-    when(productRepository.existsById(1)).thenReturn(true);
-    when(productRepository.existsById(2)).thenReturn(false);
+    when(productRepository.findById(1)).thenReturn(Optional.of(product1));
+    when(productRepository.findById(2)).thenReturn(Optional.empty());
 
     EntityNotFoundException exception = assertThrows(
       EntityNotFoundException.class,
       () -> productService.deleteAllById(ids)
     );
-    assertThat(exception).hasMessage("Product with id 2 not found");
-    verify(productRepository, never()).deleteAllById(any());
+    assertThat(exception).hasMessage("Product not found with id: 2");
+    verify(productRepository, never()).deleteAll(any());
   }
 }

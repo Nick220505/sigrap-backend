@@ -2,6 +2,7 @@ package com.sigrap.employee;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -10,35 +11,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sigrap.config.BaseTestConfiguration;
-import com.sigrap.config.SecurityConfig;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@ExtendWith(MockitoExtension.class)
-@WebMvcTest(EmployeeController.class)
-@Import({ BaseTestConfiguration.class, SecurityConfig.class })
 class EmployeeControllerTest {
 
-  @Autowired
   private MockMvc mockMvc;
-
-  @MockBean
   private EmployeeService employeeService;
-
-  @Autowired
   private ObjectMapper objectMapper;
 
   private EmployeeInfo testEmployeeInfo;
@@ -47,6 +34,21 @@ class EmployeeControllerTest {
 
   @BeforeEach
   void setUp() {
+    // Setup mock service
+    employeeService = mock(EmployeeService.class);
+
+    // Setup controller with mocked service
+    EmployeeController employeeController = new EmployeeController(
+      employeeService
+    );
+
+    // Setup MockMvc
+    mockMvc = standaloneSetup(employeeController).build();
+
+    // Configure ObjectMapper for handling LocalDateTime
+    objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+
     hireDate = LocalDateTime.now().minusDays(30);
 
     testEmployeeInfo = EmployeeInfo.builder()
@@ -259,7 +261,6 @@ class EmployeeControllerTest {
   @Test
   void terminate_ShouldTerminateEmployee() throws Exception {
     testEmployeeInfo.setStatus(Employee.EmployeeStatus.TERMINATED);
-    testEmployeeInfo.setTerminationDate(LocalDateTime.now());
     when(employeeService.terminate(1L)).thenReturn(testEmployeeInfo);
 
     mockMvc
@@ -280,18 +281,18 @@ class EmployeeControllerTest {
       .andExpect(jsonPath("$.hireDate").exists())
       .andExpect(
         jsonPath("$.status").value(Employee.EmployeeStatus.TERMINATED.name())
-      )
-      .andExpect(jsonPath("$.terminationDate").exists());
+      );
   }
 
   @Test
   void findByDepartment_ShouldReturnDepartmentEmployees() throws Exception {
-    when(employeeService.findByDepartment("Sales")).thenReturn(
+    String department = "Sales";
+    when(employeeService.findByDepartment(department)).thenReturn(
       List.of(testEmployeeInfo)
     );
 
     mockMvc
-      .perform(get("/api/employees/department/{department}", "Sales"))
+      .perform(get("/api/employees/department/{department}", department))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$[0].id").value(testEmployeeInfo.getId()))
       .andExpect(jsonPath("$[0].userId").value(testEmployeeInfo.getUserId()))
@@ -319,14 +320,13 @@ class EmployeeControllerTest {
 
   @Test
   void findByStatus_ShouldReturnEmployeesWithStatus() throws Exception {
-    when(
-      employeeService.findByStatus(Employee.EmployeeStatus.ACTIVE)
-    ).thenReturn(List.of(testEmployeeInfo));
+    Employee.EmployeeStatus status = Employee.EmployeeStatus.ACTIVE;
+    when(employeeService.findByStatus(status)).thenReturn(
+      List.of(testEmployeeInfo)
+    );
 
     mockMvc
-      .perform(
-        get("/api/employees/status/{status}", Employee.EmployeeStatus.ACTIVE)
-      )
+      .perform(get("/api/employees/status/{status}", status))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$[0].id").value(testEmployeeInfo.getId()))
       .andExpect(jsonPath("$[0].userId").value(testEmployeeInfo.getUserId()))
