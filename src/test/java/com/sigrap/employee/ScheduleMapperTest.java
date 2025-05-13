@@ -3,11 +3,9 @@ package com.sigrap.employee;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -109,8 +107,6 @@ class ScheduleMapperTest {
 
   @Test
   void toEntity_ShouldMapAllFields() {
-    when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-
     Schedule result = scheduleMapper.toEntity(scheduleData, employee);
 
     assertNotNull(result);
@@ -128,8 +124,6 @@ class ScheduleMapperTest {
 
   @Test
   void updateEntity_ShouldUpdateAllFields() {
-    when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-
     Schedule existingSchedule = Schedule.builder()
       .id(1L)
       .employee(employee)
@@ -149,8 +143,6 @@ class ScheduleMapperTest {
 
   @Test
   void updateEntity_ShouldNotUpdateFields_WhenDataIsNull() {
-    when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-
     Schedule existingSchedule = Schedule.builder()
       .id(1L)
       .employee(employee)

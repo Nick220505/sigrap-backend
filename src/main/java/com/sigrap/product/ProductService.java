@@ -1,12 +1,15 @@
 package com.sigrap.product;
 
-import com.sigrap.category.Category;
-import com.sigrap.category.CategoryRepository;
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.sigrap.category.Category;
+import com.sigrap.category.CategoryRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Service class for managing product operations.
@@ -60,7 +63,9 @@ public class ProductService {
   public ProductInfo findById(Integer id) {
     Product product = productRepository
       .findById(id)
-      .orElseThrow(EntityNotFoundException::new);
+      .orElseThrow(() ->
+        new EntityNotFoundException("Product not found with id: " + id)
+      );
     return productMapper.toInfo(product);
   }
 
@@ -101,7 +106,9 @@ public class ProductService {
   public ProductInfo update(Integer id, ProductData productData) {
     Product product = productRepository
       .findById(id)
-      .orElseThrow(EntityNotFoundException::new);
+      .orElseThrow(() ->
+        new EntityNotFoundException("Product not found with id: " + id)
+      );
     productMapper.updateEntityFromData(productData, product);
 
     if (productData.getCategoryId() != null) {
@@ -130,7 +137,9 @@ public class ProductService {
   public void delete(Integer id) {
     Product product = productRepository
       .findById(id)
-      .orElseThrow(EntityNotFoundException::new);
+      .orElseThrow(() ->
+        new EntityNotFoundException("Product not found with id: " + id)
+      );
     productRepository.delete(product);
   }
 

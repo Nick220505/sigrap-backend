@@ -2,6 +2,7 @@ package com.sigrap.employee;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -9,45 +10,62 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sigrap.config.SecurityConfig;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-@WebMvcTest(ScheduleController.class)
-@Import({ SecurityConfig.class })
 class ScheduleControllerTest {
 
-  @Autowired
   private MockMvc mockMvc;
-
-  @Autowired
+  private ScheduleService scheduleService;
   private ObjectMapper objectMapper;
 
-  @MockBean
-  private ScheduleService scheduleService;
+  @ControllerAdvice
+  public static class TestExceptionHandler
+    extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Object> handleEntityNotFound(
+      EntityNotFoundException ex
+    ) {
+      return ResponseEntity.notFound().build();
+    }
+  }
 
   private ScheduleInfo testSchedule;
   private ScheduleData testData;
 
   @BeforeEach
   void setUp() {
+    scheduleService = mock(ScheduleService.class);
+    objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+
+    ScheduleController controller = new ScheduleController(scheduleService);
+
+    mockMvc = standaloneSetup(controller)
+      .setControllerAdvice(new TestExceptionHandler())
+      .build();
+
     testSchedule = ScheduleInfo.builder()
       .id(1L)
       .employeeId(1L)
       .employeeName("John Doe")
       .startTime(LocalDateTime.now())
       .endTime(LocalDateTime.now().plusHours(8))
+      .day("MONDAY")
       .createdAt(LocalDateTime.now())
       .updatedAt(LocalDateTime.now())
       .build();
@@ -56,11 +74,11 @@ class ScheduleControllerTest {
       .employeeId(1L)
       .startTime(LocalDateTime.now())
       .endTime(LocalDateTime.now().plusHours(8))
+      .day("MONDAY")
       .build();
   }
 
   @Test
-  @WithMockUser
   void findAll_shouldReturnSchedules() throws Exception {
     when(scheduleService.findAll()).thenReturn(List.of(testSchedule));
 
@@ -77,7 +95,6 @@ class ScheduleControllerTest {
   }
 
   @Test
-  @WithMockUser
   void findById_shouldReturnSchedule() throws Exception {
     when(scheduleService.findById(anyLong())).thenReturn(testSchedule);
 
@@ -92,7 +109,6 @@ class ScheduleControllerTest {
   }
 
   @Test
-  @WithMockUser
   void findByEmployeeId_shouldReturnSchedules() throws Exception {
     when(scheduleService.findByEmployeeId(anyLong())).thenReturn(
       List.of(testSchedule)
@@ -111,7 +127,6 @@ class ScheduleControllerTest {
   }
 
   @Test
-  @WithMockUser
   void create_withValidData_shouldCreateSchedule() throws Exception {
     when(scheduleService.create(any())).thenReturn(testSchedule);
 
@@ -130,7 +145,6 @@ class ScheduleControllerTest {
   }
 
   @Test
-  @WithMockUser
   void update_withValidData_shouldUpdateSchedule() throws Exception {
     when(scheduleService.update(anyLong(), any())).thenReturn(testSchedule);
 
@@ -149,7 +163,6 @@ class ScheduleControllerTest {
   }
 
   @Test
-  @WithMockUser
   void delete_shouldDeleteSchedule() throws Exception {
     mockMvc
       .perform(delete("/api/schedules/{id}", 1L))
@@ -157,7 +170,6 @@ class ScheduleControllerTest {
   }
 
   @Test
-  @WithMockUser
   void generateWeeklySchedule_shouldGenerateSchedules() throws Exception {
     when(scheduleService.generateWeeklySchedule(any(), any())).thenReturn(
       List.of(testSchedule)
@@ -165,7 +177,7 @@ class ScheduleControllerTest {
 
     mockMvc
       .perform(
-        post("/api/schedules/generate-weekly")
+        post("/api/schedules/generate-weekly/{employeeId}", 1L)
           .contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsString(testData))
       )

@@ -1,52 +1,55 @@
 package com.sigrap.employee;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sigrap.common.TestUtils;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * Unit tests for the ActivityLogController class.
  * Tests the REST endpoints for activity log management.
  */
-@ExtendWith(MockitoExtension.class)
-@WebMvcTest(ActivityLogController.class)
 class ActivityLogControllerTest {
 
-  @Autowired
   private MockMvc mockMvc;
-
-  @Autowired
   private ObjectMapper objectMapper;
-
-  @Mock
   private ActivityLogService activityLogService;
 
   private ActivityLogData activityLogData;
   private ActivityLogInfo activityLogInfo;
-  private String token;
   private LocalDateTime timestamp;
 
   @BeforeEach
   void setUp() throws Exception {
+    // Setup mock service
+    activityLogService = mock(ActivityLogService.class);
+
+    // Setup controller with mocked service
+    ActivityLogController activityLogController = new ActivityLogController(
+      activityLogService
+    );
+
+    // Setup MockMvc
+    mockMvc = standaloneSetup(activityLogController).build();
+
+    // Configure ObjectMapper for handling LocalDateTime
+    objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+
     timestamp = LocalDateTime.now();
 
     activityLogData = ActivityLogData.builder()
@@ -71,14 +74,6 @@ class ActivityLogControllerTest {
       .ipAddress("127.0.0.1")
       .createdAt(timestamp)
       .build();
-
-    token = TestUtils.registerTestUserAndGetToken(
-      mockMvc,
-      objectMapper,
-      "Test User",
-      "test@example.com",
-      "password123"
-    );
   }
 
   @Test
@@ -90,7 +85,6 @@ class ActivityLogControllerTest {
     mockMvc
       .perform(
         post("/api/activity-logs")
-          .header("Authorization", "Bearer " + token)
           .contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsString(activityLogData))
       )
@@ -122,12 +116,7 @@ class ActivityLogControllerTest {
     when(activityLogService.findByEmployeeId(1L)).thenReturn(activityLogs);
 
     mockMvc
-      .perform(
-        get("/api/activity-logs/employee/1").header(
-          "Authorization",
-          "Bearer " + token
-        )
-      )
+      .perform(get("/api/activity-logs/employee/1"))
       .andExpect(status().isOk())
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(jsonPath("$[0].id").value(activityLogInfo.getId()))
@@ -147,12 +136,7 @@ class ActivityLogControllerTest {
     ).thenReturn(activityLogs);
 
     mockMvc
-      .perform(
-        get("/api/activity-logs/action-type/CREATE").header(
-          "Authorization",
-          "Bearer " + token
-        )
-      )
+      .perform(get("/api/activity-logs/action-type/CREATE"))
       .andExpect(status().isOk())
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(jsonPath("$[0].id").value(activityLogInfo.getId()))
@@ -169,12 +153,7 @@ class ActivityLogControllerTest {
     when(activityLogService.findByModuleName("test")).thenReturn(activityLogs);
 
     mockMvc
-      .perform(
-        get("/api/activity-logs/module/test").header(
-          "Authorization",
-          "Bearer " + token
-        )
-      )
+      .perform(get("/api/activity-logs/module/test"))
       .andExpect(status().isOk())
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(jsonPath("$[0].id").value(activityLogInfo.getId()))
@@ -196,7 +175,6 @@ class ActivityLogControllerTest {
     mockMvc
       .perform(
         get("/api/activity-logs/report")
-          .header("Authorization", "Bearer " + token)
           .param("employeeId", "1")
           .param("startDate", startDate.toString())
           .param("endDate", endDate.toString())

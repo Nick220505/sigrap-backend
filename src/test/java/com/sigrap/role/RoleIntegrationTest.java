@@ -9,26 +9,28 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Set;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sigrap.permission.Permission;
 import com.sigrap.permission.PermissionRepository;
 import com.sigrap.user.User;
 import com.sigrap.user.User.UserStatus;
 import com.sigrap.user.UserRepository;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -57,6 +59,22 @@ class RoleIntegrationTest {
 
   @BeforeEach
   void setUp() {
+    List<SimpleGrantedAuthority> authorities = Arrays.asList(
+      new SimpleGrantedAuthority("ROLE_ADMIN")
+    );
+
+    UserDetails userDetails =
+      org.springframework.security.core.userdetails.User.builder()
+        .username("admin@example.com")
+        .password("password")
+        .authorities(authorities)
+        .build();
+
+    SecurityContextHolder.getContext()
+      .setAuthentication(
+        new UsernamePasswordAuthenticationToken(userDetails, null, authorities)
+      );
+
     roleRepository.deleteAll();
     permissionRepository.deleteAll();
     userRepository.deleteAll();
@@ -84,18 +102,7 @@ class RoleIntegrationTest {
     );
   }
 
-  @AfterEach
-  void tearDown() {
-    testUser.getRoles().clear();
-    userRepository.save(testUser);
-
-    roleRepository.deleteAll();
-    permissionRepository.deleteAll();
-    userRepository.deleteAll();
-  }
-
   @Test
-  @WithMockUser(username = "admin", roles = { "ADMIN" })
   void findAll_shouldReturnAllRoles() throws Exception {
     mockMvc
       .perform(get("/api/roles").contentType(MediaType.APPLICATION_JSON))
@@ -107,7 +114,6 @@ class RoleIntegrationTest {
   }
 
   @Test
-  @WithMockUser(username = "admin", roles = { "ADMIN" })
   void findById_shouldReturnRole() throws Exception {
     mockMvc
       .perform(
@@ -122,7 +128,6 @@ class RoleIntegrationTest {
   }
 
   @Test
-  @WithMockUser(username = "admin", roles = { "ADMIN" })
   void create_shouldCreateRole() throws Exception {
     RoleData roleData = RoleData.builder()
       .name("NEW_ROLE")
@@ -148,7 +153,6 @@ class RoleIntegrationTest {
   }
 
   @Test
-  @WithMockUser(username = "admin", roles = { "ADMIN" })
   void create_shouldCreateRoleWithPermissions() throws Exception {
     RoleData roleData = RoleData.builder()
       .name("NEW_ROLE")
@@ -181,7 +185,6 @@ class RoleIntegrationTest {
   }
 
   @Test
-  @WithMockUser(username = "admin", roles = { "ADMIN" })
   void update_shouldUpdateRole() throws Exception {
     RoleData roleData = RoleData.builder()
       .name("UPDATED_ROLE")
@@ -210,7 +213,6 @@ class RoleIntegrationTest {
   }
 
   @Test
-  @WithMockUser(username = "admin", roles = { "ADMIN" })
   void assignToUser_shouldAssignRoleToUser() throws Exception {
     mockMvc
       .perform(
@@ -233,7 +235,6 @@ class RoleIntegrationTest {
   }
 
   @Test
-  @WithMockUser(username = "admin", roles = { "ADMIN" })
   void removeFromUser_shouldRemoveRoleFromUser() throws Exception {
     testUser.getRoles().add(testRole);
     userRepository.save(testUser);
@@ -254,7 +255,6 @@ class RoleIntegrationTest {
   }
 
   @Test
-  @WithMockUser(username = "admin", roles = { "ADMIN" })
   void delete_shouldDeleteRole() throws Exception {
     mockMvc
       .perform(
@@ -268,7 +268,6 @@ class RoleIntegrationTest {
   }
 
   @Test
-  @WithMockUser(username = "admin", roles = { "ADMIN" })
   void create_shouldReturnError_whenRoleNameExists() throws Exception {
     RoleData roleData = RoleData.builder()
       .name("TEST_ROLE")
@@ -285,7 +284,6 @@ class RoleIntegrationTest {
   }
 
   @Test
-  @WithMockUser(username = "admin", roles = { "ADMIN" })
   void delete_shouldReturnError_whenRoleAssignedToUser() throws Exception {
     testUser.getRoles().add(testRole);
     userRepository.save(testUser);

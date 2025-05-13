@@ -2,6 +2,7 @@ package com.sigrap.config;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -13,9 +14,10 @@ import org.springframework.security.web.SecurityFilterChain;
 public class BaseTestConfiguration {
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http)
-    throws Exception {
+  @Primary
+  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
+      .securityMatcher("/api/**")
       .csrf(AbstractHttpConfigurer::disable)
       .sessionManagement(session ->
         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
