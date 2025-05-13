@@ -1,13 +1,11 @@
 package com.sigrap.employee;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Service class for activity log management operations.
@@ -42,6 +40,20 @@ public class ActivityLogService {
   private final ActivityLogMapper activityLogMapper;
 
   /**
+   * Retrieves all activity logs from the system.
+   *
+   * @return List of all activity logs
+   */
+  @Transactional(readOnly = true)
+  public List<ActivityLogInfo> findAll() {
+    return activityLogRepository
+      .findAll()
+      .stream()
+      .map(activityLogMapper::toInfo)
+      .toList();
+  }
+
+  /**
    * Logs a new activity in the system.
    * Creates a new activity log entry after validating the employee.
    *
@@ -62,6 +74,32 @@ public class ActivityLogService {
     ActivityLog activityLog = activityLogMapper.toEntity(data, employee);
     activityLog = activityLogRepository.save(activityLog);
     return activityLogMapper.toInfo(activityLog);
+  }
+
+  /**
+   * Deletes an activity log by its ID.
+   *
+   * @param id The ID of the activity log to delete
+   * @throws EntityNotFoundException if the activity log is not found
+   */
+  @Transactional
+  public void deleteById(Long id) {
+    if (!activityLogRepository.existsById(id)) {
+      throw new EntityNotFoundException(
+        "Activity log not found with ID: " + id
+      );
+    }
+    activityLogRepository.deleteById(id);
+  }
+
+  /**
+   * Deletes multiple activity logs by their IDs.
+   *
+   * @param ids List of activity log IDs to delete
+   */
+  @Transactional
+  public void deleteAllById(List<Long> ids) {
+    activityLogRepository.deleteAllById(ids);
   }
 
   /**
