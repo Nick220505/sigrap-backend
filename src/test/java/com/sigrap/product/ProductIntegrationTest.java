@@ -155,10 +155,10 @@ class ProductIntegrationTest {
 
   @Test
   void deleteMultipleProducts_shouldSucceed() throws Exception {
-    List<Long> productIds = List.of(testProduct.getId().longValue());
+    List<Integer> productIds = List.of(testProduct.getId());
     mockMvc
       .perform(
-        post("/api/products/delete")
+        delete("/api/products/delete-many")
           .contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsString(productIds))
       )

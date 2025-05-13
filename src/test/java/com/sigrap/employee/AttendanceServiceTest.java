@@ -1,18 +1,19 @@
 package com.sigrap.employee;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doReturn;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,8 +48,7 @@ class AttendanceServiceTest {
       .employee(testEmployee)
       .date(LocalDateTime.now())
       .clockInTime(LocalDateTime.now())
-      .clockOutTime(LocalDateTime.now().plusHours(8))
-      .totalHours(8.0)
+      .clockOutTime(null)
       .status(Attendance.AttendanceStatus.PRESENT)
       .notes("Regular day")
       .build();
@@ -68,13 +68,17 @@ class AttendanceServiceTest {
 
   @Test
   void findAll_ShouldReturnAllAttendanceRecords() {
-    when(attendanceRepository.findAll()).thenReturn(List.of(testAttendance));
-    when(attendanceMapper.toInfo(any(Attendance.class))).thenReturn(
-      testAttendanceInfo
-    );
+    // Given
+    List<Attendance> attendances = List.of(testAttendance);
+    doReturn(attendances).when(attendanceRepository).findAll();
+    doReturn(List.of(testAttendanceInfo))
+      .when(attendanceMapper)
+      .toInfoList(attendances);
 
+    // When
     List<AttendanceInfo> result = attendanceService.findAll();
 
+    // Then
     assertNotNull(result);
     assertEquals(1, result.size());
     assertEquals(testAttendanceInfo.getId(), result.get(0).getId());
@@ -82,20 +86,24 @@ class AttendanceServiceTest {
 
   @Test
   void clockIn_ShouldCreateNewAttendanceRecord() {
-    when(employeeRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
-    when(attendanceRepository.save(any(Attendance.class))).thenReturn(
-      testAttendance
-    );
-    when(attendanceMapper.toInfo(any(Attendance.class))).thenReturn(
-      testAttendanceInfo
-    );
+    // Given
+    doReturn(Optional.of(testEmployee))
+      .when(employeeRepository)
+      .findById(anyLong());
+    doReturn(Optional.empty())
+      .when(attendanceRepository)
+      .findByEmployeeIdAndDate(anyLong(), any());
+    doReturn(testAttendance).when(attendanceRepository).save(any());
+    doReturn(testAttendanceInfo).when(attendanceMapper).toInfo(any());
 
+    // When
     AttendanceInfo result = attendanceService.clockIn(
       1L,
       LocalDateTime.now(),
       "On time"
     );
 
+    // Then
     assertNotNull(result);
     assertEquals(testAttendanceInfo.getId(), result.getId());
     assertEquals(testAttendanceInfo.getEmployeeId(), result.getEmployeeId());
@@ -103,22 +111,21 @@ class AttendanceServiceTest {
 
   @Test
   void clockOut_ShouldUpdateAttendanceRecord() {
-    when(attendanceRepository.findById(1L)).thenReturn(
-      Optional.of(testAttendance)
-    );
-    when(attendanceRepository.save(any(Attendance.class))).thenReturn(
-      testAttendance
-    );
-    when(attendanceMapper.toInfo(any(Attendance.class))).thenReturn(
-      testAttendanceInfo
-    );
+    // Given
+    doReturn(Optional.of(testAttendance))
+      .when(attendanceRepository)
+      .findById(anyLong());
+    doReturn(testAttendance).when(attendanceRepository).save(any());
+    doReturn(testAttendanceInfo).when(attendanceMapper).toInfo(any());
 
+    // When
     AttendanceInfo result = attendanceService.clockOut(
       1L,
       LocalDateTime.now(),
       "Regular end of shift"
     );
 
+    // Then
     assertNotNull(result);
     assertEquals(testAttendanceInfo.getId(), result.getId());
     assertEquals(testAttendanceInfo.getEmployeeId(), result.getEmployeeId());
@@ -126,15 +133,19 @@ class AttendanceServiceTest {
 
   @Test
   void findByEmployeeId_ShouldReturnEmployeeAttendanceRecords() {
-    when(attendanceRepository.findByEmployeeId(1L)).thenReturn(
-      List.of(testAttendance)
-    );
-    when(attendanceMapper.toInfo(any(Attendance.class))).thenReturn(
-      testAttendanceInfo
-    );
+    // Given
+    List<Attendance> attendances = List.of(testAttendance);
+    doReturn(attendances)
+      .when(attendanceRepository)
+      .findByEmployeeId(anyLong());
+    doReturn(List.of(testAttendanceInfo))
+      .when(attendanceMapper)
+      .toInfoList(attendances);
 
+    // When
     List<AttendanceInfo> result = attendanceService.findByEmployeeId(1L);
 
+    // Then
     assertNotNull(result);
     assertEquals(1, result.size());
     assertEquals(testAttendanceInfo.getId(), result.get(0).getId());
@@ -142,26 +153,30 @@ class AttendanceServiceTest {
 
   @Test
   void generateAttendanceReport_ShouldReturnReport() {
+    // Given
     LocalDateTime startDate = LocalDateTime.now().minusDays(7);
     LocalDateTime endDate = LocalDateTime.now();
+    List<Attendance> attendances = List.of(testAttendance);
 
-    when(
-      attendanceRepository.findByEmployeeIdAndDateBetween(
-        1L,
-        startDate,
-        endDate
-      )
-    ).thenReturn(List.of(testAttendance));
-    when(attendanceMapper.toInfo(any(Attendance.class))).thenReturn(
-      testAttendanceInfo
-    );
+    doReturn(attendances)
+      .when(attendanceRepository)
+      .findByEmployeeIdAndDateBetween(
+        anyLong(),
+        any(LocalDateTime.class),
+        any(LocalDateTime.class)
+      );
+    doReturn(List.of(testAttendanceInfo))
+      .when(attendanceMapper)
+      .toInfoList(attendances);
 
+    // When
     List<AttendanceInfo> result = attendanceService.generateAttendanceReport(
       1L,
       startDate,
       endDate
     );
 
+    // Then
     assertNotNull(result);
     assertEquals(1, result.size());
     assertEquals(testAttendanceInfo.getId(), result.get(0).getId());

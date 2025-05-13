@@ -508,31 +508,27 @@ class ProductServiceTest {
   @Test
   void deleteAllById_shouldDeleteAllProducts_whenAllExist() {
     List<Integer> ids = List.of(1, 2);
-    Product product1 = Product.builder().id(1).build();
-    Product product2 = Product.builder().id(2).build();
 
-    when(productRepository.findById(1)).thenReturn(Optional.of(product1));
-    when(productRepository.findById(2)).thenReturn(Optional.of(product2));
-    doNothing().when(productRepository).deleteAll(List.of(product1, product2));
+    when(productRepository.existsById(1)).thenReturn(true);
+    when(productRepository.existsById(2)).thenReturn(true);
+    doNothing().when(productRepository).deleteAllById(ids);
 
     productService.deleteAllById(ids);
 
-    verify(productRepository).deleteAll(List.of(product1, product2));
+    verify(productRepository).deleteAllById(ids);
   }
 
   @Test
   void deleteAllById_shouldThrowException_whenAnyProductDoesNotExist() {
     List<Integer> ids = List.of(1, 2);
-    Product product1 = Product.builder().id(1).build();
 
-    when(productRepository.findById(1)).thenReturn(Optional.of(product1));
-    when(productRepository.findById(2)).thenReturn(Optional.empty());
+    when(productRepository.existsById(1)).thenReturn(false);
 
     EntityNotFoundException exception = assertThrows(
       EntityNotFoundException.class,
       () -> productService.deleteAllById(ids)
     );
-    assertThat(exception).hasMessage("Product not found with id: 2");
-    verify(productRepository, never()).deleteAll(any());
+    assertThat(exception).hasMessage("Product with id 1 not found");
+    verify(productRepository, never()).deleteAllById(any());
   }
 }
