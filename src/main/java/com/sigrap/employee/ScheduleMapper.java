@@ -36,8 +36,10 @@ public class ScheduleMapper {
       .id(schedule.getId())
       .employeeId(schedule.getEmployee().getId())
       .employeeName(getFullName(schedule.getEmployee()))
+      .day(schedule.getDay())
       .startTime(schedule.getStartTime())
       .endTime(schedule.getEndTime())
+      .isActive(schedule.getIsActive())
       .createdAt(schedule.getCreatedAt())
       .updatedAt(schedule.getUpdatedAt())
       .build();
@@ -71,8 +73,10 @@ public class ScheduleMapper {
 
     return Schedule.builder()
       .employee(employee)
+      .day(data.getDay())
       .startTime(data.getStartTime())
       .endTime(data.getEndTime())
+      .isActive(true)
       .build();
   }
 
@@ -87,6 +91,9 @@ public class ScheduleMapper {
       return;
     }
 
+    if (data.getDay() != null) {
+      entity.setDay(data.getDay());
+    }
     entity.setStartTime(data.getStartTime());
     entity.setEndTime(data.getEndTime());
   }
