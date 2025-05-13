@@ -3,6 +3,7 @@ package com.sigrap.employee;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -62,6 +63,9 @@ public class EmployeeMapper {
    * @return List of EmployeeInfo DTOs
    */
   public List<EmployeeInfo> toInfoList(List<Employee> employees) {
+    if (employees == null) {
+      return Collections.emptyList();
+    }
     return employees.stream().map(this::toInfo).toList();
   }
 

@@ -56,8 +56,10 @@ class ScheduleRepositoryTest {
 
     schedule = Schedule.builder()
       .employee(employee)
+      .day("MONDAY")
       .startTime(LocalDateTime.now())
       .endTime(LocalDateTime.now().plusHours(8))
+      .isActive(true)
       .build();
     schedule = scheduleRepository.save(schedule);
     entityManager.flush();
@@ -146,8 +148,10 @@ class ScheduleRepositoryTest {
   void save_ShouldCreateSchedule() {
     Schedule newSchedule = Schedule.builder()
       .employee(employee)
+      .day("MONDAY")
       .startTime(LocalDateTime.now().plusDays(1))
       .endTime(LocalDateTime.now().plusDays(1).plusHours(8))
+      .isActive(true)
       .build();
 
     Schedule saved = scheduleRepository.save(newSchedule);
