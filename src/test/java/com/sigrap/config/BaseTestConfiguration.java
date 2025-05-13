@@ -17,6 +17,7 @@ public class BaseTestConfiguration {
   @Primary
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
+      .securityMatcher("/**")
       .csrf(AbstractHttpConfigurer::disable)
       .sessionManagement(session ->
         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

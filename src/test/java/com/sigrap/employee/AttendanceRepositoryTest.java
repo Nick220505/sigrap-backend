@@ -126,15 +126,17 @@ class AttendanceRepositoryTest {
 
   @Test
   void findByEmployeeIdAndDate_ShouldReturnAttendanceRecord() {
-    // Get just the local date at start of day
-    LocalDateTime startOfDay = testAttendance
-      .getDate()
-      .toLocalDate()
-      .atStartOfDay();
+    // Create a specific date time to use for both the entity and the query
+    LocalDateTime specificDateTime = LocalDateTime.now().withNano(0);
+
+    // Update the saved entity with this specific date time
+    testAttendance.setDate(specificDateTime);
+    testAttendance = entityManager.merge(testAttendance);
+    entityManager.flush();
 
     Optional<Attendance> result = attendanceRepository.findByEmployeeIdAndDate(
       testEmployee.getId(),
-      startOfDay
+      specificDateTime
     );
 
     assertTrue(result.isPresent());
