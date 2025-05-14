@@ -1,6 +1,7 @@
 package com.sigrap.category;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import com.sigrap.common.mapping.DataToEntity;
@@ -28,6 +29,7 @@ public interface CategoryMapper {
    * @return A new Category entity
    */
   @DataToEntity
+  @Mapping(target = "products", ignore = true)
   Category toEntity(CategoryData categoryData);
 
   /**
@@ -37,6 +39,7 @@ public interface CategoryMapper {
    * @param category The existing Category entity to update
    */
   @DataToEntity
+  @Mapping(target = "products", ignore = true)
   void updateEntityFromData(
     CategoryData categoryData,
     @MappingTarget Category category
