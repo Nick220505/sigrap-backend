@@ -5,7 +5,7 @@
  * <ul>
  *   <li>Supplier CRUD operations</li>
  *   <li>Supplier catalog management</li>
- *   <li>Order processing for suppliers</li>
+ *   <li>Order processing for suppliers, including detailed order tracking</li>
  *   <li>Payment tracking</li>
  * </ul></p>
  *
@@ -27,23 +27,39 @@
  *   <li>Contact information management</li>
  *   <li>Payment method management</li>
  *   <li>Supplier categorization</li>
+ *   <li>Purchase order creation, status management, and itemization</li>
+ *   <li>Detailed event-based tracking for purchase orders</li>
  * </ul></p>
  *
  * <p>Core Components:
  * <ul>
  *   <li>{@link com.sigrap.supplier.Supplier} - Entity representing supplier data</li>
- *   <li>{@link com.sigrap.supplier.SupplierController} - REST API endpoints</li>
- *   <li>{@link com.sigrap.supplier.SupplierService} - Business logic implementation</li>
- *   <li>{@link com.sigrap.supplier.SupplierRepository} - Data access operations</li>
- *   <li>{@link com.sigrap.supplier.SupplierMapper} - DTO/Entity conversion</li>
- *   <li>{@link com.sigrap.supplier.SupplierData} - Data input object</li>
- *   <li>{@link com.sigrap.supplier.SupplierInfo} - Data output object</li>
+ *   <li>{@link com.sigrap.supplier.SupplierController} - REST API endpoints for suppliers</li>
+ *   <li>{@link com.sigrap.supplier.SupplierService} - Business logic for suppliers</li>
+ *   <li>{@link com.sigrap.supplier.SupplierRepository} - Data access for suppliers</li>
+ *   <li>{@link com.sigrap.supplier.SupplierMapper} - DTO/Entity conversion for suppliers</li>
+ *   <li>{@link com.sigrap.supplier.SupplierData} - Input DTO for suppliers</li>
+ *   <li>{@link com.sigrap.supplier.SupplierInfo} - Output DTO for suppliers</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrder} - Entity for purchase orders</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderController} - REST API for purchase orders</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderService} - Business logic for purchase orders</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderRepository} - Data access for purchase orders</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderMapper} - DTO/Entity conversion for orders</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderData} - Input DTO for orders</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderInfo} - Output DTO for orders</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderItem} - Entity for items in an order</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderTrackingEvent} - Entity for order tracking events</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderTrackingEventInfo} - Output DTO for tracking events</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderTrackingEventMapper} - Mapper for tracking events</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderTrackingEventRepository} - Data access for tracking events</li>
  * </ul></p>
  *
  * <p>Domain-specific Enumerations:
  * <ul>
  *   <li>{@link com.sigrap.supplier.SupplierStatus} - Possible supplier relationship statuses</li>
  *   <li>{@link com.sigrap.supplier.PaymentMethod} - Supported payment methods</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrder.Status} - Statuses for purchase orders</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderItem.Status} - Statuses for items in an order</li>
  * </ul></p>
  *
  * <p>This package follows the feature-based architecture pattern, where all components

@@ -86,6 +86,15 @@ public class PurchaseOrderInfo {
   private LocalDate expectedDeliveryDate;
 
   /**
+   * The date when the order was shipped.
+   */
+  @Schema(
+    description = "Date when the order was shipped",
+    example = "2023-05-22"
+  )
+  private LocalDate shipDate;
+
+  /**
    * The actual delivery date when the order was received.
    */
   @Schema(
@@ -120,6 +129,12 @@ public class PurchaseOrderInfo {
    */
   @Schema(description = "List of items in this order")
   private List<PurchaseOrderItemInfo> items;
+
+  /**
+   * The list of tracking events for this order.
+   */
+  @Schema(description = "List of tracking events for this order")
+  private List<PurchaseOrderTrackingEventInfo> trackingEvents;
 
   /**
    * The timestamp when the order was created.

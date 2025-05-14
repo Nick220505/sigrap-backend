@@ -22,6 +22,8 @@ import com.sigrap.supplier.PaymentMethod;
 import com.sigrap.supplier.PurchaseOrder;
 import com.sigrap.supplier.PurchaseOrderItem;
 import com.sigrap.supplier.PurchaseOrderRepository;
+import com.sigrap.supplier.PurchaseOrderTrackingEvent;
+import com.sigrap.supplier.PurchaseOrderTrackingEventRepository;
 import com.sigrap.supplier.Supplier;
 import com.sigrap.supplier.SupplierRepository;
 import com.sigrap.supplier.SupplierStatus;
@@ -44,6 +46,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Configuration component for seeding initial data into the database.
@@ -143,6 +146,7 @@ public class DataSeeder implements CommandLineRunner {
   private final SupplierRepository supplierRepository;
 
   private final PurchaseOrderRepository purchaseOrderRepository;
+  private final PurchaseOrderTrackingEventRepository purchaseOrderTrackingEventRepository;
 
   private final Random random = new Random();
 
@@ -154,6 +158,7 @@ public class DataSeeder implements CommandLineRunner {
    * @throws Exception if any seeding operation fails
    */
   @Override
+  @Transactional
   public void run(String... args) throws Exception {
     log.info("Starting data seeding...");
     seedCategories();
@@ -169,6 +174,7 @@ public class DataSeeder implements CommandLineRunner {
     seedActivityLogs();
     seedSuppliers();
     seedPurchaseOrders();
+    seedPurchaseOrderTrackingEvents();
     log.info("Data seeding completed.");
   }
 
@@ -1069,7 +1075,7 @@ public class DataSeeder implements CommandLineRunner {
         .firstName("Rosita")
         .lastName("González")
         .documentId("12345678")
-        .phoneNumber("+51987654321")
+        .phoneNumber("+573001234567")
         .email(adminUser.getEmail())
         .position("Gerente General")
         .department("Administración")
@@ -1088,7 +1094,7 @@ public class DataSeeder implements CommandLineRunner {
         .firstName("Gladys")
         .lastName("Mendoza")
         .documentId("87654321")
-        .phoneNumber("+51987654322")
+        .phoneNumber("+573109876543")
         .email(employeeUser.getEmail())
         .position("Vendedor")
         .department("Ventas")
@@ -1371,160 +1377,172 @@ public class DataSeeder implements CommandLineRunner {
       suppliers.add(
         Supplier.builder()
           .name("Office Depot")
-          .taxId("20487965214")
+          .taxId("900123456-7")
           .contactPerson("Miguel Sánchez")
-          .email("msanchez@officedepot.com")
-          .phone("(01) 619-2700")
-          .address("Av. Javier Prado Este 2558, San Borja, Lima")
+          .email("msanchez@officedepot.com.co")
+          .phone("(601) 555-2700")
+          .address("Carrera 15 # 80-25, Bogotá D.C.")
           .paymentMethod(PaymentMethod.BANK_TRANSFER)
           .status(SupplierStatus.ACTIVE)
-          .website("https://www.officedepot.com.pe")
+          .website("https://www.officedepot.com.co")
           .paymentTerms("30 días")
-          .notes("Proveedor principal de artículos de oficina y escolares")
+          .notes(
+            "Proveedor principal de artículos de oficina y escolares en Colombia"
+          )
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Tai Loy")
-          .taxId("20100049181")
+          .name("Panamericana")
+          .taxId("860000123-4")
           .contactPerson("Ana Campos")
-          .email("acampos@tailoy.com.pe")
-          .phone("(01) 612-3000")
-          .address("Av. Iquitos 799, La Victoria, Lima")
+          .email("acampos@panamericana.com.co")
+          .phone("(601) 337-9000")
+          .address("Avenida Chile # 72-41, Bogotá D.C.")
           .paymentMethod(PaymentMethod.CREDIT_CARD)
           .status(SupplierStatus.ACTIVE)
-          .website("https://www.tailoy.com.pe")
+          .website("https://www.panamericana.com.co")
           .paymentTerms("15 días")
-          .notes("Distribuidor mayorista de útiles escolares y de oficina")
+          .notes(
+            "Distribuidor mayorista de útiles escolares y de oficina en Colombia"
+          )
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Artesco")
-          .taxId("20100067324")
+          .name("Artesco Colombia")
+          .taxId("900567890-1")
           .contactPerson("Roberto Gutiérrez")
-          .email("rgutierrez@artesco.com.pe")
-          .phone("(01) 619-6000")
-          .address("Av. Elmer Faucett 3350, Callao")
+          .email("rgutierrez@artesco.com.co")
+          .phone("(604) 444-6000")
+          .address("Calle 10 # 43E-115, Medellín, Antioquia")
           .paymentMethod(PaymentMethod.BANK_TRANSFER)
           .status(SupplierStatus.ACTIVE)
-          .website("https://www.artesco.com.pe")
+          .website("https://www.artesco.com.co")
           .paymentTerms("45 días")
-          .notes("Fabricante de útiles escolares de alta calidad")
+          .notes(
+            "Fabricante de útiles escolares de alta calidad con presencia en Colombia"
+          )
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Layconsa")
-          .taxId("20101308678")
+          .name("Scribe Colombia")
+          .taxId("830000456-7")
           .contactPerson("María Elena Torres")
-          .email("metorres@layconsa.com.pe")
-          .phone("(01) 614-2500")
-          .address("Jr. Mariscal Agustín Gamarra 349, Lima")
+          .email("metorres@scribe.com.co")
+          .phone("(602) 660-2500")
+          .address("Carrera 1 # 23-89, Cali, Valle del Cauca")
           .paymentMethod(PaymentMethod.CHECK)
           .status(SupplierStatus.ACTIVE)
-          .website("https://www.layconsa.com")
+          .website("https://www.scribe.com.co")
           .paymentTerms("30 días")
-          .notes("Especialista en materiales artísticos y manualidades")
+          .notes("Especialista en materiales artísticos y cuadernos")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Faber-Castell Perú")
-          .taxId("20100041953")
+          .name("Faber-Castell Colombia")
+          .taxId("800123789-0")
           .contactPerson("Jorge Reátegui")
-          .email("jreategui@faber-castell.com.pe")
-          .phone("(01) 611-4800")
-          .address("Av. La Molina 161, La Molina, Lima")
+          .email("jreategui@faber-castell.com.co")
+          .phone("(601) 744-4800")
+          .address("Autopista Norte Km 19, Chía, Cundinamarca")
           .paymentMethod(PaymentMethod.BANK_TRANSFER)
           .status(SupplierStatus.ACTIVE)
-          .website("https://www.faber-castell.com.pe")
+          .website("https://www.faber-castell.com.co")
           .paymentTerms("45 días")
-          .notes("Proveedor global de instrumentos de escritura y dibujo")
+          .notes(
+            "Proveedor global de instrumentos de escritura y dibujo en Colombia"
+          )
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Pegafan")
-          .taxId("20101613373")
+          .name("Pegaucho")
+          .taxId("890987654-3")
           .contactPerson("Lucía Pérez")
-          .email("lperez@pegafan.com.pe")
-          .phone("(01) 419-2300")
-          .address("Av. Argentina 2458, Callao")
+          .email("lperez@pegaucho.com.co")
+          .phone("(601) 222-2300")
+          .address("Calle 13 # 68-78, Bogotá D.C.")
           .paymentMethod(PaymentMethod.CASH)
           .status(SupplierStatus.ACTIVE)
-          .website("https://www.pegafan.com.pe")
+          .website("https://www.pegaucho.com.co")
           .paymentTerms("Contado")
-          .notes("Fabricante de pegamentos y adhesivos escolares")
+          .notes("Fabricante colombiano de pegamentos y adhesivos")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Norma")
-          .taxId("20523367057")
+          .name("Norma Colombia")
+          .taxId("800234567-8")
           .contactPerson("Daniel Quispe")
-          .email("dquispe@norma.com.pe")
-          .phone("(01) 415-8000")
-          .address("Jr. Domingo Cueto 370, Lima")
+          .email("dquispe@norma.com.co")
+          .phone("(601) 423-8000")
+          .address("Calle 100 # 19A-50, Bogotá D.C.")
           .paymentMethod(PaymentMethod.BANK_TRANSFER)
           .status(SupplierStatus.ACTIVE)
-          .website("https://www.norma.com")
+          .website("https://www.norma.com.co")
           .paymentTerms("30 días")
-          .notes("Especialista en cuadernos y productos de papel")
+          .notes("Especialista en cuadernos y productos de papel en Colombia")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Continental")
-          .taxId("20102089635")
+          .name("DistriOffice")
+          .taxId("900876543-2")
           .contactPerson("Patricia Rojas")
-          .email("projas@continental.com.pe")
-          .phone("(01) 418-1800")
-          .address("Av. Industrial 3422, San Martín de Porres, Lima")
+          .email("projas@distrioffice.com.co")
+          .phone("(604) 333-1800")
+          .address("Carrera 48 # 10-45, Medellín, Antioquia")
           .paymentMethod(PaymentMethod.CHECK)
           .status(SupplierStatus.INACTIVE)
-          .website("https://www.continental.com.pe")
+          .website("https://www.distrioffice.com.co")
           .paymentTerms("45 días")
-          .notes("Distribuidor de productos importados para oficina")
+          .notes(
+            "Distribuidor de productos importados para oficina, actualmente inactivo"
+          )
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Pilot Perú")
-          .taxId("20493020618")
+          .name("Pilot Colombia")
+          .taxId("830765432-1")
           .contactPerson("Carlos Mendoza")
-          .email("cmendoza@pilotperu.com")
-          .phone("(01) 617-5200")
-          .address("Av. República de Panamá 3563, San Isidro, Lima")
+          .email("cmendoza@pilotcolombia.com")
+          .phone("(601) 617-5200")
+          .address("Carrera 7 # 71-21, Bogotá D.C.")
           .paymentMethod(PaymentMethod.BANK_TRANSFER)
           .status(SupplierStatus.ACTIVE)
-          .website("https://www.pilotpen.com.pe")
+          .website("https://www.pilotpen.com.co")
           .paymentTerms("30 días")
-          .notes("Importador oficial de productos Pilot")
+          .notes("Importador oficial de productos Pilot en Colombia")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Papelera Nacional")
-          .taxId("20100047641")
+          .name("Papeles Nacionales S.A.S.")
+          .taxId("860987123-0")
           .contactPerson("Fernando Torres")
-          .email("ftorres@papenal.com.pe")
-          .phone("(01) 613-9000")
-          .address("Av. Las Torres 426, Ate, Lima")
+          .email("ftorres@papelesnacionales.com.co")
+          .phone("(601) 742-9000")
+          .address("Zona Franca de Bogotá, Bodega 12, Bogotá D.C.")
           .paymentMethod(PaymentMethod.BANK_TRANSFER)
           .status(SupplierStatus.PROBATION)
-          .website("https://www.papeleranacional.com")
+          .website("https://www.papelesnacionales.com.co")
           .paymentTerms("60 días")
-          .notes("Fabricante de productos de papel y cuadernos")
+          .notes(
+            "Fabricante de productos de papel y cuadernos, en periodo de prueba"
+          )
           .build()
       );
 
@@ -1555,11 +1573,14 @@ public class DataSeeder implements CommandLineRunner {
       return;
     }
 
-    Supplier tailoy = findSupplierByName(suppliers, "Tai Loy");
-    Supplier faberCastell = findSupplierByName(suppliers, "Faber-Castell Perú");
-    Supplier artesco = findSupplierByName(suppliers, "Artesco");
+    Supplier panamericana = findSupplierByName(suppliers, "Panamericana");
+    Supplier faberCastell = findSupplierByName(
+      suppliers,
+      "Faber-Castell Colombia"
+    );
+    Supplier artesco = findSupplierByName(suppliers, "Artesco Colombia");
     Supplier officedepot = findSupplierByName(suppliers, "Office Depot");
-    Supplier norma = findSupplierByName(suppliers, "Norma");
+    Supplier norma = findSupplierByName(suppliers, "Norma Colombia");
 
     Product cuadernoUniversitario = findProductByName(
       products,
@@ -1594,7 +1615,7 @@ public class DataSeeder implements CommandLineRunner {
 
     PurchaseOrder orden1 = PurchaseOrder.builder()
       .orderNumber("OC-2025-001")
-      .supplier(tailoy)
+      .supplier(panamericana)
       .orderDate(LocalDate.now().minusDays(45))
       .expectedDeliveryDate(LocalDate.now().minusDays(35))
       .actualDeliveryDate(LocalDate.now().minusDays(34))
@@ -1606,7 +1627,7 @@ public class DataSeeder implements CommandLineRunner {
       .totalAmount(BigDecimal.ZERO)
       .build();
 
-    PurchaseOrderItem item1_1 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item11 = PurchaseOrderItem.builder()
       .product(cuadernoUniversitario)
       .quantity(100)
       .unitPrice(new BigDecimal("4000"))
@@ -1614,7 +1635,7 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Cuadernos para stock inicial de temporada escolar")
       .build();
 
-    PurchaseOrderItem item1_2 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item12 = PurchaseOrderItem.builder()
       .product(lapizMirado)
       .quantity(200)
       .unitPrice(new BigDecimal("500"))
@@ -1622,7 +1643,7 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Lápices HB para stock inicial de temporada escolar")
       .build();
 
-    PurchaseOrderItem item1_3 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item13 = PurchaseOrderItem.builder()
       .product(borrador)
       .quantity(150)
       .unitPrice(new BigDecimal("800"))
@@ -1630,12 +1651,12 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Borradores para stock inicial de temporada escolar")
       .build();
 
-    item1_1.setPurchaseOrder(orden1);
-    item1_2.setPurchaseOrder(orden1);
-    item1_3.setPurchaseOrder(orden1);
-    orden1.getItems().add(item1_1);
-    orden1.getItems().add(item1_2);
-    orden1.getItems().add(item1_3);
+    item11.setPurchaseOrder(orden1);
+    item12.setPurchaseOrder(orden1);
+    item13.setPurchaseOrder(orden1);
+    orden1.getItems().add(item11);
+    orden1.getItems().add(item12);
+    orden1.getItems().add(item13);
 
     BigDecimal total1 = calculateOrderTotal(orden1);
     orden1.setTotalAmount(total1);
@@ -1653,7 +1674,7 @@ public class DataSeeder implements CommandLineRunner {
       .totalAmount(BigDecimal.ZERO)
       .build();
 
-    PurchaseOrderItem item2_1 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item21 = PurchaseOrderItem.builder()
       .product(cajaColores)
       .quantity(50)
       .unitPrice(new BigDecimal("5500"))
@@ -1661,7 +1682,7 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Cajas de colores para taller de arte")
       .build();
 
-    PurchaseOrderItem item2_2 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item22 = PurchaseOrderItem.builder()
       .product(kitGeometrico)
       .quantity(30)
       .unitPrice(new BigDecimal("7500"))
@@ -1669,10 +1690,10 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Kits geométricos para estudiantes de secundaria")
       .build();
 
-    item2_1.setPurchaseOrder(orden2);
-    item2_2.setPurchaseOrder(orden2);
-    orden2.getItems().add(item2_1);
-    orden2.getItems().add(item2_2);
+    item21.setPurchaseOrder(orden2);
+    item22.setPurchaseOrder(orden2);
+    orden2.getItems().add(item21);
+    orden2.getItems().add(item22);
 
     BigDecimal total2 = calculateOrderTotal(orden2);
     orden2.setTotalAmount(total2);
@@ -1690,7 +1711,7 @@ public class DataSeeder implements CommandLineRunner {
       .totalAmount(BigDecimal.ZERO)
       .build();
 
-    PurchaseOrderItem item3_1 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item31 = PurchaseOrderItem.builder()
       .product(resmaA4)
       .quantity(80)
       .unitPrice(new BigDecimal("12000"))
@@ -1698,7 +1719,7 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Resmas de papel para fotocopias e impresiones")
       .build();
 
-    PurchaseOrderItem item3_2 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item32 = PurchaseOrderItem.builder()
       .product(cartulinaBlanca)
       .quantity(120)
       .unitPrice(new BigDecimal("700"))
@@ -1706,7 +1727,7 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Cartulinas para proyectos escolares")
       .build();
 
-    PurchaseOrderItem item3_3 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item33 = PurchaseOrderItem.builder()
       .product(blockIris)
       .quantity(60)
       .unitPrice(new BigDecimal("3500"))
@@ -1714,12 +1735,12 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Blocks de papel iris para manualidades")
       .build();
 
-    item3_1.setPurchaseOrder(orden3);
-    item3_2.setPurchaseOrder(orden3);
-    item3_3.setPurchaseOrder(orden3);
-    orden3.getItems().add(item3_1);
-    orden3.getItems().add(item3_2);
-    orden3.getItems().add(item3_3);
+    item31.setPurchaseOrder(orden3);
+    item32.setPurchaseOrder(orden3);
+    item33.setPurchaseOrder(orden3);
+    orden3.getItems().add(item31);
+    orden3.getItems().add(item32);
+    orden3.getItems().add(item33);
 
     BigDecimal total3 = calculateOrderTotal(orden3);
     orden3.setTotalAmount(total3);
@@ -1736,7 +1757,7 @@ public class DataSeeder implements CommandLineRunner {
       .totalAmount(BigDecimal.ZERO)
       .build();
 
-    PurchaseOrderItem item4_1 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item41 = PurchaseOrderItem.builder()
       .product(marcadoresPermanentes)
       .quantity(40)
       .unitPrice(new BigDecimal("5000"))
@@ -1744,8 +1765,8 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Marcadores para taller de cartelería")
       .build();
 
-    item4_1.setPurchaseOrder(orden4);
-    orden4.getItems().add(item4_1);
+    item41.setPurchaseOrder(orden4);
+    orden4.getItems().add(item41);
 
     BigDecimal total4 = calculateOrderTotal(orden4);
     orden4.setTotalAmount(total4);
@@ -1762,7 +1783,7 @@ public class DataSeeder implements CommandLineRunner {
       .totalAmount(BigDecimal.ZERO)
       .build();
 
-    PurchaseOrderItem item5_1 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item51 = PurchaseOrderItem.builder()
       .product(cuadernoUniversitario)
       .quantity(50)
       .unitPrice(new BigDecimal("4000"))
@@ -1770,7 +1791,7 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Reposición de stock de cuadernos universitarios")
       .build();
 
-    PurchaseOrderItem item5_2 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item52 = PurchaseOrderItem.builder()
       .product(cuadernoArgollado)
       .quantity(35)
       .unitPrice(new BigDecimal("9000"))
@@ -1778,10 +1799,10 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Reposición de stock de cuadernos argollados")
       .build();
 
-    item5_1.setPurchaseOrder(orden5);
-    item5_2.setPurchaseOrder(orden5);
-    orden5.getItems().add(item5_1);
-    orden5.getItems().add(item5_2);
+    item51.setPurchaseOrder(orden5);
+    item52.setPurchaseOrder(orden5);
+    orden5.getItems().add(item51);
+    orden5.getItems().add(item52);
 
     BigDecimal total5 = calculateOrderTotal(orden5);
     orden5.setTotalAmount(total5);
@@ -1789,7 +1810,7 @@ public class DataSeeder implements CommandLineRunner {
 
     PurchaseOrder orden6 = PurchaseOrder.builder()
       .orderNumber("OC-2025-006")
-      .supplier(tailoy)
+      .supplier(panamericana)
       .orderDate(LocalDate.now())
       .expectedDeliveryDate(LocalDate.now().plusDays(15))
       .status(PurchaseOrder.Status.DRAFT)
@@ -1798,7 +1819,7 @@ public class DataSeeder implements CommandLineRunner {
       .totalAmount(BigDecimal.ZERO)
       .build();
 
-    PurchaseOrderItem item6_1 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item61 = PurchaseOrderItem.builder()
       .product(lapizMirado)
       .quantity(150)
       .unitPrice(new BigDecimal("500"))
@@ -1806,7 +1827,7 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Stock preventivo para próximo trimestre")
       .build();
 
-    PurchaseOrderItem item6_2 = PurchaseOrderItem.builder()
+    PurchaseOrderItem item62 = PurchaseOrderItem.builder()
       .product(borrador)
       .quantity(100)
       .unitPrice(new BigDecimal("800"))
@@ -1814,10 +1835,10 @@ public class DataSeeder implements CommandLineRunner {
       .notes("Stock preventivo para próximo trimestre")
       .build();
 
-    item6_1.setPurchaseOrder(orden6);
-    item6_2.setPurchaseOrder(orden6);
-    orden6.getItems().add(item6_1);
-    orden6.getItems().add(item6_2);
+    item61.setPurchaseOrder(orden6);
+    item62.setPurchaseOrder(orden6);
+    orden6.getItems().add(item61);
+    orden6.getItems().add(item62);
 
     BigDecimal total6 = calculateOrderTotal(orden6);
     orden6.setTotalAmount(total6);
@@ -1825,6 +1846,202 @@ public class DataSeeder implements CommandLineRunner {
 
     purchaseOrderRepository.saveAll(purchaseOrders);
     log.info("{} purchase orders seeded successfully.", purchaseOrders.size());
+  }
+
+  private void seedPurchaseOrderTrackingEvents() {
+    if (purchaseOrderTrackingEventRepository.count() > 0) {
+      log.info(
+        "Purchase order tracking events already exist, skipping seeding."
+      );
+      return;
+    }
+
+    log.info("Seeding purchase order tracking events...");
+
+    List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findAll();
+    if (purchaseOrders.isEmpty()) {
+      log.warn(
+        "No purchase orders found. Skipping purchase order tracking event seeding."
+      );
+      return;
+    }
+
+    List<PurchaseOrderTrackingEvent> trackingEvents = new ArrayList<>();
+
+    for (PurchaseOrder order : purchaseOrders) {
+      LocalDate orderDate = order.getOrderDate();
+      LocalDateTime orderDateTime = orderDate.atStartOfDay();
+
+      trackingEvents.add(
+        PurchaseOrderTrackingEvent.builder()
+          .purchaseOrder(order)
+          .eventTimestamp(orderDateTime.plusHours(1))
+          .status("PEDIDO REALIZADO")
+          .description("El pedido ha sido realizado y enviado al proveedor.")
+          .location("Sistema SIGRAP")
+          .notes("Generado automáticamente por el sistema.")
+          .build()
+      );
+
+      switch (order.getStatus()) {
+        case SUBMITTED:
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(orderDateTime.plusDays(1).plusHours(9))
+              .status("PEDIDO ENVIADO")
+              .description(
+                "El pedido ha sido formalmente enviado al proveedor."
+              )
+              .location("Departamento de Compras")
+              .notes("Confirmación de envío pendiente.")
+              .build()
+          );
+          break;
+        case CONFIRMED:
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(orderDateTime.plusDays(1).plusHours(9))
+              .status("PEDIDO ENVIADO")
+              .description(
+                "El pedido ha sido formalmente enviado al proveedor."
+              )
+              .location("Departamento de Compras")
+              .build()
+          );
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(orderDateTime.plusDays(2).plusHours(14))
+              .status("PEDIDO CONFIRMADO")
+              .description(
+                "El proveedor ha confirmado la recepción y procesamiento del pedido."
+              )
+              .location(order.getSupplier().getName())
+              .notes(
+                "Proveedor " +
+                order.getSupplier().getName() +
+                " confirmó el pedido."
+              )
+              .build()
+          );
+          break;
+        case SHIPPED:
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(orderDateTime.plusDays(1).plusHours(9))
+              .status("PEDIDO ENVIADO")
+              .description(
+                "El pedido ha sido formalmente enviado al proveedor."
+              )
+              .location("Departamento de Compras")
+              .build()
+          );
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(orderDateTime.plusDays(2).plusHours(14))
+              .status("PEDIDO CONFIRMADO")
+              .description(
+                "El proveedor ha confirmado la recepción y procesamiento del pedido."
+              )
+              .location(order.getSupplier().getName())
+              .build()
+          );
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(
+                order.getExpectedDeliveryDate().minusDays(2).atTime(16, 0)
+              )
+              .status("PEDIDO DESPACHADO")
+              .description(
+                "El pedido ha sido despachado por el proveedor y está en camino."
+              )
+              .location("Almacén de " + order.getSupplier().getName())
+              .notes("Número de guía: TRK" + order.getId() + "XYZ")
+              .build()
+          );
+          break;
+        case DELIVERED:
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(orderDateTime.plusDays(1).plusHours(9))
+              .status("PEDIDO ENVIADO")
+              .description(
+                "El pedido ha sido formalmente enviado al proveedor."
+              )
+              .location("Departamento de Compras")
+              .build()
+          );
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(orderDateTime.plusDays(2).plusHours(14))
+              .status("PEDIDO CONFIRMADO")
+              .description(
+                "El proveedor ha confirmado la recepción y procesamiento del pedido."
+              )
+              .location(order.getSupplier().getName())
+              .build()
+          );
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(
+                order.getExpectedDeliveryDate().minusDays(2).atTime(16, 0)
+              )
+              .status("PEDIDO DESPACHADO")
+              .description(
+                "El pedido ha sido despachado por el proveedor y está en camino."
+              )
+              .location("Almacén de " + order.getSupplier().getName())
+              .notes("Número de guía: TRK" + order.getId() + "XYZ")
+              .build()
+          );
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(order.getActualDeliveryDate().atTime(10, 30))
+              .status("PEDIDO ENTREGADO")
+              .description(
+                "El pedido ha sido entregado y recibido en nuestras instalaciones."
+              )
+              .location("Almacén SIGRAP")
+              .notes(
+                "Recibido por: Almacenista. " +
+                order.getItems().size() +
+                " ítems verificados."
+              )
+              .build()
+          );
+          break;
+        case CANCELLED:
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(orderDateTime.plusDays(1).plusHours(10))
+              .status("PEDIDO CANCELADO")
+              .description("El pedido ha sido cancelado.")
+              .location("Sistema SIGRAP")
+              .notes("Cancelado a solicitud del usuario.")
+              .build()
+          );
+          break;
+        case DRAFT:
+          break;
+        default:
+          break;
+      }
+    }
+    purchaseOrderTrackingEventRepository.saveAll(trackingEvents);
+    log.info(
+      "{} purchase order tracking events seeded successfully.",
+      trackingEvents.size()
+    );
   }
 
   /**

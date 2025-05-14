@@ -194,4 +194,18 @@ public class PurchaseOrderController {
   public PurchaseOrderInfo cancelOrder(@PathVariable Integer id) {
     return purchaseOrderService.cancelOrder(id);
   }
+
+  /**
+   * Retrieves the tracking history for a specific purchase order.
+   *
+   * @param id The ID of the purchase order.
+   * @return A list of tracking event information, ordered by event time.
+   */
+  @GetMapping("/{id}/tracking")
+  @Operation(summary = "Get tracking history for a purchase order")
+  public List<PurchaseOrderTrackingEventInfo> getTrackingHistory(
+    @PathVariable Integer id
+  ) {
+    return purchaseOrderService.getTrackingHistory(id);
+  }
 }

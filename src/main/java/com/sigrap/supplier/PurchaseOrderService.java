@@ -53,6 +53,16 @@ public class PurchaseOrderService {
   private final PurchaseOrderItemMapper purchaseOrderItemMapper;
 
   /**
+   * Repository for database operations on purchase order tracking events.
+   */
+  private final PurchaseOrderTrackingEventRepository purchaseOrderTrackingEventRepository;
+
+  /**
+   * Mapper for converting between PurchaseOrderTrackingEvent entities and DTOs.
+   */
+  private final PurchaseOrderTrackingEventMapper purchaseOrderTrackingEventMapper;
+
+  /**
    * Retrieves all purchase orders from the database.
    *
    * @return List of all purchase orders mapped to PurchaseOrderInfo objects
@@ -111,6 +121,36 @@ public class PurchaseOrderService {
   }
 
   /**
+   * Helper method to add tracking events
+   *
+   * @param purchaseOrder The purchase order to add the event to
+   * @param eventStatus The status of the event
+   * @param description A description of the event
+   * @param location The location of the event
+   * @param notes Additional notes about the event
+   */
+  private void addTrackingEvent(
+    PurchaseOrder purchaseOrder,
+    String eventStatus,
+    String description,
+    String location,
+    String notes
+  ) {
+    PurchaseOrderTrackingEvent event = PurchaseOrderTrackingEvent.builder()
+      .purchaseOrder(purchaseOrder)
+      .status(eventStatus)
+      .description(description)
+      .location(location)
+      .notes(notes)
+      .build();
+    purchaseOrderTrackingEventRepository.save(event);
+    if (purchaseOrder.getTrackingEvents() == null) {
+      purchaseOrder.setTrackingEvents(new ArrayList<>());
+    }
+    purchaseOrder.getTrackingEvents().add(event);
+  }
+
+  /**
    * Creates a new purchase order.
    *
    * @param purchaseOrderData The data for creating the purchase order
@@ -140,6 +180,14 @@ public class PurchaseOrderService {
 
     // Save order first to get ID
     PurchaseOrder savedOrder = purchaseOrderRepository.save(purchaseOrder);
+
+    addTrackingEvent(
+      savedOrder,
+      "Order Created",
+      "Purchase order created in DRAFT status.",
+      null,
+      "Initial creation by system."
+    );
 
     // Process items if any
     if (
@@ -179,7 +227,7 @@ public class PurchaseOrderService {
 
       // Calculate total amount
       calculateTotalAmount(savedOrder);
-      purchaseOrderRepository.save(savedOrder);
+      savedOrder = purchaseOrderRepository.save(savedOrder);
     }
 
     return purchaseOrderMapper.toInfo(savedOrder);
@@ -322,6 +370,13 @@ public class PurchaseOrderService {
 
     // Save updated order
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
+    addTrackingEvent(
+      updatedOrder,
+      "Order Updated",
+      "Purchase order details were updated.",
+      null,
+      "Update operation by user."
+    );
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
 
@@ -378,6 +433,13 @@ public class PurchaseOrderService {
 
     // Save updated order
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
+    addTrackingEvent(
+      updatedOrder,
+      "Order Submitted",
+      "Purchase order submitted to supplier.",
+      null,
+      null
+    );
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
 
@@ -409,6 +471,13 @@ public class PurchaseOrderService {
 
     // Save updated order
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
+    addTrackingEvent(
+      updatedOrder,
+      "Order Confirmed",
+      "Supplier confirmed the purchase order.",
+      null,
+      null
+    );
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
 
@@ -429,7 +498,10 @@ public class PurchaseOrderService {
       );
 
     // Verify current status
-    if (purchaseOrder.getStatus() != PurchaseOrder.Status.CONFIRMED) {
+    if (
+      purchaseOrder.getStatus() != PurchaseOrder.Status.CONFIRMED &&
+      purchaseOrder.getStatus() != PurchaseOrder.Status.IN_PROCESS
+    ) {
       throw new IllegalStateException(
         "Cannot mark as shipped order in " +
         purchaseOrder.getStatus() +
@@ -539,5 +611,21 @@ public class PurchaseOrderService {
    */
   private String generateOrderNumber() {
     return "ORD-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+  }
+
+  /**
+   * Retrieves the tracking history for a specific purchase order.
+   *
+   * @param orderId The ID of the purchase order.
+   * @return A list of tracking event information, ordered by event time.
+   */
+  public List<PurchaseOrderTrackingEventInfo> getTrackingHistory(
+    Integer orderId
+  ) {
+    List<PurchaseOrderTrackingEvent> trackingEvents =
+      purchaseOrderTrackingEventRepository.findByPurchaseOrder_IdOrderByEventTimestampAsc(
+        orderId
+      );
+    return purchaseOrderTrackingEventMapper.toInfoList(trackingEvents);
   }
 }

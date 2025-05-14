@@ -88,6 +88,12 @@ public class PurchaseOrder {
   private LocalDate expectedDeliveryDate;
 
   /**
+   * Date when the order was shipped.
+   */
+  @Column(name = "ship_date")
+  private LocalDate shipDate;
+
+  /**
    * Actual delivery date when the order was received.
    */
   @Column(name = "actual_delivery_date")
@@ -128,6 +134,18 @@ public class PurchaseOrder {
   private List<PurchaseOrderItem> items = new ArrayList<>();
 
   /**
+   * Tracking events for this purchase order.
+   */
+  @OneToMany(
+    mappedBy = "purchaseOrder",
+    cascade = CascadeType.ALL,
+    orphanRemoval = true,
+    fetch = FetchType.LAZY
+  )
+  @Builder.Default
+  private List<PurchaseOrderTrackingEvent> trackingEvents = new ArrayList<>();
+
+  /**
    * Timestamp of when the purchase order was created.
    * Automatically set during entity creation.
    */
@@ -164,6 +182,18 @@ public class PurchaseOrder {
   public PurchaseOrder removeItem(PurchaseOrderItem item) {
     items.remove(item);
     item.setPurchaseOrder(null);
+    return this;
+  }
+
+  /**
+   * Helper method to add a tracking event to this purchase order.
+   *
+   * @param event The tracking event to add
+   * @return This purchase order instance for method chaining
+   */
+  public PurchaseOrder addTrackingEvent(PurchaseOrderTrackingEvent event) {
+    trackingEvents.add(event);
+    event.setPurchaseOrder(this);
     return this;
   }
 }
