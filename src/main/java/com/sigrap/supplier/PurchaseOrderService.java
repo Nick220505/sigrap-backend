@@ -63,7 +63,7 @@ public class PurchaseOrderService {
       .findAll()
       .stream()
       .map(purchaseOrderMapper::toInfo)
-      .collect(Collectors.toList());
+      .toList();
   }
 
   /**
