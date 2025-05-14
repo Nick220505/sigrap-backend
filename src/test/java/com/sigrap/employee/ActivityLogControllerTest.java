@@ -1,15 +1,8 @@
 package com.sigrap.employee;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -19,6 +12,12 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * Unit tests for the ActivityLogController class.
@@ -35,19 +34,15 @@ class ActivityLogControllerTest {
   private LocalDateTime timestamp;
 
   @BeforeEach
-  void setUp() throws Exception {
-    // Setup mock service
+  void setUp() {
     activityLogService = mock(ActivityLogService.class);
 
-    // Setup controller with mocked service
     ActivityLogController activityLogController = new ActivityLogController(
       activityLogService
     );
 
-    // Setup MockMvc
     mockMvc = standaloneSetup(activityLogController).build();
 
-    // Configure ObjectMapper for handling LocalDateTime
     objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
 

@@ -32,18 +32,14 @@ class AttendanceControllerTest {
 
   @BeforeEach
   void setUp() {
-    // Setup mock service
     attendanceService = mock(AttendanceService.class);
 
-    // Setup controller with mocked service
     AttendanceController attendanceController = new AttendanceController(
       attendanceService
     );
 
-    // Setup MockMvc
     mockMvc = standaloneSetup(attendanceController).build();
 
-    // Configure ObjectMapper for handling LocalDateTime
     objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
 

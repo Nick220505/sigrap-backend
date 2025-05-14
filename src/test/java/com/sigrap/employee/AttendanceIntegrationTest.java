@@ -1,10 +1,18 @@
 package com.sigrap.employee;
 
-import java.time.LocalDateTime;
-
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,16 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sigrap.user.User;
-import com.sigrap.user.UserRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -50,11 +49,9 @@ class AttendanceIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    // Generate unique IDs for the test
     String uniqueEmail = "john" + System.currentTimeMillis() + "@example.com";
     String uniqueDocumentId = "DOC" + System.currentTimeMillis();
 
-    // Create a user for the employee
     User user = User.builder()
       .name("John Doe")
       .email(uniqueEmail)
@@ -158,7 +155,6 @@ class AttendanceIntegrationTest {
 
   @Test
   void updateStatus_ShouldUpdateAttendanceStatus() throws Exception {
-    // Create a fresh attendance record specifically for this test
     Attendance freshAttendance = Attendance.builder()
       .employee(testEmployee)
       .date(LocalDateTime.now())
@@ -166,7 +162,7 @@ class AttendanceIntegrationTest {
       .clockOutTime(LocalDateTime.now().plusHours(8))
       .totalHours(8.0)
       .status(Attendance.AttendanceStatus.PRESENT)
-      .notes("") // Empty notes to start with
+      .notes("")
       .build();
 
     attendanceRepository.save(freshAttendance);

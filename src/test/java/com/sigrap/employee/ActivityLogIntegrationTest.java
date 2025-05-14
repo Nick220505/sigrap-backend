@@ -1,8 +1,16 @@
 package com.sigrap.employee;
 
-import java.time.LocalDateTime;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sigrap.common.TestUtils;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,16 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sigrap.common.TestUtils;
-import com.sigrap.user.User;
-import com.sigrap.user.UserRepository;
 
 /**
  * Integration tests for the Activity Log feature.
@@ -54,13 +53,11 @@ class ActivityLogIntegrationTest {
   void setUp() throws Exception {
     timestamp = LocalDateTime.now();
 
-    // Generate a unique documentId using timestamp to avoid conflicts
     String uniqueDocumentId = "DOC" + System.currentTimeMillis();
 
-    // Create a user for the employee first
     User user = User.builder()
       .name("John Doe")
-      .email("john" + System.currentTimeMillis() + "@example.com") // Unique email
+      .email("john" + System.currentTimeMillis() + "@example.com")
       .password("password")
       .status(User.UserStatus.ACTIVE)
       .build();
@@ -69,7 +66,7 @@ class ActivityLogIntegrationTest {
     employee = Employee.builder()
       .firstName("John")
       .lastName("Doe")
-      .email("john.employee" + System.currentTimeMillis() + "@example.com") // Unique email
+      .email("john.employee" + System.currentTimeMillis() + "@example.com")
       .documentId(uniqueDocumentId)
       .department("Sales")
       .position("Manager")
