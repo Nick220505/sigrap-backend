@@ -1,19 +1,19 @@
 package com.sigrap.supplier;
 
 /**
- * Enum representing payment methods accepted by suppliers.
- * Used to standardize payment method options in the system.
+ * Enumeration of payment methods accepted by suppliers.
+ * Used to standardize payment method selection across the application.
  */
 public enum PaymentMethod {
-  /**
-   * Bank transfer payment method.
-   */
-  BANK_TRANSFER,
-
   /**
    * Credit card payment method.
    */
   CREDIT_CARD,
+
+  /**
+   * Bank transfer payment method.
+   */
+  BANK_TRANSFER,
 
   /**
    * Cash payment method.
@@ -31,7 +31,12 @@ public enum PaymentMethod {
   PAYPAL,
 
   /**
-   * Other payment methods not listed above.
+   * Payment on delivery method.
    */
-  OTHER,
+  PAYMENT_ON_DELIVERY,
+
+  /**
+   * Deferred payment method (e.g., Net 30, Net 60).
+   */
+  DEFERRED_PAYMENT,
 }

@@ -1,32 +1,32 @@
 package com.sigrap.supplier;
 
 /**
- * Enum representing the possible statuses of a supplier relationship.
+ * Enumeration of possible supplier relationship statuses.
  * Used to track the current state of business relationships with suppliers.
  */
 public enum SupplierStatus {
   /**
-   * Active and fully operational supplier relationship.
+   * Actively doing business with this supplier.
    */
   ACTIVE,
 
   /**
-   * Supplier relationship is inactive or on hold.
+   * New supplier, not yet fully vetted or established.
+   */
+  NEW,
+
+  /**
+   * Temporarily not doing business with this supplier.
+   */
+  SUSPENDED,
+
+  /**
+   * No longer doing business with this supplier.
    */
   INACTIVE,
 
   /**
-   * Supplier is in a probationary period, often for new suppliers.
+   * On probation due to quality issues or other concerns.
    */
   PROBATION,
-
-  /**
-   * Supplier relationship has been terminated.
-   */
-  TERMINATED,
-
-  /**
-   * Supplier is blacklisted and should not be used.
-   */
-  BLACKLISTED,
 }

@@ -19,6 +19,9 @@ import com.sigrap.product.ProductRepository;
 import com.sigrap.role.Role;
 import com.sigrap.role.RoleRepository;
 import com.sigrap.supplier.PaymentMethod;
+import com.sigrap.supplier.PurchaseOrder;
+import com.sigrap.supplier.PurchaseOrderItem;
+import com.sigrap.supplier.PurchaseOrderRepository;
 import com.sigrap.supplier.Supplier;
 import com.sigrap.supplier.SupplierRepository;
 import com.sigrap.supplier.SupplierStatus;
@@ -28,6 +31,7 @@ import com.sigrap.user.UserNotificationPreference.NotificationType;
 import com.sigrap.user.UserNotificationPreferenceRepository;
 import com.sigrap.user.UserRepository;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -138,6 +142,8 @@ public class DataSeeder implements CommandLineRunner {
    */
   private final SupplierRepository supplierRepository;
 
+  private final PurchaseOrderRepository purchaseOrderRepository;
+
   private final Random random = new Random();
 
   /**
@@ -162,6 +168,7 @@ public class DataSeeder implements CommandLineRunner {
     seedEmployeePerformance();
     seedActivityLogs();
     seedSuppliers();
+    seedPurchaseOrders();
     log.info("Data seeding completed.");
   }
 
@@ -971,8 +978,8 @@ public class DataSeeder implements CommandLineRunner {
       }
 
       Role adminRole = Role.builder()
-        .name("ADMIN")
-        .description("Administrator role with full system access")
+        .name("Administrador")
+        .description("Rol de Administrador con acceso total al sistema")
         .permissions(new HashSet<>(permissions))
         .createdAt(now)
         .updatedAt(now)
@@ -990,8 +997,8 @@ public class DataSeeder implements CommandLineRunner {
         .forEach(employeePermissions::add);
 
       Role employeeRole = Role.builder()
-        .name("EMPLOYEE")
-        .description("Employee role with limited system access")
+        .name("Empleado")
+        .description("Rol de Empleado con acceso limitado al sistema")
         .permissions(employeePermissions)
         .createdAt(now)
         .updatedAt(now)
@@ -1526,5 +1533,343 @@ public class DataSeeder implements CommandLineRunner {
     } else {
       log.info("Suppliers already exist, skipping seeding.");
     }
+  }
+
+  private void seedPurchaseOrders() {
+    if (purchaseOrderRepository.count() > 0) {
+      log.info("Purchase orders already exist, skipping seeding.");
+      return;
+    }
+
+    log.info("Seeding purchase orders...");
+
+    List<Supplier> suppliers = supplierRepository.findAll();
+    if (suppliers.isEmpty()) {
+      log.warn("No suppliers found. Skipping purchase order seeding.");
+      return;
+    }
+
+    List<Product> products = productRepository.findAll();
+    if (products.isEmpty()) {
+      log.warn("No products found. Skipping purchase order seeding.");
+      return;
+    }
+
+    Supplier tailoy = findSupplierByName(suppliers, "Tai Loy");
+    Supplier faberCastell = findSupplierByName(suppliers, "Faber-Castell Perú");
+    Supplier artesco = findSupplierByName(suppliers, "Artesco");
+    Supplier officedepot = findSupplierByName(suppliers, "Office Depot");
+    Supplier norma = findSupplierByName(suppliers, "Norma");
+
+    Product cuadernoUniversitario = findProductByName(
+      products,
+      "Cuaderno Universitario Norma"
+    );
+    Product lapizMirado = findProductByName(products, "Lápiz Mirado HB");
+    Product cajaColores = findProductByName(
+      products,
+      "Caja de Colores Faber-Castell x12"
+    );
+    Product kitGeometrico = findProductByName(
+      products,
+      "Kit Geométrico Faber-Castell"
+    );
+    Product borrador = findProductByName(products, "Borrador Nata Pelikan");
+    Product resmaA4 = findProductByName(products, "Resma Papel Bond A4");
+    Product cartulinaBlanca = findProductByName(
+      products,
+      "Cartulina Blanca Pliego"
+    );
+    Product blockIris = findProductByName(products, "Block Iris Carta");
+    Product marcadoresPermanentes = findProductByName(
+      products,
+      "Marcadores Permanentes x4"
+    );
+    Product cuadernoArgollado = findProductByName(
+      products,
+      "Cuaderno Argollado 5 Materias"
+    );
+
+    List<PurchaseOrder> purchaseOrders = new ArrayList<>();
+
+    PurchaseOrder orden1 = PurchaseOrder.builder()
+      .orderNumber("OC-2025-001")
+      .supplier(tailoy)
+      .orderDate(LocalDate.now().minusDays(45))
+      .expectedDeliveryDate(LocalDate.now().minusDays(35))
+      .actualDeliveryDate(LocalDate.now().minusDays(34))
+      .status(PurchaseOrder.Status.DELIVERED)
+      .notes(
+        "Pedido para abastecer inventario de útiles escolares por temporada de regreso a clases"
+      )
+      .items(new ArrayList<>())
+      .totalAmount(BigDecimal.ZERO)
+      .build();
+
+    PurchaseOrderItem item1_1 = PurchaseOrderItem.builder()
+      .product(cuadernoUniversitario)
+      .quantity(100)
+      .unitPrice(new BigDecimal("4000"))
+      .receivedQuantity(100)
+      .notes("Cuadernos para stock inicial de temporada escolar")
+      .build();
+
+    PurchaseOrderItem item1_2 = PurchaseOrderItem.builder()
+      .product(lapizMirado)
+      .quantity(200)
+      .unitPrice(new BigDecimal("500"))
+      .receivedQuantity(200)
+      .notes("Lápices HB para stock inicial de temporada escolar")
+      .build();
+
+    PurchaseOrderItem item1_3 = PurchaseOrderItem.builder()
+      .product(borrador)
+      .quantity(150)
+      .unitPrice(new BigDecimal("800"))
+      .receivedQuantity(150)
+      .notes("Borradores para stock inicial de temporada escolar")
+      .build();
+
+    item1_1.setPurchaseOrder(orden1);
+    item1_2.setPurchaseOrder(orden1);
+    item1_3.setPurchaseOrder(orden1);
+    orden1.getItems().add(item1_1);
+    orden1.getItems().add(item1_2);
+    orden1.getItems().add(item1_3);
+
+    BigDecimal total1 = calculateOrderTotal(orden1);
+    orden1.setTotalAmount(total1);
+    purchaseOrders.add(orden1);
+
+    PurchaseOrder orden2 = PurchaseOrder.builder()
+      .orderNumber("OC-2025-002")
+      .supplier(faberCastell)
+      .orderDate(LocalDate.now().minusDays(30))
+      .expectedDeliveryDate(LocalDate.now().minusDays(20))
+      .actualDeliveryDate(LocalDate.now().minusDays(22))
+      .status(PurchaseOrder.Status.DELIVERED)
+      .notes("Pedido de materiales artísticos para taller de arte")
+      .items(new ArrayList<>())
+      .totalAmount(BigDecimal.ZERO)
+      .build();
+
+    PurchaseOrderItem item2_1 = PurchaseOrderItem.builder()
+      .product(cajaColores)
+      .quantity(50)
+      .unitPrice(new BigDecimal("5500"))
+      .receivedQuantity(50)
+      .notes("Cajas de colores para taller de arte")
+      .build();
+
+    PurchaseOrderItem item2_2 = PurchaseOrderItem.builder()
+      .product(kitGeometrico)
+      .quantity(30)
+      .unitPrice(new BigDecimal("7500"))
+      .receivedQuantity(30)
+      .notes("Kits geométricos para estudiantes de secundaria")
+      .build();
+
+    item2_1.setPurchaseOrder(orden2);
+    item2_2.setPurchaseOrder(orden2);
+    orden2.getItems().add(item2_1);
+    orden2.getItems().add(item2_2);
+
+    BigDecimal total2 = calculateOrderTotal(orden2);
+    orden2.setTotalAmount(total2);
+    purchaseOrders.add(orden2);
+
+    PurchaseOrder orden3 = PurchaseOrder.builder()
+      .orderNumber("OC-2025-003")
+      .supplier(officedepot)
+      .orderDate(LocalDate.now().minusDays(15))
+      .expectedDeliveryDate(LocalDate.now().minusDays(7))
+      .actualDeliveryDate(LocalDate.now().minusDays(8))
+      .status(PurchaseOrder.Status.DELIVERED)
+      .notes("Reposición de stock de papel y cartulina")
+      .items(new ArrayList<>())
+      .totalAmount(BigDecimal.ZERO)
+      .build();
+
+    PurchaseOrderItem item3_1 = PurchaseOrderItem.builder()
+      .product(resmaA4)
+      .quantity(80)
+      .unitPrice(new BigDecimal("12000"))
+      .receivedQuantity(80)
+      .notes("Resmas de papel para fotocopias e impresiones")
+      .build();
+
+    PurchaseOrderItem item3_2 = PurchaseOrderItem.builder()
+      .product(cartulinaBlanca)
+      .quantity(120)
+      .unitPrice(new BigDecimal("700"))
+      .receivedQuantity(120)
+      .notes("Cartulinas para proyectos escolares")
+      .build();
+
+    PurchaseOrderItem item3_3 = PurchaseOrderItem.builder()
+      .product(blockIris)
+      .quantity(60)
+      .unitPrice(new BigDecimal("3500"))
+      .receivedQuantity(60)
+      .notes("Blocks de papel iris para manualidades")
+      .build();
+
+    item3_1.setPurchaseOrder(orden3);
+    item3_2.setPurchaseOrder(orden3);
+    item3_3.setPurchaseOrder(orden3);
+    orden3.getItems().add(item3_1);
+    orden3.getItems().add(item3_2);
+    orden3.getItems().add(item3_3);
+
+    BigDecimal total3 = calculateOrderTotal(orden3);
+    orden3.setTotalAmount(total3);
+    purchaseOrders.add(orden3);
+
+    PurchaseOrder orden4 = PurchaseOrder.builder()
+      .orderNumber("OC-2025-004")
+      .supplier(artesco)
+      .orderDate(LocalDate.now().minusDays(5))
+      .expectedDeliveryDate(LocalDate.now().plusDays(3))
+      .status(PurchaseOrder.Status.CONFIRMED)
+      .notes("Pedido urgente de marcadores para evento escolar")
+      .items(new ArrayList<>())
+      .totalAmount(BigDecimal.ZERO)
+      .build();
+
+    PurchaseOrderItem item4_1 = PurchaseOrderItem.builder()
+      .product(marcadoresPermanentes)
+      .quantity(40)
+      .unitPrice(new BigDecimal("5000"))
+      .receivedQuantity(0)
+      .notes("Marcadores para taller de cartelería")
+      .build();
+
+    item4_1.setPurchaseOrder(orden4);
+    orden4.getItems().add(item4_1);
+
+    BigDecimal total4 = calculateOrderTotal(orden4);
+    orden4.setTotalAmount(total4);
+    purchaseOrders.add(orden4);
+
+    PurchaseOrder orden5 = PurchaseOrder.builder()
+      .orderNumber("OC-2025-005")
+      .supplier(norma)
+      .orderDate(LocalDate.now().minusDays(2))
+      .expectedDeliveryDate(LocalDate.now().plusDays(10))
+      .status(PurchaseOrder.Status.SUBMITTED)
+      .notes("Pedido para reponer stock de cuadernos")
+      .items(new ArrayList<>())
+      .totalAmount(BigDecimal.ZERO)
+      .build();
+
+    PurchaseOrderItem item5_1 = PurchaseOrderItem.builder()
+      .product(cuadernoUniversitario)
+      .quantity(50)
+      .unitPrice(new BigDecimal("4000"))
+      .receivedQuantity(0)
+      .notes("Reposición de stock de cuadernos universitarios")
+      .build();
+
+    PurchaseOrderItem item5_2 = PurchaseOrderItem.builder()
+      .product(cuadernoArgollado)
+      .quantity(35)
+      .unitPrice(new BigDecimal("9000"))
+      .receivedQuantity(0)
+      .notes("Reposición de stock de cuadernos argollados")
+      .build();
+
+    item5_1.setPurchaseOrder(orden5);
+    item5_2.setPurchaseOrder(orden5);
+    orden5.getItems().add(item5_1);
+    orden5.getItems().add(item5_2);
+
+    BigDecimal total5 = calculateOrderTotal(orden5);
+    orden5.setTotalAmount(total5);
+    purchaseOrders.add(orden5);
+
+    PurchaseOrder orden6 = PurchaseOrder.builder()
+      .orderNumber("OC-2025-006")
+      .supplier(tailoy)
+      .orderDate(LocalDate.now())
+      .expectedDeliveryDate(LocalDate.now().plusDays(15))
+      .status(PurchaseOrder.Status.DRAFT)
+      .notes("Borrador de pedido para próximo mes")
+      .items(new ArrayList<>())
+      .totalAmount(BigDecimal.ZERO)
+      .build();
+
+    PurchaseOrderItem item6_1 = PurchaseOrderItem.builder()
+      .product(lapizMirado)
+      .quantity(150)
+      .unitPrice(new BigDecimal("500"))
+      .receivedQuantity(0)
+      .notes("Stock preventivo para próximo trimestre")
+      .build();
+
+    PurchaseOrderItem item6_2 = PurchaseOrderItem.builder()
+      .product(borrador)
+      .quantity(100)
+      .unitPrice(new BigDecimal("800"))
+      .receivedQuantity(0)
+      .notes("Stock preventivo para próximo trimestre")
+      .build();
+
+    item6_1.setPurchaseOrder(orden6);
+    item6_2.setPurchaseOrder(orden6);
+    orden6.getItems().add(item6_1);
+    orden6.getItems().add(item6_2);
+
+    BigDecimal total6 = calculateOrderTotal(orden6);
+    orden6.setTotalAmount(total6);
+    purchaseOrders.add(orden6);
+
+    purchaseOrderRepository.saveAll(purchaseOrders);
+    log.info("{} purchase orders seeded successfully.", purchaseOrders.size());
+  }
+
+  /**
+   * Find a supplier by name in a list of suppliers.
+   *
+   * @param suppliers List of suppliers to search in
+   * @param name Name of the supplier to find
+   * @return The found supplier or the first supplier if not found
+   */
+  private Supplier findSupplierByName(List<Supplier> suppliers, String name) {
+    return suppliers
+      .stream()
+      .filter(s -> s.getName().equals(name))
+      .findFirst()
+      .orElse(suppliers.get(0));
+  }
+
+  /**
+   * Find a product by name in a list of products.
+   *
+   * @param products List of products to search in
+   * @param name Name of the product to find
+   * @return The found product or the first product if not found
+   */
+  private Product findProductByName(List<Product> products, String name) {
+    return products
+      .stream()
+      .filter(p -> p.getName().equals(name))
+      .findFirst()
+      .orElse(products.get(0));
+  }
+
+  /**
+   * Calculate total amount for an order based on its items.
+   *
+   * @param order The purchase order
+   * @return The total amount
+   */
+  private BigDecimal calculateOrderTotal(PurchaseOrder order) {
+    return order
+      .getItems()
+      .stream()
+      .map(item ->
+        item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity()))
+      )
+      .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 }

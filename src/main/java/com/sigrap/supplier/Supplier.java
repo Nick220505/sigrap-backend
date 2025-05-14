@@ -180,4 +180,3 @@ public class Supplier {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 }
- 

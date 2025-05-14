@@ -1,9 +1,24 @@
 /**
- * Supplier Management Package.
+ * Supplier management package for SIGRAP.
  *
- * <p>This package provides functionality for managing suppliers in the SIGRAP system.
- * It includes entity definitions, data transfer objects, repository interfaces, and
- * business logic for complete supplier lifecycle management.</p>
+ * <p>This package contains all functionality related to supplier management including:
+ * <ul>
+ *   <li>Supplier CRUD operations</li>
+ *   <li>Supplier catalog management</li>
+ *   <li>Order processing for suppliers</li>
+ *   <li>Payment tracking</li>
+ * </ul></p>
+ *
+ * <p>The package uses a layered architecture:
+ * <ul>
+ *   <li>Controllers - REST endpoints for supplier operations</li>
+ *   <li>Services - Business logic and validation</li>
+ *   <li>Repositories - Data access layer</li>
+ *   <li>Models - Domain entities and DTOs</li>
+ * </ul></p>
+ *
+ * <p>Suppliers are a critical part of the inventory management system,
+ * providing products that are then tracked in the inventory system.</p>
  *
  * <p>Key Features:
  * <ul>
