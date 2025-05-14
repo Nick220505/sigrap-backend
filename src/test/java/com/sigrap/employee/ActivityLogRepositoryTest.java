@@ -1,9 +1,11 @@
 package com.sigrap.employee;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.sigrap.config.RepositoryTestConfiguration;
+import com.sigrap.user.User;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +13,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
-import com.sigrap.config.RepositoryTestConfiguration;
-import com.sigrap.user.User;
 
 /**
  * Integration tests for the ActivityLogRepository class.
@@ -39,7 +38,6 @@ class ActivityLogRepositoryTest {
   void setUp() {
     timestamp = LocalDateTime.now();
 
-    // Create a user first
     User user = User.builder()
       .name("John Doe")
       .email("john@example.com")

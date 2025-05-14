@@ -68,17 +68,14 @@ class AttendanceServiceTest {
 
   @Test
   void findAll_ShouldReturnAllAttendanceRecords() {
-    // Given
     List<Attendance> attendances = List.of(testAttendance);
     doReturn(attendances).when(attendanceRepository).findAll();
     doReturn(List.of(testAttendanceInfo))
       .when(attendanceMapper)
       .toInfoList(attendances);
 
-    // When
     List<AttendanceInfo> result = attendanceService.findAll();
 
-    // Then
     assertNotNull(result);
     assertEquals(1, result.size());
     assertEquals(testAttendanceInfo.getId(), result.get(0).getId());
@@ -86,7 +83,6 @@ class AttendanceServiceTest {
 
   @Test
   void clockIn_ShouldCreateNewAttendanceRecord() {
-    // Given
     doReturn(Optional.of(testEmployee))
       .when(employeeRepository)
       .findById(anyLong());
@@ -96,14 +92,12 @@ class AttendanceServiceTest {
     doReturn(testAttendance).when(attendanceRepository).save(any());
     doReturn(testAttendanceInfo).when(attendanceMapper).toInfo(any());
 
-    // When
     AttendanceInfo result = attendanceService.clockIn(
       1L,
       LocalDateTime.now(),
       "On time"
     );
 
-    // Then
     assertNotNull(result);
     assertEquals(testAttendanceInfo.getId(), result.getId());
     assertEquals(testAttendanceInfo.getEmployeeId(), result.getEmployeeId());
@@ -111,21 +105,18 @@ class AttendanceServiceTest {
 
   @Test
   void clockOut_ShouldUpdateAttendanceRecord() {
-    // Given
     doReturn(Optional.of(testAttendance))
       .when(attendanceRepository)
       .findById(anyLong());
     doReturn(testAttendance).when(attendanceRepository).save(any());
     doReturn(testAttendanceInfo).when(attendanceMapper).toInfo(any());
 
-    // When
     AttendanceInfo result = attendanceService.clockOut(
       1L,
       LocalDateTime.now(),
       "Regular end of shift"
     );
 
-    // Then
     assertNotNull(result);
     assertEquals(testAttendanceInfo.getId(), result.getId());
     assertEquals(testAttendanceInfo.getEmployeeId(), result.getEmployeeId());
@@ -133,7 +124,6 @@ class AttendanceServiceTest {
 
   @Test
   void findByEmployeeId_ShouldReturnEmployeeAttendanceRecords() {
-    // Given
     List<Attendance> attendances = List.of(testAttendance);
     doReturn(attendances)
       .when(attendanceRepository)
@@ -142,10 +132,8 @@ class AttendanceServiceTest {
       .when(attendanceMapper)
       .toInfoList(attendances);
 
-    // When
     List<AttendanceInfo> result = attendanceService.findByEmployeeId(1L);
 
-    // Then
     assertNotNull(result);
     assertEquals(1, result.size());
     assertEquals(testAttendanceInfo.getId(), result.get(0).getId());
@@ -153,7 +141,6 @@ class AttendanceServiceTest {
 
   @Test
   void generateAttendanceReport_ShouldReturnReport() {
-    // Given
     LocalDateTime startDate = LocalDateTime.now().minusDays(7);
     LocalDateTime endDate = LocalDateTime.now();
     List<Attendance> attendances = List.of(testAttendance);
@@ -169,14 +156,12 @@ class AttendanceServiceTest {
       .when(attendanceMapper)
       .toInfoList(attendances);
 
-    // When
     List<AttendanceInfo> result = attendanceService.generateAttendanceReport(
       1L,
       startDate,
       endDate
     );
 
-    // Then
     assertNotNull(result);
     assertEquals(1, result.size());
     assertEquals(testAttendanceInfo.getId(), result.get(0).getId());

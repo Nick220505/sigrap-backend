@@ -182,7 +182,6 @@ public class UserService implements UserDetailsService {
    */
   @Transactional
   public void deleteAllById(List<Long> ids) {
-    // Verify all users exist before deleting any
     for (Long id : ids) {
       if (!userRepository.existsById(id)) {
         throw new EntityNotFoundException("User not found: " + id);

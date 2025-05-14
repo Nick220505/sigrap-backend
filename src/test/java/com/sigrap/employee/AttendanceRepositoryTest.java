@@ -1,12 +1,14 @@
 package com.sigrap.employee;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.sigrap.config.RepositoryTestConfiguration;
+import com.sigrap.user.User;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +16,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
-import com.sigrap.config.RepositoryTestConfiguration;
-import com.sigrap.user.User;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -34,11 +33,9 @@ class AttendanceRepositoryTest {
 
   @BeforeEach
   void setUp() {
-    // Generate unique IDs for the test
     String uniqueEmail = "john" + System.currentTimeMillis() + "@example.com";
     String uniqueDocumentId = "DOC" + System.currentTimeMillis();
 
-    // Create a user for the employee
     User user = User.builder()
       .name("John Doe")
       .email(uniqueEmail)
@@ -101,7 +98,6 @@ class AttendanceRepositoryTest {
 
   @Test
   void findByDate_ShouldReturnAttendanceRecords() {
-    // Get the date part only without the time
     LocalDateTime startOfDay = testAttendance
       .getDate()
       .toLocalDate()
@@ -131,10 +127,8 @@ class AttendanceRepositoryTest {
 
   @Test
   void findByEmployeeIdAndDate_ShouldReturnAttendanceRecord() {
-    // Create a specific date time to use for both the entity and the query
     LocalDateTime specificDateTime = LocalDateTime.now().withNano(0);
 
-    // Update the saved entity with this specific date time
     testAttendance.setDate(specificDateTime);
     testAttendance = entityManager.merge(testAttendance);
     entityManager.flush();

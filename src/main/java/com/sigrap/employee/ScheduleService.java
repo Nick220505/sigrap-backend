@@ -1,14 +1,12 @@
 package com.sigrap.employee;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Service class for schedule management operations.
@@ -162,7 +160,6 @@ public class ScheduleService {
     LocalDateTime startTime = data.getStartTime();
     LocalDateTime endTime = data.getEndTime();
 
-    // Days of the week
     String[] daysOfWeek = {
       "MONDAY",
       "TUESDAY",

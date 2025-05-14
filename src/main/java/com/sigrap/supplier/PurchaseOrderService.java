@@ -119,12 +119,10 @@ public class PurchaseOrderService {
    */
   @Transactional
   public PurchaseOrderInfo create(PurchaseOrderData purchaseOrderData) {
-    // Convert data to entity
     PurchaseOrder purchaseOrder = purchaseOrderMapper.toEntity(
       purchaseOrderData
     );
 
-    // Find and set supplier
     Supplier supplier = supplierRepository
       .findById(purchaseOrderData.getSupplierId().longValue())
       .orElseThrow(() ->
@@ -134,14 +132,11 @@ public class PurchaseOrderService {
       );
     purchaseOrder.setSupplier(supplier);
 
-    // Generate order number
     String orderNumber = generateOrderNumber();
     purchaseOrder.setOrderNumber(orderNumber);
 
-    // Save order first to get ID
     PurchaseOrder savedOrder = purchaseOrderRepository.save(purchaseOrder);
 
-    // Process items if any
     if (
       purchaseOrderData.getItems() != null &&
       !purchaseOrderData.getItems().isEmpty()
@@ -151,7 +146,6 @@ public class PurchaseOrderService {
       for (PurchaseOrderItemData itemData : purchaseOrderData.getItems()) {
         PurchaseOrderItem item = purchaseOrderItemMapper.toEntity(itemData);
 
-        // Find and set product
         Product product = productRepository
           .findById(itemData.getProductId())
           .orElseThrow(() ->
@@ -161,23 +155,17 @@ public class PurchaseOrderService {
           );
         item.setProduct(product);
 
-        // Set purchase order reference
         item.setPurchaseOrder(savedOrder);
 
-        // Calculate total price
         item.calculateTotalPrice();
 
-        // Add to items list
         items.add(item);
       }
 
-      // Save all items
       purchaseOrderItemRepository.saveAll(items);
 
-      // Update order with items
       savedOrder.setItems(items);
 
-      // Calculate total amount
       calculateTotalAmount(savedOrder);
       purchaseOrderRepository.save(savedOrder);
     }
@@ -198,14 +186,12 @@ public class PurchaseOrderService {
     Integer id,
     PurchaseOrderData purchaseOrderData
   ) {
-    // Find existing order
     PurchaseOrder purchaseOrder = purchaseOrderRepository
       .findById(id)
       .orElseThrow(() ->
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    // Only allow updates for DRAFT or SUBMITTED orders
     if (
       purchaseOrder.getStatus() != PurchaseOrder.Status.DRAFT &&
       purchaseOrder.getStatus() != PurchaseOrder.Status.SUBMITTED
@@ -215,10 +201,8 @@ public class PurchaseOrderService {
       );
     }
 
-    // Update fields from data
     purchaseOrderMapper.updateEntityFromData(purchaseOrderData, purchaseOrder);
 
-    // Update supplier if changed
     if (
       purchaseOrderData.getSupplierId() != null &&
       !purchaseOrderData
@@ -235,25 +219,19 @@ public class PurchaseOrderService {
       purchaseOrder.setSupplier(supplier);
     }
 
-    // Process items if any
     if (purchaseOrderData.getItems() != null) {
-      // Get current items
       List<PurchaseOrderItem> currentItems = purchaseOrder.getItems();
 
-      // Create map of item IDs for efficient lookup
       java.util.Map<Integer, PurchaseOrderItem> currentItemsMap = currentItems
         .stream()
         .collect(
           Collectors.toMap(PurchaseOrderItem::getId, item -> item, (a, b) -> a)
         );
 
-      // Keep track of processed items to identify items to remove
       java.util.Set<Integer> processedItemIds = new java.util.HashSet<>();
 
-      // Process each item in the request
       for (PurchaseOrderItemData itemData : purchaseOrderData.getItems()) {
         if (itemData.getId() != null) {
-          // Update existing item
           PurchaseOrderItem existingItem = currentItemsMap.get(
             itemData.getId()
           );
@@ -263,7 +241,6 @@ public class PurchaseOrderService {
               existingItem
             );
 
-            // Update product if changed
             if (
               itemData.getProductId() != null &&
               !itemData.getProductId().equals(existingItem.getProduct().getId())
@@ -278,19 +255,15 @@ public class PurchaseOrderService {
               existingItem.setProduct(product);
             }
 
-            // Recalculate total price
             existingItem.calculateTotalPrice();
 
-            // Mark as processed
             processedItemIds.add(existingItem.getId());
           }
         } else {
-          // Create new item
           PurchaseOrderItem newItem = purchaseOrderItemMapper.toEntity(
             itemData
           );
 
-          // Find and set product
           Product product = productRepository
             .findById(itemData.getProductId())
             .orElseThrow(() ->
@@ -300,27 +273,21 @@ public class PurchaseOrderService {
             );
           newItem.setProduct(product);
 
-          // Set purchase order reference
           newItem.setPurchaseOrder(purchaseOrder);
 
-          // Calculate total price
           newItem.calculateTotalPrice();
 
-          // Add to current items
           currentItems.add(newItem);
         }
       }
 
-      // Remove items not in request
       currentItems.removeIf(
         item -> item.getId() != null && !processedItemIds.contains(item.getId())
       );
 
-      // Recalculate total amount
       calculateTotalAmount(purchaseOrder);
     }
 
-    // Save updated order
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
@@ -340,7 +307,6 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    // Only allow deletion for DRAFT orders
     if (purchaseOrder.getStatus() != PurchaseOrder.Status.DRAFT) {
       throw new IllegalStateException(
         "Cannot delete order in " + purchaseOrder.getStatus() + " status"
@@ -366,17 +332,14 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    // Verify current status
     if (purchaseOrder.getStatus() != PurchaseOrder.Status.DRAFT) {
       throw new IllegalStateException(
         "Cannot submit order in " + purchaseOrder.getStatus() + " status"
       );
     }
 
-    // Update status
     purchaseOrder.setStatus(PurchaseOrder.Status.SUBMITTED);
 
-    // Save updated order
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
@@ -397,17 +360,14 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    // Verify current status
     if (purchaseOrder.getStatus() != PurchaseOrder.Status.SUBMITTED) {
       throw new IllegalStateException(
         "Cannot confirm order in " + purchaseOrder.getStatus() + " status"
       );
     }
 
-    // Update status
     purchaseOrder.setStatus(PurchaseOrder.Status.CONFIRMED);
 
-    // Save updated order
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
@@ -428,7 +388,6 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    // Verify current status
     if (purchaseOrder.getStatus() != PurchaseOrder.Status.CONFIRMED) {
       throw new IllegalStateException(
         "Cannot mark as shipped order in " +
@@ -437,10 +396,8 @@ public class PurchaseOrderService {
       );
     }
 
-    // Update status
     purchaseOrder.setStatus(PurchaseOrder.Status.SHIPPED);
 
-    // Save updated order
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
@@ -465,7 +422,6 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    // Verify current status
     if (purchaseOrder.getStatus() != PurchaseOrder.Status.SHIPPED) {
       throw new IllegalStateException(
         "Cannot mark as delivered order in " +
@@ -474,11 +430,9 @@ public class PurchaseOrderService {
       );
     }
 
-    // Update status and delivery date
     purchaseOrder.setStatus(PurchaseOrder.Status.DELIVERED);
     purchaseOrder.setActualDeliveryDate(actualDeliveryDate);
 
-    // Save updated order
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
@@ -499,7 +453,6 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    // Verify current status
     if (
       purchaseOrder.getStatus() == PurchaseOrder.Status.DELIVERED ||
       purchaseOrder.getStatus() == PurchaseOrder.Status.CANCELLED
@@ -509,10 +462,8 @@ public class PurchaseOrderService {
       );
     }
 
-    // Update status
     purchaseOrder.setStatus(PurchaseOrder.Status.CANCELLED);
 
-    // Save updated order
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
