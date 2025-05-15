@@ -2,6 +2,9 @@ package com.sigrap.config;
 
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
+import com.sigrap.customer.Customer;
+import com.sigrap.customer.CustomerRepository;
+import com.sigrap.customer.CustomerStatus;
 import com.sigrap.employee.ActivityLog;
 import com.sigrap.employee.ActivityLogRepository;
 import com.sigrap.employee.Attendance;
@@ -148,9 +151,29 @@ public class DataSeeder implements CommandLineRunner {
    */
   private final SupplierRepository supplierRepository;
 
+  /**
+   * Repository for purchase order database operations.
+   * Used to check if purchase orders exist and to save new purchase orders during seeding.
+   */
   private final PurchaseOrderRepository purchaseOrderRepository;
+
+  /**
+   * Repository for purchase order tracking event database operations.
+   * Used to check if tracking events exist and to save new tracking events during seeding.
+   */
   private final PurchaseOrderTrackingEventRepository purchaseOrderTrackingEventRepository;
+
+  /**
+   * Repository for payment database operations.
+   * Used to check if payments exist and to save new payments during seeding.
+   */
   private final PaymentRepository paymentRepository;
+
+  /**
+   * Repository for customer database operations.
+   * Used to check if customers exist and to save new customers during seeding.
+   */
+  private final CustomerRepository customerRepository;
 
   private final Random random = new Random();
 
@@ -180,6 +203,7 @@ public class DataSeeder implements CommandLineRunner {
     seedPurchaseOrders();
     seedPurchaseOrderTrackingEvents();
     seedPayments();
+    seedCustomers();
     log.info("Data seeding completed.");
   }
 
@@ -907,6 +931,38 @@ public class DataSeeder implements CommandLineRunner {
             .updatedAt(now)
             .build(),
           Permission.builder()
+            .name("CLIENT_READ")
+            .description("Permission to read client information")
+            .resource("CLIENT")
+            .action("READ")
+            .createdAt(now)
+            .updatedAt(now)
+            .build(),
+          Permission.builder()
+            .name("CLIENT_CREATE")
+            .description("Permission to create new clients")
+            .resource("CLIENT")
+            .action("CREATE")
+            .createdAt(now)
+            .updatedAt(now)
+            .build(),
+          Permission.builder()
+            .name("CLIENT_UPDATE")
+            .description("Permission to update client information")
+            .resource("CLIENT")
+            .action("UPDATE")
+            .createdAt(now)
+            .updatedAt(now)
+            .build(),
+          Permission.builder()
+            .name("CLIENT_DELETE")
+            .description("Permission to delete clients")
+            .resource("CLIENT")
+            .action("DELETE")
+            .createdAt(now)
+            .updatedAt(now)
+            .build(),
+          Permission.builder()
             .name("ROLE_READ")
             .description("Permission to read role information")
             .resource("ROLE")
@@ -1003,7 +1059,13 @@ public class DataSeeder implements CommandLineRunner {
           p ->
             p.getAction().equals("READ") ||
             (p.getResource().equals("PRODUCT") &&
-              !p.getAction().equals("DELETE"))
+              !p.getAction().equals("DELETE")) ||
+            (p.getResource().equals("CATEGORY") &&
+              !p.getAction().equals("DELETE")) ||
+            (p.getResource().equals("CLIENT") &&
+              (p.getAction().equals("READ") ||
+                p.getAction().equals("CREATE") ||
+                p.getAction().equals("UPDATE")))
         )
         .forEach(employeePermissions::add);
 
@@ -2176,5 +2238,174 @@ public class DataSeeder implements CommandLineRunner {
         item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity()))
       )
       .reduce(BigDecimal.ZERO, BigDecimal::add);
+  }
+
+  /**
+   * Seeds initial customers into the database.
+   * Creates a diverse set of customers with realistic personal information.
+   * Only executes if the customers table is empty.
+   */
+  private void seedCustomers() {
+    if (customerRepository.count() == 0) {
+      log.info("Seeding customers...");
+
+      customerRepository.saveAll(
+        List.of(
+          Customer.builder()
+            .firstName("Juan")
+            .lastName("Rodríguez")
+            .documentId("1098765432")
+            .email("juan.rodriguez@gmail.com")
+            .phoneNumber("310-555-1234")
+            .address(
+              "Calle 45 Sur # 23-18, Barrio Kennedy Central, Bogotá D.C."
+            )
+            .status(CustomerStatus.ACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("María")
+            .lastName("González")
+            .documentId("1076543210")
+            .email("maria.gonzalez@hotmail.com")
+            .phoneNumber("315-555-6789")
+            .address(
+              "Carrera 72 Sur # 56-24, Apto 402, Barrio Ciudad Kennedy Sur, Bogotá D.C."
+            )
+            .status(CustomerStatus.ACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Carlos")
+            .lastName("Pérez")
+            .documentId("1053789456")
+            .email("carlos.perez@outlook.com")
+            .phoneNumber("300-555-4321")
+            .address("Diagonal 38 Sur # 34-71, Barrio Timiza, Bogotá D.C.")
+            .status(CustomerStatus.ACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Ana")
+            .lastName("Martínez")
+            .documentId("1087654321")
+            .email("ana.martinez@gmail.com")
+            .phoneNumber("320-555-8765")
+            .address(
+              "Transversal R1 # 67B-21 Sur, Barrio Bosa Nova, Bogotá D.C."
+            )
+            .status(CustomerStatus.INACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Pedro")
+            .lastName("Sánchez")
+            .documentId("1012345678")
+            .email("pedro.sanchez@yahoo.com")
+            .phoneNumber("313-555-2345")
+            .address("Calle 69A Sur # 92-41, Barrio El Perdomo, Bogotá D.C.")
+            .status(CustomerStatus.ACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Laura")
+            .lastName("Díaz")
+            .documentId("1034567890")
+            .email("laura.diaz@hotmail.com")
+            .phoneNumber("318-555-7890")
+            .address(
+              "Carrera 18M # 69J-06 Sur, Barrio Villa de los Alpes Sur, Bogotá D.C."
+            )
+            .status(CustomerStatus.ACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Andrés")
+            .lastName("López")
+            .documentId("1045678923")
+            .email("andres.lopez@gmail.com")
+            .phoneNumber("301-555-5432")
+            .address(
+              "Diagonal 62 Sur # 20F-21, Barrio San Francisco, Bogotá D.C."
+            )
+            .status(CustomerStatus.ACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Sofía")
+            .lastName("Ramírez")
+            .documentId("1078912345")
+            .email("sofia.ramirez@outlook.com")
+            .phoneNumber("312-555-9876")
+            .address("Calle 43 Sur # 24-27, Barrio Venecia, Bogotá D.C.")
+            .status(CustomerStatus.INACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Javier")
+            .lastName("Torres")
+            .documentId("1089012345")
+            .email("javier.torres@yahoo.com")
+            .phoneNumber("316-555-3456")
+            .address("Carrera 80 # 68-23 Sur, Barrio Roma, Bogotá D.C.")
+            .status(CustomerStatus.ACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Daniela")
+            .lastName("Herrera")
+            .documentId("1023456789")
+            .email("daniela.herrera@gmail.com")
+            .phoneNumber("314-555-8901")
+            .address(
+              "Transversal 74F # 40B-54 Sur, Barrio Ciudad Kennedy Oriental, Bogotá D.C."
+            )
+            .status(CustomerStatus.ACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Sebastián")
+            .lastName("Castro")
+            .documentId("1067890123")
+            .email("sebastian.castro@hotmail.com")
+            .phoneNumber("305-555-6543")
+            .address("Calle 68 Sur # 47A-15, Barrio Atlanta, Bogotá D.C.")
+            .status(CustomerStatus.ACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Valentina")
+            .lastName("Ortiz")
+            .documentId("1056789012")
+            .email("valentina.ortiz@outlook.com")
+            .phoneNumber("319-555-0987")
+            .address("Carrera 100 # 52-41 Sur, Barrio Corabastos, Bogotá D.C.")
+            .status(CustomerStatus.ACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Camilo")
+            .lastName("Reyes")
+            .documentId("1032109876")
+            .email("camilo.reyes@yahoo.com")
+            .phoneNumber("311-555-4567")
+            .address(
+              "Diagonal 82 Sur # 6-22 Este, Barrio La Aurora, Bogotá D.C."
+            )
+            .status(CustomerStatus.INACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Isabella")
+            .lastName("Vargas")
+            .documentId("1054321098")
+            .email("isabella.vargas@gmail.com")
+            .phoneNumber("317-555-9012")
+            .address(
+              "Transversal 70D # 68-12 Sur, Barrio Britalia, Bogotá D.C."
+            )
+            .status(CustomerStatus.ACTIVE)
+            .build(),
+          Customer.builder()
+            .firstName("Santiago")
+            .lastName("Morales")
+            .documentId("1065432109")
+            .email("santiago.morales@hotmail.com")
+            .phoneNumber("304-555-7654")
+            .address("Calle 73 Sur # 87M-15, Barrio Dindalito, Bogotá D.C.")
+            .status(CustomerStatus.BLOCKED)
+            .build()
+        )
+      );
+
+      log.info("Successfully seeded 15 customers");
+    }
   }
 }
