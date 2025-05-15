@@ -457,7 +457,6 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    // Verify current status
     if (
       purchaseOrder.getStatus() != PurchaseOrder.Status.CONFIRMED &&
       purchaseOrder.getStatus() != PurchaseOrder.Status.IN_PROCESS

@@ -12,6 +12,9 @@ import com.sigrap.employee.EmployeePerformanceRepository;
 import com.sigrap.employee.EmployeeRepository;
 import com.sigrap.employee.Schedule;
 import com.sigrap.employee.ScheduleRepository;
+import com.sigrap.payment.Payment;
+import com.sigrap.payment.PaymentRepository;
+import com.sigrap.payment.PaymentStatus;
 import com.sigrap.permission.Permission;
 import com.sigrap.permission.PermissionRepository;
 import com.sigrap.product.Product;
@@ -147,6 +150,7 @@ public class DataSeeder implements CommandLineRunner {
 
   private final PurchaseOrderRepository purchaseOrderRepository;
   private final PurchaseOrderTrackingEventRepository purchaseOrderTrackingEventRepository;
+  private final PaymentRepository paymentRepository;
 
   private final Random random = new Random();
 
@@ -175,6 +179,7 @@ public class DataSeeder implements CommandLineRunner {
     seedSuppliers();
     seedPurchaseOrders();
     seedPurchaseOrderTrackingEvents();
+    seedPayments();
     log.info("Data seeding completed.");
   }
 
@@ -1849,199 +1854,282 @@ public class DataSeeder implements CommandLineRunner {
   }
 
   private void seedPurchaseOrderTrackingEvents() {
-    if (purchaseOrderTrackingEventRepository.count() > 0) {
-      log.info(
-        "Purchase order tracking events already exist, skipping seeding."
-      );
-      return;
-    }
+    if (purchaseOrderTrackingEventRepository.count() == 0) {
+      log.info("Seeding purchase order tracking events...");
+      List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findAll();
+      List<PurchaseOrderTrackingEvent> trackingEvents = new ArrayList<>();
 
-    log.info("Seeding purchase order tracking events...");
-
-    List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findAll();
-    if (purchaseOrders.isEmpty()) {
-      log.warn(
-        "No purchase orders found. Skipping purchase order tracking event seeding."
-      );
-      return;
-    }
-
-    List<PurchaseOrderTrackingEvent> trackingEvents = new ArrayList<>();
-
-    for (PurchaseOrder order : purchaseOrders) {
-      LocalDate orderDate = order.getOrderDate();
-      LocalDateTime orderDateTime = orderDate.atStartOfDay();
-
-      trackingEvents.add(
-        PurchaseOrderTrackingEvent.builder()
-          .purchaseOrder(order)
-          .eventTimestamp(orderDateTime.plusHours(1))
-          .status("PEDIDO REALIZADO")
-          .description("El pedido ha sido realizado y enviado al proveedor.")
-          .location("Sistema SIGRAP")
-          .notes("Generado automáticamente por el sistema.")
-          .build()
-      );
-
-      switch (order.getStatus()) {
-        case SUBMITTED:
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(orderDateTime.plusDays(1).plusHours(9))
-              .status("PEDIDO ENVIADO")
-              .description(
-                "El pedido ha sido formalmente enviado al proveedor."
-              )
-              .location("Departamento de Compras")
-              .notes("Confirmación de envío pendiente.")
-              .build()
-          );
-          break;
-        case CONFIRMED:
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(orderDateTime.plusDays(1).plusHours(9))
-              .status("PEDIDO ENVIADO")
-              .description(
-                "El pedido ha sido formalmente enviado al proveedor."
-              )
-              .location("Departamento de Compras")
-              .build()
-          );
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(orderDateTime.plusDays(2).plusHours(14))
-              .status("PEDIDO CONFIRMADO")
-              .description(
-                "El proveedor ha confirmado la recepción y procesamiento del pedido."
-              )
-              .location(order.getSupplier().getName())
-              .notes(
-                "Proveedor " +
-                order.getSupplier().getName() +
-                " confirmó el pedido."
-              )
-              .build()
-          );
-          break;
-        case SHIPPED:
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(orderDateTime.plusDays(1).plusHours(9))
-              .status("PEDIDO ENVIADO")
-              .description(
-                "El pedido ha sido formalmente enviado al proveedor."
-              )
-              .location("Departamento de Compras")
-              .build()
-          );
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(orderDateTime.plusDays(2).plusHours(14))
-              .status("PEDIDO CONFIRMADO")
-              .description(
-                "El proveedor ha confirmado la recepción y procesamiento del pedido."
-              )
-              .location(order.getSupplier().getName())
-              .build()
-          );
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(
-                order.getExpectedDeliveryDate().minusDays(2).atTime(16, 0)
-              )
-              .status("PEDIDO DESPACHADO")
-              .description(
-                "El pedido ha sido despachado por el proveedor y está en camino."
-              )
-              .location("Almacén de " + order.getSupplier().getName())
-              .notes("Número de guía: TRK" + order.getId() + "XYZ")
-              .build()
-          );
-          break;
-        case DELIVERED:
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(orderDateTime.plusDays(1).plusHours(9))
-              .status("PEDIDO ENVIADO")
-              .description(
-                "El pedido ha sido formalmente enviado al proveedor."
-              )
-              .location("Departamento de Compras")
-              .build()
-          );
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(orderDateTime.plusDays(2).plusHours(14))
-              .status("PEDIDO CONFIRMADO")
-              .description(
-                "El proveedor ha confirmado la recepción y procesamiento del pedido."
-              )
-              .location(order.getSupplier().getName())
-              .build()
-          );
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(
-                order.getExpectedDeliveryDate().minusDays(2).atTime(16, 0)
-              )
-              .status("PEDIDO DESPACHADO")
-              .description(
-                "El pedido ha sido despachado por el proveedor y está en camino."
-              )
-              .location("Almacén de " + order.getSupplier().getName())
-              .notes("Número de guía: TRK" + order.getId() + "XYZ")
-              .build()
-          );
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(order.getActualDeliveryDate().atTime(10, 30))
-              .status("PEDIDO ENTREGADO")
-              .description(
-                "El pedido ha sido entregado y recibido en nuestras instalaciones."
-              )
-              .location("Almacén SIGRAP")
-              .notes(
-                "Recibido por: Almacenista. " +
-                order.getItems().size() +
-                " ítems verificados."
-              )
-              .build()
-          );
-          break;
-        case CANCELLED:
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(orderDateTime.plusDays(1).plusHours(10))
-              .status("PEDIDO CANCELADO")
-              .description("El pedido ha sido cancelado.")
-              .location("Sistema SIGRAP")
-              .notes("Cancelado a solicitud del usuario.")
-              .build()
-          );
-          break;
-        case DRAFT:
-          break;
-        default:
-          break;
+      if (purchaseOrders.isEmpty()) {
+        log.warn(
+          "No purchase orders found to seed tracking events. Skipping this step."
+        );
+        return;
       }
+
+      for (PurchaseOrder order : purchaseOrders) {
+        LocalDateTime eventDate = order
+          .getOrderDate()
+          .atStartOfDay()
+          .plusHours(random.nextInt(24));
+        String baseLocation = "Bogotá DC";
+
+        trackingEvents.add(
+          PurchaseOrderTrackingEvent.builder()
+            .purchaseOrder(order)
+            .eventTimestamp(eventDate)
+            .status("ORDEN CREADA")
+            .location(baseLocation)
+            .notes("Pedido generado en el sistema.")
+            .build()
+        );
+
+        if (
+          order.getStatus() == PurchaseOrder.Status.CONFIRMED ||
+          order.getStatus() == PurchaseOrder.Status.SHIPPED ||
+          order.getStatus() == PurchaseOrder.Status.DELIVERED ||
+          order.getStatus() == PurchaseOrder.Status.DELIVERED
+        ) {
+          eventDate = eventDate
+            .plusDays(random.nextInt(1) + 1)
+            .plusHours(random.nextInt(12));
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(eventDate)
+              .status("ORDEN CONFIRMADA")
+              .location(order.getSupplier().getAddress())
+              .notes("Proveedor ha confirmado el pedido.")
+              .build()
+          );
+        }
+
+        if (
+          order.getStatus() == PurchaseOrder.Status.SHIPPED ||
+          order.getStatus() == PurchaseOrder.Status.DELIVERED ||
+          order.getStatus() == PurchaseOrder.Status.DELIVERED
+        ) {
+          eventDate = eventDate
+            .plusDays(random.nextInt(2) + 1)
+            .plusHours(random.nextInt(12));
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(eventDate)
+              .status("ORDEN ENVIADA")
+              .location(
+                "Centro de Distribución - " + order.getSupplier().getAddress()
+              )
+              .notes(
+                "El pedido ha sido despachado por el proveedor. Transportadora: Servientrega, Guía: " +
+                "GUIA" +
+                String.format("%05d", order.getId()) +
+                random.nextInt(100)
+              )
+              .build()
+          );
+        }
+
+        if (
+          order.getStatus() == PurchaseOrder.Status.DELIVERED ||
+          order.getStatus() == PurchaseOrder.Status.DELIVERED
+        ) {
+          eventDate = eventDate
+            .plusDays(random.nextInt(3) + 1)
+            .plusHours(random.nextInt(12));
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(eventDate)
+              .status("EN TRÁNSITO")
+              .location(
+                "Punto de control - " + order.getSupplier().getAddress()
+              )
+              .notes("El pedido está en camino a la papelería.")
+              .build()
+          );
+
+          eventDate = eventDate
+            .plusDays(random.nextInt(2) + 1)
+            .plusHours(random.nextInt(12));
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(eventDate)
+              .status("ENTREGADO")
+              .location("Papelería Rosita - " + baseLocation)
+              .notes("El pedido ha sido recibido en la papelería.")
+              .build()
+          );
+        }
+
+        if (order.getStatus() == PurchaseOrder.Status.DELIVERED) {
+          eventDate = eventDate
+            .plusDays(random.nextInt(1) + 1)
+            .plusHours(random.nextInt(12));
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(eventDate)
+              .status("ORDEN COMPLETADA")
+              .location("Papelería Rosita - " + baseLocation)
+              .notes("El pedido ha sido verificado y cerrado.")
+              .build()
+          );
+        }
+
+        if (order.getStatus() == PurchaseOrder.Status.CANCELLED) {
+          eventDate = eventDate
+            .plusDays(random.nextInt(1) + 1)
+            .plusHours(random.nextInt(12));
+          trackingEvents.add(
+            PurchaseOrderTrackingEvent.builder()
+              .purchaseOrder(order)
+              .eventTimestamp(eventDate)
+              .status("ORDEN CANCELADA")
+              .location(baseLocation)
+              .notes("El pedido fue cancelado por el usuario.")
+              .build()
+          );
+        }
+      }
+      purchaseOrderTrackingEventRepository.saveAll(trackingEvents);
+      log.info(
+        "Seeded {} purchase order tracking events.",
+        trackingEvents.size()
+      );
     }
-    purchaseOrderTrackingEventRepository.saveAll(trackingEvents);
-    log.info(
-      "{} purchase order tracking events seeded successfully.",
-      trackingEvents.size()
-    );
+  }
+
+  private void seedPayments() {
+    if (paymentRepository.count() == 0) {
+      log.info("Seeding payments...");
+      List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findAll();
+      List<Payment> payments = new ArrayList<>();
+
+      if (purchaseOrders.isEmpty()) {
+        log.warn(
+          "No purchase orders found to seed payments. Skipping this step."
+        );
+        return;
+      }
+
+      int paymentCounter = 0;
+      PaymentMethod[] paymentMethods = {
+        PaymentMethod.BANK_TRANSFER,
+        PaymentMethod.CREDIT_CARD,
+        PaymentMethod.NEQUI,
+        PaymentMethod.DAVIPLATA,
+        PaymentMethod.CASH,
+      };
+
+      for (PurchaseOrder order : purchaseOrders) {
+        if (
+          order.getStatus() == PurchaseOrder.Status.CONFIRMED ||
+          order.getStatus() == PurchaseOrder.Status.SHIPPED ||
+          order.getStatus() == PurchaseOrder.Status.DELIVERED ||
+          order.getStatus() == PurchaseOrder.Status.DELIVERED
+        ) {
+          Payment.PaymentBuilder paymentBuilder = Payment.builder()
+            .purchaseOrder(order)
+            .supplier(order.getSupplier())
+            .amount(order.getTotalAmount())
+            .paymentMethod(
+              paymentMethods[paymentCounter % paymentMethods.length]
+            )
+            .transactionId(
+              "TRN-" +
+              LocalDate.now().getYear() +
+              String.format("%02d", LocalDate.now().getMonthValue()) +
+              "-" +
+              String.format("%05d", order.getId()) +
+              random.nextInt(100)
+            );
+
+          LocalDate paymentDate = order.getOrderDate();
+          LocalDate dueDate = order.getOrderDate();
+          String notes = "";
+          String invoiceNumber =
+            "INV-" +
+            order.getOrderNumber().replace("OC-", "") +
+            "-" +
+            String.format("%02d", paymentCounter + 1);
+
+          switch (order.getStatus()) {
+            case CONFIRMED:
+              paymentBuilder.status(PaymentStatus.PENDING);
+              paymentDate = order
+                .getOrderDate()
+                .plusDays(random.nextInt(2) + 1);
+              dueDate = paymentDate.plusDays(30);
+              notes =
+                "Pago programado para el pedido " +
+                order.getOrderNumber() +
+                ". Factura: " +
+                invoiceNumber;
+              break;
+            case SHIPPED:
+              paymentBuilder.status(PaymentStatus.PROCESSING);
+              paymentDate = order.getExpectedDeliveryDate() != null
+                ? order
+                  .getExpectedDeliveryDate()
+                  .minusDays(random.nextInt(3) + 1)
+                : order.getOrderDate().plusDays(random.nextInt(5) + 2);
+              dueDate = paymentDate.plusDays(15);
+              notes =
+                "Pago en proceso para el pedido " +
+                order.getOrderNumber() +
+                ". Factura: " +
+                invoiceNumber;
+              break;
+            case DELIVERED:
+              paymentBuilder.status(PaymentStatus.COMPLETED);
+              paymentDate = order.getExpectedDeliveryDate() != null
+                ? order.getExpectedDeliveryDate().plusDays(random.nextInt(2))
+                : order.getOrderDate().plusDays(random.nextInt(7) + 3);
+              if (order.getShipDate() != null) {
+                paymentDate = order
+                  .getShipDate()
+                  .plusDays(random.nextInt(2) + 1);
+              }
+              dueDate = paymentDate.plusDays(7);
+
+              notes =
+                "Pago completado para el pedido " +
+                order.getOrderNumber() +
+                ". Factura: " +
+                invoiceNumber;
+
+              if (
+                paymentCounter % 3 == 0 &&
+                order.getExpectedDeliveryDate() != null
+              ) {
+                paymentDate = order.getExpectedDeliveryDate().minusDays(1);
+              } else if (
+                paymentCounter % 4 == 0 &&
+                order.getExpectedDeliveryDate() != null
+              ) {
+                paymentDate = order.getExpectedDeliveryDate().plusDays(1);
+              }
+
+              break;
+            default:
+              continue;
+          }
+
+          if (paymentDate.isBefore(order.getOrderDate())) {
+            paymentDate = order.getOrderDate();
+          }
+
+          paymentBuilder.paymentDate(paymentDate).notes(notes);
+          paymentBuilder.invoiceNumber(invoiceNumber);
+          paymentBuilder.dueDate(dueDate);
+          payments.add(paymentBuilder.build());
+          paymentCounter++;
+        }
+      }
+      paymentRepository.saveAll(payments);
+      log.info("Seeded {} payments.", payments.size());
+    }
   }
 
   /**

@@ -54,6 +54,8 @@ public interface PurchaseOrderMapper {
   @Mapping(target = "orderNumber", ignore = true)
   @Mapping(target = "actualDeliveryDate", ignore = true)
   @Mapping(target = "totalAmount", ignore = true)
+  @Mapping(target = "shipDate", ignore = true)
+  @Mapping(target = "trackingEvents", ignore = true)
   @Mapping(target = "status", constant = "DRAFT")
   PurchaseOrder toEntity(PurchaseOrderData purchaseOrderData);
 

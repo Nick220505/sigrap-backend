@@ -39,4 +39,14 @@ public enum PaymentMethod {
    * Deferred payment method (e.g., Net 30, Net 60).
    */
   DEFERRED_PAYMENT,
+
+  /**
+   * Nequi payment method (popular in Colombia).
+   */
+  NEQUI,
+
+  /**
+   * Daviplata payment method (popular in Colombia).
+   */
+  DAVIPLATA,
 }
