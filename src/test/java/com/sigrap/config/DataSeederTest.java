@@ -10,26 +10,26 @@ import static org.mockito.Mockito.when;
 
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
+import com.sigrap.customer.CustomerRepository;
 import com.sigrap.employee.ActivityLogRepository;
 import com.sigrap.employee.AttendanceRepository;
 import com.sigrap.employee.EmployeePerformanceRepository;
 import com.sigrap.employee.EmployeeRepository;
 import com.sigrap.employee.ScheduleRepository;
-import com.sigrap.permission.Permission;
-import com.sigrap.permission.PermissionRepository;
+import com.sigrap.payment.PaymentRepository;
 import com.sigrap.product.ProductRepository;
-import com.sigrap.role.Role;
-import com.sigrap.role.RoleRepository;
+import com.sigrap.supplier.PurchaseOrderRepository;
+import com.sigrap.supplier.PurchaseOrderTrackingEventRepository;
 import com.sigrap.supplier.SupplierRepository;
 import com.sigrap.user.User;
 import com.sigrap.user.UserNotificationPreferenceRepository;
 import com.sigrap.user.UserRepository;
+import com.sigrap.user.UserRole;
+import com.sigrap.user.UserStatus;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,12 +49,6 @@ class DataSeederTest {
 
   @Mock
   private UserRepository userRepository;
-
-  @Mock
-  private RoleRepository roleRepository;
-
-  @Mock
-  private PermissionRepository permissionRepository;
 
   @Mock
   private UserNotificationPreferenceRepository userNotificationPreferenceRepository;
@@ -80,6 +74,18 @@ class DataSeederTest {
   @Mock
   private SupplierRepository supplierRepository;
 
+  @Mock
+  private PurchaseOrderRepository purchaseOrderRepository;
+
+  @Mock
+  private PurchaseOrderTrackingEventRepository purchaseOrderTrackingEventRepository;
+
+  @Mock
+  private PaymentRepository paymentRepository;
+
+  @Mock
+  private CustomerRepository customerRepository;
+
   @InjectMocks
   private DataSeeder dataSeeder;
 
@@ -90,19 +96,23 @@ class DataSeederTest {
       .thenReturn("encoded-password");
 
     lenient().when(employeeRepository.count()).thenReturn(2L);
-
     lenient().when(scheduleRepository.count()).thenReturn(2L);
     lenient().when(attendanceRepository.count()).thenReturn(2L);
     lenient().when(employeePerformanceRepository.count()).thenReturn(2L);
     lenient().when(activityLogRepository.count()).thenReturn(2L);
     lenient().when(supplierRepository.count()).thenReturn(2L);
+    lenient().when(purchaseOrderRepository.count()).thenReturn(2L);
+    lenient().when(purchaseOrderTrackingEventRepository.count()).thenReturn(2L);
+    lenient().when(paymentRepository.count()).thenReturn(2L);
+    lenient().when(customerRepository.count()).thenReturn(2L);
 
     User mockAdminUser = User.builder()
       .id(1L)
       .email("rosita@sigrap.com")
       .name("Rosita González")
       .password("encoded-password")
-      .status(User.UserStatus.ACTIVE)
+      .status(UserStatus.ACTIVE)
+      .role(UserRole.ADMINISTRATOR)
       .build();
     lenient()
       .when(userRepository.findByEmail("rosita@sigrap.com"))
@@ -113,7 +123,8 @@ class DataSeederTest {
       .email("gladys@sigrap.com")
       .name("Gladys Mendoza")
       .password("encoded-password")
-      .status(User.UserStatus.ACTIVE)
+      .status(UserStatus.ACTIVE)
+      .role(UserRole.EMPLOYEE)
       .build();
     lenient()
       .when(userRepository.findByEmail("gladys@sigrap.com"))
@@ -177,7 +188,6 @@ class DataSeederTest {
   @Test
   void testSeedUsers_WhenUsersEmpty() throws Exception {
     when(userRepository.count()).thenReturn(0L);
-    when(roleRepository.findAll()).thenReturn(createTestRoles());
 
     dataSeeder.run();
 
@@ -191,53 +201,6 @@ class DataSeederTest {
     dataSeeder.run();
 
     verify(userRepository, never()).saveAll(anyList());
-  }
-
-  @Test
-  void testSeedPermissions_WhenPermissionsEmpty() throws Exception {
-    when(permissionRepository.count()).thenReturn(0L);
-
-    dataSeeder.run();
-
-    verify(permissionRepository, times(1)).saveAll(anyList());
-  }
-
-  @Test
-  void testSeedPermissions_WhenPermissionsExist() throws Exception {
-    when(permissionRepository.count()).thenReturn(10L);
-
-    dataSeeder.run();
-
-    verify(permissionRepository, never()).saveAll(anyList());
-  }
-
-  @Test
-  void testSeedRoles_WhenRolesEmpty() throws Exception {
-    when(roleRepository.count()).thenReturn(0L);
-    when(permissionRepository.findAll()).thenReturn(createTestPermissions());
-
-    dataSeeder.run();
-
-    verify(roleRepository, times(1)).saveAll(anyList());
-  }
-
-  @Test
-  void testSeedRoles_WhenRolesExist() throws Exception {
-    when(roleRepository.count()).thenReturn(2L);
-
-    dataSeeder.run();
-
-    verify(roleRepository, never()).saveAll(anyList());
-  }
-
-  @Test
-  void testSeedRoles_WhenPermissionsNotFound() throws Exception {
-    when(roleRepository.count()).thenReturn(0L);
-    when(permissionRepository.findAll()).thenReturn(Collections.emptyList());
-
-    dataSeeder.run();
-
-    verify(roleRepository, never()).saveAll(anyList());
   }
 
   @Test
@@ -255,7 +218,7 @@ class DataSeederTest {
   @Test
   void testSeedUserNotificationPreferences_WhenPreferencesExist()
     throws Exception {
-    when(userNotificationPreferenceRepository.count()).thenReturn(5L);
+    when(userNotificationPreferenceRepository.count()).thenReturn(10L);
 
     dataSeeder.run();
 
@@ -272,82 +235,25 @@ class DataSeederTest {
     verify(userNotificationPreferenceRepository, never()).saveAll(anyList());
   }
 
-  private List<Permission> createTestPermissions() {
-    List<Permission> permissions = new ArrayList<>();
-
-    permissions.add(
-      Permission.builder()
-        .id(1L)
-        .name("USER_READ")
-        .resource("USER")
-        .action("READ")
-        .build()
-    );
-
-    permissions.add(
-      Permission.builder()
-        .id(2L)
-        .name("PRODUCT_READ")
-        .resource("PRODUCT")
-        .action("READ")
-        .build()
-    );
-
-    return permissions;
-  }
-
-  private List<Role> createTestRoles() {
-    List<Role> roles = new ArrayList<>();
-
-    roles.add(
-      Role.builder()
-        .id(1L)
-        .name("ADMIN")
-        .description("Administrator role")
-        .permissions(new HashSet<>(createTestPermissions()))
-        .build()
-    );
-
-    roles.add(
-      Role.builder()
-        .id(2L)
-        .name("EMPLOYEE")
-        .description("Employee role")
-        .permissions(new HashSet<>())
-        .build()
-    );
-
-    return roles;
-  }
-
   private List<User> createTestUsers() {
-    List<User> users = new ArrayList<>();
-    Role adminRole = createTestRoles().get(0);
-    Set<Role> roles = new HashSet<>();
-    roles.add(adminRole);
+    User adminUser = User.builder()
+      .id(1L)
+      .email("admin@example.com")
+      .name("Admin User")
+      .password("encoded-password")
+      .status(UserStatus.ACTIVE)
+      .role(UserRole.ADMINISTRATOR)
+      .build();
 
-    users.add(
-      User.builder()
-        .id(1L)
-        .email("admin@example.com")
-        .name("Admin User")
-        .roles(roles)
-        .status(User.UserStatus.ACTIVE)
-        .password("encoded-password")
-        .build()
-    );
+    User employeeUser = User.builder()
+      .id(2L)
+      .email("employee@example.com")
+      .name("Employee User")
+      .password("encoded-password")
+      .status(UserStatus.ACTIVE)
+      .role(UserRole.EMPLOYEE)
+      .build();
 
-    users.add(
-      User.builder()
-        .id(2L)
-        .email("user@example.com")
-        .name("Regular User")
-        .roles(roles)
-        .status(User.UserStatus.ACTIVE)
-        .password("encoded-password")
-        .build()
-    );
-
-    return users;
+    return List.of(adminUser, employeeUser);
   }
 }

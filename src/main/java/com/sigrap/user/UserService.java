@@ -1,14 +1,11 @@
 package com.sigrap.user;
 
-import com.sigrap.role.Role;
-import com.sigrap.role.RoleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
@@ -33,7 +30,6 @@ public class UserService implements UserDetailsService {
    */
   private final UserRepository userRepository;
   private final UserMapper userMapper;
-  private final RoleRepository roleRepository;
   private static final long PASSWORD_RESET_EXPIRY_MINUTES = 30;
   private static final int MAX_FAILED_ATTEMPTS = 5;
 
@@ -151,10 +147,6 @@ public class UserService implements UserDetailsService {
     }
 
     userMapper.updateEntityFromData(user, userData);
-
-    if (userData.getRoleIds() != null) {
-      userMapper.updateRoles(user, userData.getRoleIds());
-    }
 
     com.sigrap.user.User updatedUser = userRepository.save(user);
     return userMapper.toInfo(updatedUser);
@@ -287,8 +279,8 @@ public class UserService implements UserDetailsService {
     user.setPasswordResetToken(null);
     user.setPasswordResetExpiry(null);
     user.setFailedAttempts(0);
-    if (user.getStatus() == com.sigrap.user.User.UserStatus.LOCKED) {
-      user.setStatus(com.sigrap.user.User.UserStatus.ACTIVE);
+    if (user.getStatus() == UserStatus.LOCKED) {
+      user.setStatus(UserStatus.ACTIVE);
     }
 
     com.sigrap.user.User updatedUser = userRepository.save(user);
@@ -308,7 +300,7 @@ public class UserService implements UserDetailsService {
       .findById(id)
       .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
 
-    user.setStatus(com.sigrap.user.User.UserStatus.LOCKED);
+    user.setStatus(UserStatus.LOCKED);
     com.sigrap.user.User updatedUser = userRepository.save(user);
     return userMapper.toInfo(updatedUser);
   }
@@ -326,7 +318,7 @@ public class UserService implements UserDetailsService {
       .findById(id)
       .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
 
-    user.setStatus(com.sigrap.user.User.UserStatus.ACTIVE);
+    user.setStatus(UserStatus.ACTIVE);
     user.setFailedAttempts(0);
     com.sigrap.user.User updatedUser = userRepository.save(user);
     return userMapper.toInfo(updatedUser);
@@ -343,13 +335,11 @@ public class UserService implements UserDetailsService {
   public boolean registerFailedLogin(String email) {
     com.sigrap.user.User user = userRepository.findByEmail(email).orElse(null);
 
-    if (
-      user != null && user.getStatus() == com.sigrap.user.User.UserStatus.ACTIVE
-    ) {
+    if (user != null && user.getStatus() == UserStatus.ACTIVE) {
       user.setFailedAttempts(user.getFailedAttempts() + 1);
 
       if (user.getFailedAttempts() >= MAX_FAILED_ATTEMPTS) {
-        user.setStatus(com.sigrap.user.User.UserStatus.LOCKED);
+        user.setStatus(UserStatus.LOCKED);
         userRepository.save(user);
         return true;
       }
@@ -374,74 +364,5 @@ public class UserService implements UserDetailsService {
       ZonedDateTime.now(ZoneId.of("America/Bogota")).toLocalDateTime()
     );
     userRepository.save(user);
-  }
-
-  /**
-   * Gets the roles assigned to a user.
-   *
-   * @param id The ID of the user
-   * @return Set of roles assigned to the user
-   * @throws EntityNotFoundException if the user is not found
-   */
-  @Transactional(readOnly = true)
-  public Set<Role> getRoles(Long id) {
-    com.sigrap.user.User user = userRepository
-      .findById(id)
-      .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
-    return user.getRoles();
-  }
-
-  /**
-   * Assigns a role to a user.
-   *
-   * @param userId The ID of the user
-   * @param roleId The ID of the role to assign
-   * @return UserInfo containing the updated user information
-   * @throws EntityNotFoundException if the user or role is not found
-   */
-  @Transactional
-  public UserInfo assignRole(Long userId, Long roleId) {
-    com.sigrap.user.User user = userRepository
-      .findById(userId)
-      .orElseThrow(() ->
-        new EntityNotFoundException("User not found: " + userId)
-      );
-
-    Role role = roleRepository
-      .findById(roleId)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Role not found: " + roleId)
-      );
-
-    user.getRoles().add(role);
-    com.sigrap.user.User updatedUser = userRepository.save(user);
-    return userMapper.toInfo(updatedUser);
-  }
-
-  /**
-   * Removes a role from a user.
-   *
-   * @param userId The ID of the user
-   * @param roleId The ID of the role to remove
-   * @return UserInfo containing the updated user information
-   * @throws EntityNotFoundException if the user or role is not found
-   */
-  @Transactional
-  public UserInfo removeRole(Long userId, Long roleId) {
-    com.sigrap.user.User user = userRepository
-      .findById(userId)
-      .orElseThrow(() ->
-        new EntityNotFoundException("User not found: " + userId)
-      );
-
-    Role role = roleRepository
-      .findById(roleId)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Role not found: " + roleId)
-      );
-
-    user.getRoles().remove(role);
-    com.sigrap.user.User updatedUser = userRepository.save(user);
-    return userMapper.toInfo(updatedUser);
   }
 }

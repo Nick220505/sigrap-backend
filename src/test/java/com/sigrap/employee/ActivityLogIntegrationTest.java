@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sigrap.common.TestUtils;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
+import com.sigrap.user.UserStatus;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,7 @@ class ActivityLogIntegrationTest {
       .name("John Doe")
       .email("john" + System.currentTimeMillis() + "@example.com")
       .password("password")
-      .status(User.UserStatus.ACTIVE)
+      .status(UserStatus.ACTIVE)
       .build();
     user = userRepository.save(user);
 

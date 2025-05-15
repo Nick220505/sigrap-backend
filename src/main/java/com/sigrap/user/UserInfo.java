@@ -1,9 +1,7 @@
 package com.sigrap.user;
 
-import com.sigrap.role.RoleInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -51,7 +49,7 @@ public class UserInfo {
    * Current status of the user's account.
    */
   @Schema(description = "User's account status", example = "ACTIVE")
-  private User.UserStatus status;
+  private UserStatus status;
 
   /**
    * Timestamp of the user's last successful login.
@@ -60,8 +58,8 @@ public class UserInfo {
   private LocalDateTime lastLogin;
 
   /**
-   * Collection of roles assigned to this user.
+   * Role assigned to this user.
    */
-  @Schema(description = "User roles")
-  private Set<RoleInfo> roles;
+  @Schema(description = "User role", example = "EMPLOYEE")
+  private UserRole role;
 }

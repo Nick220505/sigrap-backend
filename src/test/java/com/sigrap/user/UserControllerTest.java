@@ -15,10 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sigrap.role.RoleInfo;
-import com.sigrap.user.User.UserStatus;
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,19 +51,13 @@ class UserControllerTest {
     objectMapper = new ObjectMapper();
     mockMvc = standaloneSetup(new UserController(userService)).build();
 
-    RoleInfo role = RoleInfo.builder()
-      .id(1L)
-      .name("ADMIN")
-      .description("Administrator role")
-      .build();
-
     userInfo = UserInfo.builder()
       .id(1L)
       .name("Test User")
       .email("test@example.com")
       .phone("1234567890")
       .status(UserStatus.ACTIVE)
-      .roles(Set.of(role))
+      .role(UserRole.ADMINISTRATOR)
       .build();
 
     userData = UserData.builder()
@@ -75,7 +66,7 @@ class UserControllerTest {
       .password("password123")
       .phone("1234567890")
       .status(UserStatus.ACTIVE)
-      .roleIds(Set.of(1L))
+      .role(UserRole.ADMINISTRATOR)
       .build();
 
     SecurityContextHolder.setContext(securityContext);
@@ -95,8 +86,7 @@ class UserControllerTest {
       .andExpect(jsonPath("$[0].id").value(1))
       .andExpect(jsonPath("$[0].name").value("Test User"))
       .andExpect(jsonPath("$[0].email").value("test@example.com"))
-      .andExpect(jsonPath("$[0].roles", hasSize(1)))
-      .andExpect(jsonPath("$[0].roles[0].name").value("ADMIN"));
+      .andExpect(jsonPath("$[0].role").value("ADMINISTRATOR"));
   }
 
   @Test
@@ -110,8 +100,7 @@ class UserControllerTest {
       .andExpect(jsonPath("$.id").value(1))
       .andExpect(jsonPath("$.name").value("Test User"))
       .andExpect(jsonPath("$.email").value("test@example.com"))
-      .andExpect(jsonPath("$.roles", hasSize(1)))
-      .andExpect(jsonPath("$.roles[0].name").value("ADMIN"));
+      .andExpect(jsonPath("$.role").value("ADMINISTRATOR"));
   }
 
   @Test
@@ -129,8 +118,7 @@ class UserControllerTest {
       .andExpect(jsonPath("$.id").value(1))
       .andExpect(jsonPath("$.name").value("Test User"))
       .andExpect(jsonPath("$.email").value("test@example.com"))
-      .andExpect(jsonPath("$.roles", hasSize(1)))
-      .andExpect(jsonPath("$.roles[0].name").value("ADMIN"));
+      .andExpect(jsonPath("$.role").value("ADMINISTRATOR"));
   }
 
   @Test

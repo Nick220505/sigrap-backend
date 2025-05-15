@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.sigrap.user.User;
-import com.sigrap.user.User.UserStatus;
 import com.sigrap.user.UserRepository;
+import com.sigrap.user.UserStatus;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;

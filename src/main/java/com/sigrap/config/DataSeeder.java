@@ -18,12 +18,8 @@ import com.sigrap.employee.ScheduleRepository;
 import com.sigrap.payment.Payment;
 import com.sigrap.payment.PaymentRepository;
 import com.sigrap.payment.PaymentStatus;
-import com.sigrap.permission.Permission;
-import com.sigrap.permission.PermissionRepository;
 import com.sigrap.product.Product;
 import com.sigrap.product.ProductRepository;
-import com.sigrap.role.Role;
-import com.sigrap.role.RoleRepository;
 import com.sigrap.supplier.PaymentMethod;
 import com.sigrap.supplier.PurchaseOrder;
 import com.sigrap.supplier.PurchaseOrderItem;
@@ -38,14 +34,14 @@ import com.sigrap.user.UserNotificationPreference;
 import com.sigrap.user.UserNotificationPreference.NotificationType;
 import com.sigrap.user.UserNotificationPreferenceRepository;
 import com.sigrap.user.UserRepository;
+import com.sigrap.user.UserRole;
+import com.sigrap.user.UserStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -90,18 +86,6 @@ public class DataSeeder implements CommandLineRunner {
    * Used to check if users exist and to save new user accounts during seeding.
    */
   private final UserRepository userRepository;
-
-  /**
-   * Repository for role database operations.
-   * Used to check if roles exist and to save new roles during seeding.
-   */
-  private final RoleRepository roleRepository;
-
-  /**
-   * Repository for permission database operations.
-   * Used to check if permissions exist and to save new permissions during seeding.
-   */
-  private final PermissionRepository permissionRepository;
 
   /**
    * Repository for user notification preference database operations.
@@ -190,8 +174,6 @@ public class DataSeeder implements CommandLineRunner {
     log.info("Starting data seeding...");
     seedCategories();
     seedProducts();
-    seedPermissions();
-    seedRoles();
     seedUsers();
     seedUserNotificationPreferences();
     seedEmployees();
@@ -208,6 +190,8 @@ public class DataSeeder implements CommandLineRunner {
   }
 
   /**
+   * Seeds initial user accounts into the database.
+   * Creates default administrative and employee accounts with secure passwords.
    * Seeds initial product categories into the database.
    * Creates a comprehensive set of categories covering different types of stationery items.
    * Only executes if the categories table is empty.
@@ -780,307 +764,26 @@ public class DataSeeder implements CommandLineRunner {
     if (userRepository.count() == 0) {
       log.info("Seeding users...");
 
-      List<Role> roles = roleRepository.findAll();
-      Set<Role> adminRoles = new HashSet<>();
-      Set<Role> employeeRoles = new HashSet<>();
-
-      if (!roles.isEmpty()) {
-        roles
-          .stream()
-          .filter(role -> role.getName().equals("Administrador"))
-          .findFirst()
-          .ifPresent(adminRoles::add);
-
-        roles
-          .stream()
-          .filter(role -> role.getName().equals("Empleado"))
-          .findFirst()
-          .ifPresent(employeeRoles::add);
-      }
-
       User adminUser = User.builder()
         .name("Rosita González")
         .email("rosita@sigrap.com")
         .password(passwordEncoder.encode("Rosita123*"))
-        .status(User.UserStatus.ACTIVE)
-        .roles(adminRoles)
+        .status(UserStatus.ACTIVE)
+        .role(UserRole.ADMINISTRATOR)
         .build();
 
       User employeeUser = User.builder()
         .name("Gladys Mendoza")
         .email("gladys@sigrap.com")
         .password(passwordEncoder.encode("Gladys123*"))
-        .status(User.UserStatus.ACTIVE)
-        .roles(employeeRoles)
+        .status(UserStatus.ACTIVE)
+        .role(UserRole.EMPLOYEE)
         .build();
 
       userRepository.saveAll(List.of(adminUser, employeeUser));
       log.info("Users seeded successfully.");
     } else {
       log.info("Users already exist, skipping seeding.");
-    }
-  }
-
-  /**
-   * Seeds initial permissions into the database.
-   * Creates a set of basic permissions for different resources and actions.
-   * Only executes if the permissions table is empty.
-   */
-  private void seedPermissions() {
-    if (permissionRepository.count() == 0) {
-      log.info("Seeding permissions...");
-
-      LocalDateTime now = LocalDateTime.now();
-
-      permissionRepository.saveAll(
-        List.of(
-          Permission.builder()
-            .name("USER_READ")
-            .description("Permission to read user information")
-            .resource("USER")
-            .action("READ")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("USER_CREATE")
-            .description("Permission to create new users")
-            .resource("USER")
-            .action("CREATE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("USER_UPDATE")
-            .description("Permission to update user information")
-            .resource("USER")
-            .action("UPDATE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("USER_DELETE")
-            .description("Permission to delete users")
-            .resource("USER")
-            .action("DELETE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("PRODUCT_READ")
-            .description("Permission to read product information")
-            .resource("PRODUCT")
-            .action("READ")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("PRODUCT_CREATE")
-            .description("Permission to create new products")
-            .resource("PRODUCT")
-            .action("CREATE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("PRODUCT_UPDATE")
-            .description("Permission to update product information")
-            .resource("PRODUCT")
-            .action("UPDATE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("PRODUCT_DELETE")
-            .description("Permission to delete products")
-            .resource("PRODUCT")
-            .action("DELETE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("CATEGORY_READ")
-            .description("Permission to read category information")
-            .resource("CATEGORY")
-            .action("READ")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("CATEGORY_CREATE")
-            .description("Permission to create new categories")
-            .resource("CATEGORY")
-            .action("CREATE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("CATEGORY_UPDATE")
-            .description("Permission to update category information")
-            .resource("CATEGORY")
-            .action("UPDATE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("CATEGORY_DELETE")
-            .description("Permission to delete categories")
-            .resource("CATEGORY")
-            .action("DELETE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("CLIENT_READ")
-            .description("Permission to read client information")
-            .resource("CLIENT")
-            .action("READ")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("CLIENT_CREATE")
-            .description("Permission to create new clients")
-            .resource("CLIENT")
-            .action("CREATE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("CLIENT_UPDATE")
-            .description("Permission to update client information")
-            .resource("CLIENT")
-            .action("UPDATE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("CLIENT_DELETE")
-            .description("Permission to delete clients")
-            .resource("CLIENT")
-            .action("DELETE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("ROLE_READ")
-            .description("Permission to read role information")
-            .resource("ROLE")
-            .action("READ")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("ROLE_CREATE")
-            .description("Permission to create new roles")
-            .resource("ROLE")
-            .action("CREATE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("ROLE_UPDATE")
-            .description("Permission to update role information")
-            .resource("ROLE")
-            .action("UPDATE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("ROLE_DELETE")
-            .description("Permission to delete roles")
-            .resource("ROLE")
-            .action("DELETE")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("PERMISSION_READ")
-            .description("Permission to read permission information")
-            .resource("PERMISSION")
-            .action("READ")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("PERMISSION_ASSIGN")
-            .description("Permission to assign permissions to roles")
-            .resource("PERMISSION")
-            .action("ASSIGN")
-            .createdAt(now)
-            .updatedAt(now)
-            .build(),
-          Permission.builder()
-            .name("AUDIT_READ")
-            .description("Permission to read audit logs")
-            .resource("AUDIT")
-            .action("READ")
-            .createdAt(now)
-            .updatedAt(now)
-            .build()
-        )
-      );
-
-      log.info("Permissions seeded successfully.");
-    } else {
-      log.info("Permissions already exist, skipping seeding.");
-    }
-  }
-
-  /**
-   * Seeds initial roles into the database.
-   * Creates standard roles with appropriate permissions.
-   * Only executes if the roles table is empty.
-   */
-  private void seedRoles() {
-    if (roleRepository.count() == 0) {
-      log.info("Seeding roles...");
-
-      LocalDateTime now = LocalDateTime.now();
-
-      List<Permission> permissions = permissionRepository.findAll();
-      if (permissions.isEmpty()) {
-        log.warn("No permissions found for role seeding.");
-        return;
-      }
-
-      Role adminRole = Role.builder()
-        .name("Administrador")
-        .description("Rol de Administrador con acceso total al sistema")
-        .permissions(new HashSet<>(permissions))
-        .createdAt(now)
-        .updatedAt(now)
-        .build();
-
-      Set<Permission> employeePermissions = new HashSet<>();
-      permissions
-        .stream()
-        .filter(
-          p ->
-            p.getAction().equals("READ") ||
-            (p.getResource().equals("PRODUCT") &&
-              !p.getAction().equals("DELETE")) ||
-            (p.getResource().equals("CATEGORY") &&
-              !p.getAction().equals("DELETE")) ||
-            (p.getResource().equals("CLIENT") &&
-              (p.getAction().equals("READ") ||
-                p.getAction().equals("CREATE") ||
-                p.getAction().equals("UPDATE")))
-        )
-        .forEach(employeePermissions::add);
-
-      Role employeeRole = Role.builder()
-        .name("Empleado")
-        .description("Rol de Empleado con acceso limitado al sistema")
-        .permissions(employeePermissions)
-        .createdAt(now)
-        .updatedAt(now)
-        .build();
-
-      roleRepository.saveAll(List.of(adminRole, employeeRole));
-      log.info("Roles seeded successfully.");
-    } else {
-      log.info("Roles already exist, skipping seeding.");
     }
   }
 

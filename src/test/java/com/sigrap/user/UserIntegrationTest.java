@@ -12,10 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sigrap.role.RoleInfo;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,19 +41,13 @@ class UserIntegrationTest {
   void setUp() {
     mockMvc = standaloneSetup(userController).build();
 
-    RoleInfo roleInfo = RoleInfo.builder()
-      .id(1L)
-      .name("TEST_ROLE")
-      .description("Test role")
-      .build();
-
     testUserInfo = UserInfo.builder()
       .id(1L)
       .name("Test User")
       .email("test@example.com")
       .phone("1234567890")
-      .status(User.UserStatus.ACTIVE)
-      .roles(Set.of(roleInfo))
+      .status(UserStatus.ACTIVE)
+      .role(UserRole.ADMINISTRATOR)
       .build();
   }
 
@@ -90,8 +82,8 @@ class UserIntegrationTest {
       .email("newuser@example.com")
       .password("password123")
       .phone("9876543210")
-      .status(User.UserStatus.ACTIVE)
-      .roleIds(Set.of(1L))
+      .status(UserStatus.ACTIVE)
+      .role(UserRole.EMPLOYEE)
       .build();
 
     UserInfo newUserInfo = UserInfo.builder()
@@ -100,7 +92,7 @@ class UserIntegrationTest {
       .email(userData.getEmail())
       .phone(userData.getPhone())
       .status(userData.getStatus())
-      .roles(Set.of(RoleInfo.builder().id(1L).name("TEST_ROLE").build()))
+      .role(userData.getRole())
       .build();
 
     when(userService.create(any(UserData.class))).thenReturn(newUserInfo);
@@ -122,7 +114,8 @@ class UserIntegrationTest {
       .name("Updated User")
       .email("updated@example.com")
       .phone("5555555555")
-      .status(User.UserStatus.ACTIVE)
+      .status(UserStatus.ACTIVE)
+      .role(UserRole.EMPLOYEE)
       .build();
 
     UserInfo updatedUserInfo = UserInfo.builder()
@@ -131,6 +124,7 @@ class UserIntegrationTest {
       .email(userData.getEmail())
       .phone(userData.getPhone())
       .status(userData.getStatus())
+      .role(userData.getRole())
       .build();
 
     when(userService.update(eq(1L), any(UserData.class))).thenReturn(
@@ -199,7 +193,7 @@ class UserIntegrationTest {
       .id(1L)
       .name("Test User")
       .email("test@example.com")
-      .status(User.UserStatus.LOCKED)
+      .status(UserStatus.LOCKED)
       .build();
 
     when(userService.lockAccount(1L)).thenReturn(lockedUserInfo);
@@ -215,7 +209,7 @@ class UserIntegrationTest {
       .id(1L)
       .name("Test User")
       .email("test@example.com")
-      .status(User.UserStatus.ACTIVE)
+      .status(UserStatus.ACTIVE)
       .build();
 
     when(userService.unlockAccount(1L)).thenReturn(unlockedUserInfo);

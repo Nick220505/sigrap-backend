@@ -2,6 +2,7 @@ package com.sigrap.config;
 
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
+import com.sigrap.user.UserRole;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -60,20 +61,13 @@ public class SecurityUtils {
   }
 
   /**
-   * Checks if the current user has a specific role.
+   * Checks if the current user has the specified role.
    *
-   * @param roleName The name of the role to check
+   * @param role The role to check
    * @return true if the user has the role, false otherwise
    */
-  public boolean hasRole(String roleName) {
-    return getCurrentUser()
-      .map(user ->
-        user
-          .getRoles()
-          .stream()
-          .anyMatch(role -> role.getName().equals(roleName))
-      )
-      .orElse(false);
+  public boolean hasRole(UserRole role) {
+    return getCurrentUser().map(user -> user.getRole() == role).orElse(false);
   }
 
   /**
@@ -91,6 +85,9 @@ public class SecurityUtils {
 
   /**
    * Checks if the current user has permission for a specific resource and action.
+   * This method implements a simplified role-based permission system where:
+   * - Administrators have access to everything
+   * - Employees have read access to most resources, and create/update access to products/categories/customers
    *
    * @param resource The resource to check permissions for
    * @param action The action to check permissions for
@@ -98,17 +95,36 @@ public class SecurityUtils {
    */
   public boolean hasPermission(String resource, String action) {
     return getCurrentUser()
-      .map(user ->
-        user
-          .getRoles()
-          .stream()
-          .flatMap(role -> role.getPermissions().stream())
-          .anyMatch(
-            permission ->
-              permission.getResource().equalsIgnoreCase(resource) &&
-              permission.getAction().equalsIgnoreCase(action)
-          )
-      )
+      .map(user -> {
+        if (user.getRole() == UserRole.ADMINISTRATOR) {
+          return true;
+        }
+
+        if (user.getRole() == UserRole.EMPLOYEE) {
+          if (action.equalsIgnoreCase("READ")) {
+            return true;
+          }
+
+          if (
+            (resource.equalsIgnoreCase("Product") ||
+              resource.equalsIgnoreCase("Category")) &&
+            (action.equalsIgnoreCase("CREATE") ||
+              action.equalsIgnoreCase("UPDATE"))
+          ) {
+            return true;
+          }
+
+          if (
+            resource.equalsIgnoreCase("Customer") &&
+            (action.equalsIgnoreCase("CREATE") ||
+              action.equalsIgnoreCase("UPDATE"))
+          ) {
+            return true;
+          }
+        }
+
+        return false;
+      })
       .orElse(false);
   }
 }

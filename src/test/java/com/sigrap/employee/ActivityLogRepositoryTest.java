@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sigrap.config.RepositoryTestConfiguration;
 import com.sigrap.user.User;
+import com.sigrap.user.UserStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +43,7 @@ class ActivityLogRepositoryTest {
       .name("John Doe")
       .email("john@example.com")
       .password("password")
-      .status(User.UserStatus.ACTIVE)
+      .status(UserStatus.ACTIVE)
       .build();
     user = entityManager.persist(user);
 

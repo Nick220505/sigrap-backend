@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sigrap.config.RepositoryTestConfiguration;
 import com.sigrap.user.User;
+import com.sigrap.user.UserStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +41,7 @@ class AttendanceRepositoryTest {
       .name("John Doe")
       .email(uniqueEmail)
       .password("password")
-      .status(User.UserStatus.ACTIVE)
+      .status(UserStatus.ACTIVE)
       .build();
     entityManager.persist(user);
 

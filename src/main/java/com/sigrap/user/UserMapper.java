@@ -1,14 +1,6 @@
 package com.sigrap.user;
 
-import com.sigrap.role.Role;
-import com.sigrap.role.RoleInfo;
-import com.sigrap.role.RoleMapper;
-import com.sigrap.role.RoleRepository;
-import jakarta.persistence.EntityNotFoundException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,8 +14,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserMapper {
 
-  private final RoleRepository roleRepository;
-  private final RoleMapper roleMapper;
   private final PasswordEncoder passwordEncoder;
 
   /**
@@ -37,14 +27,6 @@ public class UserMapper {
       return null;
     }
 
-    Set<RoleInfo> roleInfos = user.getRoles() != null
-      ? user
-        .getRoles()
-        .stream()
-        .map(roleMapper::toInfo)
-        .collect(Collectors.toSet())
-      : Collections.emptySet();
-
     return UserInfo.builder()
       .id(user.getId())
       .name(user.getName())
@@ -52,7 +34,7 @@ public class UserMapper {
       .phone(user.getPhone())
       .status(user.getStatus())
       .lastLogin(user.getLastLogin())
-      .roles(roleInfos)
+      .role(user.getRole())
       .build();
   }
 
@@ -81,32 +63,15 @@ public class UserMapper {
       return null;
     }
 
-    Set<Role> roles = new HashSet<>();
-    if (userData.getRoleIds() != null && !userData.getRoleIds().isEmpty()) {
-      roles = userData
-        .getRoleIds()
-        .stream()
-        .map(roleId ->
-          roleRepository
-            .findById(roleId)
-            .orElseThrow(() ->
-              new EntityNotFoundException("Role not found: " + roleId)
-            )
-        )
-        .collect(Collectors.toSet());
-    }
-
     return User.builder()
       .name(userData.getName())
       .email(userData.getEmail())
       .password(passwordEncoder.encode(userData.getPassword()))
       .phone(userData.getPhone())
       .status(
-        userData.getStatus() != null
-          ? userData.getStatus()
-          : User.UserStatus.ACTIVE
+        userData.getStatus() != null ? userData.getStatus() : UserStatus.ACTIVE
       )
-      .roles(roles)
+      .role(userData.getRole() != null ? userData.getRole() : UserRole.EMPLOYEE)
       .failedAttempts(0)
       .build();
   }
@@ -141,30 +106,9 @@ public class UserMapper {
     if (userData.getStatus() != null) {
       user.setStatus(userData.getStatus());
     }
-  }
 
-  /**
-   * Updates the roles of a User entity.
-   *
-   * @param user The User entity to update
-   * @param roleIds The set of role IDs to assign
-   */
-  public void updateRoles(User user, Set<Long> roleIds) {
-    if (user == null || roleIds == null) {
-      return;
+    if (userData.getRole() != null) {
+      user.setRole(userData.getRole());
     }
-
-    Set<Role> roles = roleIds
-      .stream()
-      .map(roleId ->
-        roleRepository
-          .findById(roleId)
-          .orElseThrow(() ->
-            new EntityNotFoundException("Role not found: " + roleId)
-          )
-      )
-      .collect(Collectors.toSet());
-
-    user.setRoles(roles);
   }
 }

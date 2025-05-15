@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -59,11 +58,11 @@ public class UserData {
    * Account status of the user.
    */
   @Schema(description = "User's account status", example = "ACTIVE")
-  private User.UserStatus status;
+  private UserStatus status;
 
   /**
-   * IDs of roles to assign to the user.
+   * Role of the user.
    */
-  @Schema(description = "Role IDs to assign to the user", example = "[1, 2]")
-  private Set<Long> roleIds;
+  @Schema(description = "User's role", example = "EMPLOYEE")
+  private UserRole role;
 }

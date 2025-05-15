@@ -314,44 +314,6 @@ public class UserController {
   }
 
   /**
-   * Assigns a role to a user.
-   *
-   * @param userId The ID of the user
-   * @param roleId The ID of the role to assign
-   * @return The updated user information
-   */
-  @PutMapping("/{userId}/roles/{roleId}")
-  @Operation(
-    summary = "Assign role to user",
-    description = "Assigns a role to a user"
-  )
-  public UserInfo assignRole(
-    @Parameter(description = "User ID") @PathVariable Long userId,
-    @Parameter(description = "Role ID") @PathVariable Long roleId
-  ) {
-    return userService.assignRole(userId, roleId);
-  }
-
-  /**
-   * Removes a role from a user.
-   *
-   * @param userId The ID of the user
-   * @param roleId The ID of the role to remove
-   * @return The updated user information
-   */
-  @DeleteMapping("/{userId}/roles/{roleId}")
-  @Operation(
-    summary = "Remove role from user",
-    description = "Removes a role from a user"
-  )
-  public UserInfo removeRole(
-    @Parameter(description = "User ID") @PathVariable Long userId,
-    @Parameter(description = "Role ID") @PathVariable Long roleId
-  ) {
-    return userService.removeRole(userId, roleId);
-  }
-
-  /**
    * Resets a user's password by ID.
    *
    * @param id The ID of the user to reset the password for

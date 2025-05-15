@@ -1,12 +1,13 @@
 package com.sigrap.employee;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.sigrap.config.RepositoryTestConfiguration;
 import com.sigrap.user.User;
-import com.sigrap.user.User.UserStatus;
+import com.sigrap.user.UserStatus;
 
 @DataJpaTest
 @ActiveProfiles("test")

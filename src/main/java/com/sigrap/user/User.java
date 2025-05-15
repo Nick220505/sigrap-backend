@@ -1,6 +1,5 @@
 package com.sigrap.user;
 
-import com.sigrap.role.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,9 +7,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
@@ -18,7 +14,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -84,6 +79,13 @@ public class User implements UserDetails {
   private UserStatus status = UserStatus.ACTIVE;
 
   /**
+   * The role of the user in the system.
+   */
+  @Enumerated(EnumType.STRING)
+  @Builder.Default
+  private UserRole role = UserRole.EMPLOYEE;
+
+  /**
    * Timestamp of the user's last successful login.
    */
   @Column(name = "last_login")
@@ -108,19 +110,6 @@ public class User implements UserDetails {
   private LocalDateTime passwordResetExpiry;
 
   /**
-   * Collection of roles assigned to this user.
-   * Many-to-many relationship with Role.
-   */
-  @ManyToMany
-  @JoinTable(
-    name = "user_roles",
-    joinColumns = @JoinColumn(name = "user_id"),
-    inverseJoinColumns = @JoinColumn(name = "role_id")
-  )
-  @Builder.Default
-  private Set<Role> roles = new HashSet<>();
-
-  /**
    * Collection of notification preferences for this user.
    * One-to-many relationship with UserNotificationPreference.
    * Excluded from equals/hashCode to prevent LazyInitializationException.
@@ -131,32 +120,9 @@ public class User implements UserDetails {
   private Set<UserNotificationPreference> notificationPreferences =
     new HashSet<>();
 
-  /**
-   * Enum representing possible user account statuses.
-   */
-  public enum UserStatus {
-    /**
-     * User account is active and can be used for login.
-     */
-    ACTIVE,
-
-    /**
-     * User account is locked due to security concerns or policy violations.
-     */
-    LOCKED,
-
-    /**
-     * User account is inactive and cannot be used for login.
-     */
-    INACTIVE,
-  }
-
   @Override
   public Set<GrantedAuthority> getAuthorities() {
-    return roles
-      .stream()
-      .map(role -> new SimpleGrantedAuthority(role.getName()))
-      .collect(Collectors.toSet());
+    return Set.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
   }
 
   @Override

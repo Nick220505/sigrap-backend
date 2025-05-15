@@ -10,8 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sigrap.user.User;
-import com.sigrap.user.User.UserStatus;
 import com.sigrap.user.UserRepository;
+import com.sigrap.user.UserStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;

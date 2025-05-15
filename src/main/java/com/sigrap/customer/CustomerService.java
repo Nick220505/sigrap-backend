@@ -90,7 +90,6 @@ public class CustomerService {
         new EntityNotFoundException("Customer not found with ID: " + id)
       );
 
-    // Check if email is being changed and is already taken by another customer
     if (
       !customer.getEmail().equals(customerData.getEmail()) &&
       customerRepository.existsByEmail(customerData.getEmail())

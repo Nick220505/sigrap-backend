@@ -1,12 +1,9 @@
 package com.sigrap.config;
 
-import com.sigrap.permission.Permission;
-import com.sigrap.role.Role;
 import com.sigrap.user.UserRepository;
+import com.sigrap.user.UserRole;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -14,8 +11,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 /**
- * Custom permission evaluator for evaluating permissions in SpEL expressions.
- * Used in @PreAuthorize annotations for fine-grained access control.
+ * Custom permission evaluator for evaluating role-based permissions in SpEL expressions.
+ * Used in @PreAuthorize annotations for access control.
+ *
+ * <p>This implementation provides a simplified role-based permission system where:
+ * <ul>
+ *   <li>Administrators have access to all resources and actions</li>
+ *   <li>Employees have read access to most resources</li>
+ *   <li>Employees have create/update access to specific resources (products, categories, customers)</li>
+ * </ul></p>
  */
 @Component
 @RequiredArgsConstructor
@@ -25,6 +29,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
   /**
    * Evaluates if the authenticated user has permission to perform an action on a target object.
+   * In this simplified implementation, administrators have access to everything,
+   * while specific permissions for employees are determined by the hasResourcePermission method.
    *
    * @param authentication The authentication object containing the user's credentials
    * @param targetDomainObject The target domain object to check permissions against
@@ -52,6 +58,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
   /**
    * Evaluates if the authenticated user has permission to perform an action on a target identified by ID.
+   * In this simplified implementation, administrators have access to everything,
+   * while specific permissions for employees are determined by the hasResourcePermission method.
    *
    * @param authentication The authentication object containing the user's credentials
    * @param targetId The ID of the target object
@@ -84,6 +92,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
   /**
    * Checks if a user has a specific permission for a resource and action.
+   * Administrators have access to all resources and actions.
+   * Employees have limited access based on predefined rules.
    *
    * @param username The username of the user
    * @param resource The resource to check permissions for
@@ -98,20 +108,34 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     return userRepository
       .findByEmail(username)
       .map(user -> {
-        Set<Permission> permissions = user
-          .getRoles()
-          .stream()
-          .map(Role::getPermissions)
-          .flatMap(Set::stream)
-          .collect(Collectors.toSet());
+        if (user.getRole() == UserRole.ADMINISTRATOR) {
+          return true;
+        }
 
-        return permissions
-          .stream()
-          .anyMatch(
-            p ->
-              p.getResource().equalsIgnoreCase(resource) &&
-              p.getAction().equalsIgnoreCase(action)
-          );
+        if (user.getRole() == UserRole.EMPLOYEE) {
+          if (action.equalsIgnoreCase("READ")) {
+            return true;
+          }
+
+          if (
+            (resource.equalsIgnoreCase("Product") ||
+              resource.equalsIgnoreCase("Category")) &&
+            (action.equalsIgnoreCase("CREATE") ||
+              action.equalsIgnoreCase("UPDATE"))
+          ) {
+            return true;
+          }
+
+          if (
+            resource.equalsIgnoreCase("Customer") &&
+            (action.equalsIgnoreCase("CREATE") ||
+              action.equalsIgnoreCase("UPDATE"))
+          ) {
+            return true;
+          }
+        }
+
+        return false;
       })
       .orElse(false);
   }
