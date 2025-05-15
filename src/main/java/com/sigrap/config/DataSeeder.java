@@ -787,13 +787,13 @@ public class DataSeeder implements CommandLineRunner {
       if (!roles.isEmpty()) {
         roles
           .stream()
-          .filter(role -> role.getName().equals("ADMIN"))
+          .filter(role -> role.getName().equals("Administrador"))
           .findFirst()
           .ifPresent(adminRoles::add);
 
         roles
           .stream()
-          .filter(role -> role.getName().equals("EMPLOYEE"))
+          .filter(role -> role.getName().equals("Empleado"))
           .findFirst()
           .ifPresent(employeeRoles::add);
       }
