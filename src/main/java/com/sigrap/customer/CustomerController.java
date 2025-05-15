@@ -43,7 +43,7 @@ public class CustomerController {
    */
   @GetMapping
   @Operation(
-    summary = "Get all customers",
+    summary = "Find all customers",
     description = "Retrieves a list of all customers in the system",
     responses = {
       @ApiResponse(
@@ -54,19 +54,19 @@ public class CustomerController {
       @ApiResponse(responseCode = "403", description = "Forbidden"),
     }
   )
-  public List<CustomerInfo> getAll() {
+  public List<CustomerInfo> findAll() {
     return customerService.findAll();
   }
 
   /**
-   * Gets a customer by ID.
+   * Finds a customer by ID.
    *
    * @param id The ID of the customer to retrieve
    * @return The customer information
    */
   @GetMapping("/{id}")
   @Operation(
-    summary = "Get customer by ID",
+    summary = "Find customer by ID",
     description = "Retrieves a single customer by their ID",
     responses = {
       @ApiResponse(
@@ -78,7 +78,7 @@ public class CustomerController {
       @ApiResponse(responseCode = "403", description = "Forbidden"),
     }
   )
-  public CustomerInfo getById(
+  public CustomerInfo findById(
     @Parameter(
       description = "ID of the customer to retrieve",
       required = true
