@@ -106,7 +106,7 @@ public class EmployeeInfo {
    * Current status of the employee.
    */
   @Schema(description = "Current status of the employee", example = "ACTIVE")
-  private Employee.EmployeeStatus status;
+  private EmployeeStatus status;
 
   /**
    * URL of the employee's profile image.

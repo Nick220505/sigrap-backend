@@ -55,7 +55,7 @@ class EmployeeMapperTest {
       .position("Sales")
       .department("Sales")
       .hireDate(hireDate)
-      .status(Employee.EmployeeStatus.ACTIVE)
+      .status(EmployeeStatus.ACTIVE)
       .user(testUser)
       .build();
 
@@ -69,7 +69,7 @@ class EmployeeMapperTest {
       .position("Sales")
       .department("Sales")
       .hireDate(hireDate)
-      .status(Employee.EmployeeStatus.ACTIVE)
+      .status(EmployeeStatus.ACTIVE)
       .build();
 
     testEmployeeData = EmployeeData.builder()
@@ -153,7 +153,7 @@ class EmployeeMapperTest {
     assertEquals(testEmployeeData.getPosition(), result.getPosition());
     assertEquals(testEmployeeData.getDepartment(), result.getDepartment());
     assertEquals(testEmployeeData.getHireDate(), result.getHireDate());
-    assertEquals(Employee.EmployeeStatus.ACTIVE, result.getStatus());
+    assertEquals(EmployeeStatus.ACTIVE, result.getStatus());
   }
 
   @Test
@@ -185,7 +185,7 @@ class EmployeeMapperTest {
       .position("Old Position")
       .department("Old Department")
       .hireDate(LocalDateTime.now().minusDays(1))
-      .status(Employee.EmployeeStatus.ACTIVE)
+      .status(EmployeeStatus.ACTIVE)
       .user(testUser)
       .build();
 
@@ -229,7 +229,7 @@ class EmployeeMapperTest {
       .position("Old Position")
       .department("Old Department")
       .hireDate(LocalDateTime.now().minusDays(1))
-      .status(Employee.EmployeeStatus.ACTIVE)
+      .status(EmployeeStatus.ACTIVE)
       .user(testUser)
       .build();
 

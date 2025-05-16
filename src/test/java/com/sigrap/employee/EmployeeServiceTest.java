@@ -48,7 +48,7 @@ class EmployeeServiceTest {
       .position("Sales")
       .department("Sales")
       .hireDate(hireDate)
-      .status(Employee.EmployeeStatus.ACTIVE)
+      .status(EmployeeStatus.ACTIVE)
       .build();
 
     testEmployeeInfo = EmployeeInfo.builder()
@@ -61,7 +61,7 @@ class EmployeeServiceTest {
       .position("Sales")
       .department("Sales")
       .hireDate(hireDate)
-      .status(Employee.EmployeeStatus.ACTIVE)
+      .status(EmployeeStatus.ACTIVE)
       .build();
 
     testEmployeeData = EmployeeData.builder()
@@ -411,14 +411,14 @@ class EmployeeServiceTest {
     EmployeeInfo result = employeeService.activate(1L);
 
     assertNotNull(result);
-    assertEquals(Employee.EmployeeStatus.ACTIVE, result.getStatus());
+    assertEquals(EmployeeStatus.ACTIVE, result.getStatus());
 
     verify(employeeRepository).save(testEmployee);
   }
 
   @Test
   void activate_ShouldThrowIllegalStateException_WhenEmployeeIsTerminated() {
-    testEmployee.setStatus(Employee.EmployeeStatus.TERMINATED);
+    testEmployee.setStatus(EmployeeStatus.TERMINATED);
     when(employeeRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
 
     IllegalStateException exception = assertThrows(
@@ -434,21 +434,21 @@ class EmployeeServiceTest {
   @Test
   void deactivate_ShouldDeactivateEmployee() {
     when(employeeRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
-    testEmployeeInfo.setStatus(Employee.EmployeeStatus.INACTIVE);
+    testEmployeeInfo.setStatus(EmployeeStatus.INACTIVE);
     when(employeeRepository.save(any(Employee.class))).thenReturn(testEmployee);
     when(employeeMapper.toInfo(testEmployee)).thenReturn(testEmployeeInfo);
 
     EmployeeInfo result = employeeService.deactivate(1L);
 
     assertNotNull(result);
-    assertEquals(Employee.EmployeeStatus.INACTIVE, result.getStatus());
+    assertEquals(EmployeeStatus.INACTIVE, result.getStatus());
 
     verify(employeeRepository).save(testEmployee);
   }
 
   @Test
   void deactivate_ShouldThrowIllegalStateException_WhenEmployeeIsTerminated() {
-    testEmployee.setStatus(Employee.EmployeeStatus.TERMINATED);
+    testEmployee.setStatus(EmployeeStatus.TERMINATED);
     when(employeeRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
 
     IllegalStateException exception = assertThrows(
@@ -464,7 +464,7 @@ class EmployeeServiceTest {
   @Test
   void terminate_ShouldTerminateEmployee() {
     when(employeeRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
-    testEmployeeInfo.setStatus(Employee.EmployeeStatus.TERMINATED);
+    testEmployeeInfo.setStatus(EmployeeStatus.TERMINATED);
     testEmployeeInfo.setTerminationDate(LocalDateTime.now());
     when(employeeRepository.save(any(Employee.class))).thenReturn(testEmployee);
     when(employeeMapper.toInfo(testEmployee)).thenReturn(testEmployeeInfo);
@@ -472,7 +472,7 @@ class EmployeeServiceTest {
     EmployeeInfo result = employeeService.terminate(1L);
 
     assertNotNull(result);
-    assertEquals(Employee.EmployeeStatus.TERMINATED, result.getStatus());
+    assertEquals(EmployeeStatus.TERMINATED, result.getStatus());
     assertNotNull(result.getTerminationDate());
 
     verify(employeeRepository).save(testEmployee);
@@ -511,15 +511,15 @@ class EmployeeServiceTest {
 
   @Test
   void findByStatus_ShouldReturnEmployeesWithStatus() {
-    when(
-      employeeRepository.findByStatus(Employee.EmployeeStatus.ACTIVE)
-    ).thenReturn(List.of(testEmployee));
+    when(employeeRepository.findByStatus(EmployeeStatus.ACTIVE)).thenReturn(
+      List.of(testEmployee)
+    );
     when(employeeMapper.toInfoList(List.of(testEmployee))).thenReturn(
       List.of(testEmployeeInfo)
     );
 
     List<EmployeeInfo> result = employeeService.findByStatus(
-      Employee.EmployeeStatus.ACTIVE
+      EmployeeStatus.ACTIVE
     );
 
     assertNotNull(result);

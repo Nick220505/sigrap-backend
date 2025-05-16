@@ -9,6 +9,7 @@ import com.sigrap.employee.Attendance;
 import com.sigrap.employee.AttendanceRepository;
 import com.sigrap.employee.Employee;
 import com.sigrap.employee.EmployeeRepository;
+import com.sigrap.employee.EmployeeStatus;
 import com.sigrap.employee.Schedule;
 import com.sigrap.employee.ScheduleRepository;
 import com.sigrap.payment.Payment;
@@ -785,7 +786,7 @@ public class DataSeeder implements CommandLineRunner {
         .position("Gerente General")
         .department("Administración")
         .hireDate(LocalDateTime.now().minusYears(2))
-        .status(Employee.EmployeeStatus.ACTIVE)
+        .status(EmployeeStatus.ACTIVE)
         .build()
     );
 
@@ -804,7 +805,7 @@ public class DataSeeder implements CommandLineRunner {
         .position("Vendedor")
         .department("Ventas")
         .hireDate(LocalDateTime.now().minusMonths(6))
-        .status(Employee.EmployeeStatus.ACTIVE)
+        .status(EmployeeStatus.ACTIVE)
         .build()
     );
 

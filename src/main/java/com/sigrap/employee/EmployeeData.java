@@ -1,11 +1,10 @@
 package com.sigrap.employee;
 
-import java.time.LocalDateTime;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -129,5 +128,5 @@ public class EmployeeData {
    * Status of the employee.
    */
   @Schema(description = "Status of the employee")
-  private Employee.EmployeeStatus status;
+  private EmployeeStatus status;
 }

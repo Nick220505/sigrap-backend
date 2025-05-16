@@ -50,7 +50,7 @@ class ScheduleRepositoryTest {
       .position("Sales")
       .department("Sales")
       .hireDate(LocalDateTime.now().withNano(0))
-      .status(Employee.EmployeeStatus.ACTIVE)
+      .status(EmployeeStatus.ACTIVE)
       .user(user)
       .build();
     employee = entityManager.persist(employee);

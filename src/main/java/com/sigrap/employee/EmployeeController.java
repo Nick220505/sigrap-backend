@@ -337,7 +337,7 @@ public class EmployeeController {
   public List<EmployeeInfo> findByStatus(
     @Parameter(
       description = "Status to search for"
-    ) @PathVariable Employee.EmployeeStatus status
+    ) @PathVariable EmployeeStatus status
   ) {
     return employeeService.findByStatus(status);
   }
@@ -395,7 +395,7 @@ public class EmployeeController {
     ) @PathVariable String department,
     @Parameter(
       description = "Status to search for"
-    ) @PathVariable Employee.EmployeeStatus status
+    ) @PathVariable EmployeeStatus status
   ) {
     return employeeService.findByDepartmentAndStatus(department, status);
   }

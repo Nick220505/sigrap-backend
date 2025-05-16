@@ -50,7 +50,7 @@ class EmployeeRepositoryTest {
       .position("Sales")
       .department("Sales")
       .hireDate(LocalDateTime.now())
-      .status(Employee.EmployeeStatus.ACTIVE)
+      .status(EmployeeStatus.ACTIVE)
       .user(testUser)
       .build();
     entityManager.persist(testEmployee);
@@ -128,7 +128,7 @@ class EmployeeRepositoryTest {
   void findByDepartmentAndStatus_ShouldReturnEmployees() {
     List<Employee> result = employeeRepository.findByDepartmentAndStatus(
       "Sales",
-      Employee.EmployeeStatus.ACTIVE
+      EmployeeStatus.ACTIVE
     );
 
     assertNotNull(result);

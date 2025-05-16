@@ -78,7 +78,7 @@ public class EmployeeService {
     }
 
     Employee employee = employeeMapper.toEntity(data);
-    employee.setStatus(Employee.EmployeeStatus.ACTIVE);
+    employee.setStatus(EmployeeStatus.ACTIVE);
     employee = employeeRepository.save(employee);
     return employeeMapper.toInfo(employee);
   }
@@ -175,11 +175,11 @@ public class EmployeeService {
         new EntityNotFoundException("Employee not found: " + id)
       );
 
-    if (employee.getStatus() == Employee.EmployeeStatus.TERMINATED) {
+    if (employee.getStatus() == EmployeeStatus.TERMINATED) {
       throw new IllegalStateException("Cannot activate a terminated employee");
     }
 
-    employee.setStatus(Employee.EmployeeStatus.ACTIVE);
+    employee.setStatus(EmployeeStatus.ACTIVE);
     employee = employeeRepository.save(employee);
     return employeeMapper.toInfo(employee);
   }
@@ -199,13 +199,13 @@ public class EmployeeService {
         new EntityNotFoundException("Employee not found: " + id)
       );
 
-    if (employee.getStatus() == Employee.EmployeeStatus.TERMINATED) {
+    if (employee.getStatus() == EmployeeStatus.TERMINATED) {
       throw new IllegalStateException(
         "Cannot deactivate a terminated employee"
       );
     }
 
-    employee.setStatus(Employee.EmployeeStatus.INACTIVE);
+    employee.setStatus(EmployeeStatus.INACTIVE);
     employee = employeeRepository.save(employee);
     return employeeMapper.toInfo(employee);
   }
@@ -225,7 +225,7 @@ public class EmployeeService {
         new EntityNotFoundException("Employee not found: " + id)
       );
 
-    employee.setStatus(Employee.EmployeeStatus.TERMINATED);
+    employee.setStatus(EmployeeStatus.TERMINATED);
     employee.setTerminationDate(LocalDateTime.now());
     employee = employeeRepository.save(employee);
     return employeeMapper.toInfo(employee);
@@ -250,7 +250,7 @@ public class EmployeeService {
    * @return List of EmployeeInfo DTOs
    */
   @Transactional(readOnly = true)
-  public List<EmployeeInfo> findByStatus(Employee.EmployeeStatus status) {
+  public List<EmployeeInfo> findByStatus(EmployeeStatus status) {
     List<Employee> employees = employeeRepository.findByStatus(status);
     return employeeMapper.toInfoList(employees);
   }
@@ -284,7 +284,7 @@ public class EmployeeService {
   @Transactional(readOnly = true)
   public List<EmployeeInfo> findByDepartmentAndStatus(
     String department,
-    Employee.EmployeeStatus status
+    EmployeeStatus status
   ) {
     List<Employee> employees = employeeRepository.findByDepartmentAndStatus(
       department,

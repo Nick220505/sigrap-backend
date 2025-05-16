@@ -57,7 +57,7 @@ class EmployeeControllerTest {
       .position("Sales")
       .department("Sales")
       .hireDate(hireDate)
-      .status(Employee.EmployeeStatus.ACTIVE)
+      .status(EmployeeStatus.ACTIVE)
       .build();
 
     testEmployeeData = EmployeeData.builder()
@@ -98,9 +98,7 @@ class EmployeeControllerTest {
         jsonPath("$[0].department").value(testEmployeeInfo.getDepartment())
       )
       .andExpect(jsonPath("$[0].hireDate").exists())
-      .andExpect(
-        jsonPath("$[0].status").value(Employee.EmployeeStatus.ACTIVE.name())
-      );
+      .andExpect(jsonPath("$[0].status").value(EmployeeStatus.ACTIVE.name()));
   }
 
   @Test
@@ -123,9 +121,7 @@ class EmployeeControllerTest {
         jsonPath("$.department").value(testEmployeeInfo.getDepartment())
       )
       .andExpect(jsonPath("$.hireDate").exists())
-      .andExpect(
-        jsonPath("$.status").value(Employee.EmployeeStatus.ACTIVE.name())
-      );
+      .andExpect(jsonPath("$.status").value(EmployeeStatus.ACTIVE.name()));
   }
 
   @Test
@@ -154,9 +150,7 @@ class EmployeeControllerTest {
         jsonPath("$.department").value(testEmployeeInfo.getDepartment())
       )
       .andExpect(jsonPath("$.hireDate").exists())
-      .andExpect(
-        jsonPath("$.status").value(Employee.EmployeeStatus.ACTIVE.name())
-      );
+      .andExpect(jsonPath("$.status").value(EmployeeStatus.ACTIVE.name()));
   }
 
   @Test
@@ -185,9 +179,7 @@ class EmployeeControllerTest {
         jsonPath("$.department").value(testEmployeeInfo.getDepartment())
       )
       .andExpect(jsonPath("$.hireDate").exists())
-      .andExpect(
-        jsonPath("$.status").value(Employee.EmployeeStatus.ACTIVE.name())
-      );
+      .andExpect(jsonPath("$.status").value(EmployeeStatus.ACTIVE.name()));
   }
 
   @Test
@@ -204,7 +196,7 @@ class EmployeeControllerTest {
 
   @Test
   void activate_ShouldActivateEmployee() throws Exception {
-    testEmployeeInfo.setStatus(Employee.EmployeeStatus.ACTIVE);
+    testEmployeeInfo.setStatus(EmployeeStatus.ACTIVE);
     when(employeeService.activate(1L)).thenReturn(testEmployeeInfo);
 
     mockMvc
@@ -223,14 +215,12 @@ class EmployeeControllerTest {
         jsonPath("$.department").value(testEmployeeInfo.getDepartment())
       )
       .andExpect(jsonPath("$.hireDate").exists())
-      .andExpect(
-        jsonPath("$.status").value(Employee.EmployeeStatus.ACTIVE.name())
-      );
+      .andExpect(jsonPath("$.status").value(EmployeeStatus.ACTIVE.name()));
   }
 
   @Test
   void deactivate_ShouldDeactivateEmployee() throws Exception {
-    testEmployeeInfo.setStatus(Employee.EmployeeStatus.INACTIVE);
+    testEmployeeInfo.setStatus(EmployeeStatus.INACTIVE);
     when(employeeService.deactivate(1L)).thenReturn(testEmployeeInfo);
 
     mockMvc
@@ -249,14 +239,12 @@ class EmployeeControllerTest {
         jsonPath("$.department").value(testEmployeeInfo.getDepartment())
       )
       .andExpect(jsonPath("$.hireDate").exists())
-      .andExpect(
-        jsonPath("$.status").value(Employee.EmployeeStatus.INACTIVE.name())
-      );
+      .andExpect(jsonPath("$.status").value(EmployeeStatus.INACTIVE.name()));
   }
 
   @Test
   void terminate_ShouldTerminateEmployee() throws Exception {
-    testEmployeeInfo.setStatus(Employee.EmployeeStatus.TERMINATED);
+    testEmployeeInfo.setStatus(EmployeeStatus.TERMINATED);
     when(employeeService.terminate(1L)).thenReturn(testEmployeeInfo);
 
     mockMvc
@@ -275,9 +263,7 @@ class EmployeeControllerTest {
         jsonPath("$.department").value(testEmployeeInfo.getDepartment())
       )
       .andExpect(jsonPath("$.hireDate").exists())
-      .andExpect(
-        jsonPath("$.status").value(Employee.EmployeeStatus.TERMINATED.name())
-      );
+      .andExpect(jsonPath("$.status").value(EmployeeStatus.TERMINATED.name()));
   }
 
   @Test
@@ -309,14 +295,12 @@ class EmployeeControllerTest {
         jsonPath("$[0].department").value(testEmployeeInfo.getDepartment())
       )
       .andExpect(jsonPath("$[0].hireDate").exists())
-      .andExpect(
-        jsonPath("$[0].status").value(Employee.EmployeeStatus.ACTIVE.name())
-      );
+      .andExpect(jsonPath("$[0].status").value(EmployeeStatus.ACTIVE.name()));
   }
 
   @Test
   void findByStatus_ShouldReturnEmployeesWithStatus() throws Exception {
-    Employee.EmployeeStatus status = Employee.EmployeeStatus.ACTIVE;
+    EmployeeStatus status = EmployeeStatus.ACTIVE;
     when(employeeService.findByStatus(status)).thenReturn(
       List.of(testEmployeeInfo)
     );
@@ -343,8 +327,6 @@ class EmployeeControllerTest {
         jsonPath("$[0].department").value(testEmployeeInfo.getDepartment())
       )
       .andExpect(jsonPath("$[0].hireDate").exists())
-      .andExpect(
-        jsonPath("$[0].status").value(Employee.EmployeeStatus.ACTIVE.name())
-      );
+      .andExpect(jsonPath("$[0].status").value(EmployeeStatus.ACTIVE.name()));
   }
 }

@@ -3,7 +3,6 @@ package com.sigrap.employee;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -35,7 +34,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
    * @param status Status to search for
    * @return List of employees with the specified status
    */
-  List<Employee> findByStatus(Employee.EmployeeStatus status);
+  List<Employee> findByStatus(EmployeeStatus status);
 
   /**
    * Finds all employees in a specific department.
@@ -98,6 +97,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
    */
   List<Employee> findByDepartmentAndStatus(
     String department,
-    Employee.EmployeeStatus status
+    EmployeeStatus status
   );
 }

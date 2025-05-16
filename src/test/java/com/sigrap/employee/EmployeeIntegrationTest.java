@@ -47,7 +47,7 @@ class EmployeeIntegrationTest {
       .position("Sales")
       .department("Sales")
       .hireDate(LocalDateTime.now())
-      .status(Employee.EmployeeStatus.ACTIVE)
+      .status(EmployeeStatus.ACTIVE)
       .user(testUser)
       .build();
     testEmployee = entityManager.persist(testEmployee);
