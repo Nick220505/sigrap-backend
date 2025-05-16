@@ -1,6 +1,7 @@
 package com.sigrap.employee;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -16,6 +17,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,8 +56,6 @@ class EmployeeControllerTest {
       .lastName("Doe")
       .documentId("123456")
       .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
       .hireDate(hireDate)
       .status(EmployeeStatus.ACTIVE)
       .build();
@@ -66,9 +66,8 @@ class EmployeeControllerTest {
       .lastName("Doe")
       .documentId("123456")
       .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
       .hireDate(hireDate)
+      .status(EmployeeStatus.ACTIVE)
       .build();
   }
 
@@ -91,12 +90,6 @@ class EmployeeControllerTest {
         jsonPath("$[0].documentId").value(testEmployeeInfo.getDocumentId())
       )
       .andExpect(jsonPath("$[0].email").value(testEmployeeInfo.getEmail()))
-      .andExpect(
-        jsonPath("$[0].position").value(testEmployeeInfo.getPosition())
-      )
-      .andExpect(
-        jsonPath("$[0].department").value(testEmployeeInfo.getDepartment())
-      )
       .andExpect(jsonPath("$[0].hireDate").exists())
       .andExpect(jsonPath("$[0].status").value(EmployeeStatus.ACTIVE.name()));
   }
@@ -116,10 +109,6 @@ class EmployeeControllerTest {
         jsonPath("$.documentId").value(testEmployeeInfo.getDocumentId())
       )
       .andExpect(jsonPath("$.email").value(testEmployeeInfo.getEmail()))
-      .andExpect(jsonPath("$.position").value(testEmployeeInfo.getPosition()))
-      .andExpect(
-        jsonPath("$.department").value(testEmployeeInfo.getDepartment())
-      )
       .andExpect(jsonPath("$.hireDate").exists())
       .andExpect(jsonPath("$.status").value(EmployeeStatus.ACTIVE.name()));
   }
@@ -145,10 +134,6 @@ class EmployeeControllerTest {
         jsonPath("$.documentId").value(testEmployeeInfo.getDocumentId())
       )
       .andExpect(jsonPath("$.email").value(testEmployeeInfo.getEmail()))
-      .andExpect(jsonPath("$.position").value(testEmployeeInfo.getPosition()))
-      .andExpect(
-        jsonPath("$.department").value(testEmployeeInfo.getDepartment())
-      )
       .andExpect(jsonPath("$.hireDate").exists())
       .andExpect(jsonPath("$.status").value(EmployeeStatus.ACTIVE.name()));
   }
@@ -174,10 +159,6 @@ class EmployeeControllerTest {
         jsonPath("$.documentId").value(testEmployeeInfo.getDocumentId())
       )
       .andExpect(jsonPath("$.email").value(testEmployeeInfo.getEmail()))
-      .andExpect(jsonPath("$.position").value(testEmployeeInfo.getPosition()))
-      .andExpect(
-        jsonPath("$.department").value(testEmployeeInfo.getDepartment())
-      )
       .andExpect(jsonPath("$.hireDate").exists())
       .andExpect(jsonPath("$.status").value(EmployeeStatus.ACTIVE.name()));
   }
@@ -210,10 +191,6 @@ class EmployeeControllerTest {
         jsonPath("$.documentId").value(testEmployeeInfo.getDocumentId())
       )
       .andExpect(jsonPath("$.email").value(testEmployeeInfo.getEmail()))
-      .andExpect(jsonPath("$.position").value(testEmployeeInfo.getPosition()))
-      .andExpect(
-        jsonPath("$.department").value(testEmployeeInfo.getDepartment())
-      )
       .andExpect(jsonPath("$.hireDate").exists())
       .andExpect(jsonPath("$.status").value(EmployeeStatus.ACTIVE.name()));
   }
@@ -234,10 +211,6 @@ class EmployeeControllerTest {
         jsonPath("$.documentId").value(testEmployeeInfo.getDocumentId())
       )
       .andExpect(jsonPath("$.email").value(testEmployeeInfo.getEmail()))
-      .andExpect(jsonPath("$.position").value(testEmployeeInfo.getPosition()))
-      .andExpect(
-        jsonPath("$.department").value(testEmployeeInfo.getDepartment())
-      )
       .andExpect(jsonPath("$.hireDate").exists())
       .andExpect(jsonPath("$.status").value(EmployeeStatus.INACTIVE.name()));
   }
@@ -258,44 +231,31 @@ class EmployeeControllerTest {
         jsonPath("$.documentId").value(testEmployeeInfo.getDocumentId())
       )
       .andExpect(jsonPath("$.email").value(testEmployeeInfo.getEmail()))
-      .andExpect(jsonPath("$.position").value(testEmployeeInfo.getPosition()))
-      .andExpect(
-        jsonPath("$.department").value(testEmployeeInfo.getDepartment())
-      )
       .andExpect(jsonPath("$.hireDate").exists())
       .andExpect(jsonPath("$.status").value(EmployeeStatus.TERMINATED.name()));
   }
 
   @Test
-  void findByDepartment_ShouldReturnDepartmentEmployees() throws Exception {
-    String department = "Sales";
-    when(employeeService.findByDepartment(department)).thenReturn(
-      List.of(testEmployeeInfo)
+  void findByDocumentId_ShouldReturnEmployee() throws Exception {
+    when(employeeService.findByDocumentId(anyString())).thenReturn(
+      testEmployeeInfo
     );
 
     mockMvc
-      .perform(get("/api/employees/department/{department}", department))
+      .perform(
+        get("/api/employees/document/" + testEmployeeInfo.getDocumentId())
+      )
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$[0].id").value(testEmployeeInfo.getId()))
-      .andExpect(jsonPath("$[0].userId").value(testEmployeeInfo.getUserId()))
+      .andExpect(jsonPath("$.id").value(testEmployeeInfo.getId()))
+      .andExpect(jsonPath("$.userId").value(testEmployeeInfo.getUserId()))
+      .andExpect(jsonPath("$.firstName").value(testEmployeeInfo.getFirstName()))
+      .andExpect(jsonPath("$.lastName").value(testEmployeeInfo.getLastName()))
       .andExpect(
-        jsonPath("$[0].firstName").value(testEmployeeInfo.getFirstName())
+        jsonPath("$.documentId").value(testEmployeeInfo.getDocumentId())
       )
-      .andExpect(
-        jsonPath("$[0].lastName").value(testEmployeeInfo.getLastName())
-      )
-      .andExpect(
-        jsonPath("$[0].documentId").value(testEmployeeInfo.getDocumentId())
-      )
-      .andExpect(jsonPath("$[0].email").value(testEmployeeInfo.getEmail()))
-      .andExpect(
-        jsonPath("$[0].position").value(testEmployeeInfo.getPosition())
-      )
-      .andExpect(
-        jsonPath("$[0].department").value(testEmployeeInfo.getDepartment())
-      )
-      .andExpect(jsonPath("$[0].hireDate").exists())
-      .andExpect(jsonPath("$[0].status").value(EmployeeStatus.ACTIVE.name()));
+      .andExpect(jsonPath("$.email").value(testEmployeeInfo.getEmail()))
+      .andExpect(jsonPath("$.hireDate").exists())
+      .andExpect(jsonPath("$.status").value(EmployeeStatus.ACTIVE.name()));
   }
 
   @Test
@@ -320,12 +280,35 @@ class EmployeeControllerTest {
         jsonPath("$[0].documentId").value(testEmployeeInfo.getDocumentId())
       )
       .andExpect(jsonPath("$[0].email").value(testEmployeeInfo.getEmail()))
+      .andExpect(jsonPath("$[0].hireDate").exists())
+      .andExpect(jsonPath("$[0].status").value(EmployeeStatus.ACTIVE.name()));
+  }
+
+  @Test
+  void findByHireDateBetween_ShouldReturnEmployees() throws Exception {
+    when(employeeService.findByHireDateBetween(any(), any())).thenReturn(
+      Collections.singletonList(testEmployeeInfo)
+    );
+
+    mockMvc
+      .perform(
+        get("/api/employees/hire-date-between")
+          .param("startDate", LocalDateTime.now().minusYears(1).toString())
+          .param("endDate", LocalDateTime.now().toString())
+      )
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$[0].id").value(testEmployeeInfo.getId()))
+      .andExpect(jsonPath("$[0].userId").value(testEmployeeInfo.getUserId()))
       .andExpect(
-        jsonPath("$[0].position").value(testEmployeeInfo.getPosition())
+        jsonPath("$[0].firstName").value(testEmployeeInfo.getFirstName())
       )
       .andExpect(
-        jsonPath("$[0].department").value(testEmployeeInfo.getDepartment())
+        jsonPath("$[0].lastName").value(testEmployeeInfo.getLastName())
       )
+      .andExpect(
+        jsonPath("$[0].documentId").value(testEmployeeInfo.getDocumentId())
+      )
+      .andExpect(jsonPath("$[0].email").value(testEmployeeInfo.getEmail()))
       .andExpect(jsonPath("$[0].hireDate").exists())
       .andExpect(jsonPath("$[0].status").value(EmployeeStatus.ACTIVE.name()));
   }

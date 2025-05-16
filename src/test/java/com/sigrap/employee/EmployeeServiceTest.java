@@ -43,36 +43,29 @@ class EmployeeServiceTest {
       .id(1L)
       .firstName("John")
       .lastName("Doe")
-      .documentId("123456")
       .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
       .hireDate(hireDate)
       .status(EmployeeStatus.ACTIVE)
       .build();
 
     testEmployeeInfo = EmployeeInfo.builder()
       .id(1L)
-      .userId(1L)
       .firstName("John")
       .lastName("Doe")
-      .documentId("123456")
       .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
       .hireDate(hireDate)
       .status(EmployeeStatus.ACTIVE)
+      .userId(1L)
       .build();
 
     testEmployeeData = EmployeeData.builder()
-      .userId(1L)
-      .firstName("John")
-      .lastName("Doe")
-      .documentId("123456")
-      .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
+      .firstName("Jane")
+      .lastName("Smith")
+      .email("jane.smith@example.com")
       .hireDate(hireDate)
+      .documentId("DOC123")
+      .status(EmployeeStatus.ACTIVE)
+      .userId(1L)
       .build();
   }
 
@@ -96,11 +89,6 @@ class EmployeeServiceTest {
       result.get(0).getDocumentId()
     );
     assertEquals(testEmployeeInfo.getEmail(), result.get(0).getEmail());
-    assertEquals(testEmployeeInfo.getPosition(), result.get(0).getPosition());
-    assertEquals(
-      testEmployeeInfo.getDepartment(),
-      result.get(0).getDepartment()
-    );
     assertEquals(testEmployeeInfo.getHireDate(), result.get(0).getHireDate());
     assertEquals(testEmployeeInfo.getStatus(), result.get(0).getStatus());
   }
@@ -119,8 +107,6 @@ class EmployeeServiceTest {
     assertEquals(testEmployeeInfo.getLastName(), result.getLastName());
     assertEquals(testEmployeeInfo.getDocumentId(), result.getDocumentId());
     assertEquals(testEmployeeInfo.getEmail(), result.getEmail());
-    assertEquals(testEmployeeInfo.getPosition(), result.getPosition());
-    assertEquals(testEmployeeInfo.getDepartment(), result.getDepartment());
     assertEquals(testEmployeeInfo.getHireDate(), result.getHireDate());
     assertEquals(testEmployeeInfo.getStatus(), result.getStatus());
   }
@@ -155,8 +141,6 @@ class EmployeeServiceTest {
     assertEquals(testEmployeeInfo.getLastName(), result.getLastName());
     assertEquals(testEmployeeInfo.getDocumentId(), result.getDocumentId());
     assertEquals(testEmployeeInfo.getEmail(), result.getEmail());
-    assertEquals(testEmployeeInfo.getPosition(), result.getPosition());
-    assertEquals(testEmployeeInfo.getDepartment(), result.getDepartment());
     assertEquals(testEmployeeInfo.getHireDate(), result.getHireDate());
     assertEquals(testEmployeeInfo.getStatus(), result.getStatus());
 
@@ -205,8 +189,6 @@ class EmployeeServiceTest {
       .lastName("Doe")
       .documentId("123456")
       .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
       .hireDate(hireDate)
       .build();
 
@@ -224,8 +206,6 @@ class EmployeeServiceTest {
       .lastName("Doe")
       .documentId("123456")
       .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
       .hireDate(hireDate)
       .build();
 
@@ -243,8 +223,6 @@ class EmployeeServiceTest {
       .firstName("John")
       .documentId("123456")
       .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
       .hireDate(hireDate)
       .build();
 
@@ -262,8 +240,6 @@ class EmployeeServiceTest {
       .firstName("John")
       .lastName("Doe")
       .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
       .hireDate(hireDate)
       .build();
 
@@ -281,8 +257,6 @@ class EmployeeServiceTest {
       .firstName("John")
       .lastName("Doe")
       .documentId("123456")
-      .position("Sales")
-      .department("Sales")
       .hireDate(hireDate)
       .build();
 
@@ -294,44 +268,6 @@ class EmployeeServiceTest {
   }
 
   @Test
-  void create_ShouldThrowIllegalArgumentException_WhenPositionIsNull() {
-    testEmployeeData = EmployeeData.builder()
-      .userId(1L)
-      .firstName("John")
-      .lastName("Doe")
-      .documentId("123456")
-      .email("john.doe@example.com")
-      .department("Sales")
-      .hireDate(hireDate)
-      .build();
-
-    IllegalArgumentException exception = assertThrows(
-      IllegalArgumentException.class,
-      () -> employeeService.create(testEmployeeData)
-    );
-    assertEquals("Position is required", exception.getMessage());
-  }
-
-  @Test
-  void create_ShouldThrowIllegalArgumentException_WhenDepartmentIsNull() {
-    testEmployeeData = EmployeeData.builder()
-      .userId(1L)
-      .firstName("John")
-      .lastName("Doe")
-      .documentId("123456")
-      .email("john.doe@example.com")
-      .position("Sales")
-      .hireDate(hireDate)
-      .build();
-
-    IllegalArgumentException exception = assertThrows(
-      IllegalArgumentException.class,
-      () -> employeeService.create(testEmployeeData)
-    );
-    assertEquals("Department is required", exception.getMessage());
-  }
-
-  @Test
   void create_ShouldThrowIllegalArgumentException_WhenHireDateIsNull() {
     testEmployeeData = EmployeeData.builder()
       .userId(1L)
@@ -339,8 +275,6 @@ class EmployeeServiceTest {
       .lastName("Doe")
       .documentId("123456")
       .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
       .build();
 
     IllegalArgumentException exception = assertThrows(
@@ -358,8 +292,6 @@ class EmployeeServiceTest {
       .lastName("Doe")
       .documentId("123456")
       .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
       .hireDate(LocalDateTime.now().plusDays(1))
       .build();
 
@@ -385,8 +317,6 @@ class EmployeeServiceTest {
     assertEquals(testEmployeeInfo.getLastName(), result.getLastName());
     assertEquals(testEmployeeInfo.getDocumentId(), result.getDocumentId());
     assertEquals(testEmployeeInfo.getEmail(), result.getEmail());
-    assertEquals(testEmployeeInfo.getPosition(), result.getPosition());
-    assertEquals(testEmployeeInfo.getDepartment(), result.getDepartment());
     assertEquals(testEmployeeInfo.getHireDate(), result.getHireDate());
     assertEquals(testEmployeeInfo.getStatus(), result.getStatus());
 
@@ -479,37 +409,6 @@ class EmployeeServiceTest {
   }
 
   @Test
-  void findByDepartment_ShouldReturnDepartmentEmployees() {
-    when(employeeRepository.findByDepartment("Sales")).thenReturn(
-      List.of(testEmployee)
-    );
-    when(employeeMapper.toInfoList(List.of(testEmployee))).thenReturn(
-      List.of(testEmployeeInfo)
-    );
-
-    List<EmployeeInfo> result = employeeService.findByDepartment("Sales");
-
-    assertNotNull(result);
-    assertEquals(1, result.size());
-    assertEquals(testEmployeeInfo.getId(), result.get(0).getId());
-    assertEquals(testEmployeeInfo.getUserId(), result.get(0).getUserId());
-    assertEquals(testEmployeeInfo.getFirstName(), result.get(0).getFirstName());
-    assertEquals(testEmployeeInfo.getLastName(), result.get(0).getLastName());
-    assertEquals(
-      testEmployeeInfo.getDocumentId(),
-      result.get(0).getDocumentId()
-    );
-    assertEquals(testEmployeeInfo.getEmail(), result.get(0).getEmail());
-    assertEquals(testEmployeeInfo.getPosition(), result.get(0).getPosition());
-    assertEquals(
-      testEmployeeInfo.getDepartment(),
-      result.get(0).getDepartment()
-    );
-    assertEquals(testEmployeeInfo.getHireDate(), result.get(0).getHireDate());
-    assertEquals(testEmployeeInfo.getStatus(), result.get(0).getStatus());
-  }
-
-  @Test
   void findByStatus_ShouldReturnEmployeesWithStatus() {
     when(employeeRepository.findByStatus(EmployeeStatus.ACTIVE)).thenReturn(
       List.of(testEmployee)
@@ -533,11 +432,6 @@ class EmployeeServiceTest {
       result.get(0).getDocumentId()
     );
     assertEquals(testEmployeeInfo.getEmail(), result.get(0).getEmail());
-    assertEquals(testEmployeeInfo.getPosition(), result.get(0).getPosition());
-    assertEquals(
-      testEmployeeInfo.getDepartment(),
-      result.get(0).getDepartment()
-    );
     assertEquals(testEmployeeInfo.getHireDate(), result.get(0).getHireDate());
     assertEquals(testEmployeeInfo.getStatus(), result.get(0).getStatus());
   }

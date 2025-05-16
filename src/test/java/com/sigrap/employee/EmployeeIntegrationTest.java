@@ -44,8 +44,6 @@ class EmployeeIntegrationTest {
       .lastName("Doe")
       .documentId("123456")
       .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
       .hireDate(LocalDateTime.now())
       .status(EmployeeStatus.ACTIVE)
       .user(testUser)
@@ -66,8 +64,6 @@ class EmployeeIntegrationTest {
     assertEquals(testEmployee.getLastName(), found.getLastName());
     assertEquals(testEmployee.getDocumentId(), found.getDocumentId());
     assertEquals(testEmployee.getEmail(), found.getEmail());
-    assertEquals(testEmployee.getPosition(), found.getPosition());
-    assertEquals(testEmployee.getDepartment(), found.getDepartment());
     assertEquals(testEmployee.getHireDate(), found.getHireDate());
     assertEquals(testEmployee.getStatus(), found.getStatus());
   }
@@ -84,8 +80,6 @@ class EmployeeIntegrationTest {
     assertEquals(testEmployee.getLastName(), found.getLastName());
     assertEquals(testEmployee.getDocumentId(), found.getDocumentId());
     assertEquals(testEmployee.getEmail(), found.getEmail());
-    assertEquals(testEmployee.getPosition(), found.getPosition());
-    assertEquals(testEmployee.getDepartment(), found.getDepartment());
     assertEquals(testEmployee.getHireDate(), found.getHireDate());
     assertEquals(testEmployee.getStatus(), found.getStatus());
   }
@@ -102,8 +96,6 @@ class EmployeeIntegrationTest {
     assertEquals(testEmployee.getLastName(), found.getLastName());
     assertEquals(testEmployee.getDocumentId(), found.getDocumentId());
     assertEquals(testEmployee.getEmail(), found.getEmail());
-    assertEquals(testEmployee.getPosition(), found.getPosition());
-    assertEquals(testEmployee.getDepartment(), found.getDepartment());
     assertEquals(testEmployee.getHireDate(), found.getHireDate());
     assertEquals(testEmployee.getStatus(), found.getStatus());
   }
@@ -120,29 +112,8 @@ class EmployeeIntegrationTest {
     assertEquals(testEmployee.getLastName(), found.getLastName());
     assertEquals(testEmployee.getDocumentId(), found.getDocumentId());
     assertEquals(testEmployee.getEmail(), found.getEmail());
-    assertEquals(testEmployee.getPosition(), found.getPosition());
-    assertEquals(testEmployee.getDepartment(), found.getDepartment());
     assertEquals(testEmployee.getHireDate(), found.getHireDate());
     assertEquals(testEmployee.getStatus(), found.getStatus());
-  }
-
-  @Test
-  void findByDepartment_ShouldReturnDepartmentEmployees() {
-    List<Employee> found = employeeRepository.findByDepartment(
-      testEmployee.getDepartment()
-    );
-
-    assertNotNull(found);
-    assertEquals(1, found.size());
-    assertEquals(testEmployee.getId(), found.get(0).getId());
-    assertEquals(testEmployee.getFirstName(), found.get(0).getFirstName());
-    assertEquals(testEmployee.getLastName(), found.get(0).getLastName());
-    assertEquals(testEmployee.getDocumentId(), found.get(0).getDocumentId());
-    assertEquals(testEmployee.getEmail(), found.get(0).getEmail());
-    assertEquals(testEmployee.getPosition(), found.get(0).getPosition());
-    assertEquals(testEmployee.getDepartment(), found.get(0).getDepartment());
-    assertEquals(testEmployee.getHireDate(), found.get(0).getHireDate());
-    assertEquals(testEmployee.getStatus(), found.get(0).getStatus());
   }
 
   @Test
@@ -158,8 +129,6 @@ class EmployeeIntegrationTest {
     assertEquals(testEmployee.getLastName(), found.get(0).getLastName());
     assertEquals(testEmployee.getDocumentId(), found.get(0).getDocumentId());
     assertEquals(testEmployee.getEmail(), found.get(0).getEmail());
-    assertEquals(testEmployee.getPosition(), found.get(0).getPosition());
-    assertEquals(testEmployee.getDepartment(), found.get(0).getDepartment());
     assertEquals(testEmployee.getHireDate(), found.get(0).getHireDate());
     assertEquals(testEmployee.getStatus(), found.get(0).getStatus());
   }

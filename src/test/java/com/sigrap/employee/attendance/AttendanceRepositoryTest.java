@@ -50,8 +50,6 @@ class AttendanceRepositoryTest {
       .firstName("John")
       .lastName("Doe")
       .documentId(uniqueDocumentId)
-      .position("Sales")
-      .department("Sales")
       .hireDate(LocalDateTime.now())
       .user(user)
       .build();

@@ -45,8 +45,6 @@ public class EmployeeMapper {
       .documentId(employee.getDocumentId())
       .phoneNumber(employee.getPhoneNumber())
       .email(employee.getEmail())
-      .position(employee.getPosition())
-      .department(employee.getDepartment())
       .hireDate(employee.getHireDate())
       .terminationDate(employee.getTerminationDate())
       .status(employee.getStatus())
@@ -100,8 +98,6 @@ public class EmployeeMapper {
       .documentId(employeeData.getDocumentId())
       .phoneNumber(employeeData.getPhoneNumber())
       .email(employeeData.getEmail())
-      .position(employeeData.getPosition())
-      .department(employeeData.getDepartment())
       .hireDate(employeeData.getHireDate())
       .profileImageUrl(employeeData.getProfileImageUrl())
       .status(EmployeeStatus.ACTIVE)
@@ -151,12 +147,6 @@ public class EmployeeMapper {
     }
     if (employeeData.getEmail() != null) {
       employee.setEmail(employeeData.getEmail());
-    }
-    if (employeeData.getPosition() != null) {
-      employee.setPosition(employeeData.getPosition());
-    }
-    if (employeeData.getDepartment() != null) {
-      employee.setDepartment(employeeData.getDepartment());
     }
     if (employeeData.getHireDate() != null) {
       employee.setHireDate(employeeData.getHireDate());

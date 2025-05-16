@@ -37,14 +37,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
   List<Employee> findByStatus(EmployeeStatus status);
 
   /**
-   * Finds all employees in a specific department.
-   *
-   * @param department Department to search for
-   * @return List of employees in the specified department
-   */
-  List<Employee> findByDepartment(String department);
-
-  /**
    * Finds all employees hired between two dates.
    *
    * @param startDate Start of the date range
@@ -87,16 +79,4 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
    * @return true if an employee exists with the email
    */
   boolean existsByEmail(String email);
-
-  /**
-   * Finds all employees in a specific department with a specific status.
-   *
-   * @param department Department to search for
-   * @param status Status to search for
-   * @return List of employees matching both criteria
-   */
-  List<Employee> findByDepartmentAndStatus(
-    String department,
-    EmployeeStatus status
-  );
 }

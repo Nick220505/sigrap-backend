@@ -232,18 +232,6 @@ public class EmployeeService {
   }
 
   /**
-   * Finds all employees in a specific department.
-   *
-   * @param department The department to search for
-   * @return List of EmployeeInfo DTOs
-   */
-  @Transactional(readOnly = true)
-  public List<EmployeeInfo> findByDepartment(String department) {
-    List<Employee> employees = employeeRepository.findByDepartment(department);
-    return employeeMapper.toInfoList(employees);
-  }
-
-  /**
    * Finds all employees with a specific status.
    *
    * @param status The status to search for
@@ -275,22 +263,22 @@ public class EmployeeService {
   }
 
   /**
-   * Finds all employees in a specific department with a specific status.
+   * Finds an employee by their document ID.
    *
-   * @param department The department to search for
-   * @param status The status to search for
-   * @return List of EmployeeInfo DTOs
+   * @param documentId The document ID to search for
+   * @return EmployeeInfo containing the employee's information
+   * @throws EntityNotFoundException if the employee is not found
    */
   @Transactional(readOnly = true)
-  public List<EmployeeInfo> findByDepartmentAndStatus(
-    String department,
-    EmployeeStatus status
-  ) {
-    List<Employee> employees = employeeRepository.findByDepartmentAndStatus(
-      department,
-      status
-    );
-    return employeeMapper.toInfoList(employees);
+  public EmployeeInfo findByDocumentId(String documentId) {
+    Employee employee = employeeRepository
+      .findByDocumentId(documentId)
+      .orElseThrow(() ->
+        new EntityNotFoundException(
+          "Employee not found with document ID: " + documentId
+        )
+      );
+    return employeeMapper.toInfo(employee);
   }
 
   private void validateEmployeeData(EmployeeData data) {
@@ -312,14 +300,6 @@ public class EmployeeService {
 
     if (data.getEmail() == null || data.getEmail().trim().isEmpty()) {
       throw new IllegalArgumentException("Email is required");
-    }
-
-    if (data.getPosition() == null || data.getPosition().trim().isEmpty()) {
-      throw new IllegalArgumentException("Position is required");
-    }
-
-    if (data.getDepartment() == null || data.getDepartment().trim().isEmpty()) {
-      throw new IllegalArgumentException("Department is required");
     }
 
     if (data.getHireDate() == null) {

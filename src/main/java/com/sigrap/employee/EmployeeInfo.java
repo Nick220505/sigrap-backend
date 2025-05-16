@@ -73,18 +73,6 @@ public class EmployeeInfo {
   private String email;
 
   /**
-   * Position or job title of the employee.
-   */
-  @Schema(description = "Position of the employee", example = "Sales Associate")
-  private String position;
-
-  /**
-   * Department the employee belongs to.
-   */
-  @Schema(description = "Department of the employee", example = "Sales")
-  private String department;
-
-  /**
    * Date when the employee was hired.
    */
   @Schema(

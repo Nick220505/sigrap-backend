@@ -297,29 +297,6 @@ public class EmployeeController {
   }
 
   /**
-   * Finds all employees in a specific department.
-   *
-   * @param department The department to search for
-   * @return List of EmployeeInfo DTOs
-   */
-  @GetMapping("/department/{department}")
-  @Operation(
-    summary = "Find employees by department",
-    description = "Retrieves all employees in a specific department"
-  )
-  @ApiResponse(
-    responseCode = "200",
-    description = "Successfully retrieved employees"
-  )
-  public List<EmployeeInfo> findByDepartment(
-    @Parameter(
-      description = "Department to search for"
-    ) @PathVariable String department
-  ) {
-    return employeeService.findByDepartment(department);
-  }
-
-  /**
    * Finds all employees with a specific status.
    *
    * @param status The status to search for
@@ -371,32 +348,5 @@ public class EmployeeController {
     ) LocalDateTime endDate
   ) {
     return employeeService.findByHireDateBetween(startDate, endDate);
-  }
-
-  /**
-   * Finds all employees in a specific department with a specific status.
-   *
-   * @param department The department to search for
-   * @param status The status to search for
-   * @return List of EmployeeInfo DTOs
-   */
-  @GetMapping("/department/{department}/status/{status}")
-  @Operation(
-    summary = "Find employees by department and status",
-    description = "Retrieves all employees in a specific department with a specific status"
-  )
-  @ApiResponse(
-    responseCode = "200",
-    description = "Successfully retrieved employees"
-  )
-  public List<EmployeeInfo> findByDepartmentAndStatus(
-    @Parameter(
-      description = "Department to search for"
-    ) @PathVariable String department,
-    @Parameter(
-      description = "Status to search for"
-    ) @PathVariable EmployeeStatus status
-  ) {
-    return employeeService.findByDepartmentAndStatus(department, status);
   }
 }

@@ -784,8 +784,6 @@ public class DataSeeder implements CommandLineRunner {
         .documentId("12345678")
         .phoneNumber("+573001234567")
         .email(adminUser.getEmail())
-        .position("Gerente General")
-        .department("Administración")
         .hireDate(LocalDateTime.now().minusYears(2))
         .status(EmployeeStatus.ACTIVE)
         .build()
@@ -803,8 +801,6 @@ public class DataSeeder implements CommandLineRunner {
         .documentId("87654321")
         .phoneNumber("+573109876543")
         .email(employeeUser.getEmail())
-        .position("Vendedor")
-        .department("Ventas")
         .hireDate(LocalDateTime.now().minusMonths(6))
         .status(EmployeeStatus.ACTIVE)
         .build()
@@ -848,7 +844,7 @@ public class DataSeeder implements CommandLineRunner {
         );
       }
 
-      if ("Vendedor".equals(employee.getPosition())) {
+      if ("gladys@sigrap.com".equals(employee.getEmail())) {
         schedules.add(
           Schedule.builder()
             .employee(employee)
@@ -883,7 +879,7 @@ public class DataSeeder implements CommandLineRunner {
 
         if (
           date.getDayOfWeek().getValue() > 5 &&
-          !"Vendedor".equals(employee.getPosition())
+          !"gladys@sigrap.com".equals(employee.getEmail())
         ) {
           continue;
         }

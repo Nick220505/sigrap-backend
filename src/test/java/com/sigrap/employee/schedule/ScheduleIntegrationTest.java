@@ -59,21 +59,23 @@ class ScheduleIntegrationTest {
   void setUp() {
     objectMapper.findAndRegisterModules();
 
+    String uniqueEmail =
+      "john.doe" + System.currentTimeMillis() + "@example.com";
+    String uniqueDocumentId = "DOC" + System.currentTimeMillis();
+
     User user = User.builder()
       .name("John Doe")
-      .email("john.doe@example.com")
-      .password("password123")
+      .email(uniqueEmail)
+      .password("securePassword")
       .status(UserStatus.ACTIVE)
       .build();
-    user = userRepository.save(user);
+    userRepository.save(user);
 
     testEmployee = Employee.builder()
       .firstName("John")
       .lastName("Doe")
-      .documentId("123456")
-      .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
+      .documentId(uniqueDocumentId)
+      .email(uniqueEmail)
       .hireDate(LocalDateTime.now().withNano(0))
       .status(EmployeeStatus.ACTIVE)
       .user(user)

@@ -49,8 +49,6 @@ class ScheduleRepositoryTest {
       .lastName("Doe")
       .documentId("123456")
       .email("john.doe@example.com")
-      .position("Sales")
-      .department("Sales")
       .hireDate(LocalDateTime.now().withNano(0))
       .status(EmployeeStatus.ACTIVE)
       .user(user)

@@ -89,22 +89,6 @@ public class EmployeeData {
   private String email;
 
   /**
-   * Position or job title of the employee.
-   * Must not be blank.
-   */
-  @NotBlank(message = "Position cannot be blank")
-  @Schema(description = "Position of the employee", example = "Sales Associate")
-  private String position;
-
-  /**
-   * Department the employee belongs to.
-   * Must not be blank.
-   */
-  @NotBlank(message = "Department cannot be blank")
-  @Schema(description = "Department of the employee", example = "Sales")
-  private String department;
-
-  /**
    * Date when the employee was hired.
    * Must not be null.
    */
