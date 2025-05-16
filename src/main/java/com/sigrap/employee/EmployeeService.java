@@ -1,7 +1,6 @@
 package com.sigrap.employee;
 
 import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -156,64 +155,45 @@ public class EmployeeService {
         );
       }
     });
-    employeeRepository.deleteAllById(ids);
-  }
-
-  /**
-   * Finds all employees hired between two dates.
-   *
-   * @param startDate Start of the date range
-   * @param endDate End of the date range
-   * @return List of EmployeeInfo DTOs
-   */
-  @Transactional(readOnly = true)
-  public List<EmployeeInfo> findByHireDateBetween(
-    LocalDateTime startDate,
-    LocalDateTime endDate
-  ) {
-    List<Employee> employees = employeeRepository.findByHireDateBetween(
-      startDate,
-      endDate
-    );
-    return employeeMapper.toInfoList(employees);
+    employeeRepository.deleteAllByIdInBatch(ids);
   }
 
   /**
    * Finds an employee by their document ID.
    *
-   * @param documentId The document ID to search for
-   * @return EmployeeInfo containing the employee's information
-   * @throws EntityNotFoundException if the employee is not found
+   * @param documentId Document ID to search for
+   * @return EmployeeInfo if found
+   * @throws EntityNotFoundException if no employee is found with the document ID
    */
-  @Transactional(readOnly = true)
   public EmployeeInfo findByDocumentId(String documentId) {
-    Employee employee = employeeRepository
+    return employeeRepository
       .findByDocumentId(documentId)
+      .map(employeeMapper::toInfo)
       .orElseThrow(() ->
         new EntityNotFoundException(
-          "Employee not found with document ID: " + documentId
+          "Employee with document ID " + documentId + " not found"
         )
       );
-    return employeeMapper.toInfo(employee);
   }
 
+  /**
+   * Validates the employee data.
+   *
+   * @param data Employee data to validate
+   */
   private void validateEmployeeData(EmployeeData data) {
     if (data.getUserId() == null) {
       throw new IllegalArgumentException("User ID is required");
     }
-
     if (data.getFirstName() == null || data.getFirstName().trim().isEmpty()) {
       throw new IllegalArgumentException("First name is required");
     }
-
     if (data.getLastName() == null || data.getLastName().trim().isEmpty()) {
       throw new IllegalArgumentException("Last name is required");
     }
-
     if (data.getDocumentId() == null || data.getDocumentId().trim().isEmpty()) {
       throw new IllegalArgumentException("Document ID is required");
     }
-
     if (data.getEmail() == null || data.getEmail().trim().isEmpty()) {
       throw new IllegalArgumentException("Email is required");
     }

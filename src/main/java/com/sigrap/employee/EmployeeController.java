@@ -2,14 +2,15 @@ package com.sigrap.employee;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -216,33 +216,38 @@ public class EmployeeController {
   }
 
   /**
-   * Finds all employees hired between two dates.
+   * Finds an employee by their document ID.
    *
-   * @param startDate Start of the date range
-   * @param endDate End of the date range
-   * @return List of EmployeeInfo DTOs
+   * @param documentId Document ID to search for
+   * @return ResponseEntity containing EmployeeInfo if found, or 404 if not found
    */
-  @GetMapping("/hired-between")
-  @Operation(
-    summary = "Find employees by hire date range",
-    description = "Retrieves all employees hired between two dates"
+  @GetMapping("/document/{documentId}")
+  @Operation(summary = "Find employee by document ID")
+  @ApiResponses(
+    value = {
+      @ApiResponse(
+        responseCode = "200",
+        description = "Successfully retrieved employee",
+        content = {
+          @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = EmployeeInfo.class)
+          ),
+        }
+      ),
+      @ApiResponse(
+        responseCode = "404",
+        description = "Employee not found",
+        content = @Content
+      ),
+    }
   )
-  @ApiResponse(
-    responseCode = "200",
-    description = "Successfully retrieved employees"
-  )
-  public List<EmployeeInfo> findByHireDateBetween(
+  public EmployeeInfo findByDocumentId(
     @Parameter(
-      description = "Start date of the range"
-    ) @RequestParam @DateTimeFormat(
-      iso = DateTimeFormat.ISO.DATE_TIME
-    ) LocalDateTime startDate,
-    @Parameter(
-      description = "End date of the range"
-    ) @RequestParam @DateTimeFormat(
-      iso = DateTimeFormat.ISO.DATE_TIME
-    ) LocalDateTime endDate
+      description = "Document ID of the employee to be retrieved",
+      required = true
+    ) @PathVariable String documentId
   ) {
-    return employeeService.findByHireDateBetween(startDate, endDate);
+    return employeeService.findByDocumentId(documentId);
   }
 }

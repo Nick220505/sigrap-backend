@@ -1,14 +1,11 @@
 package com.sigrap.employee;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sigrap.config.RepositoryTestConfiguration;
 import com.sigrap.user.User;
 import com.sigrap.user.UserStatus;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,22 +78,5 @@ class EmployeeRepositoryTest {
 
     assertTrue(result.isPresent());
     assertEquals(testEmployee.getId(), result.get().getId());
-  }
-
-  @Test
-  void findByHireDateBetween_ShouldReturnEmployees() {
-    LocalDateTime startDate = LocalDateTime.now().minusDays(1);
-    LocalDateTime endDate = LocalDateTime.now().plusDays(1);
-
-    List<Employee> result = employeeRepository.findByHireDateBetween(
-      startDate,
-      endDate
-    );
-
-    assertNotNull(result);
-    assertTrue(
-      result.isEmpty() ||
-      result.stream().anyMatch(e -> e.getId().equals(testEmployee.getId()))
-    );
   }
 }
