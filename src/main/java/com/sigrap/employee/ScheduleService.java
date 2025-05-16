@@ -1,9 +1,10 @@
 package com.sigrap.employee;
 
 import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -139,9 +140,10 @@ public class ScheduleService {
 
   /**
    * Generates a weekly schedule for an employee.
+   * The input ScheduleData's startTime and endTime (LocalTime) will be used for all days.
    *
    * @param employeeId The ID of the employee
-   * @param data The base schedule data to use
+   * @param data The base schedule data to use (containing LocalTime for start/end)
    * @return List of ScheduleInfo DTOs for the generated schedules
    * @throws EntityNotFoundException if the employee is not found
    */
@@ -157,8 +159,8 @@ public class ScheduleService {
       );
 
     List<ScheduleInfo> weeklySchedules = new ArrayList<>();
-    LocalDateTime startTime = data.getStartTime();
-    LocalDateTime endTime = data.getEndTime();
+    LocalTime startTime = data.getStartTime();
+    LocalTime endTime = data.getEndTime();
 
     String[] daysOfWeek = {
       "MONDAY",
@@ -174,9 +176,9 @@ public class ScheduleService {
       ScheduleData dailyData = ScheduleData.builder()
         .employeeId(employeeId)
         .day(daysOfWeek[i])
-        .startTime(startTime.plusDays(i))
-        .endTime(endTime.plusDays(i))
-        .isActive(data.getIsActive())
+        .startTime(startTime)
+        .endTime(endTime)
+        .isActive(Optional.ofNullable(data.getIsActive()).orElse(true))
         .build();
 
       Schedule schedule = scheduleMapper.toEntity(dailyData, employee);
@@ -189,6 +191,9 @@ public class ScheduleService {
 
   /**
    * Copies schedules from the previous week.
+   * This method might need re-evaluation if schedules are defined by LocalTime and DayOfWeek only,
+   * as "previous week" concept might change.
+   * For now, it copies existing active schedules, which now use LocalTime.
    *
    * @param employeeId The ID of the employee
    * @return List of ScheduleInfo DTOs for the copied schedules
@@ -196,11 +201,17 @@ public class ScheduleService {
    */
   @Transactional
   public List<ScheduleInfo> copyScheduleFromPreviousWeek(Long employeeId) {
+    if (!employeeRepository.existsById(employeeId)) {
+      throw new EntityNotFoundException("Employee not found: " + employeeId);
+    }
+
     List<Schedule> previousSchedules =
       scheduleRepository.findByEmployeeIdAndIsActive(employeeId, true);
 
     if (previousSchedules.isEmpty()) {
-      throw new IllegalStateException("No active schedules found to copy from");
+      throw new IllegalStateException(
+        "No active schedules found to copy from for employee: " + employeeId
+      );
     }
 
     List<Schedule> newSchedules = new ArrayList<>();

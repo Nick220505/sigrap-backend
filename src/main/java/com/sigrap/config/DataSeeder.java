@@ -36,6 +36,7 @@ import com.sigrap.user.UserStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -840,6 +841,10 @@ public class DataSeeder implements CommandLineRunner {
     List<Schedule> schedules = new ArrayList<>();
     List<Employee> employees = employeeRepository.findAll();
 
+    LocalTime defaultStartTime = LocalTime.of(8, 0);
+    LocalTime defaultEndTime = LocalTime.of(17, 0);
+    LocalTime saturdayEndTime = LocalTime.of(13, 0);
+
     for (Employee employee : employees) {
       for (String day : List.of(
         "MONDAY",
@@ -852,8 +857,8 @@ public class DataSeeder implements CommandLineRunner {
           Schedule.builder()
             .employee(employee)
             .day(day)
-            .startTime(LocalDateTime.now().withHour(8).withMinute(0))
-            .endTime(LocalDateTime.now().withHour(17).withMinute(0))
+            .startTime(defaultStartTime)
+            .endTime(defaultEndTime)
             .isActive(true)
             .build()
         );
@@ -864,8 +869,8 @@ public class DataSeeder implements CommandLineRunner {
           Schedule.builder()
             .employee(employee)
             .day("SATURDAY")
-            .startTime(LocalDateTime.now().withHour(8).withMinute(0))
-            .endTime(LocalDateTime.now().withHour(13).withMinute(0))
+            .startTime(defaultStartTime)
+            .endTime(saturdayEndTime)
             .isActive(true)
             .build()
         );

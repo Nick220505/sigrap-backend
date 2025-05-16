@@ -2,6 +2,7 @@ package com.sigrap.employee;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,13 +55,13 @@ public class ScheduleInfo {
    * Start time of the work shift.
    */
   @Schema(description = "Start time of the shift", example = "09:00")
-  private LocalDateTime startTime;
+  private LocalTime startTime;
 
   /**
    * End time of the work shift.
    */
   @Schema(description = "End time of the shift", example = "17:00")
-  private LocalDateTime endTime;
+  private LocalTime endTime;
 
   /**
    * Whether this schedule is active.

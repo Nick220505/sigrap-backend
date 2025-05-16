@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -68,7 +69,7 @@ public class Schedule {
    */
   @NotNull(message = "Start time cannot be null")
   @Column(name = "start_time", nullable = false)
-  private LocalDateTime startTime;
+  private LocalTime startTime;
 
   /**
    * End time of the work shift.
@@ -76,7 +77,7 @@ public class Schedule {
    */
   @NotNull(message = "End time cannot be null")
   @Column(name = "end_time", nullable = false)
-  private LocalDateTime endTime;
+  private LocalTime endTime;
 
   /**
    * Whether this schedule is currently active.

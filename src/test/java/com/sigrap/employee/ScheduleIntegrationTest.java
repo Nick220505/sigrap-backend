@@ -13,6 +13,7 @@ import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserStatus;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +49,13 @@ class ScheduleIntegrationTest {
 
   private Employee testEmployee;
   private Schedule testSchedule;
+  private LocalTime defaultStartTime;
+  private LocalTime defaultEndTime;
 
   @BeforeEach
   void setUp() {
+    objectMapper.findAndRegisterModules();
+
     User user = User.builder()
       .name("John Doe")
       .email("john.doe@example.com")
@@ -66,17 +71,20 @@ class ScheduleIntegrationTest {
       .email("john.doe@example.com")
       .position("Sales")
       .department("Sales")
-      .hireDate(LocalDateTime.now())
+      .hireDate(LocalDateTime.now().withNano(0))
       .status(Employee.EmployeeStatus.ACTIVE)
       .user(user)
       .build();
     testEmployee = employeeRepository.save(testEmployee);
 
+    defaultStartTime = LocalTime.of(9, 0);
+    defaultEndTime = LocalTime.of(17, 0);
+
     testSchedule = Schedule.builder()
       .employee(testEmployee)
       .day("MONDAY")
-      .startTime(LocalDateTime.now())
-      .endTime(LocalDateTime.now().plusHours(8))
+      .startTime(defaultStartTime)
+      .endTime(defaultEndTime)
       .isActive(true)
       .build();
     testSchedule = scheduleRepository.save(testSchedule);
@@ -89,7 +97,9 @@ class ScheduleIntegrationTest {
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(testSchedule.getId()))
       .andExpect(jsonPath("$.employeeId").value(testEmployee.getId()))
-      .andExpect(jsonPath("$.day").value(testSchedule.getDay()));
+      .andExpect(jsonPath("$.day").value(testSchedule.getDay()))
+      .andExpect(jsonPath("$.startTime").value(defaultStartTime.toString()))
+      .andExpect(jsonPath("$.endTime").value(defaultEndTime.toString()));
   }
 
   @Test
@@ -100,16 +110,21 @@ class ScheduleIntegrationTest {
       )
       .andExpect(status().isOk())
       .andExpect(jsonPath("$[0].id").value(testSchedule.getId()))
-      .andExpect(jsonPath("$[0].employeeId").value(testEmployee.getId()));
+      .andExpect(jsonPath("$[0].employeeId").value(testEmployee.getId()))
+      .andExpect(jsonPath("$[0].startTime").value(defaultStartTime.toString()))
+      .andExpect(jsonPath("$[0].endTime").value(defaultEndTime.toString()));
   }
 
   @Test
   void create_ShouldCreateSchedule() throws Exception {
+    LocalTime newStartTime = LocalTime.of(10, 0);
+    LocalTime newEndTime = LocalTime.of(18, 0);
+
     ScheduleData scheduleData = ScheduleData.builder()
       .employeeId(testEmployee.getId())
       .day("TUESDAY")
-      .startTime(LocalDateTime.now().plusDays(1))
-      .endTime(LocalDateTime.now().plusDays(1).plusHours(8))
+      .startTime(newStartTime)
+      .endTime(newEndTime)
       .isActive(true)
       .build();
 
@@ -121,19 +136,21 @@ class ScheduleIntegrationTest {
       )
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.employeeId").value(testEmployee.getId()))
-      .andExpect(jsonPath("$.day").value("TUESDAY"));
+      .andExpect(jsonPath("$.day").value("TUESDAY"))
+      .andExpect(jsonPath("$.startTime").value(newStartTime.toString()))
+      .andExpect(jsonPath("$.endTime").value(newEndTime.toString()));
   }
 
   @Test
   void update_ShouldUpdateSchedule() throws Exception {
-    LocalDateTime startTime = LocalDateTime.now();
-    LocalDateTime endTime = startTime.plusHours(8);
+    LocalTime updatedStartTime = LocalTime.of(8, 30);
+    LocalTime updatedEndTime = LocalTime.of(16, 30);
 
     ScheduleData updateData = ScheduleData.builder()
       .employeeId(testEmployee.getId())
       .day(testSchedule.getDay())
-      .startTime(startTime)
-      .endTime(endTime)
+      .startTime(updatedStartTime)
+      .endTime(updatedEndTime)
       .isActive(true)
       .build();
 
@@ -146,6 +163,8 @@ class ScheduleIntegrationTest {
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.employeeId").value(testEmployee.getId()))
       .andExpect(jsonPath("$.day").value(testSchedule.getDay()))
+      .andExpect(jsonPath("$.startTime").value(updatedStartTime.toString()))
+      .andExpect(jsonPath("$.endTime").value(updatedEndTime.toString()))
       .andExpect(jsonPath("$.isActive").value(true));
   }
 
@@ -160,11 +179,13 @@ class ScheduleIntegrationTest {
 
   @Test
   void generateWeeklySchedule_ShouldGenerateSchedules() throws Exception {
+    LocalTime genStartTime = LocalTime.of(9, 0);
+    LocalTime genEndTime = LocalTime.of(17, 0);
     ScheduleData scheduleData = ScheduleData.builder()
       .employeeId(testEmployee.getId())
       .day("MONDAY")
-      .startTime(LocalDateTime.now())
-      .endTime(LocalDateTime.now().plusHours(8))
+      .startTime(genStartTime)
+      .endTime(genEndTime)
       .isActive(true)
       .build();
 
@@ -177,6 +198,8 @@ class ScheduleIntegrationTest {
           .contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsString(scheduleData))
       )
-      .andExpect(status().is2xxSuccessful());
+      .andExpect(status().isCreated())
+      .andExpect(jsonPath("$[0].employeeId").value(testEmployee.getId()))
+      .andExpect(jsonPath("$[0].startTime").value(genStartTime.toString()));
   }
 }

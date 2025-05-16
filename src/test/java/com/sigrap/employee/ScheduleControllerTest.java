@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,22 +45,25 @@ class ScheduleControllerTest {
     mockMvc = MockMvcBuilders.standaloneSetup(scheduleController).build();
     objectMapper.findAndRegisterModules();
 
+    LocalTime startTime = LocalTime.now().withNano(0);
+    LocalTime endTime = LocalTime.now().plusHours(8).withNano(0);
+
     testSchedule = ScheduleInfo.builder()
       .id(1L)
       .employeeId(1L)
       .employeeName("John Doe")
-      .startTime(LocalDateTime.now())
-      .endTime(LocalDateTime.now().plusHours(8))
+      .startTime(startTime)
+      .endTime(endTime)
       .day("MONDAY")
       .isActive(true)
-      .createdAt(LocalDateTime.now())
-      .updatedAt(LocalDateTime.now())
+      .createdAt(LocalDateTime.now().withNano(0))
+      .updatedAt(LocalDateTime.now().withNano(0))
       .build();
 
     testData = ScheduleData.builder()
       .employeeId(1L)
-      .startTime(LocalDateTime.now())
-      .endTime(LocalDateTime.now().plusHours(8))
+      .startTime(startTime)
+      .endTime(endTime)
       .day("MONDAY")
       .isActive(true)
       .build();
@@ -78,6 +82,12 @@ class ScheduleControllerTest {
       )
       .andExpect(
         jsonPath("$[0].employeeName").value(testSchedule.getEmployeeName())
+      )
+      .andExpect(
+        jsonPath("$[0].startTime").value(testSchedule.getStartTime().toString())
+      )
+      .andExpect(
+        jsonPath("$[0].endTime").value(testSchedule.getEndTime().toString())
       );
   }
 
@@ -92,6 +102,12 @@ class ScheduleControllerTest {
       .andExpect(jsonPath("$.employeeId").value(testSchedule.getEmployeeId()))
       .andExpect(
         jsonPath("$.employeeName").value(testSchedule.getEmployeeName())
+      )
+      .andExpect(
+        jsonPath("$.startTime").value(testSchedule.getStartTime().toString())
+      )
+      .andExpect(
+        jsonPath("$.endTime").value(testSchedule.getEndTime().toString())
       );
   }
 
@@ -110,12 +126,20 @@ class ScheduleControllerTest {
       )
       .andExpect(
         jsonPath("$[0].employeeName").value(testSchedule.getEmployeeName())
+      )
+      .andExpect(
+        jsonPath("$[0].startTime").value(testSchedule.getStartTime().toString())
+      )
+      .andExpect(
+        jsonPath("$[0].endTime").value(testSchedule.getEndTime().toString())
       );
   }
 
   @Test
   void create_withValidData_shouldCreateSchedule() throws Exception {
-    when(scheduleService.create(any())).thenReturn(testSchedule);
+    when(scheduleService.create(any(ScheduleData.class))).thenReturn(
+      testSchedule
+    );
 
     mockMvc
       .perform(
@@ -128,12 +152,20 @@ class ScheduleControllerTest {
       .andExpect(jsonPath("$.employeeId").value(testSchedule.getEmployeeId()))
       .andExpect(
         jsonPath("$.employeeName").value(testSchedule.getEmployeeName())
+      )
+      .andExpect(
+        jsonPath("$.startTime").value(testSchedule.getStartTime().toString())
+      )
+      .andExpect(
+        jsonPath("$.endTime").value(testSchedule.getEndTime().toString())
       );
   }
 
   @Test
   void update_withValidData_shouldUpdateSchedule() throws Exception {
-    when(scheduleService.update(anyLong(), any())).thenReturn(testSchedule);
+    when(scheduleService.update(anyLong(), any(ScheduleData.class))).thenReturn(
+      testSchedule
+    );
 
     mockMvc
       .perform(
@@ -146,6 +178,12 @@ class ScheduleControllerTest {
       .andExpect(jsonPath("$.employeeId").value(testSchedule.getEmployeeId()))
       .andExpect(
         jsonPath("$.employeeName").value(testSchedule.getEmployeeName())
+      )
+      .andExpect(
+        jsonPath("$.startTime").value(testSchedule.getStartTime().toString())
+      )
+      .andExpect(
+        jsonPath("$.endTime").value(testSchedule.getEndTime().toString())
       );
   }
 
@@ -158,9 +196,9 @@ class ScheduleControllerTest {
 
   @Test
   void generateWeeklySchedule_shouldGenerateSchedules() throws Exception {
-    when(scheduleService.generateWeeklySchedule(any(), any())).thenReturn(
-      List.of(testSchedule)
-    );
+    when(
+      scheduleService.generateWeeklySchedule(anyLong(), any(ScheduleData.class))
+    ).thenReturn(List.of(testSchedule));
 
     mockMvc
       .perform(
@@ -175,6 +213,12 @@ class ScheduleControllerTest {
       )
       .andExpect(
         jsonPath("$[0].employeeName").value(testSchedule.getEmployeeName())
+      )
+      .andExpect(
+        jsonPath("$[0].startTime").value(testSchedule.getStartTime().toString())
+      )
+      .andExpect(
+        jsonPath("$[0].endTime").value(testSchedule.getEndTime().toString())
       );
   }
 }

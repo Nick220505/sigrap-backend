@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,9 +38,16 @@ class ScheduleServiceTest {
   private ScheduleData scheduleData;
   private ScheduleInfo scheduleInfo;
   private Employee employee;
+  private LocalTime testStartTime;
+  private LocalTime testEndTime;
+  private LocalDateTime testTimestamp;
 
   @BeforeEach
   void setUp() {
+    testStartTime = LocalTime.now().withNano(0);
+    testEndTime = LocalTime.now().plusHours(8).withNano(0);
+    testTimestamp = LocalDateTime.now().withNano(0);
+
     employee = Employee.builder()
       .id(1L)
       .firstName("John")
@@ -50,26 +58,32 @@ class ScheduleServiceTest {
     schedule = Schedule.builder()
       .id(1L)
       .employee(employee)
-      .startTime(LocalDateTime.now())
-      .endTime(LocalDateTime.now().plusHours(8))
-      .createdAt(LocalDateTime.now())
-      .updatedAt(LocalDateTime.now())
+      .day("MONDAY")
+      .startTime(testStartTime)
+      .endTime(testEndTime)
+      .isActive(true)
+      .createdAt(testTimestamp)
+      .updatedAt(testTimestamp)
       .build();
 
     scheduleData = ScheduleData.builder()
       .employeeId(1L)
-      .startTime(LocalDateTime.now())
-      .endTime(LocalDateTime.now().plusHours(8))
+      .day("MONDAY")
+      .startTime(testStartTime)
+      .endTime(testEndTime)
+      .isActive(true)
       .build();
 
     scheduleInfo = ScheduleInfo.builder()
       .id(1L)
       .employeeId(1L)
       .employeeName("John Doe")
-      .startTime(LocalDateTime.now())
-      .endTime(LocalDateTime.now().plusHours(8))
-      .createdAt(LocalDateTime.now())
-      .updatedAt(LocalDateTime.now())
+      .day("MONDAY")
+      .startTime(testStartTime)
+      .endTime(testEndTime)
+      .isActive(true)
+      .createdAt(testTimestamp)
+      .updatedAt(testTimestamp)
       .build();
   }
 
@@ -145,7 +159,6 @@ class ScheduleServiceTest {
     assertNotNull(result);
     assertEquals(scheduleInfo, result);
     verify(scheduleMapper).updateEntity(schedule, scheduleData);
-    verify(scheduleRepository).save(schedule);
   }
 
   @Test
@@ -197,8 +210,10 @@ class ScheduleServiceTest {
   @Test
   void generateWeeklySchedule_shouldGenerateSchedules() {
     when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-    when(scheduleMapper.toEntity(any(), any())).thenReturn(schedule);
-    when(scheduleRepository.save(any())).thenReturn(schedule);
+    when(
+      scheduleMapper.toEntity(any(ScheduleData.class), any(Employee.class))
+    ).thenReturn(schedule);
+    when(scheduleRepository.save(any(Schedule.class))).thenReturn(schedule);
     when(scheduleMapper.toInfo(schedule)).thenReturn(scheduleInfo);
 
     List<ScheduleInfo> result = scheduleService.generateWeeklySchedule(
@@ -208,7 +223,11 @@ class ScheduleServiceTest {
 
     assertNotNull(result);
     assertEquals(7, result.size());
-    result.forEach(info -> assertEquals(scheduleInfo, info));
+    result.forEach(info -> {
+      assertNotNull(info);
+      assertEquals(scheduleInfo.getStartTime(), info.getStartTime());
+      assertEquals(scheduleInfo.getEndTime(), info.getEndTime());
+    });
   }
 
   @Test

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.sigrap.user.User;
 import com.sigrap.user.UserStatus;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,11 +27,10 @@ class ScheduleRepositoryTest {
   @Autowired
   private ScheduleRepository scheduleRepository;
 
-  @Autowired
-  private EmployeeRepository employeeRepository;
-
   private Employee employee;
   private Schedule schedule;
+  private LocalTime defaultStartTime;
+  private LocalTime defaultEndTime;
 
   @BeforeEach
   void setUp() {
@@ -49,17 +49,20 @@ class ScheduleRepositoryTest {
       .email("john.doe@example.com")
       .position("Sales")
       .department("Sales")
-      .hireDate(LocalDateTime.now())
+      .hireDate(LocalDateTime.now().withNano(0))
       .status(Employee.EmployeeStatus.ACTIVE)
       .user(user)
       .build();
-    employee = employeeRepository.save(employee);
+    employee = entityManager.persist(employee);
+
+    defaultStartTime = LocalTime.of(9, 0);
+    defaultEndTime = LocalTime.of(17, 0);
 
     schedule = Schedule.builder()
       .employee(employee)
       .day("MONDAY")
-      .startTime(LocalDateTime.now())
-      .endTime(LocalDateTime.now().plusHours(8))
+      .startTime(defaultStartTime)
+      .endTime(defaultEndTime)
       .isActive(true)
       .build();
     schedule = scheduleRepository.save(schedule);
@@ -147,29 +150,36 @@ class ScheduleRepositoryTest {
 
   @Test
   void save_ShouldCreateSchedule() {
+    LocalTime newStartTime = LocalTime.of(10, 0);
+    LocalTime newEndTime = LocalTime.of(18, 0);
+
     Schedule newSchedule = Schedule.builder()
       .employee(employee)
-      .day("MONDAY")
-      .startTime(LocalDateTime.now().plusDays(1))
-      .endTime(LocalDateTime.now().plusDays(1).plusHours(8))
+      .day("TUESDAY")
+      .startTime(newStartTime)
+      .endTime(newEndTime)
       .isActive(true)
       .build();
 
     Schedule saved = scheduleRepository.save(newSchedule);
+    entityManager.flush();
 
     assertNotNull(saved);
     assertNotNull(saved.getId());
+    Schedule found = entityManager.find(Schedule.class, saved.getId());
+    assertNotNull(found);
     assertEquals(
       newSchedule.getEmployee().getId(),
-      saved.getEmployee().getId()
+      found.getEmployee().getId()
     );
-    assertEquals(newSchedule.getStartTime(), saved.getStartTime());
-    assertEquals(newSchedule.getEndTime(), saved.getEndTime());
+    assertEquals(newSchedule.getStartTime(), found.getStartTime());
+    assertEquals(newSchedule.getEndTime(), found.getEndTime());
   }
 
   @Test
   void delete_ShouldRemoveSchedule() {
     scheduleRepository.deleteById(schedule.getId());
+    entityManager.flush();
 
     Optional<Schedule> found = scheduleRepository.findById(schedule.getId());
     assertTrue(found.isEmpty());

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,11 +26,15 @@ class ScheduleMapperTest {
   private Schedule schedule;
   private ScheduleData scheduleData;
   private Employee employee;
-  private LocalDateTime now;
+  private LocalTime testStartTime;
+  private LocalTime testEndTime;
+  private LocalDateTime testTimestamp;
 
   @BeforeEach
   void setUp() {
-    now = LocalDateTime.now();
+    testTimestamp = LocalDateTime.now().withNano(0);
+    testStartTime = LocalTime.of(9, 0);
+    testEndTime = LocalTime.of(17, 0);
 
     employee = Employee.builder()
       .id(1L)
@@ -41,18 +46,18 @@ class ScheduleMapperTest {
       .id(1L)
       .employee(employee)
       .day("MONDAY")
-      .startTime(now)
-      .endTime(now.plusHours(8))
+      .startTime(testStartTime)
+      .endTime(testEndTime)
       .isActive(true)
-      .createdAt(now)
-      .updatedAt(now)
+      .createdAt(testTimestamp)
+      .updatedAt(testTimestamp)
       .build();
 
     scheduleData = ScheduleData.builder()
       .employeeId(1L)
       .day("MONDAY")
-      .startTime(now)
-      .endTime(now.plusHours(8))
+      .startTime(testStartTime)
+      .endTime(testEndTime)
       .isActive(true)
       .build();
   }
@@ -114,7 +119,7 @@ class ScheduleMapperTest {
     assertEquals(scheduleData.getDay(), result.getDay());
     assertEquals(scheduleData.getStartTime(), result.getStartTime());
     assertEquals(scheduleData.getEndTime(), result.getEndTime());
-    assertEquals(scheduleData.getIsActive(), result.getIsActive());
+    assertEquals(true, result.getIsActive());
   }
 
   @Test
@@ -124,40 +129,57 @@ class ScheduleMapperTest {
 
   @Test
   void updateEntity_ShouldUpdateAllFields() {
+    LocalTime newStartTime = LocalTime.of(8, 0);
+    LocalTime newEndTime = LocalTime.of(16, 0);
+
     Schedule existingSchedule = Schedule.builder()
       .id(1L)
       .employee(employee)
       .day("TUESDAY")
-      .startTime(now.minusDays(1))
-      .endTime(now.minusDays(1).plusHours(8))
+      .startTime(newStartTime)
+      .endTime(newEndTime)
       .isActive(false)
       .build();
 
-    scheduleMapper.updateEntity(existingSchedule, scheduleData);
+    ScheduleData updateSourceData = ScheduleData.builder()
+      .day("WEDNESDAY")
+      .startTime(LocalTime.of(10, 0))
+      .endTime(LocalTime.of(18, 0))
+      .isActive(true)
+      .build();
 
-    assertEquals(scheduleData.getDay(), existingSchedule.getDay());
-    assertEquals(scheduleData.getStartTime(), existingSchedule.getStartTime());
-    assertEquals(scheduleData.getEndTime(), existingSchedule.getEndTime());
-    assertEquals(scheduleData.getIsActive(), existingSchedule.getIsActive());
+    scheduleMapper.updateEntity(existingSchedule, updateSourceData);
+
+    assertEquals(updateSourceData.getDay(), existingSchedule.getDay());
+    assertEquals(
+      updateSourceData.getStartTime(),
+      existingSchedule.getStartTime()
+    );
+    assertEquals(updateSourceData.getEndTime(), existingSchedule.getEndTime());
+    assertEquals(
+      updateSourceData.getIsActive(),
+      existingSchedule.getIsActive()
+    );
   }
 
   @Test
   void updateEntity_ShouldNotUpdateFields_WhenDataIsNull() {
+    LocalTime originalStartTime = LocalTime.of(7, 0);
+    LocalTime originalEndTime = LocalTime.of(15, 0);
+
     Schedule existingSchedule = Schedule.builder()
       .id(1L)
       .employee(employee)
       .day("TUESDAY")
-      .startTime(now.minusDays(1))
-      .endTime(now.minusDays(1).plusHours(8))
+      .startTime(originalStartTime)
+      .endTime(originalEndTime)
       .isActive(false)
       .build();
-
-    LocalDateTime originalStartTime = existingSchedule.getStartTime();
-    LocalDateTime originalEndTime = existingSchedule.getEndTime();
 
     scheduleMapper.updateEntity(existingSchedule, null);
 
     assertEquals(originalStartTime, existingSchedule.getStartTime());
     assertEquals(originalEndTime, existingSchedule.getEndTime());
+    assertEquals(false, existingSchedule.getIsActive());
   }
 }
