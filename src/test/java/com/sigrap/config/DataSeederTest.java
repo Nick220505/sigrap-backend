@@ -12,7 +12,6 @@ import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
 import com.sigrap.customer.CustomerRepository;
 import com.sigrap.employee.AttendanceRepository;
-import com.sigrap.employee.EmployeePerformanceRepository;
 import com.sigrap.employee.EmployeeRepository;
 import com.sigrap.employee.ScheduleRepository;
 import com.sigrap.payment.PaymentRepository;
@@ -61,9 +60,6 @@ class DataSeederTest {
   private AttendanceRepository attendanceRepository;
 
   @Mock
-  private EmployeePerformanceRepository employeePerformanceRepository;
-
-  @Mock
   private SupplierRepository supplierRepository;
 
   @Mock
@@ -90,7 +86,6 @@ class DataSeederTest {
     lenient().when(employeeRepository.count()).thenReturn(2L);
     lenient().when(scheduleRepository.count()).thenReturn(2L);
     lenient().when(attendanceRepository.count()).thenReturn(2L);
-    lenient().when(employeePerformanceRepository.count()).thenReturn(2L);
     lenient().when(supplierRepository.count()).thenReturn(2L);
     lenient().when(purchaseOrderRepository.count()).thenReturn(2L);
     lenient().when(purchaseOrderTrackingEventRepository.count()).thenReturn(2L);

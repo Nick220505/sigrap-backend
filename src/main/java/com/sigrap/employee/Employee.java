@@ -1,14 +1,6 @@
 package com.sigrap.employee;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import com.sigrap.user.User;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -23,11 +15,16 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  * Entity class representing an employee in the system.
@@ -155,15 +152,6 @@ public class Employee {
   @Builder.Default
   @EqualsAndHashCode.Exclude
   private Set<Attendance> attendanceRecords = new HashSet<>();
-
-  /**
-   * Collection of performance records for this employee.
-   * One-to-many relationship with EmployeePerformance.
-   */
-  @OneToMany(mappedBy = "employee")
-  @Builder.Default
-  @EqualsAndHashCode.Exclude
-  private Set<EmployeePerformance> performanceRecords = new HashSet<>();
 
   /**
    * Timestamp of when the employee record was created.

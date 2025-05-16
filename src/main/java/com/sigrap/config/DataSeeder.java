@@ -8,8 +8,6 @@ import com.sigrap.customer.CustomerStatus;
 import com.sigrap.employee.Attendance;
 import com.sigrap.employee.AttendanceRepository;
 import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeePerformance;
-import com.sigrap.employee.EmployeePerformanceRepository;
 import com.sigrap.employee.EmployeeRepository;
 import com.sigrap.employee.Schedule;
 import com.sigrap.employee.ScheduleRepository;
@@ -108,12 +106,6 @@ public class DataSeeder implements CommandLineRunner {
   private final AttendanceRepository attendanceRepository;
 
   /**
-   * Repository for employee performance database operations.
-   * Used to check if employee performance records exist and to save new performance records during seeding.
-   */
-  private final EmployeePerformanceRepository employeePerformanceRepository;
-
-  /**
    * Repository for supplier database operations.
    * Used to check if suppliers exist and to save new suppliers during seeding.
    */
@@ -162,7 +154,6 @@ public class DataSeeder implements CommandLineRunner {
     seedEmployees();
     seedSchedules();
     seedAttendance();
-    seedEmployeePerformance();
     seedSuppliers();
     seedPurchaseOrders();
     seedPurchaseOrderTrackingEvents();
@@ -922,71 +913,6 @@ public class DataSeeder implements CommandLineRunner {
 
     attendanceRepository.saveAll(attendanceRecords);
     log.info("Attendance records seeded successfully.");
-  }
-
-  private void seedEmployeePerformance() {
-    if (employeePerformanceRepository.count() > 0) {
-      log.info("Performance records already seeded.");
-      return;
-    }
-
-    log.info("Seeding performance records...");
-
-    List<EmployeePerformance> performanceRecords = new ArrayList<>();
-    List<Employee> employees = employeeRepository.findAll();
-    LocalDateTime now = LocalDateTime.now();
-
-    for (Employee employee : employees) {
-      for (int i = 0; i < 3; i++) {
-        LocalDateTime periodStart = now.minusMonths(i).withDayOfMonth(1);
-        LocalDateTime periodEnd = periodStart.plusMonths(1).minusDays(1);
-
-        int salesCount = 0;
-        BigDecimal salesTotal = BigDecimal.ZERO;
-        int rating = 0;
-        String notes = "";
-
-        switch (employee.getPosition()) {
-          case "Vendedor":
-            salesCount = 80 + random.nextInt(40);
-            salesTotal = BigDecimal.valueOf(
-              salesCount * 100 * (1 + random.nextDouble())
-            );
-            rating = 85 + random.nextInt(15);
-            notes = "Excelente desempeño en ventas. Buena atención al cliente.";
-            break;
-          case "Almacenero":
-            salesCount = 150 + random.nextInt(50);
-            salesTotal = BigDecimal.valueOf(salesCount * 50);
-            rating = 80 + random.nextInt(15);
-            notes =
-              "Eficiente manejo de inventario. Mantiene el almacén organizado.";
-            break;
-          case "Gerente General":
-            salesCount = 20 + random.nextInt(10);
-            salesTotal = BigDecimal.valueOf(10000 + random.nextDouble() * 5000);
-            rating = 90 + random.nextInt(10);
-            notes =
-              "Liderazgo efectivo. Cumplimiento de objetivos del departamento.";
-            break;
-        }
-
-        performanceRecords.add(
-          EmployeePerformance.builder()
-            .employee(employee)
-            .periodStart(periodStart)
-            .periodEnd(periodEnd)
-            .salesCount(salesCount)
-            .salesTotal(salesTotal)
-            .rating(rating)
-            .notes(notes)
-            .build()
-        );
-      }
-    }
-
-    employeePerformanceRepository.saveAll(performanceRecords);
-    log.info("Performance records seeded successfully.");
   }
 
   /**
