@@ -1,8 +1,7 @@
-package com.sigrap.employee;
-
-import java.time.LocalDateTime;
+package com.sigrap.employee.attendance;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -79,7 +78,7 @@ public class AttendanceInfo {
    * Status of the attendance record.
    */
   @Schema(description = "Status of the attendance", example = "PRESENT")
-  private Attendance.AttendanceStatus status;
+  private AttendanceStatus status;
 
   /**
    * Additional notes or comments about the attendance.

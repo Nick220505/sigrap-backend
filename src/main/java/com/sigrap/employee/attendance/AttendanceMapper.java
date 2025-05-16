@@ -1,5 +1,7 @@
-package com.sigrap.employee;
+package com.sigrap.employee.attendance;
 
+import com.sigrap.employee.Employee;
+import com.sigrap.employee.EmployeeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Duration;
 import java.util.Collections;

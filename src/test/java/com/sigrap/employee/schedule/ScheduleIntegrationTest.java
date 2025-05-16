@@ -1,4 +1,4 @@
-package com.sigrap.employee;
+package com.sigrap.employee.schedule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -9,6 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sigrap.employee.Employee;
+import com.sigrap.employee.EmployeeRepository;
+import com.sigrap.employee.EmployeeStatus;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserStatus;

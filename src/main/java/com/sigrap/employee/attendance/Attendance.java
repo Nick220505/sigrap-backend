@@ -1,10 +1,6 @@
-package com.sigrap.employee;
+package com.sigrap.employee.attendance;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
+import com.sigrap.employee.Employee;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,10 +12,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  * Entity class representing employee attendance records.
@@ -113,34 +112,4 @@ public class Attendance {
   @UpdateTimestamp
   @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
-
-  /**
-   * Enum representing possible attendance statuses.
-   */
-  public enum AttendanceStatus {
-    /**
-     * Employee was present for their shift.
-     */
-    PRESENT,
-
-    /**
-     * Employee was absent from their shift.
-     */
-    ABSENT,
-
-    /**
-     * Employee arrived late for their shift.
-     */
-    LATE,
-
-    /**
-     * Employee left early from their shift.
-     */
-    EARLY_DEPARTURE,
-
-    /**
-     * Employee was on approved leave.
-     */
-    ON_LEAVE,
-  }
 }

@@ -1,4 +1,4 @@
-package com.sigrap.employee;
+package com.sigrap.employee.attendance;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,8 +9,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sigrap.employee.Employee;
+import com.sigrap.employee.EmployeeRepository;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
+import com.sigrap.user.UserStatus;
 import java.time.LocalDateTime;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sigrap.user.User;
-import com.sigrap.user.UserRepository;
-import com.sigrap.user.UserStatus;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -78,7 +78,7 @@ class AttendanceIntegrationTest {
       .employee(testEmployee)
       .date(LocalDateTime.now())
       .clockInTime(LocalDateTime.now())
-      .status(Attendance.AttendanceStatus.PRESENT)
+      .status(AttendanceStatus.PRESENT)
       .notes("Regular day")
       .build();
     attendanceRepository.save(testAttendance);
@@ -164,7 +164,7 @@ class AttendanceIntegrationTest {
       .clockInTime(LocalDateTime.now())
       .clockOutTime(LocalDateTime.now().plusHours(8))
       .totalHours(8.0)
-      .status(Attendance.AttendanceStatus.PRESENT)
+      .status(AttendanceStatus.PRESENT)
       .notes("")
       .build();
 
@@ -173,22 +173,17 @@ class AttendanceIntegrationTest {
     mockMvc
       .perform(
         put("/api/attendance/" + freshAttendance.getId() + "/status")
-          .param("status", Attendance.AttendanceStatus.LATE.toString())
+          .param("status", AttendanceStatus.LATE.toString())
           .param("notes", "Late arrival")
       )
       .andExpect(status().isOk())
-      .andExpect(
-        jsonPath("$.status").value(Attendance.AttendanceStatus.LATE.toString())
-      );
+      .andExpect(jsonPath("$.status").value(AttendanceStatus.LATE.toString()));
 
     Attendance updatedAttendance = attendanceRepository
       .findById(freshAttendance.getId())
       .orElse(null);
     assertNotNull(updatedAttendance);
-    assertEquals(
-      Attendance.AttendanceStatus.LATE,
-      updatedAttendance.getStatus()
-    );
+    assertEquals(AttendanceStatus.LATE, updatedAttendance.getStatus());
     assertEquals("Late arrival", updatedAttendance.getNotes());
   }
 }

@@ -1,10 +1,11 @@
-package com.sigrap.employee;
+package com.sigrap.employee.attendance;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sigrap.config.RepositoryTestConfiguration;
+import com.sigrap.employee.Employee;
 import com.sigrap.user.User;
 import com.sigrap.user.UserStatus;
 import java.time.LocalDateTime;
@@ -62,7 +63,7 @@ class AttendanceRepositoryTest {
       .clockInTime(LocalDateTime.now())
       .clockOutTime(LocalDateTime.now().plusHours(8))
       .totalHours(8.0)
-      .status(Attendance.AttendanceStatus.PRESENT)
+      .status(AttendanceStatus.PRESENT)
       .notes("Regular day")
       .build();
     entityManager.persist(testAttendance);
@@ -118,7 +119,7 @@ class AttendanceRepositoryTest {
   @Test
   void findByStatus_ShouldReturnAttendanceRecords() {
     List<Attendance> result = attendanceRepository.findByStatus(
-      Attendance.AttendanceStatus.PRESENT
+      AttendanceStatus.PRESENT
     );
 
     assertNotNull(result);
@@ -147,7 +148,7 @@ class AttendanceRepositoryTest {
   void findByEmployeeIdAndStatus_ShouldReturnAttendanceRecords() {
     List<Attendance> result = attendanceRepository.findByEmployeeIdAndStatus(
       testEmployee.getId(),
-      Attendance.AttendanceStatus.PRESENT
+      AttendanceStatus.PRESENT
     );
 
     assertNotNull(result);

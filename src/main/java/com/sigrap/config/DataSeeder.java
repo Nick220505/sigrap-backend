@@ -5,13 +5,14 @@ import com.sigrap.category.CategoryRepository;
 import com.sigrap.customer.Customer;
 import com.sigrap.customer.CustomerRepository;
 import com.sigrap.customer.CustomerStatus;
-import com.sigrap.employee.Attendance;
-import com.sigrap.employee.AttendanceRepository;
 import com.sigrap.employee.Employee;
 import com.sigrap.employee.EmployeeRepository;
 import com.sigrap.employee.EmployeeStatus;
-import com.sigrap.employee.Schedule;
-import com.sigrap.employee.ScheduleRepository;
+import com.sigrap.employee.attendance.Attendance;
+import com.sigrap.employee.attendance.AttendanceRepository;
+import com.sigrap.employee.attendance.AttendanceStatus;
+import com.sigrap.employee.schedule.Schedule;
+import com.sigrap.employee.schedule.ScheduleRepository;
 import com.sigrap.payment.Payment;
 import com.sigrap.payment.PaymentRepository;
 import com.sigrap.payment.PaymentStatus;
@@ -887,15 +888,14 @@ public class DataSeeder implements CommandLineRunner {
           continue;
         }
 
-        Attendance.AttendanceStatus status =
-          Attendance.AttendanceStatus.PRESENT;
+        AttendanceStatus status = AttendanceStatus.PRESENT;
         String notes = "Asistencia regular";
 
         if (i == 2) {
-          status = Attendance.AttendanceStatus.LATE;
+          status = AttendanceStatus.LATE;
           notes = "Llegó 15 minutos tarde debido al tráfico";
         } else if (i == 5) {
-          status = Attendance.AttendanceStatus.ON_LEAVE;
+          status = AttendanceStatus.ON_LEAVE;
           notes = "Permiso por asuntos personales";
         }
 

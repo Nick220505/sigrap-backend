@@ -1,4 +1,4 @@
-package com.sigrap.employee;
+package com.sigrap.employee.attendance;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -51,7 +51,7 @@ class AttendanceControllerTest {
       .clockInTime(LocalDateTime.now())
       .clockOutTime(LocalDateTime.now().plusHours(8))
       .totalHours(8.0)
-      .status(Attendance.AttendanceStatus.PRESENT)
+      .status(AttendanceStatus.PRESENT)
       .notes("Regular day")
       .build();
 

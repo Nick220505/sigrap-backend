@@ -1,4 +1,4 @@
-package com.sigrap.employee;
+package com.sigrap.employee.attendance;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 
+import com.sigrap.employee.Employee;
+import com.sigrap.employee.EmployeeRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +51,7 @@ class AttendanceServiceTest {
       .date(LocalDateTime.now())
       .clockInTime(LocalDateTime.now())
       .clockOutTime(null)
-      .status(Attendance.AttendanceStatus.PRESENT)
+      .status(AttendanceStatus.PRESENT)
       .notes("Regular day")
       .build();
 
@@ -61,7 +63,7 @@ class AttendanceServiceTest {
       .clockInTime(LocalDateTime.now())
       .clockOutTime(LocalDateTime.now().plusHours(8))
       .totalHours(8.0)
-      .status(Attendance.AttendanceStatus.PRESENT)
+      .status(AttendanceStatus.PRESENT)
       .notes("Regular day")
       .build();
   }

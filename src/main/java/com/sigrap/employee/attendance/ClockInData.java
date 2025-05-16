@@ -1,9 +1,8 @@
-package com.sigrap.employee;
-
-import java.time.LocalDateTime;
+package com.sigrap.employee.attendance;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

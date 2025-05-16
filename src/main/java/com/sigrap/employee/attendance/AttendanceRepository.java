@@ -1,9 +1,8 @@
-package com.sigrap.employee;
+package com.sigrap.employee.attendance;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -57,7 +56,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
    * @param status Status to search for
    * @return List of attendance records with the status
    */
-  List<Attendance> findByStatus(Attendance.AttendanceStatus status);
+  List<Attendance> findByStatus(AttendanceStatus status);
 
   /**
    * Finds an active attendance record for an employee on a specific date.
@@ -80,7 +79,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
    */
   List<Attendance> findByEmployeeIdAndStatus(
     Long employeeId,
-    Attendance.AttendanceStatus status
+    AttendanceStatus status
   );
 
   /**

@@ -1,4 +1,4 @@
-package com.sigrap.employee;
+package com.sigrap.employee.schedule;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

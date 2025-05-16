@@ -1,9 +1,13 @@
-package com.sigrap.employee;
+package com.sigrap.employee.schedule;
 
 import java.util.Collections;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
+
+import com.sigrap.employee.Employee;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Mapper class for converting between Schedule entities and DTOs.

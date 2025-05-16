@@ -1,5 +1,6 @@
-package com.sigrap.employee;
+package com.sigrap.employee.schedule;
 
+import com.sigrap.employee.Employee;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

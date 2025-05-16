@@ -1,9 +1,11 @@
-package com.sigrap.employee;
+package com.sigrap.employee.schedule;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.sigrap.employee.Employee;
+import com.sigrap.employee.EmployeeStatus;
 import com.sigrap.user.User;
 import com.sigrap.user.UserStatus;
 import java.time.LocalDateTime;

@@ -1,5 +1,6 @@
 package com.sigrap.employee;
 
+import com.sigrap.employee.attendance.Attendance;
 import com.sigrap.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,14 +1,14 @@
-package com.sigrap.employee;
+package com.sigrap.employee.attendance;
 
+import com.sigrap.employee.Employee;
+import com.sigrap.employee.EmployeeRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Service class for attendance management operations.
@@ -95,7 +95,7 @@ public class AttendanceService {
       .employeeId(employee.getId())
       .date(today)
       .clockInTime(timestamp)
-      .status(Attendance.AttendanceStatus.PRESENT)
+      .status(AttendanceStatus.PRESENT)
       .notes(notes)
       .build();
 
@@ -209,7 +209,7 @@ public class AttendanceService {
   @Transactional
   public AttendanceInfo updateStatus(
     Long id,
-    Attendance.AttendanceStatus status,
+    AttendanceStatus status,
     String notes
   ) {
     Attendance attendance = attendanceRepository
@@ -234,7 +234,7 @@ public class AttendanceService {
    * @return List of AttendanceInfo DTOs
    */
   @Transactional(readOnly = true)
-  public List<AttendanceInfo> findByStatus(Attendance.AttendanceStatus status) {
+  public List<AttendanceInfo> findByStatus(AttendanceStatus status) {
     List<Attendance> attendances = attendanceRepository.findByStatus(status);
     return attendanceMapper.toInfoList(attendances);
   }
