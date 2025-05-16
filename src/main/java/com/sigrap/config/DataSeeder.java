@@ -5,8 +5,6 @@ import com.sigrap.category.CategoryRepository;
 import com.sigrap.customer.Customer;
 import com.sigrap.customer.CustomerRepository;
 import com.sigrap.customer.CustomerStatus;
-import com.sigrap.employee.ActivityLog;
-import com.sigrap.employee.ActivityLogRepository;
 import com.sigrap.employee.Attendance;
 import com.sigrap.employee.AttendanceRepository;
 import com.sigrap.employee.Employee;
@@ -116,12 +114,6 @@ public class DataSeeder implements CommandLineRunner {
   private final EmployeePerformanceRepository employeePerformanceRepository;
 
   /**
-   * Repository for activity log database operations.
-   * Used to check if activity logs exist and to save new activity logs during seeding.
-   */
-  private final ActivityLogRepository activityLogRepository;
-
-  /**
    * Repository for supplier database operations.
    * Used to check if suppliers exist and to save new suppliers during seeding.
    */
@@ -171,7 +163,6 @@ public class DataSeeder implements CommandLineRunner {
     seedSchedules();
     seedAttendance();
     seedEmployeePerformance();
-    seedActivityLogs();
     seedSuppliers();
     seedPurchaseOrders();
     seedPurchaseOrderTrackingEvents();
@@ -996,98 +987,6 @@ public class DataSeeder implements CommandLineRunner {
 
     employeePerformanceRepository.saveAll(performanceRecords);
     log.info("Performance records seeded successfully.");
-  }
-
-  private void seedActivityLogs() {
-    if (activityLogRepository.count() > 0) {
-      log.info("Activity logs already seeded.");
-      return;
-    }
-
-    log.info("Seeding activity logs...");
-
-    List<ActivityLog> activityLogs = new ArrayList<>();
-    List<Employee> employees = employeeRepository.findAll();
-    LocalDateTime now = LocalDateTime.now();
-
-    for (Employee employee : employees) {
-      activityLogs.add(
-        ActivityLog.builder()
-          .employee(employee)
-          .timestamp(now.minusDays(1))
-          .actionType(ActivityLog.ActionType.LOGIN)
-          .description("Inicio de sesión exitoso")
-          .moduleName("auth")
-          .ipAddress("192.168.1.100")
-          .build()
-      );
-
-      activityLogs.add(
-        ActivityLog.builder()
-          .employee(employee)
-          .timestamp(now.minusDays(1).plusHours(9))
-          .actionType(ActivityLog.ActionType.VIEW)
-          .description("Consulta de inventario")
-          .moduleName("inventory")
-          .ipAddress("192.168.1.100")
-          .build()
-      );
-
-      if ("Vendedor".equals(employee.getPosition())) {
-        activityLogs.add(
-          ActivityLog.builder()
-            .employee(employee)
-            .timestamp(now.minusDays(1).plusHours(10))
-            .actionType(ActivityLog.ActionType.CREATE)
-            .description("Registro de nueva venta")
-            .moduleName("sales")
-            .entityId("SALE-001")
-            .ipAddress("192.168.1.100")
-            .build()
-        );
-      }
-
-      if ("Almacenero".equals(employee.getPosition())) {
-        activityLogs.add(
-          ActivityLog.builder()
-            .employee(employee)
-            .timestamp(now.minusDays(1).plusHours(11))
-            .actionType(ActivityLog.ActionType.UPDATE)
-            .description("Actualización de stock de producto")
-            .moduleName("inventory")
-            .entityId("PROD-001")
-            .ipAddress("192.168.1.100")
-            .build()
-        );
-      }
-
-      if ("Gerente General".equals(employee.getPosition())) {
-        activityLogs.add(
-          ActivityLog.builder()
-            .employee(employee)
-            .timestamp(now.minusDays(1).plusHours(14))
-            .actionType(ActivityLog.ActionType.EXPORT)
-            .description("Generación de reporte de ventas")
-            .moduleName("reports")
-            .ipAddress("192.168.1.100")
-            .build()
-        );
-      }
-
-      activityLogs.add(
-        ActivityLog.builder()
-          .employee(employee)
-          .timestamp(now.minusDays(1).plusHours(17))
-          .actionType(ActivityLog.ActionType.LOGOUT)
-          .description("Cierre de sesión")
-          .moduleName("auth")
-          .ipAddress("192.168.1.100")
-          .build()
-      );
-    }
-
-    activityLogRepository.saveAll(activityLogs);
-    log.info("Activity logs seeded successfully.");
   }
 
   /**

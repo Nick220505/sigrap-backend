@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
 import com.sigrap.customer.CustomerRepository;
-import com.sigrap.employee.ActivityLogRepository;
 import com.sigrap.employee.AttendanceRepository;
 import com.sigrap.employee.EmployeePerformanceRepository;
 import com.sigrap.employee.EmployeeRepository;
@@ -65,9 +64,6 @@ class DataSeederTest {
   private EmployeePerformanceRepository employeePerformanceRepository;
 
   @Mock
-  private ActivityLogRepository activityLogRepository;
-
-  @Mock
   private SupplierRepository supplierRepository;
 
   @Mock
@@ -95,7 +91,6 @@ class DataSeederTest {
     lenient().when(scheduleRepository.count()).thenReturn(2L);
     lenient().when(attendanceRepository.count()).thenReturn(2L);
     lenient().when(employeePerformanceRepository.count()).thenReturn(2L);
-    lenient().when(activityLogRepository.count()).thenReturn(2L);
     lenient().when(supplierRepository.count()).thenReturn(2L);
     lenient().when(purchaseOrderRepository.count()).thenReturn(2L);
     lenient().when(purchaseOrderTrackingEventRepository.count()).thenReturn(2L);
