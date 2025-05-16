@@ -4,8 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeeRepository;
+import com.sigrap.user.User;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -13,21 +12,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ScheduleMapperTest {
-
-  @Mock
-  private EmployeeRepository employeeRepository;
 
   @InjectMocks
   private ScheduleMapper scheduleMapper;
 
   private Schedule schedule;
   private ScheduleData scheduleData;
-  private Employee employee;
+  private User testUser;
   private LocalTime testStartTime;
   private LocalTime testEndTime;
   private LocalDateTime testTimestamp;
@@ -38,15 +33,15 @@ class ScheduleMapperTest {
     testStartTime = LocalTime.of(9, 0);
     testEndTime = LocalTime.of(17, 0);
 
-    employee = Employee.builder()
+    testUser = User.builder()
       .id(1L)
-      .firstName("John")
-      .lastName("Doe")
+      .name("John Doe")
+      .email("john.doe@example.com")
       .build();
 
     schedule = Schedule.builder()
       .id(1L)
-      .employee(employee)
+      .user(testUser)
       .day("MONDAY")
       .startTime(testStartTime)
       .endTime(testEndTime)
@@ -56,7 +51,7 @@ class ScheduleMapperTest {
       .build();
 
     scheduleData = ScheduleData.builder()
-      .employeeId(1L)
+      .userId(1L)
       .day("MONDAY")
       .startTime(testStartTime)
       .endTime(testEndTime)
@@ -70,8 +65,8 @@ class ScheduleMapperTest {
 
     assertNotNull(info);
     assertEquals(schedule.getId(), info.getId());
-    assertEquals(employee.getId(), info.getEmployeeId());
-    assertEquals("John Doe", info.getEmployeeName());
+    assertEquals(testUser.getId(), info.getUserId());
+    assertEquals(testUser.getName(), info.getUserName());
     assertEquals(schedule.getDay(), info.getDay());
     assertEquals(schedule.getStartTime(), info.getStartTime());
     assertEquals(schedule.getEndTime(), info.getEndTime());
@@ -94,8 +89,8 @@ class ScheduleMapperTest {
 
     ScheduleInfo info = infos.get(0);
     assertEquals(schedule.getId(), info.getId());
-    assertEquals(employee.getId(), info.getEmployeeId());
-    assertEquals("John Doe", info.getEmployeeName());
+    assertEquals(testUser.getId(), info.getUserId());
+    assertEquals(testUser.getName(), info.getUserName());
     assertEquals(schedule.getDay(), info.getDay());
     assertEquals(schedule.getStartTime(), info.getStartTime());
     assertEquals(schedule.getEndTime(), info.getEndTime());
@@ -114,10 +109,10 @@ class ScheduleMapperTest {
 
   @Test
   void toEntity_ShouldMapAllFields() {
-    Schedule result = scheduleMapper.toEntity(scheduleData, employee);
+    Schedule result = scheduleMapper.toEntity(scheduleData, testUser);
 
     assertNotNull(result);
-    assertEquals(employee, result.getEmployee());
+    assertEquals(testUser, result.getUser());
     assertEquals(scheduleData.getDay(), result.getDay());
     assertEquals(scheduleData.getStartTime(), result.getStartTime());
     assertEquals(scheduleData.getEndTime(), result.getEndTime());
@@ -136,7 +131,7 @@ class ScheduleMapperTest {
 
     Schedule existingSchedule = Schedule.builder()
       .id(1L)
-      .employee(employee)
+      .user(testUser)
       .day("TUESDAY")
       .startTime(newStartTime)
       .endTime(newEndTime)
@@ -171,7 +166,7 @@ class ScheduleMapperTest {
 
     Schedule existingSchedule = Schedule.builder()
       .id(1L)
-      .employee(employee)
+      .user(testUser)
       .day("TUESDAY")
       .startTime(originalStartTime)
       .endTime(originalEndTime)

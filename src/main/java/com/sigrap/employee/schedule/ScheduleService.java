@@ -1,7 +1,7 @@
 package com.sigrap.employee.schedule;
 
-import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeeRepository;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class ScheduleService {
 
   private final ScheduleRepository scheduleRepository;
   private final ScheduleMapper scheduleMapper;
-  private final EmployeeRepository employeeRepository;
+  private final UserRepository userRepository;
 
   /**
    * Retrieves all schedules.
@@ -64,19 +64,16 @@ public class ScheduleService {
    *
    * @param data The data for the new schedule
    * @return ScheduleInfo containing the created schedule's information
-   * @throws EntityNotFoundException if the referenced employee is not found
+   * @throws EntityNotFoundException if the referenced user is not found
    */
   @Transactional
   public ScheduleInfo create(ScheduleData data) {
-    Employee employee = employeeRepository
-      .findById(data.getEmployeeId())
+    User user = userRepository
+      .findById(data.getUserId())
       .orElseThrow(() ->
-        new EntityNotFoundException(
-          "Employee not found: " + data.getEmployeeId()
-        )
+        new EntityNotFoundException("User not found: " + data.getUserId())
       );
-
-    Schedule schedule = scheduleMapper.toEntity(data, employee);
+    Schedule schedule = scheduleMapper.toEntity(data, user);
     schedule = scheduleRepository.save(schedule);
     return scheduleMapper.toInfo(schedule);
   }
@@ -87,7 +84,7 @@ public class ScheduleService {
    * @param id The ID of the schedule to update
    * @param data The new data for the schedule
    * @return ScheduleInfo containing the updated schedule's information
-   * @throws EntityNotFoundException if the schedule is not found
+   * @throws EntityNotFoundException if the schedule or user is not found
    */
   @Transactional
   public ScheduleInfo update(Long id, ScheduleData data) {
@@ -117,14 +114,14 @@ public class ScheduleService {
   }
 
   /**
-   * Finds all schedules for a specific employee.
+   * Finds all schedules for a specific user.
    *
-   * @param employeeId The ID of the employee
+   * @param userId The ID of the user
    * @return List of ScheduleInfo DTOs
    */
   @Transactional(readOnly = true)
-  public List<ScheduleInfo> findByEmployeeId(Long employeeId) {
-    List<Schedule> schedules = scheduleRepository.findByEmployeeId(employeeId);
+  public List<ScheduleInfo> findByUserId(Long userId) {
+    List<Schedule> schedules = scheduleRepository.findByUserId(userId);
     return scheduleMapper.toInfoList(schedules);
   }
 
@@ -141,28 +138,31 @@ public class ScheduleService {
   }
 
   /**
-   * Generates a weekly schedule for an employee.
+   * Generates a weekly schedule for a user.
    * The input ScheduleData's startTime and endTime (LocalTime) will be used for all days.
    *
-   * @param employeeId The ID of the employee
-   * @param data The base schedule data to use (containing LocalTime for start/end)
+   * @param userId The ID of the user
+   * @param data The base schedule data to use (containing LocalTime for start/end and optionally isActive)
    * @return List of ScheduleInfo DTOs for the generated schedules
-   * @throws EntityNotFoundException if the employee is not found
+   * @throws EntityNotFoundException if the user is not found
    */
   @Transactional
   public List<ScheduleInfo> generateWeeklySchedule(
-    Long employeeId,
+    Long userId,
     ScheduleData data
   ) {
-    Employee employee = employeeRepository
-      .findById(employeeId)
+    User user = userRepository
+      .findById(userId)
       .orElseThrow(() ->
-        new EntityNotFoundException("Employee not found: " + employeeId)
+        new EntityNotFoundException("User not found: " + userId)
       );
 
     List<ScheduleInfo> weeklySchedules = new ArrayList<>();
     LocalTime startTime = data.getStartTime();
     LocalTime endTime = data.getEndTime();
+    boolean isActiveForWeek = Optional.ofNullable(data.getIsActive()).orElse(
+      true
+    );
 
     String[] daysOfWeek = {
       "MONDAY",
@@ -174,16 +174,16 @@ public class ScheduleService {
       "SUNDAY",
     };
 
-    for (int i = 0; i < 7; i++) {
+    for (String day : daysOfWeek) {
       ScheduleData dailyData = ScheduleData.builder()
-        .employeeId(employeeId)
-        .day(daysOfWeek[i])
+        .userId(userId)
+        .day(day)
         .startTime(startTime)
         .endTime(endTime)
-        .isActive(Optional.ofNullable(data.getIsActive()).orElse(true))
+        .isActive(isActiveForWeek)
         .build();
 
-      Schedule schedule = scheduleMapper.toEntity(dailyData, employee);
+      Schedule schedule = scheduleMapper.toEntity(dailyData, user);
       schedule = scheduleRepository.save(schedule);
       weeklySchedules.add(scheduleMapper.toInfo(schedule));
     }
@@ -192,39 +192,39 @@ public class ScheduleService {
   }
 
   /**
-   * Copies schedules from the previous week.
-   * This method might need re-evaluation if schedules are defined by LocalTime and DayOfWeek only,
-   * as "previous week" concept might change.
-   * For now, it copies existing active schedules, which now use LocalTime.
+   * Copies schedules from the previous week for a user.
    *
-   * @param employeeId The ID of the employee
+   * @param userId The ID of the user
    * @return List of ScheduleInfo DTOs for the copied schedules
-   * @throws EntityNotFoundException if the employee is not found
+   * @throws EntityNotFoundException if the user is not found
    */
   @Transactional
-  public List<ScheduleInfo> copyScheduleFromPreviousWeek(Long employeeId) {
-    if (!employeeRepository.existsById(employeeId)) {
-      throw new EntityNotFoundException("Employee not found: " + employeeId);
-    }
+  public List<ScheduleInfo> copyScheduleFromPreviousWeek(Long userId) {
+    User user = userRepository
+      .findById(userId)
+      .orElseThrow(() ->
+        new EntityNotFoundException("User not found: " + userId)
+      );
 
     List<Schedule> previousSchedules =
-      scheduleRepository.findByEmployeeIdAndIsActive(employeeId, true);
+      scheduleRepository.findByUserIdAndIsActive(userId, true);
 
     if (previousSchedules.isEmpty()) {
       throw new IllegalStateException(
-        "No active schedules found to copy from for employee: " + employeeId
+        "No active schedules found to copy from for user: " + userId
       );
     }
 
     List<Schedule> newSchedules = new ArrayList<>();
     for (Schedule prevSchedule : previousSchedules) {
-      Schedule newSchedule = Schedule.builder()
-        .employee(prevSchedule.getEmployee())
+      ScheduleData copiedData = ScheduleData.builder()
+        .userId(user.getId())
         .day(prevSchedule.getDay())
         .startTime(prevSchedule.getStartTime())
         .endTime(prevSchedule.getEndTime())
-        .isActive(true)
+        .isActive(prevSchedule.getIsActive())
         .build();
+      Schedule newSchedule = scheduleMapper.toEntity(copiedData, user);
       newSchedules.add(newSchedule);
     }
 
@@ -233,15 +233,15 @@ public class ScheduleService {
   }
 
   /**
-   * Finds all active schedules for a specific employee.
+   * Finds all active schedules for a specific user.
    *
-   * @param employeeId The ID of the employee
+   * @param userId The ID of the user
    * @return List of ScheduleInfo DTOs
    */
   @Transactional(readOnly = true)
-  public List<ScheduleInfo> findActiveSchedulesByEmployeeId(Long employeeId) {
-    List<Schedule> schedules = scheduleRepository.findByEmployeeIdAndIsActive(
-      employeeId,
+  public List<ScheduleInfo> findActiveSchedulesByUserId(Long userId) {
+    List<Schedule> schedules = scheduleRepository.findByUserIdAndIsActive(
+      userId,
       true
     );
     return scheduleMapper.toInfoList(schedules);

@@ -9,11 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeeRepository;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
-import com.sigrap.user.UserStatus;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,15 +37,12 @@ class ScheduleIntegrationTest {
   private ObjectMapper objectMapper;
 
   @Autowired
-  private EmployeeRepository employeeRepository;
-
-  @Autowired
   private ScheduleRepository scheduleRepository;
 
   @Autowired
   private UserRepository userRepository;
 
-  private Employee testEmployee;
+  private User testUser;
   private Schedule testSchedule;
   private LocalTime defaultStartTime;
   private LocalTime defaultEndTime;
@@ -61,28 +55,19 @@ class ScheduleIntegrationTest {
       "john.doe" + System.currentTimeMillis() + "@example.com";
     String uniqueDocumentId = "DOC" + System.currentTimeMillis();
 
-    User user = User.builder()
+    this.testUser = User.builder()
       .name("John Doe")
       .email(uniqueEmail)
       .password("securePassword")
-      .status(UserStatus.ACTIVE)
-      .build();
-    userRepository.save(user);
-
-    testEmployee = Employee.builder()
-      .firstName("John")
-      .lastName("Doe")
       .documentId(uniqueDocumentId)
-      .email(uniqueEmail)
-      .user(user)
       .build();
-    testEmployee = employeeRepository.save(testEmployee);
+    this.testUser = userRepository.save(this.testUser);
 
     defaultStartTime = LocalTime.of(9, 0);
     defaultEndTime = LocalTime.of(17, 0);
 
     testSchedule = Schedule.builder()
-      .employee(testEmployee)
+      .user(this.testUser)
       .day("MONDAY")
       .startTime(defaultStartTime)
       .endTime(defaultEndTime)
@@ -97,21 +82,19 @@ class ScheduleIntegrationTest {
       .perform(get("/api/schedules/{id}", testSchedule.getId()))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(testSchedule.getId()))
-      .andExpect(jsonPath("$.employeeId").value(testEmployee.getId()))
+      .andExpect(jsonPath("$.userId").value(this.testUser.getId()))
       .andExpect(jsonPath("$.day").value(testSchedule.getDay()))
       .andExpect(jsonPath("$.startTime").value(defaultStartTime.toString()))
       .andExpect(jsonPath("$.endTime").value(defaultEndTime.toString()));
   }
 
   @Test
-  void findByEmployeeId_ShouldReturnSchedules() throws Exception {
+  void findByUserId_ShouldReturnSchedules() throws Exception {
     mockMvc
-      .perform(
-        get("/api/schedules/employee/{employeeId}", testEmployee.getId())
-      )
+      .perform(get("/api/schedules/user/{userId}", this.testUser.getId()))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$[0].id").value(testSchedule.getId()))
-      .andExpect(jsonPath("$[0].employeeId").value(testEmployee.getId()))
+      .andExpect(jsonPath("$[0].userId").value(this.testUser.getId()))
       .andExpect(jsonPath("$[0].startTime").value(defaultStartTime.toString()))
       .andExpect(jsonPath("$[0].endTime").value(defaultEndTime.toString()));
   }
@@ -122,7 +105,7 @@ class ScheduleIntegrationTest {
     LocalTime newEndTime = LocalTime.of(18, 0);
 
     ScheduleData scheduleData = ScheduleData.builder()
-      .employeeId(testEmployee.getId())
+      .userId(this.testUser.getId())
       .day("TUESDAY")
       .startTime(newStartTime)
       .endTime(newEndTime)
@@ -136,7 +119,7 @@ class ScheduleIntegrationTest {
           .content(objectMapper.writeValueAsString(scheduleData))
       )
       .andExpect(status().isCreated())
-      .andExpect(jsonPath("$.employeeId").value(testEmployee.getId()))
+      .andExpect(jsonPath("$.userId").value(this.testUser.getId()))
       .andExpect(jsonPath("$.day").value("TUESDAY"))
       .andExpect(jsonPath("$.startTime").value(newStartTime.toString()))
       .andExpect(jsonPath("$.endTime").value(newEndTime.toString()));
@@ -148,7 +131,7 @@ class ScheduleIntegrationTest {
     LocalTime updatedEndTime = LocalTime.of(16, 30);
 
     ScheduleData updateData = ScheduleData.builder()
-      .employeeId(testEmployee.getId())
+      .userId(this.testUser.getId())
       .day(testSchedule.getDay())
       .startTime(updatedStartTime)
       .endTime(updatedEndTime)
@@ -162,7 +145,7 @@ class ScheduleIntegrationTest {
           .content(objectMapper.writeValueAsString(updateData))
       )
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.employeeId").value(testEmployee.getId()))
+      .andExpect(jsonPath("$.userId").value(this.testUser.getId()))
       .andExpect(jsonPath("$.day").value(testSchedule.getDay()))
       .andExpect(jsonPath("$.startTime").value(updatedStartTime.toString()))
       .andExpect(jsonPath("$.endTime").value(updatedEndTime.toString()))
@@ -183,7 +166,7 @@ class ScheduleIntegrationTest {
     LocalTime genStartTime = LocalTime.of(9, 0);
     LocalTime genEndTime = LocalTime.of(17, 0);
     ScheduleData scheduleData = ScheduleData.builder()
-      .employeeId(testEmployee.getId())
+      .userId(this.testUser.getId())
       .day("MONDAY")
       .startTime(genStartTime)
       .endTime(genEndTime)
@@ -192,15 +175,12 @@ class ScheduleIntegrationTest {
 
     mockMvc
       .perform(
-        post(
-          "/api/schedules/generate-weekly/{employeeId}",
-          testEmployee.getId()
-        )
+        post("/api/schedules/generate-weekly/{userId}", this.testUser.getId())
           .contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsString(scheduleData))
       )
       .andExpect(status().isCreated())
-      .andExpect(jsonPath("$[0].employeeId").value(testEmployee.getId()))
+      .andExpect(jsonPath("$[0].userId").value(this.testUser.getId()))
       .andExpect(jsonPath("$[0].startTime").value(genStartTime.toString()));
   }
 }

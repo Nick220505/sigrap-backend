@@ -36,16 +36,16 @@ public class AttendanceInfo {
   private Long id;
 
   /**
-   * ID of the associated employee.
+   * ID of the associated user.
    */
-  @Schema(description = "ID of the associated employee", example = "1")
-  private Long employeeId;
+  @Schema(description = "ID of the associated user", example = "1")
+  private Long userId;
 
   /**
-   * Name of the employee.
+   * Name of the user.
    */
-  @Schema(description = "Name of the employee", example = "John Doe")
-  private String employeeName;
+  @Schema(description = "Name of the user", example = "John Doe")
+  private String userName;
 
   /**
    * Date of the attendance record.
@@ -57,13 +57,13 @@ public class AttendanceInfo {
   private LocalDateTime date;
 
   /**
-   * Time when the employee clocked in.
+   * Time when the user clocked in.
    */
   @Schema(description = "Clock-in time", example = "2024-01-15T09:00:00")
   private LocalDateTime clockInTime;
 
   /**
-   * Time when the employee clocked out.
+   * Time when the user clocked out.
    */
   @Schema(description = "Clock-out time", example = "2024-01-15T17:00:00")
   private LocalDateTime clockOutTime;
@@ -85,7 +85,7 @@ public class AttendanceInfo {
    */
   @Schema(
     description = "Additional notes about the attendance",
-    example = "Employee arrived on time"
+    example = "User arrived on time"
   )
   private String notes;
 

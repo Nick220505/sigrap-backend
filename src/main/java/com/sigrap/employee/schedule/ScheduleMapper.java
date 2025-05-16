@@ -1,13 +1,11 @@
 package com.sigrap.employee.schedule;
 
+import com.sigrap.user.User;
 import java.util.Collections;
 import java.util.List;
-
-import org.springframework.stereotype.Component;
-
-import com.sigrap.employee.Employee;
-
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Mapper class for converting between Schedule entities and DTOs.
@@ -38,8 +36,8 @@ public class ScheduleMapper {
 
     return ScheduleInfo.builder()
       .id(schedule.getId())
-      .employeeId(schedule.getEmployee().getId())
-      .employeeName(getFullName(schedule.getEmployee()))
+      .userId(schedule.getUser().getId())
+      .userName(schedule.getUser().getName())
       .day(schedule.getDay())
       .startTime(schedule.getStartTime())
       .endTime(schedule.getEndTime())
@@ -64,23 +62,23 @@ public class ScheduleMapper {
   }
 
   /**
-   * Creates a new Schedule entity from ScheduleData DTO.
+   * Creates a new Schedule entity from ScheduleData DTO and a User entity.
    *
    * @param data The DTO containing schedule data
-   * @param employee The employee associated with the schedule
+   * @param user The User entity to associate with the schedule
    * @return New Schedule entity
    */
-  public Schedule toEntity(ScheduleData data, Employee employee) {
-    if (data == null) {
+  public Schedule toEntity(ScheduleData data, User user) {
+    if (data == null || user == null) {
       return null;
     }
 
     return Schedule.builder()
-      .employee(employee)
+      .user(user)
       .day(data.getDay())
       .startTime(data.getStartTime())
       .endTime(data.getEndTime())
-      .isActive(true)
+      .isActive(Optional.ofNullable(data.getIsActive()).orElse(true))
       .build();
   }
 
@@ -91,7 +89,7 @@ public class ScheduleMapper {
    * @param data The DTO containing new schedule data
    */
   public void updateEntity(Schedule entity, ScheduleData data) {
-    if (data == null) {
+    if (data == null || entity == null) {
       return;
     }
 
@@ -107,9 +105,5 @@ public class ScheduleMapper {
     if (data.getIsActive() != null) {
       entity.setIsActive(data.getIsActive());
     }
-  }
-
-  private String getFullName(Employee employee) {
-    return employee.getFirstName() + " " + employee.getLastName();
   }
 }

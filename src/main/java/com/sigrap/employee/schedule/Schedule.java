@@ -1,6 +1,6 @@
 package com.sigrap.employee.schedule;
 
-import com.sigrap.employee.Employee;
+import com.sigrap.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,8 +20,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 /**
- * Entity class representing employee work schedules.
- * Tracks employee work hours and shift assignments.
+ * Entity class representing user work schedules.
+ * Tracks user work hours and shift assignments.
  *
  * <p>This entity maintains schedule information including:
  * <ul>
@@ -48,13 +48,13 @@ public class Schedule {
   private Long id;
 
   /**
-   * Employee associated with this schedule.
-   * Many-to-one relationship with Employee.
+   * User associated with this schedule.
+   * Many-to-one relationship with User.
    */
   @ManyToOne
-  @JoinColumn(name = "employee_id", nullable = false)
-  @NotNull(message = "Employee reference cannot be null")
-  private Employee employee;
+  @JoinColumn(name = "user_id", nullable = false)
+  @NotNull(message = "User reference cannot be null")
+  private User user;
 
   /**
    * Day of the week for this schedule.

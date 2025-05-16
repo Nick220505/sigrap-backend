@@ -46,7 +46,7 @@ class UserIntegrationTest {
       .name("Test User")
       .email("test@example.com")
       .phone("1234567890")
-      .status(UserStatus.ACTIVE)
+      .documentId("DOC123IT")
       .role(UserRole.ADMINISTRATOR)
       .build();
   }
@@ -60,7 +60,8 @@ class UserIntegrationTest {
       .andExpect(status().isOk())
       .andExpect(jsonPath("$[0].id").value(testUserInfo.getId()))
       .andExpect(jsonPath("$[0].name").value("Test User"))
-      .andExpect(jsonPath("$[0].email").value("test@example.com"));
+      .andExpect(jsonPath("$[0].email").value("test@example.com"))
+      .andExpect(jsonPath("$[0].documentId").value("DOC123IT"));
   }
 
   @Test
@@ -72,7 +73,8 @@ class UserIntegrationTest {
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(testUserInfo.getId()))
       .andExpect(jsonPath("$.name").value("Test User"))
-      .andExpect(jsonPath("$.email").value("test@example.com"));
+      .andExpect(jsonPath("$.email").value("test@example.com"))
+      .andExpect(jsonPath("$.documentId").value("DOC123IT"));
   }
 
   @Test
@@ -82,7 +84,7 @@ class UserIntegrationTest {
       .email("newuser@example.com")
       .password("password123")
       .phone("9876543210")
-      .status(UserStatus.ACTIVE)
+      .documentId("DOC456IT")
       .role(UserRole.EMPLOYEE)
       .build();
 
@@ -91,7 +93,7 @@ class UserIntegrationTest {
       .name(userData.getName())
       .email(userData.getEmail())
       .phone(userData.getPhone())
-      .status(userData.getStatus())
+      .documentId(userData.getDocumentId())
       .role(userData.getRole())
       .build();
 
@@ -105,7 +107,8 @@ class UserIntegrationTest {
       )
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.name").value("New User"))
-      .andExpect(jsonPath("$.email").value("newuser@example.com"));
+      .andExpect(jsonPath("$.email").value("newuser@example.com"))
+      .andExpect(jsonPath("$.documentId").value("DOC456IT"));
   }
 
   @Test
@@ -114,7 +117,7 @@ class UserIntegrationTest {
       .name("Updated User")
       .email("updated@example.com")
       .phone("5555555555")
-      .status(UserStatus.ACTIVE)
+      .documentId("DOC789IT")
       .role(UserRole.EMPLOYEE)
       .build();
 
@@ -123,7 +126,7 @@ class UserIntegrationTest {
       .name(userData.getName())
       .email(userData.getEmail())
       .phone(userData.getPhone())
-      .status(userData.getStatus())
+      .documentId(userData.getDocumentId())
       .role(userData.getRole())
       .build();
 
@@ -140,83 +143,8 @@ class UserIntegrationTest {
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(1L))
       .andExpect(jsonPath("$.name").value("Updated User"))
-      .andExpect(jsonPath("$.email").value("updated@example.com"));
-  }
-
-  @Test
-  void changePassword_shouldChangeUserPassword() throws Exception {
-    Map<String, String> passwordChangeRequest = Map.of(
-      "newPassword",
-      "newPassword123"
-    );
-
-    mockMvc
-      .perform(
-        post("/api/users/1/reset-password")
-          .contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsString(passwordChangeRequest))
-      )
-      .andExpect(status().isNoContent());
-  }
-
-  @Test
-  void resetPassword_shouldResetUserPassword() throws Exception {
-    Map<String, String> passwordResetRequest = Map.of(
-      "token",
-      "reset-token-123",
-      "newPassword",
-      "resetPassword123"
-    );
-
-    UserInfo userInfo = UserInfo.builder()
-      .id(1L)
-      .name("Test User")
-      .email("test@example.com")
-      .build();
-
-    when(
-      userService.resetPassword(eq("reset-token-123"), eq("resetPassword123"))
-    ).thenReturn(userInfo);
-
-    mockMvc
-      .perform(
-        post("/api/users/reset-password/confirm")
-          .contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsString(passwordResetRequest))
-      )
-      .andExpect(status().isOk());
-  }
-
-  @Test
-  void lockAccount_shouldLockUserAccount() throws Exception {
-    UserInfo lockedUserInfo = UserInfo.builder()
-      .id(1L)
-      .name("Test User")
-      .email("test@example.com")
-      .status(UserStatus.LOCKED)
-      .build();
-
-    when(userService.lockAccount(1L)).thenReturn(lockedUserInfo);
-
-    mockMvc
-      .perform(post("/api/users/1/lock"))
-      .andExpect(status().isNoContent());
-  }
-
-  @Test
-  void unlockAccount_shouldUnlockUserAccount() throws Exception {
-    UserInfo unlockedUserInfo = UserInfo.builder()
-      .id(1L)
-      .name("Test User")
-      .email("test@example.com")
-      .status(UserStatus.ACTIVE)
-      .build();
-
-    when(userService.unlockAccount(1L)).thenReturn(unlockedUserInfo);
-
-    mockMvc
-      .perform(post("/api/users/1/unlock"))
-      .andExpect(status().isNoContent());
+      .andExpect(jsonPath("$.email").value("updated@example.com"))
+      .andExpect(jsonPath("$.documentId").value("DOC789IT"));
   }
 
   @Test

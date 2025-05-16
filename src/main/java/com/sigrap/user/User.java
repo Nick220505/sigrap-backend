@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -69,13 +71,6 @@ public class User implements UserDetails {
   private String phone;
 
   /**
-   * Current status of the user's account.
-   */
-  @Enumerated(EnumType.STRING)
-  @Builder.Default
-  private UserStatus status = UserStatus.ACTIVE;
-
-  /**
    * The role of the user in the system.
    */
   @Enumerated(EnumType.STRING)
@@ -88,23 +83,16 @@ public class User implements UserDetails {
   @Column(name = "last_login")
   private LocalDateTime lastLogin;
 
-  /**
-   * Number of consecutive failed login attempts.
-   * Reset to 0 on successful login.
-   */
-  @Builder.Default
-  private Integer failedAttempts = 0;
+  @Column(name = "document_id", unique = true)
+  private String documentId;
 
-  /**
-   * Token for password reset operations.
-   * Null when no reset is in progress.
-   */
-  private String passwordResetToken;
+  @CreationTimestamp
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private LocalDateTime createdAt;
 
-  /**
-   * Expiration timestamp for the password reset token.
-   */
-  private LocalDateTime passwordResetExpiry;
+  @UpdateTimestamp
+  @Column(name = "updated_at", nullable = false)
+  private LocalDateTime updatedAt;
 
   @Override
   public Set<GrantedAuthority> getAuthorities() {
@@ -123,7 +111,7 @@ public class User implements UserDetails {
 
   @Override
   public boolean isAccountNonLocked() {
-    return status != UserStatus.LOCKED;
+    return true;
   }
 
   @Override
@@ -133,6 +121,6 @@ public class User implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return status == UserStatus.ACTIVE;
+    return true;
   }
 }

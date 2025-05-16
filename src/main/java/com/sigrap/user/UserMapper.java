@@ -32,9 +32,11 @@ public class UserMapper {
       .name(user.getName())
       .email(user.getEmail())
       .phone(user.getPhone())
-      .status(user.getStatus())
       .lastLogin(user.getLastLogin())
       .role(user.getRole())
+      .documentId(user.getDocumentId())
+      .createdAt(user.getCreatedAt())
+      .updatedAt(user.getUpdatedAt())
       .build();
   }
 
@@ -68,11 +70,8 @@ public class UserMapper {
       .email(userData.getEmail())
       .password(passwordEncoder.encode(userData.getPassword()))
       .phone(userData.getPhone())
-      .status(
-        userData.getStatus() != null ? userData.getStatus() : UserStatus.ACTIVE
-      )
       .role(userData.getRole() != null ? userData.getRole() : UserRole.EMPLOYEE)
-      .failedAttempts(0)
+      .documentId(userData.getDocumentId())
       .build();
   }
 
@@ -103,12 +102,12 @@ public class UserMapper {
       user.setPhone(userData.getPhone());
     }
 
-    if (userData.getStatus() != null) {
-      user.setStatus(userData.getStatus());
-    }
-
     if (userData.getRole() != null) {
       user.setRole(userData.getRole());
+    }
+
+    if (userData.getDocumentId() != null) {
+      user.setDocumentId(userData.getDocumentId());
     }
   }
 }

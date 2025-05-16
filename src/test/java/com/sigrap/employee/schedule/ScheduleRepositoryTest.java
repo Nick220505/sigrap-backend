@@ -4,9 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.sigrap.employee.Employee;
 import com.sigrap.user.User;
-import com.sigrap.user.UserStatus;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,35 +25,26 @@ class ScheduleRepositoryTest {
   @Autowired
   private ScheduleRepository scheduleRepository;
 
-  private Employee employee;
+  private User testUser;
   private Schedule schedule;
   private LocalTime defaultStartTime;
   private LocalTime defaultEndTime;
 
   @BeforeEach
   void setUp() {
-    User user = User.builder()
+    this.testUser = User.builder()
       .name("John Doe")
       .email("john.doe@example.com")
       .password("password123")
-      .status(UserStatus.ACTIVE)
+      .documentId("DOC_SCHEDULE_REPO_TEST" + System.currentTimeMillis())
       .build();
-    user = entityManager.persist(user);
-
-    employee = Employee.builder()
-      .firstName("John")
-      .lastName("Doe")
-      .documentId("123456")
-      .email("john.doe@example.com")
-      .user(user)
-      .build();
-    employee = entityManager.persist(employee);
+    this.testUser = entityManager.persist(this.testUser);
 
     defaultStartTime = LocalTime.of(9, 0);
     defaultEndTime = LocalTime.of(17, 0);
 
     schedule = Schedule.builder()
-      .employee(employee)
+      .user(this.testUser)
       .day("MONDAY")
       .startTime(defaultStartTime)
       .endTime(defaultEndTime)
@@ -80,18 +69,15 @@ class ScheduleRepositoryTest {
 
     assertTrue(found.isPresent());
     assertEquals(schedule.getId(), found.get().getId());
-    assertEquals(
-      schedule.getEmployee().getId(),
-      found.get().getEmployee().getId()
-    );
+    assertEquals(schedule.getUser().getId(), found.get().getUser().getId());
     assertEquals(schedule.getStartTime(), found.get().getStartTime());
     assertEquals(schedule.getEndTime(), found.get().getEndTime());
   }
 
   @Test
-  void findByEmployeeId_ShouldReturnSchedules() {
-    List<Schedule> schedules = scheduleRepository.findByEmployeeId(
-      employee.getId()
+  void findByUserId_ShouldReturnSchedules() {
+    List<Schedule> schedules = scheduleRepository.findByUserId(
+      this.testUser.getId()
     );
 
     assertNotNull(schedules);
@@ -100,9 +86,9 @@ class ScheduleRepositoryTest {
   }
 
   @Test
-  void findByEmployeeIdAndDay_shouldReturnSchedules() {
-    List<Schedule> found = scheduleRepository.findByEmployeeIdAndDay(
-      employee.getId(),
+  void findByUserIdAndDay_shouldReturnSchedules() {
+    List<Schedule> found = scheduleRepository.findByUserIdAndDay(
+      this.testUser.getId(),
       "MONDAY"
     );
 
@@ -121,9 +107,9 @@ class ScheduleRepositoryTest {
   }
 
   @Test
-  void findByEmployeeIdAndIsActive_shouldReturnSchedules() {
-    List<Schedule> found = scheduleRepository.findByEmployeeIdAndIsActive(
-      employee.getId(),
+  void findByUserIdAndIsActive_shouldReturnSchedules() {
+    List<Schedule> found = scheduleRepository.findByUserIdAndIsActive(
+      this.testUser.getId(),
       true
     );
 
@@ -150,7 +136,7 @@ class ScheduleRepositoryTest {
     LocalTime newEndTime = LocalTime.of(18, 0);
 
     Schedule newSchedule = Schedule.builder()
-      .employee(employee)
+      .user(this.testUser)
       .day("TUESDAY")
       .startTime(newStartTime)
       .endTime(newEndTime)
@@ -164,10 +150,7 @@ class ScheduleRepositoryTest {
     assertNotNull(saved.getId());
     Schedule found = entityManager.find(Schedule.class, saved.getId());
     assertNotNull(found);
-    assertEquals(
-      newSchedule.getEmployee().getId(),
-      found.getEmployee().getId()
-    );
+    assertEquals(newSchedule.getUser().getId(), found.getUser().getId());
     assertEquals(newSchedule.getStartTime(), found.getStartTime());
     assertEquals(newSchedule.getEndTime(), found.getEndTime());
   }

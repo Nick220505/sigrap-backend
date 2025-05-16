@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
 import com.sigrap.customer.CustomerRepository;
-import com.sigrap.employee.EmployeeRepository;
 import com.sigrap.employee.attendance.AttendanceRepository;
 import com.sigrap.employee.schedule.ScheduleRepository;
 import com.sigrap.payment.PaymentRepository;
@@ -22,7 +21,6 @@ import com.sigrap.supplier.SupplierRepository;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserRole;
-import com.sigrap.user.UserStatus;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,9 +47,6 @@ class DataSeederTest {
 
   @Mock
   private PasswordEncoder passwordEncoder;
-
-  @Mock
-  private EmployeeRepository employeeRepository;
 
   @Mock
   private ScheduleRepository scheduleRepository;
@@ -83,7 +78,6 @@ class DataSeederTest {
       .when(passwordEncoder.encode(any()))
       .thenReturn("encoded-password");
 
-    lenient().when(employeeRepository.count()).thenReturn(2L);
     lenient().when(scheduleRepository.count()).thenReturn(2L);
     lenient().when(attendanceRepository.count()).thenReturn(2L);
     lenient().when(supplierRepository.count()).thenReturn(2L);
@@ -97,7 +91,6 @@ class DataSeederTest {
       .email("rosita@sigrap.com")
       .name("Rosita González")
       .password("encoded-password")
-      .status(UserStatus.ACTIVE)
       .role(UserRole.ADMINISTRATOR)
       .build();
     lenient()
@@ -109,7 +102,6 @@ class DataSeederTest {
       .email("gladys@sigrap.com")
       .name("Gladys Mendoza")
       .password("encoded-password")
-      .status(UserStatus.ACTIVE)
       .role(UserRole.EMPLOYEE)
       .build();
     lenient()

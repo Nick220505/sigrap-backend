@@ -14,30 +14,30 @@ import org.springframework.stereotype.Repository;
  * <ul>
  *   <li>Basic CRUD operations</li>
  *   <li>Custom search methods</li>
- *   <li>Employee-based queries</li>
+ *   <li>User-based queries</li>
  *   <li>Date-based queries</li>
  * </ul></p>
  */
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
   /**
-   * Finds all attendance records for a specific employee.
+   * Finds all attendance records for a specific user.
    *
-   * @param employeeId ID of the employee
-   * @return List of attendance records for the employee
+   * @param userId ID of the user
+   * @return List of attendance records for the user
    */
-  List<Attendance> findByEmployeeId(Long employeeId);
+  List<Attendance> findByUserId(Long userId);
 
   /**
-   * Finds all attendance records for a specific employee between two dates.
+   * Finds all attendance records for a specific user between two dates.
    *
-   * @param employeeId ID of the employee
+   * @param userId ID of the user
    * @param startDate Start of the date range
    * @param endDate End of the date range
    * @return List of attendance records matching the criteria
    */
-  List<Attendance> findByEmployeeIdAndDateBetween(
-    Long employeeId,
+  List<Attendance> findByUserIdAndDateBetween(
+    Long userId,
     LocalDateTime startDate,
     LocalDateTime endDate
   );
@@ -59,28 +59,22 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
   List<Attendance> findByStatus(AttendanceStatus status);
 
   /**
-   * Finds an active attendance record for an employee on a specific date.
+   * Finds an active attendance record for a user on a specific date.
    *
-   * @param employeeId ID of the employee
+   * @param userId ID of the user
    * @param date Date to search for
    * @return Optional containing the attendance record if found
    */
-  Optional<Attendance> findByEmployeeIdAndDate(
-    Long employeeId,
-    LocalDateTime date
-  );
+  Optional<Attendance> findByUserIdAndDate(Long userId, LocalDateTime date);
 
   /**
-   * Finds all attendance records for a specific employee with a specific status.
+   * Finds all attendance records for a specific user with a specific status.
    *
-   * @param employeeId ID of the employee
+   * @param userId ID of the user
    * @param status Status to search for
    * @return List of attendance records matching the criteria
    */
-  List<Attendance> findByEmployeeIdAndStatus(
-    Long employeeId,
-    AttendanceStatus status
-  );
+  List<Attendance> findByUserIdAndStatus(Long userId, AttendanceStatus status);
 
   /**
    * Finds all attendance records between two dates.

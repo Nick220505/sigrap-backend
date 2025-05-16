@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
  * <p>Validation Rules:
  * <ul>
  *   <li>Required fields must not be null</li>
- *   <li>Employee ID must reference existing employee</li>
+ *   <li>User ID must reference existing user</li>
  *   <li>Times must be valid</li>
  * </ul></p>
  */
@@ -37,12 +37,12 @@ import lombok.NoArgsConstructor;
 public class AttendanceData {
 
   /**
-   * ID of the associated employee.
-   * Must reference an existing employee.
+   * ID of the associated user.
+   * Must reference an existing user.
    */
-  @NotNull(message = "Employee ID cannot be null")
-  @Schema(description = "ID of the associated employee", example = "1")
-  private Long employeeId;
+  @NotNull(message = "User ID cannot be null")
+  @Schema(description = "ID of the associated user", example = "1")
+  private Long userId;
 
   /**
    * Date of the attendance record.
@@ -56,13 +56,13 @@ public class AttendanceData {
   private LocalDateTime date;
 
   /**
-   * Time when the employee clocked in.
+   * Time when the user clocked in.
    */
   @Schema(description = "Clock-in time", example = "2024-01-15T09:00:00")
   private LocalDateTime clockInTime;
 
   /**
-   * Time when the employee clocked out.
+   * Time when the user clocked out.
    */
   @Schema(description = "Clock-out time", example = "2024-01-15T17:00:00")
   private LocalDateTime clockOutTime;
@@ -79,7 +79,7 @@ public class AttendanceData {
    */
   @Schema(
     description = "Additional notes about the attendance",
-    example = "Employee arrived on time"
+    example = "User arrived on time"
   )
   private String notes;
 }

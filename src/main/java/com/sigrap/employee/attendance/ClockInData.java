@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Data Transfer Object (DTO) for clock-in requests.
- * Contains validated data for recording employee clock-ins.
+ * Contains validated data for recording user clock-ins.
  *
  * <p>This class:
  * <ul>
@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
  *
  * <p>Validation Rules:
  * <ul>
- *   <li>Employee ID must not be null</li>
+ *   <li>User ID must not be null</li>
  *   <li>Timestamp must not be null</li>
  *   <li>Notes are optional</li>
  * </ul></p>
@@ -34,12 +34,12 @@ import lombok.NoArgsConstructor;
 public class ClockInData {
 
   /**
-   * ID of the employee clocking in.
+   * ID of the user clocking in.
    * Must not be null.
    */
-  @NotNull(message = "Employee ID cannot be null")
-  @Schema(description = "ID of the employee clocking in", example = "1")
-  private Long employeeId;
+  @NotNull(message = "User ID cannot be null")
+  @Schema(description = "ID of the user clocking in", example = "1")
+  private Long userId;
 
   /**
    * Timestamp of the clock-in.

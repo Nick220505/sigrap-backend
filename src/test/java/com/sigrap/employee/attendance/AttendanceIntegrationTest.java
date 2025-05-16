@@ -9,8 +9,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
 import java.time.LocalDateTime;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeeRepository;
-import com.sigrap.user.User;
-import com.sigrap.user.UserRepository;
-import com.sigrap.user.UserStatus;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -39,15 +34,12 @@ class AttendanceIntegrationTest {
   private ObjectMapper objectMapper;
 
   @Autowired
-  private EmployeeRepository employeeRepository;
-
-  @Autowired
   private AttendanceRepository attendanceRepository;
 
   @Autowired
   private UserRepository userRepository;
 
-  private Employee testEmployee;
+  private User testUser;
   private Attendance testAttendance;
   private ClockInData testClockInData;
   private ClockOutData testClockOutData;
@@ -55,26 +47,17 @@ class AttendanceIntegrationTest {
   @BeforeEach
   void setUp() {
     String uniqueEmail = "john" + System.currentTimeMillis() + "@example.com";
-    String uniqueDocumentId = "DOC" + System.currentTimeMillis();
 
-    User user = User.builder()
+    this.testUser = User.builder()
       .name("John Doe")
       .email(uniqueEmail)
       .password("password")
-      .status(UserStatus.ACTIVE)
+      .documentId("DOC" + System.currentTimeMillis())
       .build();
-    userRepository.save(user);
-
-    testEmployee = Employee.builder()
-      .firstName("John")
-      .lastName("Doe")
-      .documentId(uniqueDocumentId)
-      .user(user)
-      .build();
-    employeeRepository.save(testEmployee);
+    this.testUser = userRepository.save(this.testUser);
 
     testAttendance = Attendance.builder()
-      .employee(testEmployee)
+      .user(this.testUser)
       .date(LocalDateTime.now())
       .clockInTime(LocalDateTime.now())
       .status(AttendanceStatus.PRESENT)
@@ -83,7 +66,7 @@ class AttendanceIntegrationTest {
     attendanceRepository.save(testAttendance);
 
     testClockInData = ClockInData.builder()
-      .employeeId(testEmployee.getId())
+      .userId(this.testUser.getId())
       .timestamp(LocalDateTime.now())
       .notes("On time")
       .build();
@@ -113,7 +96,7 @@ class AttendanceIntegrationTest {
           .content(objectMapper.writeValueAsString(testClockInData))
       )
       .andExpect(status().isCreated())
-      .andExpect(jsonPath("$.employeeId").value(testEmployee.getId()));
+      .andExpect(jsonPath("$.userId").value(this.testUser.getId()));
   }
 
   @Test
@@ -126,17 +109,16 @@ class AttendanceIntegrationTest {
       )
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(testAttendance.getId()))
-      .andExpect(jsonPath("$.employeeId").value(testEmployee.getId()));
+      .andExpect(jsonPath("$.userId").value(this.testUser.getId()));
   }
 
   @Test
-  void findByEmployeeId_ShouldReturnEmployeeAttendanceRecords()
-    throws Exception {
+  void findByUserId_ShouldReturnUserAttendanceRecords() throws Exception {
     mockMvc
-      .perform(get("/api/attendance/employee/" + testEmployee.getId()))
+      .perform(get("/api/attendance/user/" + this.testUser.getId()))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$[0].id").value(testAttendance.getId()))
-      .andExpect(jsonPath("$[0].employeeId").value(testEmployee.getId()));
+      .andExpect(jsonPath("$[0].userId").value(this.testUser.getId()));
   }
 
   @Test
@@ -147,7 +129,7 @@ class AttendanceIntegrationTest {
     mockMvc
       .perform(
         get("/api/attendance/report")
-          .param("employeeId", testEmployee.getId().toString())
+          .param("userId", this.testUser.getId().toString())
           .param("startDate", startDate.toString())
           .param("endDate", endDate.toString())
       )
@@ -158,7 +140,7 @@ class AttendanceIntegrationTest {
   @Test
   void updateStatus_ShouldUpdateAttendanceStatus() throws Exception {
     Attendance freshAttendance = Attendance.builder()
-      .employee(testEmployee)
+      .user(this.testUser)
       .date(LocalDateTime.now())
       .clockInTime(LocalDateTime.now())
       .clockOutTime(LocalDateTime.now().plusHours(8))

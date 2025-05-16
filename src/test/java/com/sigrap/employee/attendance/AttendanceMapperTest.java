@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeeRepository;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,12 +22,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class AttendanceMapperTest {
 
   @Mock
-  private EmployeeRepository employeeRepository;
+  private UserRepository userRepository;
 
   @InjectMocks
   private AttendanceMapper attendanceMapper;
 
-  private Employee testEmployee;
+  private User testUser;
   private Attendance testAttendance;
   private AttendanceInfo testAttendanceInfo;
   private AttendanceData testAttendanceData;
@@ -41,15 +41,15 @@ class AttendanceMapperTest {
     clockInTime = date.withHour(9).withMinute(0).withSecond(0).withNano(0);
     clockOutTime = clockInTime.plusHours(8);
 
-    testEmployee = Employee.builder()
+    testUser = User.builder()
       .id(1L)
-      .firstName("John")
-      .lastName("Doe")
+      .name("John Doe")
+      .email("john.doe@example.com")
       .build();
 
     testAttendance = Attendance.builder()
       .id(1L)
-      .employee(testEmployee)
+      .user(testUser)
       .date(date)
       .clockInTime(clockInTime)
       .clockOutTime(clockOutTime)
@@ -60,8 +60,8 @@ class AttendanceMapperTest {
 
     testAttendanceInfo = AttendanceInfo.builder()
       .id(1L)
-      .employeeId(1L)
-      .employeeName("John Doe")
+      .userId(1L)
+      .userName("John Doe")
       .date(date)
       .clockInTime(clockInTime)
       .clockOutTime(clockOutTime)
@@ -71,7 +71,7 @@ class AttendanceMapperTest {
       .build();
 
     testAttendanceData = AttendanceData.builder()
-      .employeeId(1L)
+      .userId(1L)
       .date(date)
       .clockInTime(clockInTime)
       .clockOutTime(clockOutTime)
@@ -86,8 +86,8 @@ class AttendanceMapperTest {
 
     assertNotNull(result);
     assertEquals(testAttendance.getId(), result.getId());
-    assertEquals(testAttendance.getEmployee().getId(), result.getEmployeeId());
-    assertEquals("John Doe", result.getEmployeeName());
+    assertEquals(testAttendance.getUser().getId(), result.getUserId());
+    assertEquals("John Doe", result.getUserName());
     assertEquals(testAttendance.getDate(), result.getDate());
     assertEquals(testAttendance.getClockInTime(), result.getClockInTime());
     assertEquals(testAttendance.getClockOutTime(), result.getClockOutTime());
@@ -112,11 +112,8 @@ class AttendanceMapperTest {
     assertNotNull(result);
     assertEquals(1, result.size());
     assertEquals(testAttendance.getId(), result.get(0).getId());
-    assertEquals(
-      testAttendance.getEmployee().getId(),
-      result.get(0).getEmployeeId()
-    );
-    assertEquals("John Doe", result.get(0).getEmployeeName());
+    assertEquals(testAttendance.getUser().getId(), result.get(0).getUserId());
+    assertEquals("John Doe", result.get(0).getUserName());
     assertEquals(testAttendance.getDate(), result.get(0).getDate());
     assertEquals(
       testAttendance.getClockInTime(),
@@ -141,14 +138,14 @@ class AttendanceMapperTest {
 
   @Test
   void toEntity_ShouldMapDataToEntity() {
-    when(
-      employeeRepository.findById(testAttendanceData.getEmployeeId())
-    ).thenReturn(Optional.of(testEmployee));
+    when(userRepository.findById(testAttendanceData.getUserId())).thenReturn(
+      Optional.of(testUser)
+    );
 
     Attendance result = attendanceMapper.toEntity(testAttendanceData);
 
     assertNotNull(result);
-    assertEquals(testEmployee, result.getEmployee());
+    assertEquals(testUser, result.getUser());
     assertEquals(testAttendanceData.getDate(), result.getDate());
     assertEquals(testAttendanceData.getClockInTime(), result.getClockInTime());
     assertEquals(
@@ -162,9 +159,9 @@ class AttendanceMapperTest {
 
   @Test
   void toEntity_ShouldThrowEntityNotFoundException_WhenEmployeeNotFound() {
-    when(
-      employeeRepository.findById(testAttendanceData.getEmployeeId())
-    ).thenReturn(Optional.empty());
+    when(userRepository.findById(testAttendanceData.getUserId())).thenReturn(
+      Optional.empty()
+    );
 
     assertThrows(EntityNotFoundException.class, () ->
       attendanceMapper.toEntity(testAttendanceData)
@@ -182,7 +179,7 @@ class AttendanceMapperTest {
   void updateEntityFromData_ShouldUpdateEntityWithData() {
     Attendance existingAttendance = Attendance.builder()
       .id(1L)
-      .employee(testEmployee)
+      .user(testUser)
       .date(date.minusDays(1))
       .clockInTime(clockInTime.minusDays(1))
       .clockOutTime(clockOutTime.minusDays(1))
@@ -217,7 +214,7 @@ class AttendanceMapperTest {
   void updateEntityFromData_ShouldNotUpdateEmployee_WhenDataIsNull() {
     Attendance existingAttendance = Attendance.builder()
       .id(1L)
-      .employee(testEmployee)
+      .user(testUser)
       .date(date.minusDays(1))
       .clockInTime(clockInTime.minusDays(1))
       .clockOutTime(clockOutTime.minusDays(1))
@@ -228,7 +225,7 @@ class AttendanceMapperTest {
 
     attendanceMapper.updateEntityFromData(existingAttendance, null);
 
-    assertEquals(testEmployee, existingAttendance.getEmployee());
+    assertEquals(testUser, existingAttendance.getUser());
     assertEquals(date.minusDays(1), existingAttendance.getDate());
     assertEquals(clockInTime.minusDays(1), existingAttendance.getClockInTime());
     assertEquals(

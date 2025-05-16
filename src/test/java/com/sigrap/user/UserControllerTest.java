@@ -2,7 +2,6 @@ package com.sigrap.user;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -56,7 +55,7 @@ class UserControllerTest {
       .name("Test User")
       .email("test@example.com")
       .phone("1234567890")
-      .status(UserStatus.ACTIVE)
+      .documentId("DOC123")
       .role(UserRole.ADMINISTRATOR)
       .build();
 
@@ -65,7 +64,7 @@ class UserControllerTest {
       .email("test@example.com")
       .password("password123")
       .phone("1234567890")
-      .status(UserStatus.ACTIVE)
+      .documentId("DOC123")
       .role(UserRole.ADMINISTRATOR)
       .build();
 
@@ -86,6 +85,7 @@ class UserControllerTest {
       .andExpect(jsonPath("$[0].id").value(1))
       .andExpect(jsonPath("$[0].name").value("Test User"))
       .andExpect(jsonPath("$[0].email").value("test@example.com"))
+      .andExpect(jsonPath("$[0].documentId").value("DOC123"))
       .andExpect(jsonPath("$[0].role").value("ADMINISTRATOR"));
   }
 
@@ -100,6 +100,7 @@ class UserControllerTest {
       .andExpect(jsonPath("$.id").value(1))
       .andExpect(jsonPath("$.name").value("Test User"))
       .andExpect(jsonPath("$.email").value("test@example.com"))
+      .andExpect(jsonPath("$.documentId").value("DOC123"))
       .andExpect(jsonPath("$.role").value("ADMINISTRATOR"));
   }
 
@@ -118,6 +119,7 @@ class UserControllerTest {
       .andExpect(jsonPath("$.id").value(1))
       .andExpect(jsonPath("$.name").value("Test User"))
       .andExpect(jsonPath("$.email").value("test@example.com"))
+      .andExpect(jsonPath("$.documentId").value("DOC123"))
       .andExpect(jsonPath("$.role").value("ADMINISTRATOR"));
   }
 
@@ -135,7 +137,8 @@ class UserControllerTest {
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(1))
       .andExpect(jsonPath("$.name").value("Test User"))
-      .andExpect(jsonPath("$.email").value("test@example.com"));
+      .andExpect(jsonPath("$.email").value("test@example.com"))
+      .andExpect(jsonPath("$.documentId").value("DOC123"));
   }
 
   @Test
@@ -150,7 +153,8 @@ class UserControllerTest {
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(1))
       .andExpect(jsonPath("$.name").value("Test User"))
-      .andExpect(jsonPath("$.email").value("test@example.com"));
+      .andExpect(jsonPath("$.email").value("test@example.com"))
+      .andExpect(jsonPath("$.documentId").value("DOC123"));
   }
 
   @Test
@@ -172,6 +176,7 @@ class UserControllerTest {
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(1))
       .andExpect(jsonPath("$.name").value("Test User"))
+      .andExpect(jsonPath("$.documentId").value("DOC123"))
       .andExpect(jsonPath("$.email").value("test@example.com"));
   }
 
@@ -197,48 +202,6 @@ class UserControllerTest {
           .content(objectMapper.writeValueAsString(passwordChange))
       )
       .andExpect(status().isNoContent());
-  }
-
-  @Test
-  @WithMockUser(username = "admin@example.com", roles = { "ADMIN" })
-  void resetPassword_shouldResetUserPassword() throws Exception {
-    when(userService.resetPassword(anyString(), anyString())).thenReturn(
-      userInfo
-    );
-
-    PasswordResetRequest passwordReset = new PasswordResetRequest(
-      "test@example.com"
-    );
-
-    mockMvc
-      .perform(
-        post("/api/users/reset-password")
-          .contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsString(passwordReset))
-      )
-      .andExpect(status().isOk());
-  }
-
-  @Test
-  @WithMockUser(username = "admin@example.com", roles = { "ADMIN" })
-  void lockAccount_shouldLockUserAccount() throws Exception {
-    when(userService.lockAccount(1L)).thenReturn(userInfo);
-
-    mockMvc
-      .perform(put("/api/users/1/lock").contentType(MediaType.APPLICATION_JSON))
-      .andExpect(status().isOk());
-  }
-
-  @Test
-  @WithMockUser(username = "admin@example.com", roles = { "USER" })
-  void unlockAccount_shouldUnlockUserAccount() throws Exception {
-    when(userService.unlockAccount(1L)).thenReturn(userInfo);
-
-    mockMvc
-      .perform(
-        put("/api/users/1/unlock").contentType(MediaType.APPLICATION_JSON)
-      )
-      .andExpect(status().isOk());
   }
 
   @Test

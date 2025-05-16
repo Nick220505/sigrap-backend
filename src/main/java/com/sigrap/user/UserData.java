@@ -55,14 +55,11 @@ public class UserData {
   private String phone;
 
   /**
-   * Account status of the user.
-   */
-  @Schema(description = "User's account status", example = "ACTIVE")
-  private UserStatus status;
-
-  /**
    * Role of the user.
    */
   @Schema(description = "User's role", example = "EMPLOYEE")
   private UserRole role;
+
+  @Schema(description = "Document ID of the user", example = "123456789")
+  private String documentId;
 }

@@ -173,38 +173,38 @@ public class ScheduleController {
   }
 
   /**
-   * Finds all schedules for a specific employee.
+   * Finds all schedules for a specific user.
    *
-   * @param employeeId The ID of the employee
+   * @param userId The ID of the user
    * @return List of ScheduleInfo DTOs
    */
-  @GetMapping("/employee/{employeeId}")
+  @GetMapping("/user/{userId}")
   @Operation(
-    summary = "Find schedules by employee",
-    description = "Retrieves all schedules for a specific employee"
+    summary = "Find schedules by user",
+    description = "Retrieves all schedules for a specific user"
   )
   @ApiResponse(
     responseCode = "200",
     description = "Successfully retrieved schedules"
   )
-  public List<ScheduleInfo> findByEmployeeId(
-    @Parameter(description = "ID of the employee") @PathVariable Long employeeId
+  public List<ScheduleInfo> findByUserId(
+    @Parameter(description = "ID of the user") @PathVariable Long userId
   ) {
-    return scheduleService.findByEmployeeId(employeeId);
+    return scheduleService.findByUserId(userId);
   }
 
   /**
-   * Generates a weekly schedule for an employee.
+   * Generates a weekly schedule for a user.
    *
-   * @param employeeId The ID of the employee
+   * @param userId The ID of the user
    * @param scheduleData The base schedule data to use
    * @return List of ScheduleInfo DTOs for the generated schedules
    */
-  @PostMapping("/generate-weekly/{employeeId}")
+  @PostMapping("/generate-weekly/{userId}")
   @ResponseStatus(HttpStatus.CREATED)
   @Operation(
     summary = "Generate weekly schedule",
-    description = "Generates a weekly schedule for an employee"
+    description = "Generates a weekly schedule for a user"
   )
   @ApiResponse(
     responseCode = "201",
@@ -212,30 +212,28 @@ public class ScheduleController {
   )
   @ApiResponse(
     responseCode = "404",
-    description = "Employee not found with the given ID"
+    description = "User not found with the given ID"
   )
   public List<ScheduleInfo> generateWeeklySchedule(
-    @Parameter(
-      description = "ID of the employee"
-    ) @PathVariable Long employeeId,
+    @Parameter(description = "ID of the user") @PathVariable Long userId,
     @Parameter(
       description = "Base schedule data"
     ) @Valid @RequestBody ScheduleData scheduleData
   ) {
-    return scheduleService.generateWeeklySchedule(employeeId, scheduleData);
+    return scheduleService.generateWeeklySchedule(userId, scheduleData);
   }
 
   /**
-   * Copies schedules from the previous week.
+   * Copies schedules from the previous week for a user.
    *
-   * @param employeeId The ID of the employee
+   * @param userId The ID of the user
    * @return List of ScheduleInfo DTOs for the copied schedules
    */
-  @PostMapping("/copy-previous-week/{employeeId}")
+  @PostMapping("/copy-previous-week/{userId}")
   @ResponseStatus(HttpStatus.CREATED)
   @Operation(
-    summary = "Copy previous week's schedule",
-    description = "Copies schedules from the previous week for an employee"
+    summary = "Copy previous week's schedule for user",
+    description = "Copies schedules from the previous week for a user"
   )
   @ApiResponse(
     responseCode = "201",
@@ -243,33 +241,33 @@ public class ScheduleController {
   )
   @ApiResponse(
     responseCode = "404",
-    description = "Employee not found with the given ID"
+    description = "User not found with the given ID"
   )
   public List<ScheduleInfo> copyScheduleFromPreviousWeek(
-    @Parameter(description = "ID of the employee") @PathVariable Long employeeId
+    @Parameter(description = "ID of the user") @PathVariable Long userId
   ) {
-    return scheduleService.copyScheduleFromPreviousWeek(employeeId);
+    return scheduleService.copyScheduleFromPreviousWeek(userId);
   }
 
   /**
-   * Finds all active schedules for a specific employee.
+   * Finds all active schedules for a specific user.
    *
-   * @param employeeId The ID of the employee
+   * @param userId The ID of the user
    * @return List of ScheduleInfo DTOs
    */
-  @GetMapping("/active/employee/{employeeId}")
+  @GetMapping("/active/user/{userId}")
   @Operation(
-    summary = "Find active schedules by employee",
-    description = "Retrieves all active schedules for a specific employee"
+    summary = "Find active schedules by user",
+    description = "Retrieves all active schedules for a specific user"
   )
   @ApiResponse(
     responseCode = "200",
     description = "Successfully retrieved schedules"
   )
-  public List<ScheduleInfo> findActiveSchedulesByEmployeeId(
-    @Parameter(description = "ID of the employee") @PathVariable Long employeeId
+  public List<ScheduleInfo> findActiveSchedulesByUserId(
+    @Parameter(description = "ID of the user") @PathVariable Long userId
   ) {
-    return scheduleService.findActiveSchedulesByEmployeeId(employeeId);
+    return scheduleService.findActiveSchedulesByUserId(userId);
   }
 
   /**

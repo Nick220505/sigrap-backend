@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
  * <ul>
  *   <li>Required fields must not be blank</li>
  *   <li>Times must be valid</li>
- *   <li>Employee ID must reference existing employee</li>
+ *   <li>User ID must reference existing user</li>
  * </ul></p>
  */
 @Data
@@ -38,12 +38,12 @@ import lombok.NoArgsConstructor;
 public class ScheduleData {
 
   /**
-   * ID of the associated employee.
-   * Must reference an existing employee.
+   * ID of the associated user.
+   * Must reference an existing user.
    */
-  @NotNull(message = "Employee ID cannot be null")
-  @Schema(description = "ID of the associated employee", example = "1")
-  private Long employeeId;
+  @NotNull(message = "User ID cannot be null")
+  @Schema(description = "ID of the associated user", example = "1")
+  private Long userId;
 
   /**
    * Day of the week for this schedule.

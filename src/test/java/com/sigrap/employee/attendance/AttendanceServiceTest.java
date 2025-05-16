@@ -6,8 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 
-import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeeRepository;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,26 +28,26 @@ class AttendanceServiceTest {
   private AttendanceMapper attendanceMapper;
 
   @Mock
-  private EmployeeRepository employeeRepository;
+  private UserRepository userRepository;
 
   @InjectMocks
   private AttendanceService attendanceService;
 
-  private Employee testEmployee;
+  private User testUser;
   private Attendance testAttendance;
   private AttendanceInfo testAttendanceInfo;
 
   @BeforeEach
   void setUp() {
-    testEmployee = Employee.builder()
+    testUser = User.builder()
       .id(1L)
-      .firstName("John")
-      .lastName("Doe")
+      .name("John Doe")
+      .email("john.doe@example.com")
       .build();
 
     testAttendance = Attendance.builder()
       .id(1L)
-      .employee(testEmployee)
+      .user(testUser)
       .date(LocalDateTime.now())
       .clockInTime(LocalDateTime.now())
       .clockOutTime(null)
@@ -57,8 +57,8 @@ class AttendanceServiceTest {
 
     testAttendanceInfo = AttendanceInfo.builder()
       .id(1L)
-      .employeeId(1L)
-      .employeeName("John Doe")
+      .userId(1L)
+      .userName("John Doe")
       .date(LocalDateTime.now())
       .clockInTime(LocalDateTime.now())
       .clockOutTime(LocalDateTime.now().plusHours(8))
@@ -85,14 +85,16 @@ class AttendanceServiceTest {
 
   @Test
   void clockIn_ShouldCreateNewAttendanceRecord() {
-    doReturn(Optional.of(testEmployee))
-      .when(employeeRepository)
-      .findById(anyLong());
+    doReturn(Optional.of(testUser)).when(userRepository).findById(anyLong());
     doReturn(Optional.empty())
       .when(attendanceRepository)
-      .findByEmployeeIdAndDate(anyLong(), any());
-    doReturn(testAttendance).when(attendanceRepository).save(any());
-    doReturn(testAttendanceInfo).when(attendanceMapper).toInfo(any());
+      .findByUserIdAndDate(anyLong(), any(LocalDateTime.class));
+    doReturn(testAttendance)
+      .when(attendanceRepository)
+      .save(any(Attendance.class));
+    doReturn(testAttendanceInfo)
+      .when(attendanceMapper)
+      .toInfo(any(Attendance.class));
 
     AttendanceInfo result = attendanceService.clockIn(
       1L,
@@ -102,7 +104,7 @@ class AttendanceServiceTest {
 
     assertNotNull(result);
     assertEquals(testAttendanceInfo.getId(), result.getId());
-    assertEquals(testAttendanceInfo.getEmployeeId(), result.getEmployeeId());
+    assertEquals(testAttendanceInfo.getUserId(), result.getUserId());
   }
 
   @Test
@@ -110,8 +112,12 @@ class AttendanceServiceTest {
     doReturn(Optional.of(testAttendance))
       .when(attendanceRepository)
       .findById(anyLong());
-    doReturn(testAttendance).when(attendanceRepository).save(any());
-    doReturn(testAttendanceInfo).when(attendanceMapper).toInfo(any());
+    doReturn(testAttendance)
+      .when(attendanceRepository)
+      .save(any(Attendance.class));
+    doReturn(testAttendanceInfo)
+      .when(attendanceMapper)
+      .toInfo(any(Attendance.class));
 
     AttendanceInfo result = attendanceService.clockOut(
       1L,
@@ -121,20 +127,18 @@ class AttendanceServiceTest {
 
     assertNotNull(result);
     assertEquals(testAttendanceInfo.getId(), result.getId());
-    assertEquals(testAttendanceInfo.getEmployeeId(), result.getEmployeeId());
+    assertEquals(testAttendanceInfo.getUserId(), result.getUserId());
   }
 
   @Test
-  void findByEmployeeId_ShouldReturnEmployeeAttendanceRecords() {
+  void findByUserId_ShouldReturnUserAttendanceRecords() {
     List<Attendance> attendances = List.of(testAttendance);
-    doReturn(attendances)
-      .when(attendanceRepository)
-      .findByEmployeeId(anyLong());
+    doReturn(attendances).when(attendanceRepository).findByUserId(anyLong());
     doReturn(List.of(testAttendanceInfo))
       .when(attendanceMapper)
       .toInfoList(attendances);
 
-    List<AttendanceInfo> result = attendanceService.findByEmployeeId(1L);
+    List<AttendanceInfo> result = attendanceService.findByUserId(1L);
 
     assertNotNull(result);
     assertEquals(1, result.size());
@@ -149,7 +153,7 @@ class AttendanceServiceTest {
 
     doReturn(attendances)
       .when(attendanceRepository)
-      .findByEmployeeIdAndDateBetween(
+      .findByUserIdAndDateBetween(
         anyLong(),
         any(LocalDateTime.class),
         any(LocalDateTime.class)

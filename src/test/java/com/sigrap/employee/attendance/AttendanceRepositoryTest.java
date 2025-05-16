@@ -5,9 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sigrap.config.RepositoryTestConfiguration;
-import com.sigrap.employee.Employee;
 import com.sigrap.user.User;
-import com.sigrap.user.UserStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,32 +28,23 @@ class AttendanceRepositoryTest {
   @Autowired
   private AttendanceRepository attendanceRepository;
 
-  private Employee testEmployee;
+  private User testUser;
   private Attendance testAttendance;
 
   @BeforeEach
   void setUp() {
     String uniqueEmail = "john" + System.currentTimeMillis() + "@example.com";
-    String uniqueDocumentId = "DOC" + System.currentTimeMillis();
 
-    User user = User.builder()
+    testUser = User.builder()
       .name("John Doe")
       .email(uniqueEmail)
       .password("password")
-      .status(UserStatus.ACTIVE)
+      .documentId("DOC" + System.currentTimeMillis())
       .build();
-    entityManager.persist(user);
-
-    testEmployee = Employee.builder()
-      .firstName("John")
-      .lastName("Doe")
-      .documentId(uniqueDocumentId)
-      .user(user)
-      .build();
-    entityManager.persist(testEmployee);
+    testUser = entityManager.persist(testUser);
 
     testAttendance = Attendance.builder()
-      .employee(testEmployee)
+      .user(testUser)
       .date(LocalDateTime.now())
       .clockInTime(LocalDateTime.now())
       .clockOutTime(LocalDateTime.now().plusHours(8))
@@ -68,9 +57,9 @@ class AttendanceRepositoryTest {
   }
 
   @Test
-  void findByEmployeeId_ShouldReturnAttendanceRecords() {
-    List<Attendance> result = attendanceRepository.findByEmployeeId(
-      testEmployee.getId()
+  void findByUserId_ShouldReturnAttendanceRecords() {
+    List<Attendance> result = attendanceRepository.findByUserId(
+      testUser.getId()
     );
 
     assertNotNull(result);
@@ -79,16 +68,15 @@ class AttendanceRepositoryTest {
   }
 
   @Test
-  void findByEmployeeIdAndDateBetween_ShouldReturnAttendanceRecords() {
+  void findByUserIdAndDateBetween_ShouldReturnAttendanceRecords() {
     LocalDateTime startDate = LocalDateTime.now().minusDays(1);
     LocalDateTime endDate = LocalDateTime.now().plusDays(1);
 
-    List<Attendance> result =
-      attendanceRepository.findByEmployeeIdAndDateBetween(
-        testEmployee.getId(),
-        startDate,
-        endDate
-      );
+    List<Attendance> result = attendanceRepository.findByUserIdAndDateBetween(
+      testUser.getId(),
+      startDate,
+      endDate
+    );
 
     assertNotNull(result);
     assertEquals(1, result.size());
@@ -125,15 +113,15 @@ class AttendanceRepositoryTest {
   }
 
   @Test
-  void findByEmployeeIdAndDate_ShouldReturnAttendanceRecord() {
+  void findByUserIdAndDate_ShouldReturnAttendanceRecord() {
     LocalDateTime specificDateTime = LocalDateTime.now().withNano(0);
 
     testAttendance.setDate(specificDateTime);
     testAttendance = entityManager.merge(testAttendance);
     entityManager.flush();
 
-    Optional<Attendance> result = attendanceRepository.findByEmployeeIdAndDate(
-      testEmployee.getId(),
+    Optional<Attendance> result = attendanceRepository.findByUserIdAndDate(
+      testUser.getId(),
       specificDateTime
     );
 
@@ -142,9 +130,9 @@ class AttendanceRepositoryTest {
   }
 
   @Test
-  void findByEmployeeIdAndStatus_ShouldReturnAttendanceRecords() {
-    List<Attendance> result = attendanceRepository.findByEmployeeIdAndStatus(
-      testEmployee.getId(),
+  void findByUserIdAndStatus_ShouldReturnAttendanceRecords() {
+    List<Attendance> result = attendanceRepository.findByUserIdAndStatus(
+      testUser.getId(),
       AttendanceStatus.PRESENT
     );
 

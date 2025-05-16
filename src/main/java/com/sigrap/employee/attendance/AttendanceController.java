@@ -62,7 +62,7 @@ public class AttendanceController {
   }
 
   /**
-   * Records a clock-in for an employee.
+   * Records a clock-in for a user.
    *
    * @param clockInData The clock-in data
    * @return AttendanceInfo containing the created attendance record
@@ -71,27 +71,27 @@ public class AttendanceController {
   @ResponseStatus(HttpStatus.CREATED)
   @Operation(
     summary = "Record clock-in",
-    description = "Records a clock-in for an employee"
+    description = "Records a clock-in for a user"
   )
   @ApiResponse(
     responseCode = "201",
     description = "Successfully recorded clock-in"
   )
-  @ApiResponse(responseCode = "404", description = "Employee not found")
+  @ApiResponse(responseCode = "404", description = "User not found")
   public AttendanceInfo clockIn(
     @Parameter(
       description = "Clock-in data"
     ) @Valid @RequestBody ClockInData clockInData
   ) {
     return attendanceService.clockIn(
-      clockInData.getEmployeeId(),
+      clockInData.getUserId(),
       clockInData.getTimestamp(),
       clockInData.getNotes()
     );
   }
 
   /**
-   * Records a clock-out for an employee.
+   * Records a clock-out for a user.
    *
    * @param clockOutData The clock-out data
    * @return AttendanceInfo containing the updated attendance record
@@ -99,7 +99,7 @@ public class AttendanceController {
   @PutMapping("/clock-out")
   @Operation(
     summary = "Record clock-out",
-    description = "Records a clock-out for an employee"
+    description = "Records a clock-out for a user"
   )
   @ApiResponse(
     responseCode = "200",
@@ -122,30 +122,30 @@ public class AttendanceController {
   }
 
   /**
-   * Finds all attendance records for a specific employee.
+   * Finds all attendance records for a specific user.
    *
-   * @param employeeId The ID of the employee
+   * @param userId The ID of the user
    * @return List of AttendanceInfo DTOs
    */
-  @GetMapping("/employee/{employeeId}")
+  @GetMapping("/user/{userId}")
   @Operation(
-    summary = "Find attendance by employee",
-    description = "Retrieves all attendance records for a specific employee"
+    summary = "Find attendance by user",
+    description = "Retrieves all attendance records for a specific user"
   )
   @ApiResponse(
     responseCode = "200",
     description = "Successfully retrieved attendance records"
   )
-  public List<AttendanceInfo> findByEmployeeId(
-    @Parameter(description = "ID of the employee") @PathVariable Long employeeId
+  public List<AttendanceInfo> findByUserId(
+    @Parameter(description = "ID of the user") @PathVariable Long userId
   ) {
-    return attendanceService.findByEmployeeId(employeeId);
+    return attendanceService.findByUserId(userId);
   }
 
   /**
-   * Generates an attendance report for a specific employee between two dates.
+   * Generates an attendance report for a specific user between two dates.
    *
-   * @param employeeId The ID of the employee
+   * @param userId The ID of the user
    * @param startDate Start of the date range
    * @param endDate End of the date range
    * @return List of AttendanceInfo DTOs
@@ -153,16 +153,14 @@ public class AttendanceController {
   @GetMapping("/report")
   @Operation(
     summary = "Generate attendance report",
-    description = "Generates an attendance report for a specific employee between two dates"
+    description = "Generates an attendance report for a specific user between two dates"
   )
   @ApiResponse(
     responseCode = "200",
     description = "Successfully generated attendance report"
   )
   public List<AttendanceInfo> generateAttendanceReport(
-    @Parameter(
-      description = "ID of the employee"
-    ) @RequestParam Long employeeId,
+    @Parameter(description = "ID of the user") @RequestParam Long userId,
     @Parameter(description = "Start date") @RequestParam @DateTimeFormat(
       iso = DateTimeFormat.ISO.DATE_TIME
     ) LocalDateTime startDate,
@@ -171,7 +169,7 @@ public class AttendanceController {
     ) LocalDateTime endDate
   ) {
     return attendanceService.generateAttendanceReport(
-      employeeId,
+      userId,
       startDate,
       endDate
     );

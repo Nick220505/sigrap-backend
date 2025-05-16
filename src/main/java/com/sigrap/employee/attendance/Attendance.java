@@ -1,6 +1,6 @@
 package com.sigrap.employee.attendance;
 
-import com.sigrap.employee.Employee;
+import com.sigrap.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,8 +21,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 /**
- * Entity class representing employee attendance records.
- * Tracks employee clock-in/clock-out times and attendance status.
+ * Entity class representing user attendance records.
+ * Tracks user clock-in/clock-out times and attendance status.
  *
  * <p>This entity maintains attendance information including:
  * <ul>
@@ -49,13 +49,13 @@ public class Attendance {
   private Long id;
 
   /**
-   * Employee associated with this attendance record.
-   * Many-to-one relationship with Employee.
+   * User associated with this attendance record.
+   * Many-to-one relationship with User.
    */
   @ManyToOne
-  @JoinColumn(name = "employee_id", nullable = false)
-  @NotNull(message = "Employee reference cannot be null")
-  private Employee employee;
+  @JoinColumn(name = "user_id", nullable = false)
+  @NotNull(message = "User reference cannot be null")
+  private User user;
 
   /**
    * Date of the attendance record.
@@ -65,13 +65,13 @@ public class Attendance {
   private LocalDateTime date;
 
   /**
-   * Time when the employee clocked in.
+   * Time when the user clocked in.
    */
   @Column(name = "clock_in_time")
   private LocalDateTime clockInTime;
 
   /**
-   * Time when the employee clocked out.
+   * Time when the user clocked out.
    */
   @Column(name = "clock_out_time")
   private LocalDateTime clockOutTime;

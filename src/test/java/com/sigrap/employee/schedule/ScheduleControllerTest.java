@@ -50,8 +50,8 @@ class ScheduleControllerTest {
 
     testSchedule = ScheduleInfo.builder()
       .id(1L)
-      .employeeId(1L)
-      .employeeName("John Doe")
+      .userId(1L)
+      .userName("John Doe")
       .startTime(startTime)
       .endTime(endTime)
       .day("MONDAY")
@@ -61,7 +61,7 @@ class ScheduleControllerTest {
       .build();
 
     testData = ScheduleData.builder()
-      .employeeId(1L)
+      .userId(1L)
       .startTime(startTime)
       .endTime(endTime)
       .day("MONDAY")
@@ -77,12 +77,8 @@ class ScheduleControllerTest {
       .perform(get("/api/schedules"))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$[0].id").value(testSchedule.getId()))
-      .andExpect(
-        jsonPath("$[0].employeeId").value(testSchedule.getEmployeeId())
-      )
-      .andExpect(
-        jsonPath("$[0].employeeName").value(testSchedule.getEmployeeName())
-      )
+      .andExpect(jsonPath("$[0].userId").value(testSchedule.getUserId()))
+      .andExpect(jsonPath("$[0].userName").value(testSchedule.getUserName()))
       .andExpect(
         jsonPath("$[0].startTime").value(testSchedule.getStartTime().toString())
       )
@@ -99,10 +95,8 @@ class ScheduleControllerTest {
       .perform(get("/api/schedules/{id}", 1L))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(testSchedule.getId()))
-      .andExpect(jsonPath("$.employeeId").value(testSchedule.getEmployeeId()))
-      .andExpect(
-        jsonPath("$.employeeName").value(testSchedule.getEmployeeName())
-      )
+      .andExpect(jsonPath("$.userId").value(testSchedule.getUserId()))
+      .andExpect(jsonPath("$.userName").value(testSchedule.getUserName()))
       .andExpect(
         jsonPath("$.startTime").value(testSchedule.getStartTime().toString())
       )
@@ -112,21 +106,17 @@ class ScheduleControllerTest {
   }
 
   @Test
-  void findByEmployeeId_shouldReturnSchedules() throws Exception {
-    when(scheduleService.findByEmployeeId(anyLong())).thenReturn(
+  void findByUserId_shouldReturnSchedules() throws Exception {
+    when(scheduleService.findByUserId(anyLong())).thenReturn(
       List.of(testSchedule)
     );
 
     mockMvc
-      .perform(get("/api/schedules/employee/{employeeId}", 1L))
+      .perform(get("/api/schedules/user/{userId}", 1L))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$[0].id").value(testSchedule.getId()))
-      .andExpect(
-        jsonPath("$[0].employeeId").value(testSchedule.getEmployeeId())
-      )
-      .andExpect(
-        jsonPath("$[0].employeeName").value(testSchedule.getEmployeeName())
-      )
+      .andExpect(jsonPath("$[0].userId").value(testSchedule.getUserId()))
+      .andExpect(jsonPath("$[0].userName").value(testSchedule.getUserName()))
       .andExpect(
         jsonPath("$[0].startTime").value(testSchedule.getStartTime().toString())
       )
@@ -149,10 +139,8 @@ class ScheduleControllerTest {
       )
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.id").value(testSchedule.getId()))
-      .andExpect(jsonPath("$.employeeId").value(testSchedule.getEmployeeId()))
-      .andExpect(
-        jsonPath("$.employeeName").value(testSchedule.getEmployeeName())
-      )
+      .andExpect(jsonPath("$.userId").value(testSchedule.getUserId()))
+      .andExpect(jsonPath("$.userName").value(testSchedule.getUserName()))
       .andExpect(
         jsonPath("$.startTime").value(testSchedule.getStartTime().toString())
       )
@@ -175,10 +163,8 @@ class ScheduleControllerTest {
       )
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(testSchedule.getId()))
-      .andExpect(jsonPath("$.employeeId").value(testSchedule.getEmployeeId()))
-      .andExpect(
-        jsonPath("$.employeeName").value(testSchedule.getEmployeeName())
-      )
+      .andExpect(jsonPath("$.userId").value(testSchedule.getUserId()))
+      .andExpect(jsonPath("$.userName").value(testSchedule.getUserName()))
       .andExpect(
         jsonPath("$.startTime").value(testSchedule.getStartTime().toString())
       )
@@ -202,18 +188,14 @@ class ScheduleControllerTest {
 
     mockMvc
       .perform(
-        post("/api/schedules/generate-weekly/{employeeId}", 1L)
+        post("/api/schedules/generate-weekly/{userId}", 1L)
           .contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsString(testData))
       )
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$[0].id").value(testSchedule.getId()))
-      .andExpect(
-        jsonPath("$[0].employeeId").value(testSchedule.getEmployeeId())
-      )
-      .andExpect(
-        jsonPath("$[0].employeeName").value(testSchedule.getEmployeeName())
-      )
+      .andExpect(jsonPath("$[0].userId").value(testSchedule.getUserId()))
+      .andExpect(jsonPath("$[0].userName").value(testSchedule.getUserName()))
       .andExpect(
         jsonPath("$[0].startTime").value(testSchedule.getStartTime().toString())
       )

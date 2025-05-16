@@ -45,8 +45,8 @@ class AttendanceControllerTest {
 
     testAttendanceInfo = AttendanceInfo.builder()
       .id(1L)
-      .employeeId(1L)
-      .employeeName("John Doe")
+      .userId(1L)
+      .userName("John Doe")
       .date(LocalDateTime.now())
       .clockInTime(LocalDateTime.now())
       .clockOutTime(LocalDateTime.now().plusHours(8))
@@ -56,7 +56,7 @@ class AttendanceControllerTest {
       .build();
 
     testClockInData = ClockInData.builder()
-      .employeeId(1L)
+      .userId(1L)
       .timestamp(LocalDateTime.now())
       .notes("On time")
       .build();
@@ -76,16 +76,14 @@ class AttendanceControllerTest {
       .perform(get("/api/attendance"))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$[0].id").value(testAttendanceInfo.getId()))
-      .andExpect(
-        jsonPath("$[0].employeeId").value(testAttendanceInfo.getEmployeeId())
-      );
+      .andExpect(jsonPath("$[0].userId").value(testAttendanceInfo.getUserId()));
   }
 
   @Test
   void clockIn_ShouldCreateNewAttendanceRecord() throws Exception {
     when(
       attendanceService.clockIn(
-        eq(testClockInData.getEmployeeId()),
+        eq(testClockInData.getUserId()),
         any(LocalDateTime.class),
         eq(testClockInData.getNotes())
       )
@@ -99,9 +97,7 @@ class AttendanceControllerTest {
       )
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.id").value(testAttendanceInfo.getId()))
-      .andExpect(
-        jsonPath("$.employeeId").value(testAttendanceInfo.getEmployeeId())
-      );
+      .andExpect(jsonPath("$.userId").value(testAttendanceInfo.getUserId()));
   }
 
   @Test
@@ -122,25 +118,20 @@ class AttendanceControllerTest {
       )
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(testAttendanceInfo.getId()))
-      .andExpect(
-        jsonPath("$.employeeId").value(testAttendanceInfo.getEmployeeId())
-      );
+      .andExpect(jsonPath("$.userId").value(testAttendanceInfo.getUserId()));
   }
 
   @Test
-  void findByEmployeeId_ShouldReturnEmployeeAttendanceRecords()
-    throws Exception {
-    when(attendanceService.findByEmployeeId(1L)).thenReturn(
+  void findByUserId_ShouldReturnUserAttendanceRecords() throws Exception {
+    when(attendanceService.findByUserId(1L)).thenReturn(
       List.of(testAttendanceInfo)
     );
 
     mockMvc
-      .perform(get("/api/attendance/employee/1"))
+      .perform(get("/api/attendance/user/1"))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$[0].id").value(testAttendanceInfo.getId()))
-      .andExpect(
-        jsonPath("$[0].employeeId").value(testAttendanceInfo.getEmployeeId())
-      );
+      .andExpect(jsonPath("$[0].userId").value(testAttendanceInfo.getUserId()));
   }
 
   @Test
@@ -159,7 +150,7 @@ class AttendanceControllerTest {
     mockMvc
       .perform(
         get("/api/attendance/report")
-          .param("employeeId", "1")
+          .param("userId", "1")
           .param("startDate", startDate.toString())
           .param("endDate", endDate.toString())
       )

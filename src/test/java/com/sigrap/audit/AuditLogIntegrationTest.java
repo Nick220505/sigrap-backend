@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
-import com.sigrap.user.UserStatus;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +49,7 @@ class AuditLogIntegrationTest {
         .name("Test User")
         .email("test@example.com")
         .password("password")
-        .status(UserStatus.ACTIVE)
+        .documentId("AUDIT_USER_DOC_123")
         .build()
     );
 

@@ -1,16 +1,15 @@
 package com.sigrap.user;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import com.sigrap.config.RepositoryTestConfiguration;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
-import com.sigrap.config.RepositoryTestConfiguration;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -29,6 +28,7 @@ class UserRepositoryTest {
       .name("Test User")
       .email("test@example.com")
       .password("password123")
+      .documentId("DOC123")
       .build();
 
     entityManager.persist(user);
@@ -55,6 +55,7 @@ class UserRepositoryTest {
       .name("Test User")
       .email("exists@example.com")
       .password("password123")
+      .documentId("DOC456")
       .build();
 
     entityManager.persist(user);
@@ -70,5 +71,58 @@ class UserRepositoryTest {
       "nonexistent@example.com"
     );
     assertThat(emailExists).isFalse();
+  }
+
+  @Test
+  void findByDocumentId_shouldReturnUser_whenDocumentIdExists() {
+    User user = User.builder()
+      .name("Doc User")
+      .email("docuser@example.com")
+      .password("password123")
+      .documentId("UNIQUE_DOC_ID_1")
+      .build();
+
+    entityManager.persist(user);
+    entityManager.flush();
+
+    Optional<User> foundUser = userRepository.findByDocumentId(
+      "UNIQUE_DOC_ID_1"
+    );
+
+    assertThat(foundUser).isPresent();
+    assertThat(foundUser.get().getName()).isEqualTo("Doc User");
+    assertThat(foundUser.get().getDocumentId()).isEqualTo("UNIQUE_DOC_ID_1");
+  }
+
+  @Test
+  void findByDocumentId_shouldReturnEmpty_whenDocumentIdDoesNotExist() {
+    Optional<User> foundUser = userRepository.findByDocumentId(
+      "NONEXISTENT_DOC_ID"
+    );
+    assertThat(foundUser).isEmpty();
+  }
+
+  @Test
+  void existsByDocumentId_shouldReturnTrue_whenDocumentIdExists() {
+    User user = User.builder()
+      .name("Doc Exists User")
+      .email("docexists@example.com")
+      .password("password123")
+      .documentId("UNIQUE_DOC_ID_2")
+      .build();
+
+    entityManager.persist(user);
+    entityManager.flush();
+
+    boolean docExists = userRepository.existsByDocumentId("UNIQUE_DOC_ID_2");
+    assertThat(docExists).isTrue();
+  }
+
+  @Test
+  void existsByDocumentId_shouldReturnFalse_whenDocumentIdDoesNotExist() {
+    boolean docExists = userRepository.existsByDocumentId(
+      "NONEXISTENT_DOC_ID_FOR_EXISTS"
+    );
+    assertThat(docExists).isFalse();
   }
 }

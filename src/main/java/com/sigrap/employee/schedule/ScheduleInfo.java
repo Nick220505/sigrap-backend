@@ -34,16 +34,16 @@ public class ScheduleInfo {
   private Long id;
 
   /**
-   * ID of the associated employee.
+   * ID of the associated user.
    */
-  @Schema(description = "ID of the associated employee", example = "1")
-  private Long employeeId;
+  @Schema(description = "ID of the associated user", example = "1")
+  private Long userId;
 
   /**
-   * Name of the employee.
+   * Name of the user.
    */
-  @Schema(description = "Name of the employee", example = "John Doe")
-  private String employeeName;
+  @Schema(description = "Name of the user", example = "John Doe")
+  private String userName;
 
   /**
    * Day of the week for this schedule.

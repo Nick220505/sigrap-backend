@@ -1,14 +1,11 @@
 package com.sigrap.user;
 
 import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,8 +27,6 @@ public class UserService implements UserDetailsService {
    */
   private final UserRepository userRepository;
   private final UserMapper userMapper;
-  private static final long PASSWORD_RESET_EXPIRY_MINUTES = 30;
-  private static final int MAX_FAILED_ATTEMPTS = 5;
 
   /**
    * Loads a user's details by their email address for authentication.
@@ -51,10 +46,12 @@ public class UserService implements UserDetailsService {
         new UsernameNotFoundException("User not found with email: " + email)
       );
 
-    return User.builder()
+    return org.springframework.security.core.userdetails.User.builder()
       .username(user.getEmail())
       .password(user.getPassword())
-      .authorities(new ArrayList<>())
+      .authorities(new ArrayList<>()) // Simplified, actual authorities depend on UserRole
+      .disabled(!user.isEnabled()) // isEnabled now always true
+      .accountLocked(!user.isAccountNonLocked()) // isAccountNonLocked now always true
       .build();
   }
 
@@ -115,6 +112,14 @@ public class UserService implements UserDetailsService {
         "Email already in use: " + userData.getEmail()
       );
     }
+    if (
+      userData.getDocumentId() != null &&
+      userRepository.existsByDocumentId(userData.getDocumentId())
+    ) {
+      throw new IllegalArgumentException(
+        "Document ID already in use: " + userData.getDocumentId()
+      );
+    }
 
     com.sigrap.user.User user = userMapper.toEntity(userData);
     com.sigrap.user.User savedUser = userRepository.save(user);
@@ -143,6 +148,15 @@ public class UserService implements UserDetailsService {
     ) {
       throw new IllegalArgumentException(
         "Email already in use: " + userData.getEmail()
+      );
+    }
+    if (
+      userData.getDocumentId() != null &&
+      !userData.getDocumentId().equals(user.getDocumentId()) &&
+      userRepository.existsByDocumentId(userData.getDocumentId())
+    ) {
+      throw new IllegalArgumentException(
+        "Document ID already in use: " + userData.getDocumentId()
       );
     }
 
@@ -207,7 +221,7 @@ public class UserService implements UserDetailsService {
   @Transactional
   public UserInfo changePassword(
     Long id,
-    String currentPassword,
+    String currentPassword, // currentPassword might not be verifiable if not stored or if admin reset
     String newPassword
   ) {
     com.sigrap.user.User user = userRepository
@@ -218,135 +232,8 @@ public class UserService implements UserDetailsService {
     passwordUpdate.setPassword(newPassword);
     userMapper.updateEntityFromData(user, passwordUpdate);
 
-    user.setFailedAttempts(0);
     com.sigrap.user.User updatedUser = userRepository.save(user);
     return userMapper.toInfo(updatedUser);
-  }
-
-  /**
-   * Initiates a password reset for a user.
-   *
-   * @param email The email address of the user
-   * @return The generated reset token
-   * @throws EntityNotFoundException if the user is not found
-   */
-  @Transactional
-  public String initiatePasswordReset(String email) {
-    com.sigrap.user.User user = userRepository
-      .findByEmail(email)
-      .orElseThrow(() ->
-        new EntityNotFoundException("User not found with email: " + email)
-      );
-
-    String resetToken = UUID.randomUUID().toString();
-    user.setPasswordResetToken(resetToken);
-    user.setPasswordResetExpiry(
-      LocalDateTime.now().plusMinutes(PASSWORD_RESET_EXPIRY_MINUTES)
-    );
-
-    userRepository.save(user);
-    return resetToken;
-  }
-
-  /**
-   * Completes a password reset using a valid token.
-   *
-   * @param token The password reset token
-   * @param newPassword The new password to set
-   * @return UserInfo containing the user's information
-   * @throws EntityNotFoundException if no user is found with the token
-   * @throws IllegalArgumentException if the token is expired
-   */
-  @Transactional
-  public UserInfo resetPassword(String token, String newPassword) {
-    com.sigrap.user.User user = userRepository
-      .findByPasswordResetToken(token)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Invalid password reset token")
-      );
-
-    if (
-      user.getPasswordResetExpiry() == null ||
-      user.getPasswordResetExpiry().isBefore(LocalDateTime.now())
-    ) {
-      throw new IllegalArgumentException("Password reset token has expired");
-    }
-
-    UserData passwordUpdate = new UserData();
-    passwordUpdate.setPassword(newPassword);
-    userMapper.updateEntityFromData(user, passwordUpdate);
-
-    user.setPasswordResetToken(null);
-    user.setPasswordResetExpiry(null);
-    user.setFailedAttempts(0);
-    if (user.getStatus() == UserStatus.LOCKED) {
-      user.setStatus(UserStatus.ACTIVE);
-    }
-
-    com.sigrap.user.User updatedUser = userRepository.save(user);
-    return userMapper.toInfo(updatedUser);
-  }
-
-  /**
-   * Locks a user's account.
-   *
-   * @param id The ID of the user to lock
-   * @return UserInfo containing the user's information
-   * @throws EntityNotFoundException if the user is not found
-   */
-  @Transactional
-  public UserInfo lockAccount(Long id) {
-    com.sigrap.user.User user = userRepository
-      .findById(id)
-      .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
-
-    user.setStatus(UserStatus.LOCKED);
-    com.sigrap.user.User updatedUser = userRepository.save(user);
-    return userMapper.toInfo(updatedUser);
-  }
-
-  /**
-   * Unlocks a user's account.
-   *
-   * @param id The ID of the user to unlock
-   * @return UserInfo containing the user's information
-   * @throws EntityNotFoundException if the user is not found
-   */
-  @Transactional
-  public UserInfo unlockAccount(Long id) {
-    com.sigrap.user.User user = userRepository
-      .findById(id)
-      .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
-
-    user.setStatus(UserStatus.ACTIVE);
-    user.setFailedAttempts(0);
-    com.sigrap.user.User updatedUser = userRepository.save(user);
-    return userMapper.toInfo(updatedUser);
-  }
-
-  /**
-   * Records a failed login attempt and locks the account if the maximum number
-   * of attempts is reached.
-   *
-   * @param email The email address of the user
-   * @return true if the account is now locked, false otherwise
-   */
-  @Transactional
-  public boolean registerFailedLogin(String email) {
-    com.sigrap.user.User user = userRepository.findByEmail(email).orElse(null);
-
-    if (user != null && user.getStatus() == UserStatus.ACTIVE) {
-      user.setFailedAttempts(user.getFailedAttempts() + 1);
-
-      if (user.getFailedAttempts() >= MAX_FAILED_ATTEMPTS) {
-        user.setStatus(UserStatus.LOCKED);
-        userRepository.save(user);
-        return true;
-      }
-
-      userRepository.save(user);
-    }
-    return false;
   }
 
   /**
@@ -358,8 +245,9 @@ public class UserService implements UserDetailsService {
   public void registerSuccessfulLogin(String email) {
     com.sigrap.user.User user = userRepository
       .findByEmail(email)
-      .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
+      .orElseThrow(() ->
+        new EntityNotFoundException("User not found with email: " + email)
+      );
     user.setLastLogin(
       ZonedDateTime.now(ZoneId.of("America/Bogota")).toLocalDateTime()
     );

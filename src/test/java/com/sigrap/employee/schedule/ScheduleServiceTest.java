@@ -7,8 +7,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeeRepository;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -31,7 +31,7 @@ class ScheduleServiceTest {
   private ScheduleMapper scheduleMapper;
 
   @Mock
-  private EmployeeRepository employeeRepository;
+  private UserRepository userRepository;
 
   @InjectMocks
   private ScheduleService scheduleService;
@@ -39,7 +39,7 @@ class ScheduleServiceTest {
   private Schedule schedule;
   private ScheduleData scheduleData;
   private ScheduleInfo scheduleInfo;
-  private Employee employee;
+  private User testUser;
   private LocalTime testStartTime;
   private LocalTime testEndTime;
   private LocalDateTime testTimestamp;
@@ -50,16 +50,15 @@ class ScheduleServiceTest {
     testEndTime = LocalTime.now().plusHours(8).withNano(0);
     testTimestamp = LocalDateTime.now().withNano(0);
 
-    employee = Employee.builder()
+    testUser = User.builder()
       .id(1L)
-      .firstName("John")
-      .lastName("Doe")
+      .name("John Doe")
       .email("john.doe@example.com")
       .build();
 
     schedule = Schedule.builder()
       .id(1L)
-      .employee(employee)
+      .user(testUser)
       .day("MONDAY")
       .startTime(testStartTime)
       .endTime(testEndTime)
@@ -69,7 +68,7 @@ class ScheduleServiceTest {
       .build();
 
     scheduleData = ScheduleData.builder()
-      .employeeId(1L)
+      .userId(1L)
       .day("MONDAY")
       .startTime(testStartTime)
       .endTime(testEndTime)
@@ -78,8 +77,8 @@ class ScheduleServiceTest {
 
     scheduleInfo = ScheduleInfo.builder()
       .id(1L)
-      .employeeId(1L)
-      .employeeName("John Doe")
+      .userId(1L)
+      .userName("John Doe")
       .day("MONDAY")
       .startTime(testStartTime)
       .endTime(testEndTime)
@@ -128,8 +127,8 @@ class ScheduleServiceTest {
 
   @Test
   void create_withValidData_shouldCreateSchedule() {
-    when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-    when(scheduleMapper.toEntity(scheduleData, employee)).thenReturn(schedule);
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+    when(scheduleMapper.toEntity(scheduleData, testUser)).thenReturn(schedule);
     when(scheduleRepository.save(schedule)).thenReturn(schedule);
     when(scheduleMapper.toInfo(schedule)).thenReturn(scheduleInfo);
 
@@ -141,13 +140,13 @@ class ScheduleServiceTest {
 
   @Test
   void create_withInvalidEmployee_shouldThrowException() {
-    when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+    when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
     EntityNotFoundException exception = assertThrows(
       EntityNotFoundException.class,
       () -> scheduleService.create(scheduleData)
     );
-    assertEquals("Employee not found: 1", exception.getMessage());
+    assertEquals("User not found: 1", exception.getMessage());
   }
 
   @Test
@@ -195,14 +194,14 @@ class ScheduleServiceTest {
   }
 
   @Test
-  void findByEmployeeId_shouldReturnSchedules() {
+  void findByUserId_shouldReturnSchedules() {
     List<Schedule> schedules = List.of(schedule);
     List<ScheduleInfo> expectedInfos = List.of(scheduleInfo);
 
-    when(scheduleRepository.findByEmployeeId(1L)).thenReturn(schedules);
+    when(scheduleRepository.findByUserId(1L)).thenReturn(schedules);
     when(scheduleMapper.toInfoList(schedules)).thenReturn(expectedInfos);
 
-    List<ScheduleInfo> result = scheduleService.findByEmployeeId(1L);
+    List<ScheduleInfo> result = scheduleService.findByUserId(1L);
 
     assertNotNull(result);
     assertEquals(1, result.size());
@@ -211,9 +210,9 @@ class ScheduleServiceTest {
 
   @Test
   void generateWeeklySchedule_shouldGenerateSchedules() {
-    when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
     when(
-      scheduleMapper.toEntity(any(ScheduleData.class), any(Employee.class))
+      scheduleMapper.toEntity(any(ScheduleData.class), any(User.class))
     ).thenReturn(schedule);
     when(scheduleRepository.save(any(Schedule.class))).thenReturn(schedule);
     when(scheduleMapper.toInfo(schedule)).thenReturn(scheduleInfo);
@@ -234,12 +233,12 @@ class ScheduleServiceTest {
 
   @Test
   void generateWeeklySchedule_withInvalidEmployeeId_shouldThrowException() {
-    when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+    when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
     EntityNotFoundException exception = assertThrows(
       EntityNotFoundException.class,
       () -> scheduleService.generateWeeklySchedule(1L, scheduleData)
     );
-    assertEquals("Employee not found: 1", exception.getMessage());
+    assertEquals("User not found: 1", exception.getMessage());
   }
 }

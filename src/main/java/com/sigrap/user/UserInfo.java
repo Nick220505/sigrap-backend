@@ -46,12 +46,6 @@ public class UserInfo {
   private String phone;
 
   /**
-   * Current status of the user's account.
-   */
-  @Schema(description = "User's account status", example = "ACTIVE")
-  private UserStatus status;
-
-  /**
    * Timestamp of the user's last successful login.
    */
   @Schema(description = "Last login timestamp", example = "2023-04-15T10:30:00")
@@ -62,4 +56,16 @@ public class UserInfo {
    */
   @Schema(description = "User role", example = "EMPLOYEE")
   private UserRole role;
+
+  @Schema(description = "Document ID of the user", example = "123456789")
+  private String documentId;
+
+  @Schema(description = "Creation timestamp", example = "2023-01-15T09:00:00")
+  private LocalDateTime createdAt;
+
+  @Schema(
+    description = "Last update timestamp",
+    example = "2023-01-15T09:30:00"
+  )
+  private LocalDateTime updatedAt;
 }

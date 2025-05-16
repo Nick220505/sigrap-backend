@@ -1,7 +1,7 @@
 package com.sigrap.employee.attendance;
 
-import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeeRepository;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Duration;
 import java.util.Collections;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AttendanceMapper {
 
-  private final EmployeeRepository employeeRepository;
+  private final UserRepository userRepository;
 
   /**
    * Converts an Attendance entity to AttendanceInfo DTO.
@@ -40,12 +40,8 @@ public class AttendanceMapper {
 
     return AttendanceInfo.builder()
       .id(attendance.getId())
-      .employeeId(attendance.getEmployee().getId())
-      .employeeName(
-        attendance.getEmployee().getFirstName() +
-        " " +
-        attendance.getEmployee().getLastName()
-      )
+      .userId(attendance.getUser().getId())
+      .userName(attendance.getUser().getName())
       .date(attendance.getDate())
       .clockInTime(attendance.getClockInTime())
       .clockOutTime(attendance.getClockOutTime())
@@ -75,23 +71,23 @@ public class AttendanceMapper {
    *
    * @param attendanceData The DTO containing attendance data
    * @return New Attendance entity
-   * @throws EntityNotFoundException if referenced employee is not found
+   * @throws EntityNotFoundException if referenced user is not found
    */
   public Attendance toEntity(AttendanceData attendanceData) {
     if (attendanceData == null) {
       return null;
     }
 
-    Employee employee = employeeRepository
-      .findById(attendanceData.getEmployeeId())
+    User user = userRepository
+      .findById(attendanceData.getUserId())
       .orElseThrow(() ->
         new EntityNotFoundException(
-          "Employee not found: " + attendanceData.getEmployeeId()
+          "User not found: " + attendanceData.getUserId()
         )
       );
 
     Attendance attendance = Attendance.builder()
-      .employee(employee)
+      .user(user)
       .date(attendanceData.getDate())
       .clockInTime(attendanceData.getClockInTime())
       .clockOutTime(attendanceData.getClockOutTime())
@@ -108,7 +104,7 @@ public class AttendanceMapper {
    *
    * @param attendance The attendance entity to update
    * @param attendanceData The DTO containing new attendance data
-   * @throws EntityNotFoundException if referenced employee is not found
+   * @throws EntityNotFoundException if referenced user is not found
    */
   public void updateEntityFromData(
     Attendance attendance,
@@ -119,17 +115,17 @@ public class AttendanceMapper {
     }
 
     if (
-      attendanceData.getEmployeeId() != null &&
-      !attendanceData.getEmployeeId().equals(attendance.getEmployee().getId())
+      attendanceData.getUserId() != null &&
+      !attendanceData.getUserId().equals(attendance.getUser().getId())
     ) {
-      Employee employee = employeeRepository
-        .findById(attendanceData.getEmployeeId())
+      User user = userRepository
+        .findById(attendanceData.getUserId())
         .orElseThrow(() ->
           new EntityNotFoundException(
-            "Employee not found: " + attendanceData.getEmployeeId()
+            "User not found: " + attendanceData.getUserId()
           )
         );
-      attendance.setEmployee(employee);
+      attendance.setUser(user);
     }
 
     if (attendanceData.getDate() != null) {

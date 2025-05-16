@@ -5,8 +5,6 @@ import com.sigrap.category.CategoryRepository;
 import com.sigrap.customer.Customer;
 import com.sigrap.customer.CustomerRepository;
 import com.sigrap.customer.CustomerStatus;
-import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeeRepository;
 import com.sigrap.employee.attendance.Attendance;
 import com.sigrap.employee.attendance.AttendanceRepository;
 import com.sigrap.employee.attendance.AttendanceStatus;
@@ -29,7 +27,6 @@ import com.sigrap.supplier.SupplierStatus;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserRole;
-import com.sigrap.user.UserStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -89,12 +86,6 @@ public class DataSeeder implements CommandLineRunner {
   private final PasswordEncoder passwordEncoder;
 
   /**
-   * Repository for employee database operations.
-   * Used to check if employees exist and to save new employees during seeding.
-   */
-  private final EmployeeRepository employeeRepository;
-
-  /**
    * Repository for schedule database operations.
    * Used to check if schedules exist and to save new schedules during seeding.
    */
@@ -152,7 +143,6 @@ public class DataSeeder implements CommandLineRunner {
     seedCategories();
     seedProducts();
     seedUsers();
-    seedEmployees();
     seedSchedules();
     seedAttendance();
     seedSuppliers();
@@ -742,16 +732,18 @@ public class DataSeeder implements CommandLineRunner {
         .name("Rosita González")
         .email("rosita@sigrap.com")
         .password(passwordEncoder.encode("Rosita123*"))
-        .status(UserStatus.ACTIVE)
         .role(UserRole.ADMINISTRATOR)
+        .documentId("12345678")
+        .phone("+573001234567")
         .build();
 
       User employeeUser = User.builder()
         .name("Gladys Mendoza")
         .email("gladys@sigrap.com")
         .password(passwordEncoder.encode("Gladys123*"))
-        .status(UserStatus.ACTIVE)
         .role(UserRole.EMPLOYEE)
+        .documentId("87654321")
+        .phone("+573109876543")
         .build();
 
       userRepository.saveAll(List.of(adminUser, employeeUser));
@@ -759,50 +751,6 @@ public class DataSeeder implements CommandLineRunner {
     } else {
       log.info("Users already exist, skipping seeding.");
     }
-  }
-
-  private void seedEmployees() {
-    if (employeeRepository.count() > 0) {
-      log.info("Employees already seeded.");
-      return;
-    }
-
-    log.info("Seeding employees...");
-
-    List<Employee> employees = new ArrayList<>();
-
-    User adminUser = userRepository
-      .findByEmail("rosita@sigrap.com")
-      .orElseThrow(() -> new RuntimeException("Admin user not found"));
-
-    employees.add(
-      Employee.builder()
-        .user(adminUser)
-        .firstName("Rosita")
-        .lastName("González")
-        .documentId("12345678")
-        .phoneNumber("+573001234567")
-        .email(adminUser.getEmail())
-        .build()
-    );
-
-    User employeeUser = userRepository
-      .findByEmail("gladys@sigrap.com")
-      .orElseThrow(() -> new RuntimeException("Employee user not found"));
-
-    employees.add(
-      Employee.builder()
-        .user(employeeUser)
-        .firstName("Gladys")
-        .lastName("Mendoza")
-        .documentId("87654321")
-        .phoneNumber("+573109876543")
-        .email(employeeUser.getEmail())
-        .build()
-    );
-
-    employeeRepository.saveAll(employees);
-    log.info("Employees seeded successfully.");
   }
 
   private void seedSchedules() {
@@ -814,14 +762,14 @@ public class DataSeeder implements CommandLineRunner {
     log.info("Seeding schedules...");
 
     List<Schedule> schedules = new ArrayList<>();
-    List<Employee> employees = employeeRepository.findAll();
+    List<User> users = userRepository.findAll();
 
     LocalTime defaultStartTime = LocalTime.of(8, 0);
     LocalTime defaultEndTime = LocalTime.of(17, 0);
     LocalTime saturdayEndTime = LocalTime.of(13, 0);
 
-    for (Employee employee : employees) {
-      if (!"gladys@sigrap.com".equals(employee.getEmail())) {
+    for (User user : users) {
+      if (!"gladys@sigrap.com".equals(user.getEmail())) {
         continue;
       }
 
@@ -834,7 +782,7 @@ public class DataSeeder implements CommandLineRunner {
       )) {
         schedules.add(
           Schedule.builder()
-            .employee(employee)
+            .user(user)
             .day(day)
             .startTime(defaultStartTime)
             .endTime(defaultEndTime)
@@ -843,10 +791,10 @@ public class DataSeeder implements CommandLineRunner {
         );
       }
 
-      if ("gladys@sigrap.com".equals(employee.getEmail())) {
+      if ("gladys@sigrap.com".equals(user.getEmail())) {
         schedules.add(
           Schedule.builder()
-            .employee(employee)
+            .user(user)
             .day("SATURDAY")
             .startTime(defaultStartTime)
             .endTime(saturdayEndTime)
@@ -869,11 +817,11 @@ public class DataSeeder implements CommandLineRunner {
     log.info("Seeding attendance records...");
 
     List<Attendance> attendanceRecords = new ArrayList<>();
-    List<Employee> employees = employeeRepository.findAll();
+    List<User> users = userRepository.findAll();
     LocalDateTime now = LocalDateTime.now();
 
-    for (Employee employee : employees) {
-      if (!"gladys@sigrap.com".equals(employee.getEmail())) {
+    for (User user : users) {
+      if (!"gladys@sigrap.com".equals(user.getEmail())) {
         continue;
       }
 
@@ -882,7 +830,7 @@ public class DataSeeder implements CommandLineRunner {
 
         if (
           date.getDayOfWeek().getValue() > 5 &&
-          !"gladys@sigrap.com".equals(employee.getEmail())
+          !"gladys@sigrap.com".equals(user.getEmail())
         ) {
           continue;
         }
@@ -900,7 +848,7 @@ public class DataSeeder implements CommandLineRunner {
 
         attendanceRecords.add(
           Attendance.builder()
-            .employee(employee)
+            .user(user)
             .date(date)
             .clockInTime(date.withHour(8).withMinute(0))
             .clockOutTime(date.withHour(17).withMinute(0))

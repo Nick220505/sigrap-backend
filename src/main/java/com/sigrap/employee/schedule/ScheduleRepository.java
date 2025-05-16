@@ -12,28 +12,28 @@ import org.springframework.stereotype.Repository;
  * <ul>
  *   <li>Basic CRUD operations</li>
  *   <li>Custom search methods</li>
- *   <li>Employee-based queries</li>
+ *   <li>User-based queries</li>
  *   <li>Day-based queries</li>
  * </ul></p>
  */
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
   /**
-   * Finds all schedules for a specific employee.
+   * Finds all schedules for a specific user.
    *
-   * @param employeeId ID of the employee
-   * @return List of schedules for the employee
+   * @param userId ID of the user
+   * @return List of schedules for the user
    */
-  List<Schedule> findByEmployeeId(Long employeeId);
+  List<Schedule> findByUserId(Long userId);
 
   /**
-   * Finds all schedules for a specific employee on a specific day.
+   * Finds all schedules for a specific user on a specific day.
    *
-   * @param employeeId ID of the employee
+   * @param userId ID of the user
    * @param day Day of the week
    * @return List of schedules matching the criteria
    */
-  List<Schedule> findByEmployeeIdAndDay(Long employeeId, String day);
+  List<Schedule> findByUserIdAndDay(Long userId, String day);
 
   /**
    * Finds all schedules for a specific day.
@@ -44,13 +44,13 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
   List<Schedule> findByDay(String day);
 
   /**
-   * Finds all active schedules for a specific employee.
+   * Finds all active schedules for a specific user.
    *
-   * @param employeeId ID of the employee
+   * @param userId ID of the user
    * @param isActive Active status to filter by
-   * @return List of active schedules for the employee
+   * @return List of active schedules for the user
    */
-  List<Schedule> findByEmployeeIdAndIsActive(Long employeeId, Boolean isActive);
+  List<Schedule> findByUserIdAndIsActive(Long userId, Boolean isActive);
 
   /**
    * Finds all active schedules for a specific day.

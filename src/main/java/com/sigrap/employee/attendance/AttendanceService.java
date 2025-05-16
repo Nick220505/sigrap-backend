@@ -1,7 +1,7 @@
 package com.sigrap.employee.attendance;
 
-import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeeRepository;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -28,7 +28,7 @@ public class AttendanceService {
 
   private final AttendanceRepository attendanceRepository;
   private final AttendanceMapper attendanceMapper;
-  private final EmployeeRepository employeeRepository;
+  private final UserRepository userRepository;
 
   /**
    * Retrieves all attendance records.
@@ -59,40 +59,36 @@ public class AttendanceService {
   }
 
   /**
-   * Records a clock-in for an employee.
+   * Records a clock-in for a user.
    *
-   * @param employeeId The ID of the employee
+   * @param userId The ID of the user
    * @param timestamp The clock-in timestamp
    * @param notes Optional notes about the clock-in
    * @return AttendanceInfo containing the created attendance record
-   * @throws EntityNotFoundException if the employee is not found
-   * @throws IllegalStateException if the employee already has an active attendance record
+   * @throws EntityNotFoundException if the user is not found
+   * @throws IllegalStateException if the user already has an active attendance record
    */
   @Transactional
   public AttendanceInfo clockIn(
-    Long employeeId,
+    Long userId,
     LocalDateTime timestamp,
     String notes
   ) {
-    Employee employee = employeeRepository
-      .findById(employeeId)
+    User user = userRepository
+      .findById(userId)
       .orElseThrow(() ->
-        new EntityNotFoundException("Employee not found: " + employeeId)
+        new EntityNotFoundException("User not found: " + userId)
       );
 
     LocalDateTime today = timestamp.toLocalDate().atStartOfDay();
-    if (
-      attendanceRepository
-        .findByEmployeeIdAndDate(employeeId, today)
-        .isPresent()
-    ) {
+    if (attendanceRepository.findByUserIdAndDate(userId, today).isPresent()) {
       throw new IllegalStateException(
-        "Employee already has an attendance record for today"
+        "User already has an attendance record for today"
       );
     }
 
     AttendanceData attendanceData = AttendanceData.builder()
-      .employeeId(employee.getId())
+      .userId(user.getId())
       .date(today)
       .clockInTime(timestamp)
       .status(AttendanceStatus.PRESENT)
@@ -105,7 +101,7 @@ public class AttendanceService {
   }
 
   /**
-   * Records a clock-out for an employee.
+   * Records a clock-out for a user.
    *
    * @param attendanceId The ID of the attendance record
    * @param timestamp The clock-out timestamp
@@ -126,7 +122,7 @@ public class AttendanceService {
       );
 
     if (attendance.getClockOutTime() != null) {
-      throw new IllegalStateException("Employee has already clocked out");
+      throw new IllegalStateException("User has already clocked out");
     }
 
     attendance.setClockOutTime(timestamp);
@@ -149,16 +145,14 @@ public class AttendanceService {
   }
 
   /**
-   * Finds all attendance records for a specific employee.
+   * Finds all attendance records for a specific user.
    *
-   * @param employeeId The ID of the employee
+   * @param userId The ID of the user
    * @return List of AttendanceInfo DTOs
    */
   @Transactional(readOnly = true)
-  public List<AttendanceInfo> findByEmployeeId(Long employeeId) {
-    List<Attendance> attendances = attendanceRepository.findByEmployeeId(
-      employeeId
-    );
+  public List<AttendanceInfo> findByUserId(Long userId) {
+    List<Attendance> attendances = attendanceRepository.findByUserId(userId);
     return attendanceMapper.toInfoList(attendances);
   }
 
@@ -175,22 +169,22 @@ public class AttendanceService {
   }
 
   /**
-   * Generates an attendance report for a specific employee between two dates.
+   * Generates an attendance report for a specific user between two dates.
    *
-   * @param employeeId The ID of the employee
+   * @param userId The ID of the user
    * @param startDate Start of the date range
    * @param endDate End of the date range
    * @return List of AttendanceInfo DTOs
    */
   @Transactional(readOnly = true)
   public List<AttendanceInfo> generateAttendanceReport(
-    Long employeeId,
+    Long userId,
     LocalDateTime startDate,
     LocalDateTime endDate
   ) {
     List<Attendance> attendances =
-      attendanceRepository.findByEmployeeIdAndDateBetween(
-        employeeId,
+      attendanceRepository.findByUserIdAndDateBetween(
+        userId,
         startDate,
         endDate
       );
