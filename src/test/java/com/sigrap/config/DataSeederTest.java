@@ -22,7 +22,6 @@ import com.sigrap.supplier.PurchaseOrderRepository;
 import com.sigrap.supplier.PurchaseOrderTrackingEventRepository;
 import com.sigrap.supplier.SupplierRepository;
 import com.sigrap.user.User;
-import com.sigrap.user.UserNotificationPreferenceRepository;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserRole;
 import com.sigrap.user.UserStatus;
@@ -49,9 +48,6 @@ class DataSeederTest {
 
   @Mock
   private UserRepository userRepository;
-
-  @Mock
-  private UserNotificationPreferenceRepository userNotificationPreferenceRepository;
 
   @Mock
   private PasswordEncoder passwordEncoder;
@@ -201,59 +197,5 @@ class DataSeederTest {
     dataSeeder.run();
 
     verify(userRepository, never()).saveAll(anyList());
-  }
-
-  @Test
-  void testSeedUserNotificationPreferences_WhenPreferencesEmptyAndUsersExist()
-    throws Exception {
-    when(userNotificationPreferenceRepository.count()).thenReturn(0L);
-    when(userRepository.count()).thenReturn(2L);
-    when(userRepository.findAll()).thenReturn(createTestUsers());
-
-    dataSeeder.run();
-
-    verify(userNotificationPreferenceRepository, times(1)).saveAll(anyList());
-  }
-
-  @Test
-  void testSeedUserNotificationPreferences_WhenPreferencesExist()
-    throws Exception {
-    when(userNotificationPreferenceRepository.count()).thenReturn(10L);
-
-    dataSeeder.run();
-
-    verify(userNotificationPreferenceRepository, never()).saveAll(anyList());
-  }
-
-  @Test
-  void testSeedUserNotificationPreferences_WhenNoUsers() throws Exception {
-    when(userNotificationPreferenceRepository.count()).thenReturn(0L);
-    when(userRepository.count()).thenReturn(0L);
-
-    dataSeeder.run();
-
-    verify(userNotificationPreferenceRepository, never()).saveAll(anyList());
-  }
-
-  private List<User> createTestUsers() {
-    User adminUser = User.builder()
-      .id(1L)
-      .email("admin@example.com")
-      .name("Admin User")
-      .password("encoded-password")
-      .status(UserStatus.ACTIVE)
-      .role(UserRole.ADMINISTRATOR)
-      .build();
-
-    User employeeUser = User.builder()
-      .id(2L)
-      .email("employee@example.com")
-      .name("Employee User")
-      .password("encoded-password")
-      .status(UserStatus.ACTIVE)
-      .role(UserRole.EMPLOYEE)
-      .build();
-
-    return List.of(adminUser, employeeUser);
   }
 }

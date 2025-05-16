@@ -7,17 +7,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -108,17 +105,6 @@ public class User implements UserDetails {
    * Expiration timestamp for the password reset token.
    */
   private LocalDateTime passwordResetExpiry;
-
-  /**
-   * Collection of notification preferences for this user.
-   * One-to-many relationship with UserNotificationPreference.
-   * Excluded from equals/hashCode to prevent LazyInitializationException.
-   */
-  @OneToMany(mappedBy = "user")
-  @Builder.Default
-  @EqualsAndHashCode.Exclude
-  private Set<UserNotificationPreference> notificationPreferences =
-    new HashSet<>();
 
   @Override
   public Set<GrantedAuthority> getAuthorities() {

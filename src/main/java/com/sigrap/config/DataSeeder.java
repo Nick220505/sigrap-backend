@@ -30,8 +30,6 @@ import com.sigrap.supplier.Supplier;
 import com.sigrap.supplier.SupplierRepository;
 import com.sigrap.supplier.SupplierStatus;
 import com.sigrap.user.User;
-import com.sigrap.user.UserNotificationPreference;
-import com.sigrap.user.UserNotificationPreferenceRepository;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserRole;
 import com.sigrap.user.UserStatus;
@@ -85,12 +83,6 @@ public class DataSeeder implements CommandLineRunner {
    * Used to check if users exist and to save new user accounts during seeding.
    */
   private final UserRepository userRepository;
-
-  /**
-   * Repository for user notification preference database operations.
-   * Used to save default notification preferences for users.
-   */
-  private final UserNotificationPreferenceRepository userNotificationPreferenceRepository;
 
   /**
    * Password encoder for securely hashing user passwords before storing them.
@@ -174,7 +166,6 @@ public class DataSeeder implements CommandLineRunner {
     seedCategories();
     seedProducts();
     seedUsers();
-    seedUserNotificationPreferences();
     seedEmployees();
     seedSchedules();
     seedAttendance();
@@ -783,47 +774,6 @@ public class DataSeeder implements CommandLineRunner {
       log.info("Users seeded successfully.");
     } else {
       log.info("Users already exist, skipping seeding.");
-    }
-  }
-
-  /**
-   * Seeds initial notification preferences for users.
-   * Creates default notification settings for each user in the system.
-   * Only executes if there are users but no notification preferences.
-   */
-  private void seedUserNotificationPreferences() {
-    if (
-      userNotificationPreferenceRepository.count() == 0 &&
-      userRepository.count() > 0
-    ) {
-      log.info("Seeding user notification preferences...");
-
-      List<User> users = userRepository.findAll();
-      List<UserNotificationPreference> preferences = new ArrayList<>();
-
-      for (User user : users) {
-        for (com.sigrap.user.UserNotificationPreference.NotificationType type : com.sigrap.user.UserNotificationPreference.NotificationType.values()) {
-          preferences.add(
-            UserNotificationPreference.builder()
-              .user(user)
-              .notificationType(type)
-              .enabled(true)
-              .emailEnabled(true)
-              .pushEnabled(
-                type ==
-                com.sigrap.user.UserNotificationPreference.NotificationType.SECURITY
-              )
-              .build()
-          );
-        }
-      }
-
-      userNotificationPreferenceRepository.saveAll(preferences);
-      log.info("User notification preferences seeded successfully.");
-    } else {
-      log.info(
-        "User notification preferences already exist, skipping seeding."
-      );
     }
   }
 
