@@ -5,10 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeeStatus;
 import com.sigrap.user.User;
 import com.sigrap.user.UserStatus;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -49,8 +47,6 @@ class ScheduleRepositoryTest {
       .lastName("Doe")
       .documentId("123456")
       .email("john.doe@example.com")
-      .hireDate(LocalDateTime.now().withNano(0))
-      .status(EmployeeStatus.ACTIVE)
       .user(user)
       .build();
     employee = entityManager.persist(employee);

@@ -10,7 +10,6 @@ import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserStatus;
 import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,12 +32,9 @@ class EmployeeMapperTest {
   private Employee testEmployee;
   private EmployeeInfo testEmployeeInfo;
   private EmployeeData testEmployeeData;
-  private LocalDateTime hireDate;
 
   @BeforeEach
   void setUp() {
-    hireDate = LocalDateTime.now().minusDays(30);
-
     testUser = User.builder()
       .id(1L)
       .name("John Doe")
@@ -52,8 +48,6 @@ class EmployeeMapperTest {
       .firstName("John")
       .lastName("Doe")
       .email("john.doe@example.com")
-      .hireDate(hireDate)
-      .status(EmployeeStatus.ACTIVE)
       .user(testUser)
       .build();
 
@@ -63,8 +57,6 @@ class EmployeeMapperTest {
       .firstName("John")
       .lastName("Doe")
       .email("john.doe@example.com")
-      .hireDate(hireDate)
-      .status(EmployeeStatus.ACTIVE)
       .build();
 
     testEmployeeData = EmployeeData.builder()
@@ -72,7 +64,6 @@ class EmployeeMapperTest {
       .firstName("John")
       .lastName("Doe")
       .email("john.doe@example.com")
-      .hireDate(hireDate)
       .build();
   }
 
@@ -84,8 +75,6 @@ class EmployeeMapperTest {
       .lastName("Doe")
       .documentId("DOC123")
       .email("john.doe@example.com")
-      .hireDate(hireDate)
-      .status(EmployeeStatus.ACTIVE)
       .user(testUser)
       .build();
 
@@ -98,8 +87,6 @@ class EmployeeMapperTest {
     assertEquals("Doe", employeeInfo.getLastName());
     assertEquals("DOC123", employeeInfo.getDocumentId());
     assertEquals("john.doe@example.com", employeeInfo.getEmail());
-    assertEquals(hireDate, employeeInfo.getHireDate());
-    assertEquals(EmployeeStatus.ACTIVE, employeeInfo.getStatus());
   }
 
   @Test
@@ -117,8 +104,6 @@ class EmployeeMapperTest {
       .lastName("Doe")
       .documentId("DOC123")
       .email("john.doe@example.com")
-      .hireDate(hireDate)
-      .status(EmployeeStatus.ACTIVE)
       .user(testUser)
       .build();
     List<Employee> employees = List.of(employee);
@@ -134,8 +119,6 @@ class EmployeeMapperTest {
     assertEquals("Doe", employeeInfo.getLastName());
     assertEquals("DOC123", employeeInfo.getDocumentId());
     assertEquals("john.doe@example.com", employeeInfo.getEmail());
-    assertEquals(hireDate, employeeInfo.getHireDate());
-    assertEquals(EmployeeStatus.ACTIVE, employeeInfo.getStatus());
   }
 
   @Test
@@ -148,13 +131,14 @@ class EmployeeMapperTest {
 
   @Test
   void toEntity_ShouldMapEmployeeDataToEmployee() {
+    when(userRepository.findById(20L)).thenReturn(
+      Optional.of(User.builder().id(20L).build())
+    );
     EmployeeData employeeData = EmployeeData.builder()
       .firstName("Jane")
       .lastName("Smith")
       .documentId("DOC456")
       .email("jane.smith@example.com")
-      .hireDate(hireDate)
-      .status(EmployeeStatus.INACTIVE)
       .userId(20L)
       .build();
 
@@ -168,8 +152,6 @@ class EmployeeMapperTest {
     assertEquals("Smith", employee.getLastName());
     assertEquals("DOC456", employee.getDocumentId());
     assertEquals("jane.smith@example.com", employee.getEmail());
-    assertEquals(hireDate, employee.getHireDate());
-    assertEquals(EmployeeStatus.INACTIVE, employee.getStatus());
   }
 
   @Test
@@ -192,28 +174,23 @@ class EmployeeMapperTest {
 
   @Test
   void updateEntityFromData_ShouldUpdateExistingEmployee() {
-    LocalDateTime initialHireDate = hireDate.minusMonths(1);
     Employee existingEmployee = Employee.builder()
       .id(1L)
       .firstName("Initial First")
       .lastName("Initial Last")
       .documentId("DOC789")
       .email("initial@example.com")
-      .hireDate(initialHireDate)
-      .status(EmployeeStatus.ACTIVE)
       .user(testUser)
       .build();
 
-    LocalDateTime updatedHireDate = hireDate;
     EmployeeData updateData = EmployeeData.builder()
       .firstName("Updated First")
       .lastName("Updated Last")
       .documentId("DOCNEW")
       .email("updated@example.com")
-      .hireDate(updatedHireDate)
-      .status(EmployeeStatus.INACTIVE)
       .userId(1L)
       .build();
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
 
     employeeMapper.updateEntityFromData(existingEmployee, updateData);
 
@@ -223,21 +200,16 @@ class EmployeeMapperTest {
     assertEquals("Updated Last", existingEmployee.getLastName());
     assertEquals("DOCNEW", existingEmployee.getDocumentId());
     assertEquals("updated@example.com", existingEmployee.getEmail());
-    assertEquals(updatedHireDate, existingEmployee.getHireDate());
-    assertEquals(EmployeeStatus.INACTIVE, existingEmployee.getStatus());
   }
 
   @Test
   void updateEntityFromData_WithNullFieldsInData_ShouldNotUpdateThoseFieldsInEntity() {
-    LocalDateTime initialHireDate = hireDate.minusMonths(1);
     Employee existingEmployee = Employee.builder()
       .id(1L)
       .firstName("Initial First")
       .lastName("Initial Last")
       .documentId("DOC789")
       .email("initial@example.com")
-      .hireDate(initialHireDate)
-      .status(EmployeeStatus.ACTIVE)
       .user(testUser)
       .build();
 
@@ -246,8 +218,6 @@ class EmployeeMapperTest {
       .lastName(null)
       .documentId(null)
       .email(null)
-      .hireDate(null)
-      .status(null)
       .userId(null)
       .build();
 
@@ -259,8 +229,6 @@ class EmployeeMapperTest {
     assertEquals("Initial Last", existingEmployee.getLastName());
     assertEquals("DOC789", existingEmployee.getDocumentId());
     assertEquals("initial@example.com", existingEmployee.getEmail());
-    assertEquals(initialHireDate, existingEmployee.getHireDate());
-    assertEquals(EmployeeStatus.ACTIVE, existingEmployee.getStatus());
   }
 
   @Test

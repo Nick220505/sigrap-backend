@@ -7,7 +7,6 @@ import com.sigrap.customer.CustomerRepository;
 import com.sigrap.customer.CustomerStatus;
 import com.sigrap.employee.Employee;
 import com.sigrap.employee.EmployeeRepository;
-import com.sigrap.employee.EmployeeStatus;
 import com.sigrap.employee.attendance.Attendance;
 import com.sigrap.employee.attendance.AttendanceRepository;
 import com.sigrap.employee.attendance.AttendanceStatus;
@@ -784,8 +783,6 @@ public class DataSeeder implements CommandLineRunner {
         .documentId("12345678")
         .phoneNumber("+573001234567")
         .email(adminUser.getEmail())
-        .hireDate(LocalDateTime.now().minusYears(2))
-        .status(EmployeeStatus.ACTIVE)
         .build()
     );
 
@@ -801,8 +798,6 @@ public class DataSeeder implements CommandLineRunner {
         .documentId("87654321")
         .phoneNumber("+573109876543")
         .email(employeeUser.getEmail())
-        .hireDate(LocalDateTime.now().minusMonths(6))
-        .status(EmployeeStatus.ACTIVE)
         .build()
     );
 
@@ -826,6 +821,10 @@ public class DataSeeder implements CommandLineRunner {
     LocalTime saturdayEndTime = LocalTime.of(13, 0);
 
     for (Employee employee : employees) {
+      if (!"gladys@sigrap.com".equals(employee.getEmail())) {
+        continue;
+      }
+
       for (String day : List.of(
         "MONDAY",
         "TUESDAY",
@@ -874,6 +873,10 @@ public class DataSeeder implements CommandLineRunner {
     LocalDateTime now = LocalDateTime.now();
 
     for (Employee employee : employees) {
+      if (!"gladys@sigrap.com".equals(employee.getEmail())) {
+        continue;
+      }
+
       for (int i = 0; i < 7; i++) {
         LocalDateTime date = now.minusDays(i);
 

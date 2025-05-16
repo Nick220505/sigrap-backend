@@ -50,7 +50,6 @@ class AttendanceRepositoryTest {
       .firstName("John")
       .lastName("Doe")
       .documentId(uniqueDocumentId)
-      .hireDate(LocalDateTime.now())
       .user(user)
       .build();
     entityManager.persist(testEmployee);

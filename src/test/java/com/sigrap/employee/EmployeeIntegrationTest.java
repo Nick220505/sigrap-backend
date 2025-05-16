@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.sigrap.user.User;
 import com.sigrap.user.UserStatus;
-import java.time.LocalDateTime;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +42,6 @@ class EmployeeIntegrationTest {
       .lastName("Doe")
       .documentId("123456")
       .email("john.doe@example.com")
-      .hireDate(LocalDateTime.now())
-      .status(EmployeeStatus.ACTIVE)
       .user(testUser)
       .build();
     testEmployee = entityManager.persist(testEmployee);
@@ -64,8 +60,6 @@ class EmployeeIntegrationTest {
     assertEquals(testEmployee.getLastName(), found.getLastName());
     assertEquals(testEmployee.getDocumentId(), found.getDocumentId());
     assertEquals(testEmployee.getEmail(), found.getEmail());
-    assertEquals(testEmployee.getHireDate(), found.getHireDate());
-    assertEquals(testEmployee.getStatus(), found.getStatus());
   }
 
   @Test
@@ -80,8 +74,6 @@ class EmployeeIntegrationTest {
     assertEquals(testEmployee.getLastName(), found.getLastName());
     assertEquals(testEmployee.getDocumentId(), found.getDocumentId());
     assertEquals(testEmployee.getEmail(), found.getEmail());
-    assertEquals(testEmployee.getHireDate(), found.getHireDate());
-    assertEquals(testEmployee.getStatus(), found.getStatus());
   }
 
   @Test
@@ -96,8 +88,6 @@ class EmployeeIntegrationTest {
     assertEquals(testEmployee.getLastName(), found.getLastName());
     assertEquals(testEmployee.getDocumentId(), found.getDocumentId());
     assertEquals(testEmployee.getEmail(), found.getEmail());
-    assertEquals(testEmployee.getHireDate(), found.getHireDate());
-    assertEquals(testEmployee.getStatus(), found.getStatus());
   }
 
   @Test
@@ -112,24 +102,5 @@ class EmployeeIntegrationTest {
     assertEquals(testEmployee.getLastName(), found.getLastName());
     assertEquals(testEmployee.getDocumentId(), found.getDocumentId());
     assertEquals(testEmployee.getEmail(), found.getEmail());
-    assertEquals(testEmployee.getHireDate(), found.getHireDate());
-    assertEquals(testEmployee.getStatus(), found.getStatus());
-  }
-
-  @Test
-  void findByStatus_ShouldReturnEmployeesWithStatus() {
-    List<Employee> found = employeeRepository.findByStatus(
-      testEmployee.getStatus()
-    );
-
-    assertNotNull(found);
-    assertEquals(1, found.size());
-    assertEquals(testEmployee.getId(), found.get(0).getId());
-    assertEquals(testEmployee.getFirstName(), found.get(0).getFirstName());
-    assertEquals(testEmployee.getLastName(), found.get(0).getLastName());
-    assertEquals(testEmployee.getDocumentId(), found.get(0).getDocumentId());
-    assertEquals(testEmployee.getEmail(), found.get(0).getEmail());
-    assertEquals(testEmployee.getHireDate(), found.get(0).getHireDate());
-    assertEquals(testEmployee.getStatus(), found.get(0).getStatus());
   }
 }

@@ -29,14 +29,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
   Optional<Employee> findByUserId(Long userId);
 
   /**
-   * Finds all employees with a specific status.
-   *
-   * @param status Status to search for
-   * @return List of employees with the specified status
-   */
-  List<Employee> findByStatus(EmployeeStatus status);
-
-  /**
    * Finds all employees hired between two dates.
    *
    * @param startDate Start of the date range

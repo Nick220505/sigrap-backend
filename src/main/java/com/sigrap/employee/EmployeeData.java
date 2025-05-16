@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -89,17 +88,6 @@ public class EmployeeData {
   private String email;
 
   /**
-   * Date when the employee was hired.
-   * Must not be null.
-   */
-  @NotNull(message = "Hire date cannot be null")
-  @Schema(
-    description = "Hire date of the employee",
-    example = "2023-01-15T09:00:00"
-  )
-  private LocalDateTime hireDate;
-
-  /**
    * URL of the employee's profile image.
    */
   @Schema(
@@ -107,10 +95,4 @@ public class EmployeeData {
     example = "https://example.com/profile.jpg"
   )
   private String profileImageUrl;
-
-  /**
-   * Status of the employee.
-   */
-  @Schema(description = "Status of the employee")
-  private EmployeeStatus status;
 }

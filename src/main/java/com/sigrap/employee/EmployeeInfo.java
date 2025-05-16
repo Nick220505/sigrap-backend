@@ -73,15 +73,6 @@ public class EmployeeInfo {
   private String email;
 
   /**
-   * Date when the employee was hired.
-   */
-  @Schema(
-    description = "Hire date of the employee",
-    example = "2023-01-15T09:00:00"
-  )
-  private LocalDateTime hireDate;
-
-  /**
    * Date when the employee was terminated.
    */
   @Schema(
@@ -89,12 +80,6 @@ public class EmployeeInfo {
     example = "2024-01-15T09:00:00"
   )
   private LocalDateTime terminationDate;
-
-  /**
-   * Current status of the employee.
-   */
-  @Schema(description = "Current status of the employee", example = "ACTIVE")
-  private EmployeeStatus status;
 
   /**
    * URL of the employee's profile image.

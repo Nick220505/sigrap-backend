@@ -9,13 +9,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sigrap.employee.Employee;
-import com.sigrap.employee.EmployeeRepository;
-import com.sigrap.user.User;
-import com.sigrap.user.UserRepository;
-import com.sigrap.user.UserStatus;
 import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +19,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sigrap.employee.Employee;
+import com.sigrap.employee.EmployeeRepository;
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
+import com.sigrap.user.UserStatus;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -67,7 +69,6 @@ class AttendanceIntegrationTest {
       .firstName("John")
       .lastName("Doe")
       .documentId(uniqueDocumentId)
-      .hireDate(LocalDateTime.now())
       .user(user)
       .build();
     employeeRepository.save(testEmployee);

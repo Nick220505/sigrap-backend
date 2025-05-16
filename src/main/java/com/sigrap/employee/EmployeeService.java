@@ -78,7 +78,6 @@ public class EmployeeService {
     }
 
     Employee employee = employeeMapper.toEntity(data);
-    employee.setStatus(EmployeeStatus.ACTIVE);
     employee = employeeRepository.save(employee);
     return employeeMapper.toInfo(employee);
   }
@@ -161,89 +160,6 @@ public class EmployeeService {
   }
 
   /**
-   * Activates an employee's account.
-   *
-   * @param id The ID of the employee to activate
-   * @return EmployeeInfo containing the updated employee's information
-   * @throws EntityNotFoundException if the employee is not found
-   */
-  @Transactional
-  public EmployeeInfo activate(Long id) {
-    Employee employee = employeeRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Employee not found: " + id)
-      );
-
-    if (employee.getStatus() == EmployeeStatus.TERMINATED) {
-      throw new IllegalStateException("Cannot activate a terminated employee");
-    }
-
-    employee.setStatus(EmployeeStatus.ACTIVE);
-    employee = employeeRepository.save(employee);
-    return employeeMapper.toInfo(employee);
-  }
-
-  /**
-   * Deactivates an employee's account.
-   *
-   * @param id The ID of the employee to deactivate
-   * @return EmployeeInfo containing the updated employee's information
-   * @throws EntityNotFoundException if the employee is not found
-   */
-  @Transactional
-  public EmployeeInfo deactivate(Long id) {
-    Employee employee = employeeRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Employee not found: " + id)
-      );
-
-    if (employee.getStatus() == EmployeeStatus.TERMINATED) {
-      throw new IllegalStateException(
-        "Cannot deactivate a terminated employee"
-      );
-    }
-
-    employee.setStatus(EmployeeStatus.INACTIVE);
-    employee = employeeRepository.save(employee);
-    return employeeMapper.toInfo(employee);
-  }
-
-  /**
-   * Terminates an employee's employment.
-   *
-   * @param id The ID of the employee to terminate
-   * @return EmployeeInfo containing the updated employee's information
-   * @throws EntityNotFoundException if the employee is not found
-   */
-  @Transactional
-  public EmployeeInfo terminate(Long id) {
-    Employee employee = employeeRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Employee not found: " + id)
-      );
-
-    employee.setStatus(EmployeeStatus.TERMINATED);
-    employee.setTerminationDate(LocalDateTime.now());
-    employee = employeeRepository.save(employee);
-    return employeeMapper.toInfo(employee);
-  }
-
-  /**
-   * Finds all employees with a specific status.
-   *
-   * @param status The status to search for
-   * @return List of EmployeeInfo DTOs
-   */
-  @Transactional(readOnly = true)
-  public List<EmployeeInfo> findByStatus(EmployeeStatus status) {
-    List<Employee> employees = employeeRepository.findByStatus(status);
-    return employeeMapper.toInfoList(employees);
-  }
-
-  /**
    * Finds all employees hired between two dates.
    *
    * @param startDate Start of the date range
@@ -300,14 +216,6 @@ public class EmployeeService {
 
     if (data.getEmail() == null || data.getEmail().trim().isEmpty()) {
       throw new IllegalArgumentException("Email is required");
-    }
-
-    if (data.getHireDate() == null) {
-      throw new IllegalArgumentException("Hire date is required");
-    }
-
-    if (data.getHireDate().isAfter(LocalDateTime.now())) {
-      throw new IllegalArgumentException("Hire date cannot be in the future");
     }
   }
 }

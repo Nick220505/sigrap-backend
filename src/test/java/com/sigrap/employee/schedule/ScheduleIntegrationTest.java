@@ -11,11 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sigrap.employee.Employee;
 import com.sigrap.employee.EmployeeRepository;
-import com.sigrap.employee.EmployeeStatus;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserStatus;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,8 +74,6 @@ class ScheduleIntegrationTest {
       .lastName("Doe")
       .documentId(uniqueDocumentId)
       .email(uniqueEmail)
-      .hireDate(LocalDateTime.now().withNano(0))
-      .status(EmployeeStatus.ACTIVE)
       .user(user)
       .build();
     testEmployee = employeeRepository.save(testEmployee);

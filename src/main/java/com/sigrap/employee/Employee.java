@@ -4,8 +4,6 @@ import com.sigrap.employee.attendance.Attendance;
 import com.sigrap.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -104,26 +102,11 @@ public class Employee {
   private String email;
 
   /**
-   * Date when the employee was hired.
-   * Must not be null.
-   */
-  @NotNull(message = "Hire date cannot be null")
-  @Column(name = "hire_date", nullable = false)
-  private LocalDateTime hireDate;
-
-  /**
    * Date when the employee was terminated.
    * Null if still employed.
    */
   @Column(name = "termination_date")
   private LocalDateTime terminationDate;
-
-  /**
-   * Current status of the employee.
-   */
-  @Enumerated(EnumType.STRING)
-  @Builder.Default
-  private EmployeeStatus status = EmployeeStatus.ACTIVE;
 
   /**
    * URL of the employee's profile image.
