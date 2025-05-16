@@ -143,6 +143,49 @@ public class ProductData {
   private BigDecimal salePrice;
 
   /**
+   * The current stock quantity of the product.
+   *
+   * <p>Validation:
+   * <ul>
+   *   <li>Must not be null</li>
+   *   <li>Must be zero or positive</li>
+   * </ul></p>
+   *
+   * <p>Used for:
+   * <ul>
+   *   <li>Inventory tracking</li>
+   *   <li>Stock level management</li>
+   * </ul></p>
+   */
+  @NotNull(message = "Stock cannot be null")
+  @PositiveOrZero(message = "Stock must be zero or positive")
+  @Schema(description = "Current stock quantity", example = "100")
+  private Integer stock;
+
+  /**
+   * The minimum stock threshold for the product.
+   *
+   * <p>Validation:
+   * <ul>
+   *   <li>Must not be null</li>
+   *   <li>Must be zero or positive</li>
+   * </ul></p>
+   *
+   * <p>Used for:
+   * <ul>
+   *   <li>Reorder alerts</li>
+   *   <li>Inventory planning</li>
+   * </ul></p>
+   */
+  @NotNull(message = "Minimum stock threshold cannot be null")
+  @PositiveOrZero(message = "Minimum stock threshold must be zero or positive")
+  @Schema(
+    description = "Minimum stock threshold for reorder alerts",
+    example = "10"
+  )
+  private Integer minimumStockThreshold;
+
+  /**
    * The ID of the category this product belongs to.
    *
    * <p>Properties:

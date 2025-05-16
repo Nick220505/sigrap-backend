@@ -126,6 +126,33 @@ public class ProductInfo {
   private BigDecimal salePrice;
 
   /**
+   * The current stock quantity of the product.
+   *
+   * <p>Properties:
+   * <ul>
+   *   <li>Current inventory level</li>
+   *   <li>Used for stock management</li>
+   * </ul></p>
+   */
+  @Schema(description = "Current stock quantity", example = "100")
+  private Integer stock;
+
+  /**
+   * The minimum stock threshold for the product.
+   *
+   * <p>Properties:
+   * <ul>
+   *   <li>Level to trigger reorder alerts</li>
+   *   <li>Used for inventory planning</li>
+   * </ul></p>
+   */
+  @Schema(
+    description = "Minimum stock threshold for reorder alerts",
+    example = "10"
+  )
+  private Integer minimumStockThreshold;
+
+  /**
    * The category the product belongs to.
    *
    * <p>Properties:

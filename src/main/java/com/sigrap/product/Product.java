@@ -76,6 +76,25 @@ public class Product {
   private BigDecimal salePrice;
 
   /**
+   * Current stock quantity of the product.
+   * Must be zero or positive.
+   */
+  @NotNull(message = "Stock cannot be null")
+  @PositiveOrZero(message = "Stock must be zero or positive")
+  @Column(nullable = false)
+  private Integer stock;
+
+  /**
+   * Minimum stock threshold for the product.
+   * When stock falls below this level, it may trigger a reorder alert.
+   * Must be zero or positive.
+   */
+  @NotNull(message = "Minimum stock threshold cannot be null")
+  @PositiveOrZero(message = "Minimum stock threshold must be zero or positive")
+  @Column(name = "minimum_stock_threshold", nullable = false)
+  private Integer minimumStockThreshold;
+
+  /**
    * Category to which this product belongs.
    * Optional many-to-one relationship with Category.
    */

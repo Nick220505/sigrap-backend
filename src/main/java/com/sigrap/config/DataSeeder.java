@@ -1,5 +1,19 @@
 package com.sigrap.config;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
 import com.sigrap.customer.Customer;
@@ -27,20 +41,9 @@ import com.sigrap.supplier.SupplierStatus;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserRole;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Configuration component for seeding initial data into the database.
@@ -270,6 +273,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("4000"))
             .salePrice(new BigDecimal("7000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(0))
             .build(),
           Product.builder()
@@ -277,6 +282,8 @@ public class DataSeeder implements CommandLineRunner {
             .description("Lápiz grafito HB, cuerpo hexagonal con goma incluida")
             .costPrice(new BigDecimal("500"))
             .salePrice(new BigDecimal("1000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(0))
             .build(),
           Product.builder()
@@ -286,6 +293,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("5500"))
             .salePrice(new BigDecimal("9500"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(0))
             .build(),
           Product.builder()
@@ -295,6 +304,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("7500"))
             .salePrice(new BigDecimal("12000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(0))
             .build(),
           Product.builder()
@@ -304,6 +315,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("800"))
             .salePrice(new BigDecimal("1500"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(0))
             .build(),
           Product.builder()
@@ -313,6 +326,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("8000"))
             .salePrice(new BigDecimal("15000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(1))
             .build(),
           Product.builder()
@@ -322,6 +337,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("10000"))
             .salePrice(new BigDecimal("18000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(1))
             .build(),
           Product.builder()
@@ -331,6 +348,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("1500"))
             .salePrice(new BigDecimal("3000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(1))
             .build(),
           Product.builder()
@@ -340,6 +359,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("12000"))
             .salePrice(new BigDecimal("22000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(1))
             .build(),
           Product.builder()
@@ -349,6 +370,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("3500"))
             .salePrice(new BigDecimal("6500"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(1))
             .build(),
           Product.builder()
@@ -358,6 +381,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("12000"))
             .salePrice(new BigDecimal("20000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(2))
             .build(),
           Product.builder()
@@ -367,6 +392,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("6000"))
             .salePrice(new BigDecimal("11000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(2))
             .build(),
           Product.builder()
@@ -376,6 +403,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("700"))
             .salePrice(new BigDecimal("1300"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(2))
             .build(),
           Product.builder()
@@ -385,6 +414,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("3500"))
             .salePrice(new BigDecimal("6000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(2))
             .build(),
           Product.builder()
@@ -394,6 +425,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("4000"))
             .salePrice(new BigDecimal("7500"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(2))
             .build(),
           Product.builder()
@@ -403,6 +436,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("1500"))
             .salePrice(new BigDecimal("3500"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(3))
             .build(),
           Product.builder()
@@ -412,6 +447,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("1000"))
             .salePrice(new BigDecimal("2000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(3))
             .build(),
           Product.builder()
@@ -421,6 +458,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("6000"))
             .salePrice(new BigDecimal("12000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(3))
             .build(),
           Product.builder()
@@ -430,6 +469,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("2500"))
             .salePrice(new BigDecimal("5500"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(3))
             .build(),
           Product.builder()
@@ -439,6 +480,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("3000"))
             .salePrice(new BigDecimal("6000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(3))
             .build(),
           Product.builder()
@@ -448,6 +491,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("15000"))
             .salePrice(new BigDecimal("25000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(4))
             .build(),
           Product.builder()
@@ -457,6 +502,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("12000"))
             .salePrice(new BigDecimal("20000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(4))
             .build(),
           Product.builder()
@@ -466,6 +513,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("18000"))
             .salePrice(new BigDecimal("30000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(4))
             .build(),
           Product.builder()
@@ -475,6 +524,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("8000"))
             .salePrice(new BigDecimal("15000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(4))
             .build(),
           Product.builder()
@@ -484,6 +535,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("10000"))
             .salePrice(new BigDecimal("18000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(4))
             .build(),
           Product.builder()
@@ -493,6 +546,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("7000"))
             .salePrice(new BigDecimal("14000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(5))
             .build(),
           Product.builder()
@@ -502,6 +557,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("6000"))
             .salePrice(new BigDecimal("12000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(5))
             .build(),
           Product.builder()
@@ -511,6 +568,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("5000"))
             .salePrice(new BigDecimal("10000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(5))
             .build(),
           Product.builder()
@@ -520,6 +579,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("9000"))
             .salePrice(new BigDecimal("16000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(5))
             .build(),
           Product.builder()
@@ -529,6 +590,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("8000"))
             .salePrice(new BigDecimal("15000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(5))
             .build(),
           Product.builder()
@@ -538,6 +601,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("6000"))
             .salePrice(new BigDecimal("10000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(6))
             .build(),
           Product.builder()
@@ -547,6 +612,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("12000"))
             .salePrice(new BigDecimal("22000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(6))
             .build(),
           Product.builder()
@@ -556,6 +623,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("5000"))
             .salePrice(new BigDecimal("9000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(6))
             .build(),
           Product.builder()
@@ -565,6 +634,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("6000"))
             .salePrice(new BigDecimal("11000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(6))
             .build(),
           Product.builder()
@@ -574,6 +645,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("2500"))
             .salePrice(new BigDecimal("4500"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(6))
             .build(),
           Product.builder()
@@ -583,6 +656,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("9000"))
             .salePrice(new BigDecimal("16000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(7))
             .build(),
           Product.builder()
@@ -592,6 +667,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("2500"))
             .salePrice(new BigDecimal("5000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(7))
             .build(),
           Product.builder()
@@ -601,6 +678,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("15000"))
             .salePrice(new BigDecimal("25000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(7))
             .build(),
           Product.builder()
@@ -610,6 +689,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("3000"))
             .salePrice(new BigDecimal("6000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(7))
             .build(),
           Product.builder()
@@ -619,6 +700,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("12000"))
             .salePrice(new BigDecimal("20000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(7))
             .build(),
           Product.builder()
@@ -628,6 +711,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("8000"))
             .salePrice(new BigDecimal("15000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(8))
             .build(),
           Product.builder()
@@ -637,6 +722,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("2000"))
             .salePrice(new BigDecimal("4000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(8))
             .build(),
           Product.builder()
@@ -646,6 +733,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("1500"))
             .salePrice(new BigDecimal("3000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(8))
             .build(),
           Product.builder()
@@ -655,6 +744,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("7000"))
             .salePrice(new BigDecimal("12000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(8))
             .build(),
           Product.builder()
@@ -664,6 +755,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("25000"))
             .salePrice(new BigDecimal("45000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(9))
             .build(),
           Product.builder()
@@ -673,6 +766,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("4000"))
             .salePrice(new BigDecimal("8000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(9))
             .build(),
           Product.builder()
@@ -682,6 +777,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("15000"))
             .salePrice(new BigDecimal("25000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(10))
             .build(),
           Product.builder()
@@ -691,6 +788,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("12000"))
             .salePrice(new BigDecimal("20000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(10))
             .build(),
           Product.builder()
@@ -700,6 +799,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("8000"))
             .salePrice(new BigDecimal("14000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(11))
             .build(),
           Product.builder()
@@ -709,6 +810,8 @@ public class DataSeeder implements CommandLineRunner {
             )
             .costPrice(new BigDecimal("18000"))
             .salePrice(new BigDecimal("30000"))
+            .stock(random.nextInt(131) + 20)
+            .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(11))
             .build()
         )
