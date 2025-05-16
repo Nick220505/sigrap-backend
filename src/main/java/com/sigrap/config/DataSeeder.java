@@ -31,7 +31,6 @@ import com.sigrap.supplier.SupplierRepository;
 import com.sigrap.supplier.SupplierStatus;
 import com.sigrap.user.User;
 import com.sigrap.user.UserNotificationPreference;
-import com.sigrap.user.UserNotificationPreference.NotificationType;
 import com.sigrap.user.UserNotificationPreferenceRepository;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserRole;
@@ -803,14 +802,17 @@ public class DataSeeder implements CommandLineRunner {
       List<UserNotificationPreference> preferences = new ArrayList<>();
 
       for (User user : users) {
-        for (NotificationType type : NotificationType.values()) {
+        for (com.sigrap.user.UserNotificationPreference.NotificationType type : com.sigrap.user.UserNotificationPreference.NotificationType.values()) {
           preferences.add(
             UserNotificationPreference.builder()
               .user(user)
               .notificationType(type)
               .enabled(true)
               .emailEnabled(true)
-              .pushEnabled(type == NotificationType.SECURITY)
+              .pushEnabled(
+                type ==
+                com.sigrap.user.UserNotificationPreference.NotificationType.SECURITY
+              )
               .build()
           );
         }
