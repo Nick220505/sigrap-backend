@@ -1,8 +1,7 @@
 package com.sigrap.auth;
 
-import java.time.LocalDateTime;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -56,4 +55,12 @@ public class AuthResponse {
    */
   @Schema(description = "Last login timestamp", example = "2024-01-01T10:30:00")
   private LocalDateTime lastLogin;
+
+  /**
+   * Role of the authenticated user.
+   * Used to determine user permissions and access rights in the application.
+   * Common values include "ADMIN", "EMPLOYEE", etc.
+   */
+  @Schema(description = "User's role", example = "ADMIN")
+  private String role;
 }

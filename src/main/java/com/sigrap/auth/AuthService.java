@@ -125,6 +125,7 @@ public class AuthService {
       .email(user.getEmail())
       .name(user.getName())
       .lastLogin(user.getLastLogin())
+      .role(user.getRole().name())
       .build();
   }
 
@@ -169,6 +170,7 @@ public class AuthService {
       .email(user.getEmail())
       .name(user.getName())
       .lastLogin(user.getLastLogin())
+      .role(user.getRole().name())
       .build();
   }
 }
