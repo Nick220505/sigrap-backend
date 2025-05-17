@@ -7,8 +7,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,8 +34,8 @@ public class SaleExportController {
    * Generate a flat file with sales data for the specified date.
    *
    * @param date       The date for which to generate the report (defaults to today if not provided)
-   * @param exportPath The directory path where to save the file
-   * @return The path to the generated file
+   * @param exportPath The directory path where to save the file or "AUTO" for direct download
+   * @return The path to the generated file or the file content for direct download
    */
   @GetMapping("/daily")
   @Operation(
@@ -55,16 +59,34 @@ public class SaleExportController {
       required = false
     ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
     @Parameter(
-      description = "Directory path where to save the file"
+      description = "Directory path where to save the file or 'AUTO' for direct download"
     ) @RequestParam String exportPath
   ) {
     try {
       LocalDate reportDate = date != null ? date : LocalDate.now();
-      String filePath = saleExportService.generateDailySalesReport(
-        reportDate,
-        exportPath
-      );
-      return ResponseEntity.ok(filePath);
+
+      if ("AUTO".equalsIgnoreCase(exportPath)) {
+        String formattedDate = reportDate.format(
+          DateTimeFormatter.ofPattern("dd-MM-yy")
+        );
+        String filename = "PAPELERIA020_" + formattedDate + ".txt";
+
+        String fileContent = saleExportService.generateDailySalesReportContent(
+          reportDate
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_PLAIN);
+        headers.setContentDispositionFormData("attachment", filename);
+
+        return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+      } else {
+        String filePath = saleExportService.generateDailySalesReport(
+          reportDate,
+          exportPath
+        );
+        return ResponseEntity.ok(filePath);
+      }
     } catch (IOException e) {
       return ResponseEntity.internalServerError()
         .body("Error generating report: " + e.getMessage());

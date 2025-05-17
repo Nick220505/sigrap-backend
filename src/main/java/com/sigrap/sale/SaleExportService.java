@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -44,41 +45,75 @@ public class SaleExportService {
       endOfDay
     );
 
-    File directory = new File(exportPath);
-    if (!directory.exists()) {
-      directory.mkdirs();
-    }
-
     String formattedDate = date.format(DateTimeFormatter.ofPattern("dd-MM-yy"));
     String filename =
       "PAPELERIA" + BUSINESS_CODE + "_" + formattedDate + ".txt";
 
+    File directory = new File(exportPath);
+    if (!directory.exists()) {
+      directory.mkdirs();
+    }
     String filePath = exportPath + File.separator + filename;
 
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-      writer.write(
-        "CÉDULA_CLIENTE|FECHA_VENTA|VALOR_TOTAL|VALOR_TOTAL_CON_IVA"
-      );
-      writer.newLine();
-
-      for (SaleInfo sale : sales) {
-        if (sale.getCustomer().getDocumentId() != null) {
-          String line = String.format(
-            "%s|%s|%d|%d",
-            sale.getCustomer().getDocumentId(),
-            sale
-              .getCreatedAt()
-              .format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-            sale.getTotalAmount().intValue(),
-            sale.getFinalAmount().intValue()
-          );
-
-          writer.write(line);
-          writer.newLine();
-        }
-      }
+      writeSalesData(sales, writer);
     }
 
     return filePath;
+  }
+
+  /**
+   * Generates the content of a daily sales report as a String.
+   * The report includes customer ID, sale date, total amount, and total with IVA for each sale.
+   * This method is used for direct downloads without saving to disk.
+   *
+   * @param date The date for which to generate the report
+   * @return The report content as a String
+   * @throws IOException If an error occurs while writing the file
+   */
+  public String generateDailySalesReportContent(LocalDate date)
+    throws IOException {
+    LocalDateTime startOfDay = date.atStartOfDay();
+    LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+
+    List<SaleInfo> sales = saleService.findByCreatedDateRange(
+      startOfDay,
+      endOfDay
+    );
+
+    StringWriter stringWriter = new StringWriter();
+    try (BufferedWriter writer = new BufferedWriter(stringWriter)) {
+      writeSalesData(sales, writer);
+    }
+
+    return stringWriter.toString();
+  }
+
+  /**
+   * Helper method to write sales data to a writer.
+   *
+   * @param sales The list of sales to write
+   * @param writer The writer to write to
+   * @throws IOException If an error occurs while writing
+   */
+  private void writeSalesData(List<SaleInfo> sales, BufferedWriter writer)
+    throws IOException {
+    writer.write("CÉDULA_CLIENTE|FECHA_VENTA|VALOR_TOTAL|VALOR_TOTAL_CON_IVA");
+    writer.newLine();
+
+    for (SaleInfo sale : sales) {
+      if (sale.getCustomer().getDocumentId() != null) {
+        String line = String.format(
+          "%s|%s|%d|%d",
+          sale.getCustomer().getDocumentId(),
+          sale.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+          sale.getTotalAmount().intValue(),
+          sale.getFinalAmount().intValue()
+        );
+
+        writer.write(line);
+        writer.newLine();
+      }
+    }
   }
 }
