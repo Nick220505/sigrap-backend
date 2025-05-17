@@ -5,8 +5,6 @@ import com.sigrap.user.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,7 +30,7 @@ import org.hibernate.annotations.UpdateTimestamp;
  * Entity representing a sale transaction in the system.
  *
  * <p>A sale represents a transaction where one or more products are sold to a customer.
- * It records details including the total amount, payment method, employee who processed the sale,
+ * It records details including the total amount, employee who processed the sale,
  * and the items included in the sale.</p>
  */
 @Entity
@@ -84,31 +82,11 @@ public class Sale {
   private BigDecimal finalAmount;
 
   /**
-   * Any additional notes related to the sale.
-   */
-  @Column(length = 500)
-  private String notes;
-
-  /**
-   * The payment method used for the sale.
-   */
-  @Enumerated(EnumType.STRING)
-  @Column(name = "payment_method", nullable = false)
-  private PaymentMethod paymentMethod;
-
-  /**
-   * The current status of the sale.
-   */
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  @Builder.Default
-  private SaleStatus status = SaleStatus.COMPLETED;
-
-  /**
    * Reference to the customer who made the purchase.
    */
+  @NotNull(message = "Customer cannot be null")
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "customer_id")
+  @JoinColumn(name = "customer_id", nullable = false)
   private Customer customer;
 
   /**

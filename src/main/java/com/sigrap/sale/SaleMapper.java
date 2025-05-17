@@ -6,8 +6,9 @@ import com.sigrap.product.Product;
 import com.sigrap.product.ProductMapper;
 import com.sigrap.user.User;
 import com.sigrap.user.UserMapper;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.IntFunction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -39,14 +40,7 @@ public class SaleMapper {
       .taxAmount(sale.getTaxAmount())
       .discountAmount(sale.getDiscountAmount())
       .finalAmount(sale.getFinalAmount())
-      .notes(sale.getNotes())
-      .paymentMethod(sale.getPaymentMethod())
-      .status(sale.getStatus())
-      .customer(
-        sale.getCustomer() != null
-          ? customerMapper.toCustomerInfo(sale.getCustomer())
-          : null
-      )
+      .customer(customerMapper.toCustomerInfo(sale.getCustomer()))
       .employee(userMapper.toInfo(sale.getEmployee()))
       .items(toSaleItemInfoList(sale.getItems()))
       .createdAt(sale.getCreatedAt())
@@ -62,10 +56,10 @@ public class SaleMapper {
    */
   public List<SaleInfo> toInfoList(List<Sale> sales) {
     if (sales == null) {
-      return null;
+      return Collections.emptyList();
     }
 
-    return sales.stream().map(this::toInfo).collect(Collectors.toList());
+    return sales.stream().map(this::toInfo).toList();
   }
 
   /**
@@ -84,7 +78,6 @@ public class SaleMapper {
       .product(productMapper.toInfo(saleItem.getProduct()))
       .quantity(saleItem.getQuantity())
       .unitPrice(saleItem.getUnitPrice())
-      .discount(saleItem.getDiscount())
       .subtotal(saleItem.getSubtotal())
       .build();
   }
@@ -97,13 +90,10 @@ public class SaleMapper {
    */
   public List<SaleItemInfo> toSaleItemInfoList(List<SaleItem> saleItems) {
     if (saleItems == null) {
-      return null;
+      return Collections.emptyList();
     }
 
-    return saleItems
-      .stream()
-      .map(this::toSaleItemInfo)
-      .collect(Collectors.toList());
+    return saleItems.stream().map(this::toSaleItemInfo).toList();
   }
 
   /**
@@ -127,13 +117,6 @@ public class SaleMapper {
           : null
       )
       .finalAmount(saleData.getFinalAmount())
-      .notes(saleData.getNotes())
-      .paymentMethod(saleData.getPaymentMethod())
-      .status(
-        saleData.getStatus() != null
-          ? saleData.getStatus()
-          : SaleStatus.COMPLETED
-      )
       .build();
   }
 
@@ -152,9 +135,6 @@ public class SaleMapper {
     return SaleItem.builder()
       .quantity(saleItemData.getQuantity())
       .unitPrice(saleItemData.getUnitPrice())
-      .discount(
-        saleItemData.getDiscount() != null ? saleItemData.getDiscount() : null
-      )
       .subtotal(saleItemData.getSubtotal())
       .build();
   }
@@ -171,10 +151,10 @@ public class SaleMapper {
   public List<SaleItem> toSaleItemEntityList(
     List<SaleItemData> saleItemDataList,
     Sale sale,
-    java.util.function.Function<Integer, Product> getProduct
+    IntFunction<Product> getProduct
   ) {
     if (saleItemDataList == null) {
-      return null;
+      return Collections.emptyList();
     }
 
     return saleItemDataList
@@ -185,7 +165,7 @@ public class SaleMapper {
         saleItem.setProduct(getProduct.apply(itemData.getProductId()));
         return saleItem;
       })
-      .collect(Collectors.toList());
+      .toList();
   }
 
   /**
@@ -206,11 +186,6 @@ public class SaleMapper {
       sale.setDiscountAmount(saleData.getDiscountAmount());
     }
     sale.setFinalAmount(saleData.getFinalAmount());
-    sale.setNotes(saleData.getNotes());
-    sale.setPaymentMethod(saleData.getPaymentMethod());
-    if (saleData.getStatus() != null) {
-      sale.setStatus(saleData.getStatus());
-    }
   }
 
   /**

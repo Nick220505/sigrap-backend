@@ -1,10 +1,8 @@
 package com.sigrap.sale;
 
-import java.math.BigDecimal;
-
 import com.sigrap.product.ProductInfo;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,12 +41,6 @@ public class SaleItemInfo {
    */
   @Schema(description = "Unit price of the product", example = "10.50")
   private BigDecimal unitPrice;
-
-  /**
-   * The discount applied to this specific item, if any.
-   */
-  @Schema(description = "Discount applied to this item", example = "1.00")
-  private BigDecimal discount;
 
   /**
    * The subtotal for this item (quantity * unit price - discount).

@@ -14,14 +14,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SaleRepository extends JpaRepository<Sale, Integer> {
   /**
-   * Find sales by status.
-   *
-   * @param status The status to search for
-   * @return List of sales with the given status
-   */
-  List<Sale> findByStatus(SaleStatus status);
-
-  /**
    * Find sales by employee.
    *
    * @param employee The employee who processed the sales
@@ -48,12 +40,4 @@ public interface SaleRepository extends JpaRepository<Sale, Integer> {
     LocalDateTime startDate,
     LocalDateTime endDate
   );
-
-  /**
-   * Find sales by payment method.
-   *
-   * @param paymentMethod The payment method to search for
-   * @return List of sales with the given payment method
-   */
-  List<Sale> findByPaymentMethod(PaymentMethod paymentMethod);
 }

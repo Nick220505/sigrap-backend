@@ -1,19 +1,5 @@
 package com.sigrap.config;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
 import com.sigrap.customer.Customer;
@@ -29,6 +15,9 @@ import com.sigrap.payment.PaymentRepository;
 import com.sigrap.payment.PaymentStatus;
 import com.sigrap.product.Product;
 import com.sigrap.product.ProductRepository;
+import com.sigrap.sale.Sale;
+import com.sigrap.sale.SaleItem;
+import com.sigrap.sale.SaleRepository;
 import com.sigrap.supplier.PaymentMethod;
 import com.sigrap.supplier.PurchaseOrder;
 import com.sigrap.supplier.PurchaseOrderItem;
@@ -41,9 +30,20 @@ import com.sigrap.supplier.SupplierStatus;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserRole;
-
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Configuration component for seeding initial data into the database.
@@ -130,6 +130,8 @@ public class DataSeeder implements CommandLineRunner {
    */
   private final CustomerRepository customerRepository;
 
+  private final SaleRepository saleRepository;
+
   private final Random random = new Random();
 
   /**
@@ -153,6 +155,7 @@ public class DataSeeder implements CommandLineRunner {
     seedPurchaseOrderTrackingEvents();
     seedPayments();
     seedCustomers();
+    seedSales();
     log.info("Data seeding completed.");
   }
 
@@ -1942,6 +1945,144 @@ public class DataSeeder implements CommandLineRunner {
       );
 
       log.info("Successfully seeded 15 customers");
+    }
+  }
+
+  /**
+   * Seeds initial sales into the database.
+   * Creates a variety of sales with different customers, employees, products, and dates.
+   * Only executes if the sales table is empty.
+   */
+  private void seedSales() {
+    if (saleRepository.count() > 0) {
+      log.info("Sales already exist, skipping seeding.");
+      return;
+    }
+    log.info("Seeding sales...");
+
+    List<Product> products = productRepository.findAll();
+    if (products.isEmpty()) {
+      log.warn("No products found, skipping sales seeding.");
+      return;
+    }
+
+    List<Customer> customers = customerRepository.findAll();
+
+    if (customers.isEmpty()) {
+      log.warn(
+        "No customers found, skipping sales seeding as customer is now mandatory for sales."
+      );
+      return;
+    }
+
+    List<User> employees = userRepository
+      .findAll()
+      .stream()
+      .filter(
+        user ->
+          user.getRole() == UserRole.EMPLOYEE ||
+          user.getRole() == UserRole.ADMINISTRATOR
+      )
+      .toList();
+
+    if (employees.isEmpty()) {
+      log.warn(
+        "No employees (EMPLOYEE or ADMINISTRATOR role) found, skipping sales seeding."
+      );
+      return;
+    }
+
+    List<Sale> salesToCreate = new ArrayList<>();
+    int numberOfSales = random.nextInt(151) + 50;
+
+    for (int i = 0; i < numberOfSales; i++) {
+      Sale.SaleBuilder saleBuilder = Sale.builder();
+
+      User assignedEmployee = employees.get(random.nextInt(employees.size()));
+      saleBuilder.employee(assignedEmployee);
+
+      saleBuilder.customer(customers.get(random.nextInt(customers.size())));
+
+      LocalDateTime saleDateTime = LocalDateTime.now()
+        .minusDays(random.nextInt(180))
+        .minusHours(random.nextInt(24))
+        .minusMinutes(random.nextInt(60));
+      saleBuilder
+        .createdAt(saleDateTime)
+        .updatedAt(saleDateTime.plusMinutes(random.nextInt(30)));
+
+      List<SaleItem> saleItems = new ArrayList<>();
+      BigDecimal totalAmount = BigDecimal.ZERO;
+      int numberOfItemsInSale = random.nextInt(8) + 1;
+
+      for (int j = 0; j < numberOfItemsInSale; j++) {
+        Product product = products.get(random.nextInt(products.size()));
+        int quantity = random.nextInt(5) + 1;
+
+        if (product.getStock() < quantity) {
+          if (product.getStock() > 0) {
+            quantity = product.getStock();
+          } else {
+            continue;
+          }
+        }
+
+        product.setStock(product.getStock() - quantity);
+
+        SaleItem saleItem = SaleItem.builder()
+          .product(product)
+          .quantity(quantity)
+          .unitPrice(product.getSalePrice())
+          .build();
+        saleItem.calculateSubtotal();
+        saleItems.add(saleItem);
+        totalAmount = totalAmount.add(saleItem.getSubtotal());
+      }
+
+      if (saleItems.isEmpty()) {
+        continue;
+      }
+
+      saleBuilder.items(saleItems);
+      saleBuilder.totalAmount(totalAmount);
+
+      BigDecimal discountAmount = BigDecimal.ZERO;
+      double discountChance = random.nextDouble() * 0.4 + 0.1;
+      if (random.nextDouble() < discountChance) {
+        double discountPercentage = (random.nextInt(20) + 1) / 100.0;
+        discountAmount = totalAmount.multiply(
+          BigDecimal.valueOf(discountPercentage)
+        );
+        discountAmount = discountAmount.setScale(
+          2,
+          java.math.RoundingMode.HALF_UP
+        );
+      }
+      saleBuilder.discountAmount(discountAmount);
+
+      BigDecimal taxableAmount = totalAmount.subtract(discountAmount);
+      BigDecimal taxAmount = taxableAmount.multiply(BigDecimal.valueOf(0.19));
+      taxAmount = taxAmount.setScale(2, java.math.RoundingMode.HALF_UP);
+      saleBuilder.taxAmount(taxAmount);
+
+      BigDecimal finalAmount = taxableAmount.add(taxAmount);
+      saleBuilder.finalAmount(finalAmount);
+
+      Sale sale = saleBuilder.build();
+
+      for (SaleItem item : saleItems) {
+        item.setSale(sale);
+      }
+      salesToCreate.add(sale);
+    }
+
+    if (!salesToCreate.isEmpty()) {
+      saleRepository.saveAll(salesToCreate);
+
+      productRepository.saveAll(products);
+      log.info("Successfully seeded {} sales.", salesToCreate.size());
+    } else {
+      log.info("No sales were generated to seed.");
     }
   }
 }

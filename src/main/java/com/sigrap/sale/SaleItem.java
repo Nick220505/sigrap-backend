@@ -73,16 +73,7 @@ public class SaleItem {
   private BigDecimal unitPrice;
 
   /**
-   * The discount applied to this specific item, if any.
-   */
-  @NotNull(message = "Discount cannot be null")
-  @PositiveOrZero(message = "Discount must be zero or positive")
-  @Column(nullable = false)
-  @Builder.Default
-  private BigDecimal discount = BigDecimal.ZERO;
-
-  /**
-   * The subtotal for this item (quantity * unit price - discount).
+   * The subtotal for this item (quantity * unit price).
    */
   @NotNull(message = "Subtotal cannot be null")
   @PositiveOrZero(message = "Subtotal must be zero or positive")
@@ -90,7 +81,7 @@ public class SaleItem {
   private BigDecimal subtotal;
 
   /**
-   * Calculate and set the subtotal based on quantity, unit price, and discount.
+   * Calculate and set the subtotal based on quantity and unit price.
    */
   @PrePersist
   @PreUpdate
@@ -99,11 +90,7 @@ public class SaleItem {
       BigDecimal totalBeforeDiscount = unitPrice.multiply(
         BigDecimal.valueOf(quantity)
       );
-      if (discount != null) {
-        subtotal = totalBeforeDiscount.subtract(discount);
-      } else {
-        subtotal = totalBeforeDiscount;
-      }
+      subtotal = totalBeforeDiscount;
       if (subtotal.compareTo(BigDecimal.ZERO) < 0) {
         subtotal = BigDecimal.ZERO;
       }

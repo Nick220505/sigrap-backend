@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -58,31 +57,9 @@ public class SaleData {
   private BigDecimal finalAmount;
 
   /**
-   * Any additional notes related to the sale.
-   */
-  @Size(max = 500, message = "Notes must be less than 500 characters")
-  @Schema(
-    description = "Additional notes about the sale",
-    example = "Customer requested fast delivery"
-  )
-  private String notes;
-
-  /**
-   * The payment method used for the sale.
-   */
-  @NotNull(message = "Payment method cannot be null")
-  @Schema(description = "Payment method used", example = "CREDIT_CARD")
-  private PaymentMethod paymentMethod;
-
-  /**
-   * The status of the sale.
-   */
-  @Schema(description = "Status of the sale", example = "COMPLETED")
-  private SaleStatus status;
-
-  /**
    * ID of the customer who made the purchase.
    */
+  @NotNull(message = "Customer ID cannot be null")
   @Schema(description = "ID of the customer", example = "1")
   private Long customerId;
 

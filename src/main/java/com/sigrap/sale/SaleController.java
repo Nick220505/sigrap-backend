@@ -13,7 +13,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -75,29 +74,6 @@ public class SaleController {
     ) @PathVariable Integer id
   ) {
     return saleService.findById(id);
-  }
-
-  /**
-   * Get sales by status.
-   *
-   * @param status The status to filter by
-   * @return List of sales with the given status as SaleInfo DTOs
-   */
-  @GetMapping("/status/{status}")
-  @Operation(
-    summary = "Get sales by status",
-    description = "Retrieves sales with the given status"
-  )
-  @ApiResponse(
-    responseCode = "200",
-    description = "Sales retrieved successfully"
-  )
-  public List<SaleInfo> findByStatus(
-    @Parameter(
-      description = "Status to filter by"
-    ) @PathVariable SaleStatus status
-  ) {
-    return saleService.findByStatus(status);
   }
 
   /**
@@ -181,29 +157,6 @@ public class SaleController {
     ) LocalDateTime endDate
   ) {
     return saleService.findByCreatedDateRange(startDate, endDate);
-  }
-
-  /**
-   * Get sales by payment method.
-   *
-   * @param paymentMethod The payment method to filter by
-   * @return List of sales with the given payment method as SaleInfo DTOs
-   */
-  @GetMapping("/payment-method/{paymentMethod}")
-  @Operation(
-    summary = "Get sales by payment method",
-    description = "Retrieves sales with the given payment method"
-  )
-  @ApiResponse(
-    responseCode = "200",
-    description = "Sales retrieved successfully"
-  )
-  public List<SaleInfo> findByPaymentMethod(
-    @Parameter(
-      description = "Payment method to filter by"
-    ) @PathVariable PaymentMethod paymentMethod
-  ) {
-    return saleService.findByPaymentMethod(paymentMethod);
   }
 
   /**
@@ -297,38 +250,5 @@ public class SaleController {
     ) @PathVariable Integer id
   ) {
     saleService.delete(id);
-  }
-
-  /**
-   * Update the status of a sale.
-   *
-   * @param id     The ID of the sale to update
-   * @param status The new status for the sale
-   * @return The updated sale as a SaleInfo DTO
-   */
-  @PatchMapping("/{id}/status")
-  @Operation(
-    summary = "Update sale status",
-    description = "Updates the status of a sale"
-  )
-  @ApiResponses(
-    value = {
-      @ApiResponse(
-        responseCode = "200",
-        description = "Status updated successfully"
-      ),
-      @ApiResponse(responseCode = "404", description = "Sale not found"),
-    }
-  )
-  public SaleInfo updateStatus(
-    @Parameter(
-      description = "ID of the sale to update"
-    ) @PathVariable Integer id,
-    @Parameter(
-      description = "New status",
-      required = true
-    ) @RequestParam SaleStatus status
-  ) {
-    return saleService.updateStatus(id, status);
   }
 }

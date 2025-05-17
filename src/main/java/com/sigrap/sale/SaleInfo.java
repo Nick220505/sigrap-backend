@@ -55,27 +55,6 @@ public class SaleInfo {
   private BigDecimal finalAmount;
 
   /**
-   * Any additional notes related to the sale.
-   */
-  @Schema(
-    description = "Additional notes about the sale",
-    example = "Customer requested fast delivery"
-  )
-  private String notes;
-
-  /**
-   * The payment method used for the sale.
-   */
-  @Schema(description = "Payment method used", example = "CREDIT_CARD")
-  private PaymentMethod paymentMethod;
-
-  /**
-   * The status of the sale.
-   */
-  @Schema(description = "Status of the sale", example = "COMPLETED")
-  private SaleStatus status;
-
-  /**
    * Information about the customer who made the purchase.
    */
   @Schema(description = "Customer information")

@@ -1,11 +1,10 @@
 package com.sigrap.sale;
 
-import java.math.BigDecimal;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,13 +42,6 @@ public class SaleItemData {
   @PositiveOrZero(message = "Unit price must be zero or positive")
   @Schema(description = "Unit price of the product", example = "10.50")
   private BigDecimal unitPrice;
-
-  /**
-   * The discount applied to this specific item, if any.
-   */
-  @PositiveOrZero(message = "Discount must be zero or positive")
-  @Schema(description = "Discount applied to this item", example = "1.00")
-  private BigDecimal discount;
 
   /**
    * The subtotal for this item (quantity * unit price - discount).

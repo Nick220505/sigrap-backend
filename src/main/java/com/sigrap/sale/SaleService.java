@@ -9,7 +9,6 @@ import com.sigrap.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,18 +53,6 @@ public class SaleService {
         new EntityNotFoundException("Sale not found with ID: " + id)
       );
     return saleMapper.toInfo(sale);
-  }
-
-  /**
-   * Find sales by status.
-   *
-   * @param status The status to filter by
-   * @return List of sales with the given status as SaleInfo DTOs
-   */
-  @Transactional(readOnly = true)
-  public List<SaleInfo> findByStatus(SaleStatus status) {
-    List<Sale> sales = saleRepository.findByStatus(status);
-    return saleMapper.toInfoList(sales);
   }
 
   /**
@@ -122,18 +109,6 @@ public class SaleService {
   }
 
   /**
-   * Find sales by payment method.
-   *
-   * @param paymentMethod The payment method to filter by
-   * @return List of sales with the given payment method as SaleInfo DTOs
-   */
-  @Transactional(readOnly = true)
-  public List<SaleInfo> findByPaymentMethod(PaymentMethod paymentMethod) {
-    List<Sale> sales = saleRepository.findByPaymentMethod(paymentMethod);
-    return saleMapper.toInfoList(sales);
-  }
-
-  /**
    * Create a new sale.
    * This method also updates the stock of the products included in the sale.
    *
@@ -144,22 +119,17 @@ public class SaleService {
    */
   @Transactional
   public SaleInfo create(SaleData saleData) {
-    // Create the sale entity
     Sale sale = saleMapper.toEntity(saleData);
 
-    // Set customer if provided
-    if (saleData.getCustomerId() != null) {
-      Customer customer = customerRepository
-        .findById(saleData.getCustomerId())
-        .orElseThrow(() ->
-          new EntityNotFoundException(
-            "Customer not found with ID: " + saleData.getCustomerId()
-          )
-        );
-      sale.setCustomer(customer);
-    }
+    Customer customer = customerRepository
+      .findById(saleData.getCustomerId())
+      .orElseThrow(() ->
+        new EntityNotFoundException(
+          "Customer not found with ID: " + saleData.getCustomerId()
+        )
+      );
+    sale.setCustomer(customer);
 
-    // Set employee
     User employee = userRepository
       .findById(saleData.getEmployeeId())
       .orElseThrow(() ->
@@ -169,13 +139,10 @@ public class SaleService {
       );
     sale.setEmployee(employee);
 
-    // Save the sale to get an ID
     Sale savedSale = saleRepository.save(sale);
 
-    // Process sale items
     processItems(savedSale, saleData.getItems());
 
-    // Refresh the sale from the database to include all relationships
     Sale refreshedSale = saleRepository
       .findById(savedSale.getId())
       .orElseThrow(() ->
@@ -197,32 +164,25 @@ public class SaleService {
    */
   @Transactional
   public SaleInfo update(Integer id, SaleData saleData) {
-    // Find the existing sale
     Sale existingSale = saleRepository
       .findById(id)
       .orElseThrow(() ->
         new EntityNotFoundException("Sale not found with ID: " + id)
       );
 
-    // Save the original items for later comparison
     List<SaleItem> originalItems = existingSale.getItems();
 
-    // Update the sale data
     saleMapper.updateEntityFromData(existingSale, saleData);
 
-    // Update customer if provided
-    if (saleData.getCustomerId() != null) {
-      Customer customer = customerRepository
-        .findById(saleData.getCustomerId())
-        .orElseThrow(() ->
-          new EntityNotFoundException(
-            "Customer not found with ID: " + saleData.getCustomerId()
-          )
-        );
-      existingSale.setCustomer(customer);
-    }
+    Customer customer = customerRepository
+      .findById(saleData.getCustomerId())
+      .orElseThrow(() ->
+        new EntityNotFoundException(
+          "Customer not found with ID: " + saleData.getCustomerId()
+        )
+      );
+    existingSale.setCustomer(customer);
 
-    // Update employee if different
     if (!existingSale.getEmployee().getId().equals(saleData.getEmployeeId())) {
       User employee = userRepository
         .findById(saleData.getEmployeeId())
@@ -234,17 +194,13 @@ public class SaleService {
       existingSale.setEmployee(employee);
     }
 
-    // Save the updated sale
     Sale updatedSale = saleRepository.save(existingSale);
 
-    // Return stock for removed items
     returnStockForRemovedItems(originalItems, saleData.getItems());
 
-    // Remove existing items and process new ones
     saleItemRepository.deleteBySale(updatedSale);
     processItems(updatedSale, saleData.getItems());
 
-    // Refresh the sale from the database
     Sale refreshedSale = saleRepository
       .findById(updatedSale.getId())
       .orElseThrow(() ->
@@ -269,37 +225,13 @@ public class SaleService {
         new EntityNotFoundException("Sale not found with ID: " + id)
       );
 
-    // Return stock for all items
     for (SaleItem item : sale.getItems()) {
       Product product = item.getProduct();
       product.setStock(product.getStock() + item.getQuantity());
       productRepository.save(product);
     }
 
-    // Delete the sale (cascade will delete items)
     saleRepository.delete(sale);
-  }
-
-  /**
-   * Update the status of a sale.
-   *
-   * @param id The ID of the sale to update
-   * @param status The new status for the sale
-   * @return The updated sale as a SaleInfo DTO
-   * @throws EntityNotFoundException if the sale is not found
-   */
-  @Transactional
-  public SaleInfo updateStatus(Integer id, SaleStatus status) {
-    Sale sale = saleRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Sale not found with ID: " + id)
-      );
-
-    sale.setStatus(status);
-    Sale updatedSale = saleRepository.save(sale);
-
-    return saleMapper.toInfo(updatedSale);
   }
 
   /**
@@ -311,7 +243,6 @@ public class SaleService {
    */
   private void processItems(Sale sale, List<SaleItemData> itemsData) {
     for (SaleItemData itemData : itemsData) {
-      // Find the product
       Product product = productRepository
         .findById(itemData.getProductId())
         .orElseThrow(() ->
@@ -320,24 +251,20 @@ public class SaleService {
           )
         );
 
-      // Check if there's enough stock
       if (product.getStock() < itemData.getQuantity()) {
         throw new IllegalArgumentException(
           "Insufficient stock for product: " + product.getName()
         );
       }
 
-      // Update the product stock
       product.setStock(product.getStock() - itemData.getQuantity());
       productRepository.save(product);
 
-      // Create and save the sale item
       SaleItem saleItem = SaleItem.builder()
         .sale(sale)
         .product(product)
         .quantity(itemData.getQuantity())
         .unitPrice(itemData.getUnitPrice())
-        .discount(itemData.getDiscount())
         .subtotal(itemData.getSubtotal())
         .build();
 
@@ -355,30 +282,24 @@ public class SaleService {
     List<SaleItem> originalItems,
     List<SaleItemData> newItemsData
   ) {
-    // Get all product IDs in the new items
     List<Integer> newProductIds = newItemsData
       .stream()
       .map(SaleItemData::getProductId)
-      .collect(Collectors.toList());
+      .toList();
 
-    // For each original item, check if it's still in the new items
     for (SaleItem originalItem : originalItems) {
       Product product = originalItem.getProduct();
       Integer productId = product.getId();
 
-      // If the product is not in the new items or its quantity has been reduced
       if (!newProductIds.contains(productId)) {
-        // Return all stock for this item
         product.setStock(product.getStock() + originalItem.getQuantity());
         productRepository.save(product);
       } else {
-        // If the product is in the new items, check if the quantity has been reduced
         for (SaleItemData newItemData : newItemsData) {
           if (newItemData.getProductId().equals(productId)) {
             int quantityDifference =
               originalItem.getQuantity() - newItemData.getQuantity();
             if (quantityDifference > 0) {
-              // Return the difference in stock
               product.setStock(product.getStock() + quantityDifference);
               productRepository.save(product);
             }
