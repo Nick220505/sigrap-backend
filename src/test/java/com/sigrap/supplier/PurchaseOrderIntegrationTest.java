@@ -1,7 +1,9 @@
 package com.sigrap.supplier;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -13,7 +15,8 @@ import com.sigrap.product.Product;
 import com.sigrap.product.ProductRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import org.junit.jupiter.api.AfterEach;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,222 +25,268 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
+@WithMockUser(username = "admin", roles = { "ADMIN" })
+class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
+
+  @Autowired
+  private ObjectMapper objectMapper;
 
   @Autowired
   private MockMvc mockMvc;
 
   @Autowired
+  private SupplierRepository supplierRepository;
+
+  @Autowired
   private PurchaseOrderRepository purchaseOrderRepository;
 
   @Autowired
-  private SupplierRepository supplierRepository;
+  private PurchaseOrderItemRepository purchaseOrderItemRepository;
 
   @Autowired
   private ProductRepository productRepository;
 
-  @Autowired
-  private ObjectMapper objectMapper;
-
   private Supplier testSupplier;
   private Product testProduct;
-  private PurchaseOrder testPurchaseOrder;
+  private Integer purchaseOrderId;
 
   @BeforeEach
   void setUp() {
+    purchaseOrderItemRepository.deleteAll();
     purchaseOrderRepository.deleteAll();
-    supplierRepository.deleteAll();
-    productRepository.deleteAll();
 
-    testSupplier = Supplier.builder()
+    Supplier supplier = Supplier.builder()
       .name("Test Supplier")
-      .contactPerson("John Contact")
-      .phone("1234567890")
-      .email("supplier@example.com")
+      .email("supplier@test.com")
+      .address("123 Test St")
       .build();
-    testSupplier = supplierRepository.save(testSupplier);
+    testSupplier = supplierRepository.save(supplier);
 
-    testProduct = Product.builder()
+    Product product = Product.builder()
       .name("Test Product")
-      .description("Test Product Description")
+      .description("Test Description")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
       .stock(100)
       .minimumStockThreshold(10)
       .build();
-    testProduct = productRepository.save(testProduct);
-
-    testPurchaseOrder = PurchaseOrder.builder()
-      .supplier(testSupplier)
-      .deliveryDate(LocalDate.now().plusDays(7))
-      .status(PurchaseOrderStatus.DRAFT)
-      .totalAmount(new BigDecimal("100.00"))
-      .build();
-    testPurchaseOrder = purchaseOrderRepository.save(testPurchaseOrder);
-  }
-
-  @AfterEach
-  void tearDown() {
-    purchaseOrderRepository.deleteAll();
-    supplierRepository.deleteAll();
-    productRepository.deleteAll();
+    testProduct = productRepository.save(product);
   }
 
   @Test
-  @WithMockUser(roles = "ADMIN")
   void crudOperations() throws Exception {
-    mockMvc
-      .perform(get("/api/purchase-orders"))
-      .andExpect(status().isOk())
-      .andExpect(jsonPath("$[0].id").value(testPurchaseOrder.getId()))
-      .andExpect(
-        jsonPath("$[0].status").value(testPurchaseOrder.getStatus().toString())
-      )
-      .andExpect(
-        jsonPath("$[0].totalAmount").value(
-          testPurchaseOrder.getTotalAmount().doubleValue()
-        )
-      )
-      .andExpect(jsonPath("$[0].supplier.id").value(testSupplier.getId()));
-
-    mockMvc
-      .perform(get("/api/purchase-orders/{id}", testPurchaseOrder.getId()))
-      .andExpect(status().isOk())
-      .andExpect(jsonPath("$.id").value(testPurchaseOrder.getId()))
-      .andExpect(
-        jsonPath("$.status").value(testPurchaseOrder.getStatus().toString())
-      )
-      .andExpect(
-        jsonPath("$.totalAmount").value(
-          testPurchaseOrder.getTotalAmount().doubleValue()
-        )
-      )
-      .andExpect(jsonPath("$.supplier.id").value(testSupplier.getId()));
-
-    PurchaseOrderData newOrderData = PurchaseOrderData.builder()
-      .supplierId(testSupplier.getId())
-      .deliveryDate(LocalDate.now().plusDays(14))
+    PurchaseOrderItemData itemData = PurchaseOrderItemData.builder()
+      .productId(testProduct.getId())
+      .quantity(10)
+      .unitPrice(new BigDecimal("10.00"))
       .build();
 
-    MvcResult result = mockMvc
+    List<PurchaseOrderItemData> items = new ArrayList<>();
+    items.add(itemData);
+
+    LocalDate deliveryDate = LocalDate.now().plusDays(10);
+    PurchaseOrderData createData = PurchaseOrderData.builder()
+      .supplierId(testSupplier.getId())
+      .deliveryDate(deliveryDate)
+      .items(items)
+      .build();
+
+    MvcResult createResult = mockMvc
       .perform(
         post("/api/purchase-orders")
           .contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsString(newOrderData))
+          .content(objectMapper.writeValueAsString(createData))
       )
       .andExpect(status().isCreated())
+      .andExpect(jsonPath("$.id").exists())
       .andExpect(jsonPath("$.supplier.id").value(testSupplier.getId()))
+      .andExpect(jsonPath("$.status").value("DRAFT"))
+      .andExpect(jsonPath("$.items", hasSize(1)))
+      .andExpect(jsonPath("$.totalAmount").value(100.0))
       .andReturn();
 
-    String responseContent = result.getResponse().getContentAsString();
+    String content = createResult.getResponse().getContentAsString();
     PurchaseOrderInfo createdOrder = objectMapper.readValue(
-      responseContent,
+      content,
       PurchaseOrderInfo.class
     );
-    Integer createdOrderId = createdOrder.getId();
+    purchaseOrderId = createdOrder.getId();
+
+    mockMvc
+      .perform(get("/api/purchase-orders/{id}", purchaseOrderId))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.id").value(purchaseOrderId))
+      .andExpect(jsonPath("$.supplier.id").value(testSupplier.getId()))
+      .andExpect(jsonPath("$.status").value("DRAFT"));
+
+    mockMvc
+      .perform(get("/api/purchase-orders"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$", hasSize(1)))
+      .andExpect(jsonPath("$[0].id").value(purchaseOrderId));
+
+    mockMvc
+      .perform(
+        get("/api/purchase-orders/by-supplier/{id}", testSupplier.getId())
+      )
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$", hasSize(1)))
+      .andExpect(jsonPath("$[0].id").value(purchaseOrderId));
+
+    mockMvc
+      .perform(get("/api/purchase-orders/by-status/{status}", "DRAFT"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$", hasSize(1)))
+      .andExpect(jsonPath("$[0].id").value(purchaseOrderId));
+
+    LocalDate newDeliveryDate = LocalDate.now().plusDays(15);
+    PurchaseOrderItemData newItemData = PurchaseOrderItemData.builder()
+      .productId(testProduct.getId())
+      .quantity(20)
+      .unitPrice(new BigDecimal("10.00"))
+      .build();
+
+    List<PurchaseOrderItemData> newItems = new ArrayList<>();
+    newItems.add(newItemData);
 
     PurchaseOrderData updateData = PurchaseOrderData.builder()
       .supplierId(testSupplier.getId())
-      .deliveryDate(LocalDate.now().plusDays(10))
+      .deliveryDate(newDeliveryDate)
+      .items(newItems)
       .build();
 
     mockMvc
       .perform(
-        put("/api/purchase-orders/{id}", createdOrderId)
+        put("/api/purchase-orders/{id}", purchaseOrderId)
           .contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsString(updateData))
       )
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.id").value(createdOrderId))
-      .andExpect(jsonPath("$.supplier.id").value(testSupplier.getId()));
+      .andExpect(jsonPath("$.id").value(purchaseOrderId))
+      .andExpect(jsonPath("$.deliveryDate").value(newDeliveryDate.toString()))
+      .andExpect(jsonPath("$.totalAmount").value(200.0));
 
     mockMvc
-      .perform(delete("/api/purchase-orders/{id}", createdOrderId))
+      .perform(
+        patch("/api/purchase-orders/{id}/submit", purchaseOrderId).contentType(
+          MediaType.APPLICATION_JSON
+        )
+      )
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.id").value(purchaseOrderId))
+      .andExpect(jsonPath("$.status").value("SUBMITTED"));
+
+    mockMvc
+      .perform(
+        put("/api/purchase-orders/{id}", purchaseOrderId)
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(objectMapper.writeValueAsString(updateData))
+      )
+      .andExpect(status().isInternalServerError());
+
+    mockMvc
+      .perform(
+        patch("/api/purchase-orders/{id}/confirm", purchaseOrderId).contentType(
+          MediaType.APPLICATION_JSON
+        )
+      )
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.id").value(purchaseOrderId))
+      .andExpect(jsonPath("$.status").value("CONFIRMED"));
+
+    mockMvc
+      .perform(
+        patch("/api/purchase-orders/{id}/ship", purchaseOrderId).contentType(
+          MediaType.APPLICATION_JSON
+        )
+      )
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.id").value(purchaseOrderId))
+      .andExpect(jsonPath("$.status").value("SHIPPED"));
+
+    mockMvc
+      .perform(
+        patch("/api/purchase-orders/{id}/deliver", purchaseOrderId).contentType(
+          MediaType.APPLICATION_JSON
+        )
+      )
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.id").value(purchaseOrderId))
+      .andExpect(jsonPath("$.status").value("DELIVERED"));
+
+    mockMvc
+      .perform(
+        patch("/api/purchase-orders/{id}/pay", purchaseOrderId).contentType(
+          MediaType.APPLICATION_JSON
+        )
+      )
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.id").value(purchaseOrderId))
+      .andExpect(jsonPath("$.status").value("PAID"));
+
+    MvcResult newOrderResult = mockMvc
+      .perform(
+        post("/api/purchase-orders")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(objectMapper.writeValueAsString(createData))
+      )
+      .andExpect(status().isCreated())
+      .andReturn();
+
+    String newContent = newOrderResult.getResponse().getContentAsString();
+    PurchaseOrderInfo newOrder = objectMapper.readValue(
+      newContent,
+      PurchaseOrderInfo.class
+    );
+    Integer newOrderId = newOrder.getId();
+
+    mockMvc
+      .perform(delete("/api/purchase-orders/{id}", newOrderId))
       .andExpect(status().isNoContent());
 
     mockMvc
-      .perform(get("/api/purchase-orders/{id}", createdOrderId))
+      .perform(get("/api/purchase-orders/{id}", newOrderId))
       .andExpect(status().isNotFound());
   }
 
   @Test
-  @WithMockUser(roles = "ADMIN")
-  void findBySupplier() throws Exception {
-    PurchaseOrder secondOrder = PurchaseOrder.builder()
-      .supplier(testSupplier)
-      .deliveryDate(LocalDate.now().plusDays(5))
-      .status(PurchaseOrderStatus.CONFIRMED)
-      .totalAmount(new BigDecimal("200.00"))
+  void invalidOperations() throws Exception {
+    PurchaseOrderItemData itemData = PurchaseOrderItemData.builder()
+      .productId(testProduct.getId())
+      .quantity(10)
+      .unitPrice(new BigDecimal("10.00"))
       .build();
 
-    secondOrder = purchaseOrderRepository.save(secondOrder);
+    List<PurchaseOrderItemData> items = new ArrayList<>();
+    items.add(itemData);
 
-    mockMvc
-      .perform(
-        get("/api/purchase-orders/supplier/{supplierId}", testSupplier.getId())
-      )
-      .andExpect(status().isOk())
-      .andExpect(jsonPath("$").isArray())
-      .andExpect(jsonPath("$.length()").value(2))
-      .andExpect(jsonPath("$[0].supplier.id").value(testSupplier.getId()))
-      .andExpect(jsonPath("$[1].supplier.id").value(testSupplier.getId()));
-  }
-
-  @Test
-  @WithMockUser(roles = "ADMIN")
-  void findByStatus() throws Exception {
-    PurchaseOrder confirmedOrder = PurchaseOrder.builder()
-      .supplier(testSupplier)
-      .deliveryDate(LocalDate.now().plusDays(5))
-      .status(PurchaseOrderStatus.CONFIRMED)
-      .totalAmount(new BigDecimal("200.00"))
+    LocalDate deliveryDate = LocalDate.now().plusDays(10);
+    PurchaseOrderData createData = PurchaseOrderData.builder()
+      .supplierId(testSupplier.getId())
+      .deliveryDate(deliveryDate)
+      .items(items)
       .build();
 
-    PurchaseOrder deliveredOrder = PurchaseOrder.builder()
-      .supplier(testSupplier)
-      .deliveryDate(LocalDate.now().minusDays(2))
-      .status(PurchaseOrderStatus.DELIVERED)
-      .totalAmount(new BigDecimal("300.00"))
-      .build();
-
-    confirmedOrder = purchaseOrderRepository.save(confirmedOrder);
-    deliveredOrder = purchaseOrderRepository.save(deliveredOrder);
-
-    mockMvc
-      .perform(get("/api/purchase-orders/status/{status}", "CONFIRMED"))
-      .andExpect(status().isOk())
-      .andExpect(jsonPath("$").isArray())
-      .andExpect(jsonPath("$[0].status").value("CONFIRMED"));
-
-    mockMvc
-      .perform(get("/api/purchase-orders/status/{status}", "DELIVERED"))
-      .andExpect(status().isOk())
-      .andExpect(jsonPath("$").isArray())
-      .andExpect(jsonPath("$[0].status").value("DELIVERED"));
-
-    mockMvc
-      .perform(get("/api/purchase-orders/status/{status}", "DRAFT"))
-      .andExpect(status().isOk())
-      .andExpect(jsonPath("$").isArray())
-      .andExpect(jsonPath("$[0].status").value("DRAFT"));
-  }
-
-  @Test
-  @WithMockUser(roles = "ADMIN")
-  void validationConstraints() throws Exception {
-    PurchaseOrderData invalidOrderData = PurchaseOrderData.builder().build();
-
-    mockMvc
+    MvcResult createResult = mockMvc
       .perform(
         post("/api/purchase-orders")
           .contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsString(invalidOrderData))
+          .content(objectMapper.writeValueAsString(createData))
       )
-      .andExpect(status().isBadRequest());
+      .andExpect(status().isCreated())
+      .andReturn();
+
+    String content = createResult.getResponse().getContentAsString();
+    PurchaseOrderInfo createdOrder = objectMapper.readValue(
+      content,
+      PurchaseOrderInfo.class
+    );
+    purchaseOrderId = createdOrder.getId();
 
     PurchaseOrderData invalidSupplierData = PurchaseOrderData.builder()
       .supplierId(999L)
-      .deliveryDate(LocalDate.now().plusDays(10))
+      .deliveryDate(deliveryDate)
+      .items(items)
       .build();
 
     mockMvc
@@ -247,5 +296,45 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
           .content(objectMapper.writeValueAsString(invalidSupplierData))
       )
       .andExpect(status().isNotFound());
+
+    PurchaseOrderItemData invalidItemData = PurchaseOrderItemData.builder()
+      .productId(999)
+      .quantity(10)
+      .unitPrice(new BigDecimal("10.00"))
+      .build();
+
+    List<PurchaseOrderItemData> invalidItems = new ArrayList<>();
+    invalidItems.add(invalidItemData);
+
+    PurchaseOrderData invalidProductData = PurchaseOrderData.builder()
+      .supplierId(testSupplier.getId())
+      .deliveryDate(deliveryDate)
+      .items(invalidItems)
+      .build();
+
+    mockMvc
+      .perform(
+        post("/api/purchase-orders")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(objectMapper.writeValueAsString(invalidProductData))
+      )
+      .andExpect(status().isNotFound());
+
+    mockMvc
+      .perform(
+        patch("/api/purchase-orders/{id}/cancel", purchaseOrderId).contentType(
+          MediaType.APPLICATION_JSON
+        )
+      )
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.status").value("CANCELLED"));
+
+    mockMvc
+      .perform(
+        patch("/api/purchase-orders/{id}/submit", purchaseOrderId).contentType(
+          MediaType.APPLICATION_JSON
+        )
+      )
+      .andExpect(status().isInternalServerError());
   }
 }
