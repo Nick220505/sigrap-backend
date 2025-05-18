@@ -11,7 +11,6 @@ import com.sigrap.employee.schedule.Schedule;
 import com.sigrap.employee.schedule.ScheduleRepository;
 import com.sigrap.payment.Payment;
 import com.sigrap.payment.PaymentRepository;
-import com.sigrap.payment.PaymentStatus;
 import com.sigrap.product.Product;
 import com.sigrap.product.ProductRepository;
 import com.sigrap.sale.Sale;
@@ -1401,13 +1400,6 @@ public class DataSeeder implements CommandLineRunner {
       }
 
       int paymentCounter = 0;
-      com.sigrap.payment.PaymentMethod[] paymentMethods = {
-        com.sigrap.payment.PaymentMethod.BANK_TRANSFER,
-        com.sigrap.payment.PaymentMethod.CREDIT_CARD,
-        com.sigrap.payment.PaymentMethod.NEQUI,
-        com.sigrap.payment.PaymentMethod.DAVIPLATA,
-        com.sigrap.payment.PaymentMethod.CASH,
-      };
 
       for (PurchaseOrder order : purchaseOrders) {
         if (
@@ -1419,97 +1411,8 @@ public class DataSeeder implements CommandLineRunner {
           Payment.PaymentBuilder paymentBuilder = Payment.builder()
             .purchaseOrder(order)
             .supplier(order.getSupplier())
-            .amount(order.getTotalAmount())
-            .paymentMethod(
-              paymentMethods[paymentCounter % paymentMethods.length]
-            )
-            .transactionId(
-              "TRN-" +
-              LocalDate.now().getYear() +
-              String.format("%02d", LocalDate.now().getMonthValue()) +
-              "-" +
-              String.format("%05d", order.getId()) +
-              random.nextInt(100)
-            );
+            .amount(order.getTotalAmount());
 
-          LocalDate paymentDate = order.getOrderDate();
-          LocalDate dueDate = order.getOrderDate();
-          String notes = "";
-          String invoiceNumber =
-            "INV-" +
-            order.getOrderNumber().replace("OC-", "") +
-            "-" +
-            String.format("%02d", paymentCounter + 1);
-
-          switch (order.getStatus()) {
-            case CONFIRMED:
-              paymentBuilder.status(PaymentStatus.PENDING);
-              paymentDate = order
-                .getOrderDate()
-                .plusDays(random.nextInt(2) + 1);
-              dueDate = paymentDate.plusDays(30);
-              notes =
-                "Pago programado para el pedido " +
-                order.getOrderNumber() +
-                ". Factura: " +
-                invoiceNumber;
-              break;
-            case SHIPPED:
-              paymentBuilder.status(PaymentStatus.PROCESSING);
-              paymentDate = order.getExpectedDeliveryDate() != null
-                ? order
-                  .getExpectedDeliveryDate()
-                  .minusDays(random.nextInt(3) + 1)
-                : order.getOrderDate().plusDays(random.nextInt(5) + 2);
-              dueDate = paymentDate.plusDays(15);
-              notes =
-                "Pago en proceso para el pedido " +
-                order.getOrderNumber() +
-                ". Factura: " +
-                invoiceNumber;
-              break;
-            case DELIVERED:
-              paymentBuilder.status(PaymentStatus.COMPLETED);
-              paymentDate = order.getExpectedDeliveryDate() != null
-                ? order.getExpectedDeliveryDate().plusDays(random.nextInt(2))
-                : order.getOrderDate().plusDays(random.nextInt(7) + 3);
-              if (order.getShipDate() != null) {
-                paymentDate = order
-                  .getShipDate()
-                  .plusDays(random.nextInt(2) + 1);
-              }
-              dueDate = paymentDate.plusDays(7);
-
-              notes =
-                "Pago completado para el pedido " +
-                order.getOrderNumber() +
-                ". Factura: " +
-                invoiceNumber;
-
-              if (
-                paymentCounter % 3 == 0 &&
-                order.getExpectedDeliveryDate() != null
-              ) {
-                paymentDate = order.getExpectedDeliveryDate().minusDays(1);
-              } else if (
-                paymentCounter % 4 == 0 &&
-                order.getExpectedDeliveryDate() != null
-              ) {
-                paymentDate = order.getExpectedDeliveryDate().plusDays(1);
-              }
-
-              break;
-            default:
-              continue;
-          }
-
-          if (paymentDate.isBefore(order.getOrderDate())) {
-            paymentDate = order.getOrderDate();
-          }
-
-          paymentBuilder.paymentDate(paymentDate).notes(notes);
-          paymentBuilder.invoiceNumber(invoiceNumber);
-          paymentBuilder.dueDate(dueDate);
           payments.add(paymentBuilder.build());
           paymentCounter++;
         }

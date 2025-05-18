@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
  *
  * <p>Example custom queries (if needed later):
  * <ul>
- *   <li>{@code List<Payment> findByStatus(PaymentStatus status);}</li>
  *   <li>{@code List<Payment> findBySupplierId(Integer supplierId);}</li>
  *   <li>{@code List<Payment> findByDueDateBeforeAndStatusNot(LocalDate date, PaymentStatus status);}</li>
  * </ul>
@@ -35,12 +34,4 @@ public interface PaymentRepository
    * @return A list of {@link Payment} entities for the given supplier.
    */
   List<Payment> findBySupplierId(Long supplierId);
-
-  /**
-   * Finds all payments that have a specific status.
-   *
-   * @param status The {@link PaymentStatus} to filter by.
-   * @return A list of {@link Payment} entities with the specified status.
-   */
-  List<Payment> findByStatus(PaymentStatus status);
 }

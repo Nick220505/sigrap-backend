@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -25,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for managing payments.
  *
  * <p>This controller provides API endpoints for performing CRUD operations on payments,
- * as well as operations to find payments by specific criteria and mark them as completed.
+ * as well as operations to find payments by specific criteria.
  * It handles HTTP requests and delegates business logic to the {@link PaymentService}.</p>
  *
  * <p>Endpoints include:
@@ -36,8 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li>{@code PUT /api/payments/{id}}: Updates an existing payment.</li>
  *   <li>{@code DELETE /api/payments/{id}}: Deletes a payment.</li>
  *   <li>{@code GET /api/payments/supplier/{supplierId}}: Finds payments by supplier ID.</li>
- *   <li>{@code GET /api/payments/status/{status}}: Finds payments by status.</li>
- *   <li>{@code PATCH /api/payments/{id}/complete}: Marks a payment as completed.</li>
  * </ul>
  * </p>
  *
@@ -251,63 +248,5 @@ public class PaymentController {
     ) @PathVariable Long supplierId
   ) {
     return paymentService.findBySupplier(supplierId);
-  }
-
-  /**
-   * Finds payments by their status.
-   *
-   * @param status The payment status to filter by.
-   * @return A list of {@link PaymentInfo} objects with the specified status.
-   */
-  @Operation(
-    summary = "Get payments by status",
-    description = "Retrieves payments filtered by their status."
-  )
-  @ApiResponse(
-    responseCode = "200",
-    description = "Successfully retrieved payments by status",
-    content = @Content(
-      mediaType = "application/json",
-      schema = @Schema(implementation = PaymentInfo.class)
-    )
-  )
-  @GetMapping("/status/{status}")
-  public List<PaymentInfo> getByStatus(
-    @Parameter(
-      description = "Payment status to filter by (e.g., PENDING, COMPLETED)",
-      required = true,
-      schema = @Schema(implementation = PaymentStatus.class)
-    ) @PathVariable PaymentStatus status
-  ) {
-    return paymentService.findByStatus(status);
-  }
-
-  /**
-   * Marks a payment as completed.
-   *
-   * @param id The ID of the payment to mark as completed.
-   * @return The updated {@link PaymentInfo}.
-   */
-  @Operation(
-    summary = "Mark payment as completed",
-    description = "Updates the status of a payment to COMPLETED."
-  )
-  @ApiResponse(
-    responseCode = "200",
-    description = "Payment marked as completed successfully",
-    content = @Content(
-      mediaType = "application/json",
-      schema = @Schema(implementation = PaymentInfo.class)
-    )
-  )
-  @ApiResponse(responseCode = "404", description = "Payment not found")
-  @PatchMapping("/{id}/complete")
-  public PaymentInfo markAsCompleted(
-    @Parameter(
-      description = "ID of the payment to be marked as completed",
-      required = true
-    ) @PathVariable Integer id
-  ) {
-    return paymentService.markAsCompleted(id);
   }
 }

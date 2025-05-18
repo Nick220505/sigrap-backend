@@ -5,7 +5,6 @@ import com.sigrap.supplier.PurchaseOrderRepository;
 import com.sigrap.supplier.Supplier;
 import com.sigrap.supplier.SupplierRepository;
 import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,8 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  *   <li>Creating new payments, associating them with suppliers and optionally purchase orders.</li>
  *   <li>Updating existing payment details.</li>
  *   <li>Deleting payments.</li>
- *   <li>Finding payments by various criteria such as supplier or status.</li>
- *   <li>Marking a payment as completed.</li>
+ *   <li>Finding payments by various criteria such as supplier.</li>
  * </ul>
  * </p>
  *
@@ -108,10 +106,6 @@ public class PaymentService {
           )
         );
       payment.setPurchaseOrder(purchaseOrder);
-    }
-
-    if (payment.getPaymentDate() == null) {
-      payment.setPaymentDate(LocalDate.now());
     }
 
     Payment savedPayment = paymentRepository.save(payment);
@@ -220,44 +214,5 @@ public class PaymentService {
   public List<PaymentInfo> findBySupplier(Long supplierId) {
     List<Payment> payments = paymentRepository.findBySupplierId(supplierId);
     return paymentMapper.toInfoList(payments);
-  }
-
-  /**
-   * Retrieves all payments with a specific status.
-   *
-   * @param status The {@link PaymentStatus} to filter by.
-   * @return A list of {@link PaymentInfo} DTOs with the specified status.
-   */
-  @Transactional(readOnly = true)
-  public List<PaymentInfo> findByStatus(PaymentStatus status) {
-    List<Payment> payments = paymentRepository.findByStatus(status);
-    return paymentMapper.toInfoList(payments);
-  }
-
-  /**
-   * Marks a payment as completed.
-   *
-   * <p>This method sets the payment's status to {@link PaymentStatus#COMPLETED}
-   * and sets the payment date to the current date if it's not already set.</p>
-   *
-   * @param id The ID of the payment to mark as completed.
-   * @return The {@link PaymentInfo} DTO of the updated payment.
-   * @throws EntityNotFoundException if no payment with the given ID is found.
-   */
-  @Transactional
-  public PaymentInfo markAsCompleted(Integer id) {
-    Payment payment = paymentRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Payment not found with id: " + id)
-      );
-
-    payment.setStatus(PaymentStatus.COMPLETED);
-    if (payment.getPaymentDate() == null) {
-      payment.setPaymentDate(LocalDate.now());
-    }
-
-    Payment updatedPayment = paymentRepository.save(payment);
-    return paymentMapper.toInfo(updatedPayment);
   }
 }

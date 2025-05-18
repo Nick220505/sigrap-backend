@@ -1,8 +1,8 @@
 package com.sigrap.payment;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,14 +22,7 @@ import lombok.NoArgsConstructor;
  *   <li>{@code purchaseOrderNumber}: The number of the associated purchase order.</li>
  *   <li>{@code supplierId}: The ID of the supplier.</li>
  *   <li>{@code supplierName}: The name of the supplier.</li>
- *   <li>{@code paymentDate}: The date of the payment.</li>
  *   <li>{@code amount}: The amount of the payment.</li>
- *   <li>{@code paymentMethod}: The method used for payment.</li>
- *   <li>{@code status}: The current status of the payment.</li>
- *   <li>{@code invoiceNumber}: The invoice number.</li>
- *   <li>{@code dueDate}: The due date of the payment.</li>
- *   <li>{@code transactionId}: Optional transaction ID.</li>
- *   <li>{@code notes}: Optional notes.</li>
  *   <li>{@code createdAt}: Creation timestamp.</li>
  *   <li>{@code updatedAt}: Last update timestamp.</li>
  * </ul>
@@ -46,14 +39,7 @@ public class PaymentInfo {
   private String purchaseOrderNumber;
   private Long supplierId;
   private String supplierName;
-  private LocalDate paymentDate;
   private BigDecimal amount;
-  private PaymentMethod paymentMethod;
-  private PaymentStatus status;
-  private String invoiceNumber;
-  private LocalDate dueDate;
-  private String transactionId;
-  private String notes;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 }
