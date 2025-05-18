@@ -116,25 +116,10 @@ public class PurchaseOrderInfo {
   private BigDecimal totalAmount;
 
   /**
-   * Additional notes about the order.
-   */
-  @Schema(
-    description = "Additional notes about the order",
-    example = "Urgent order for school supplies"
-  )
-  private String notes;
-
-  /**
    * The list of items in this order.
    */
   @Schema(description = "List of items in this order")
   private List<PurchaseOrderItemInfo> items;
-
-  /**
-   * The list of tracking events for this order.
-   */
-  @Schema(description = "List of tracking events for this order")
-  private List<PurchaseOrderTrackingEventInfo> trackingEvents;
 
   /**
    * The timestamp when the order was created.

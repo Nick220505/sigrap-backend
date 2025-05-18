@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,16 +50,6 @@ public class PurchaseOrderService {
    * Mapper for converting between PurchaseOrderItem entities and DTOs.
    */
   private final PurchaseOrderItemMapper purchaseOrderItemMapper;
-
-  /**
-   * Repository for database operations on purchase order tracking events.
-   */
-  private final PurchaseOrderTrackingEventRepository purchaseOrderTrackingEventRepository;
-
-  /**
-   * Mapper for converting between PurchaseOrderTrackingEvent entities and DTOs.
-   */
-  private final PurchaseOrderTrackingEventMapper purchaseOrderTrackingEventMapper;
 
   /**
    * Retrieves all purchase orders from the database.
@@ -121,36 +110,6 @@ public class PurchaseOrderService {
   }
 
   /**
-   * Helper method to add tracking events
-   *
-   * @param purchaseOrder The purchase order to add the event to
-   * @param eventStatus The status of the event
-   * @param description A description of the event
-   * @param location The location of the event
-   * @param notes Additional notes about the event
-   */
-  private void addTrackingEvent(
-    PurchaseOrder purchaseOrder,
-    String eventStatus,
-    String description,
-    String location,
-    String notes
-  ) {
-    PurchaseOrderTrackingEvent event = PurchaseOrderTrackingEvent.builder()
-      .purchaseOrder(purchaseOrder)
-      .status(eventStatus)
-      .description(description)
-      .location(location)
-      .notes(notes)
-      .build();
-    purchaseOrderTrackingEventRepository.save(event);
-    if (purchaseOrder.getTrackingEvents() == null) {
-      purchaseOrder.setTrackingEvents(new ArrayList<>());
-    }
-    purchaseOrder.getTrackingEvents().add(event);
-  }
-
-  /**
    * Creates a new purchase order.
    *
    * @param purchaseOrderData The data for creating the purchase order
@@ -177,14 +136,6 @@ public class PurchaseOrderService {
 
     PurchaseOrder savedOrder = purchaseOrderRepository.save(purchaseOrder);
 
-    addTrackingEvent(
-      savedOrder,
-      "Order Created",
-      "Purchase order created in DRAFT status.",
-      null,
-      "Initial creation by system."
-    );
-
     if (
       purchaseOrderData.getItems() != null &&
       !purchaseOrderData.getItems().isEmpty()
@@ -201,21 +152,19 @@ public class PurchaseOrderService {
               "Product not found with id: " + itemData.getProductId()
             )
           );
+
         item.setProduct(product);
-
         item.setPurchaseOrder(savedOrder);
-
-        item.calculateTotalPrice();
-
+        item.setTotalPrice(
+          product.getCostPrice().multiply(new BigDecimal(item.getQuantity()))
+        );
         items.add(item);
       }
 
       purchaseOrderItemRepository.saveAll(items);
-
       savedOrder.setItems(items);
-
       calculateTotalAmount(savedOrder);
-      savedOrder = purchaseOrderRepository.save(savedOrder);
+      purchaseOrderRepository.save(savedOrder);
     }
 
     return purchaseOrderMapper.toInfo(savedOrder);
@@ -228,6 +177,7 @@ public class PurchaseOrderService {
    * @param purchaseOrderData The new data for the purchase order
    * @return The updated purchase order mapped to PurchaseOrderInfo
    * @throws EntityNotFoundException if the purchase order, supplier, or any product is not found
+   * @throws IllegalStateException if the order is not in DRAFT status
    */
   @Transactional
   public PurchaseOrderInfo update(
@@ -240,23 +190,13 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    if (
-      purchaseOrder.getStatus() != PurchaseOrder.Status.DRAFT &&
-      purchaseOrder.getStatus() != PurchaseOrder.Status.SUBMITTED
-    ) {
+    if (purchaseOrder.getStatus() != PurchaseOrder.Status.DRAFT) {
       throw new IllegalStateException(
-        "Cannot update order in " + purchaseOrder.getStatus() + " status"
+        "Only purchase orders in DRAFT status can be updated"
       );
     }
 
-    purchaseOrderMapper.updateEntityFromData(purchaseOrderData, purchaseOrder);
-
-    if (
-      purchaseOrderData.getSupplierId() != null &&
-      !purchaseOrderData
-        .getSupplierId()
-        .equals(purchaseOrder.getSupplier().getId())
-    ) {
+    if (purchaseOrderData.getSupplierId() != null) {
       Supplier supplier = supplierRepository
         .findById(purchaseOrderData.getSupplierId().longValue())
         .orElseThrow(() ->
@@ -267,92 +207,59 @@ public class PurchaseOrderService {
       purchaseOrder.setSupplier(supplier);
     }
 
-    if (purchaseOrderData.getItems() != null) {
-      List<PurchaseOrderItem> currentItems = purchaseOrder.getItems();
-
-      java.util.Map<Integer, PurchaseOrderItem> currentItemsMap = currentItems
-        .stream()
-        .collect(
-          Collectors.toMap(PurchaseOrderItem::getId, item -> item, (a, b) -> a)
-        );
-
-      java.util.Set<Integer> processedItemIds = new java.util.HashSet<>();
-
-      for (PurchaseOrderItemData itemData : purchaseOrderData.getItems()) {
-        if (itemData.getId() != null) {
-          PurchaseOrderItem existingItem = currentItemsMap.get(
-            itemData.getId()
-          );
-          if (existingItem != null) {
-            purchaseOrderItemMapper.updateEntityFromData(
-              itemData,
-              existingItem
-            );
-
-            if (
-              itemData.getProductId() != null &&
-              !itemData.getProductId().equals(existingItem.getProduct().getId())
-            ) {
-              Product product = productRepository
-                .findById(itemData.getProductId())
-                .orElseThrow(() ->
-                  new EntityNotFoundException(
-                    "Product not found with id: " + itemData.getProductId()
-                  )
-                );
-              existingItem.setProduct(product);
-            }
-
-            existingItem.calculateTotalPrice();
-
-            processedItemIds.add(existingItem.getId());
-          }
-        } else {
-          PurchaseOrderItem newItem = purchaseOrderItemMapper.toEntity(
-            itemData
-          );
-
-          Product product = productRepository
-            .findById(itemData.getProductId())
-            .orElseThrow(() ->
-              new EntityNotFoundException(
-                "Product not found with id: " + itemData.getProductId()
-              )
-            );
-          newItem.setProduct(product);
-
-          newItem.setPurchaseOrder(purchaseOrder);
-
-          newItem.calculateTotalPrice();
-
-          currentItems.add(newItem);
-        }
-      }
-
-      currentItems.removeIf(
-        item -> item.getId() != null && !processedItemIds.contains(item.getId())
-      );
-
-      calculateTotalAmount(purchaseOrder);
+    if (purchaseOrderData.getOrderDate() != null) {
+      purchaseOrder.setOrderDate(purchaseOrderData.getOrderDate());
     }
 
+    if (purchaseOrderData.getExpectedDeliveryDate() != null) {
+      purchaseOrder.setExpectedDeliveryDate(
+        purchaseOrderData.getExpectedDeliveryDate()
+      );
+    }
+
+    if (
+      purchaseOrderData.getItems() != null &&
+      !purchaseOrderData.getItems().isEmpty()
+    ) {
+      purchaseOrderItemRepository.deleteAll(purchaseOrder.getItems());
+      purchaseOrder.getItems().clear();
+
+      List<PurchaseOrderItem> items = new ArrayList<>();
+
+      for (PurchaseOrderItemData itemData : purchaseOrderData.getItems()) {
+        PurchaseOrderItem item = purchaseOrderItemMapper.toEntity(itemData);
+
+        Product product = productRepository
+          .findById(itemData.getProductId())
+          .orElseThrow(() ->
+            new EntityNotFoundException(
+              "Product not found with id: " + itemData.getProductId()
+            )
+          );
+
+        item.setProduct(product);
+        item.setPurchaseOrder(purchaseOrder);
+        item.setTotalPrice(
+          product.getCostPrice().multiply(new BigDecimal(item.getQuantity()))
+        );
+        items.add(item);
+      }
+
+      purchaseOrderItemRepository.saveAll(items);
+      purchaseOrder.setItems(items);
+    }
+
+    calculateTotalAmount(purchaseOrder);
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
-    addTrackingEvent(
-      updatedOrder,
-      "Order Updated",
-      "Purchase order details were updated.",
-      null,
-      "Update operation by user."
-    );
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
 
   /**
-   * Deletes a purchase order by its ID.
+   * Deletes a purchase order.
    *
    * @param id The ID of the purchase order to delete
    * @throws EntityNotFoundException if the purchase order is not found
-   * @throws IllegalStateException if the order cannot be deleted due to its status
+   * @throws IllegalStateException if the order is not in DRAFT status
    */
   @Transactional
   public void delete(Integer id) {
@@ -364,7 +271,7 @@ public class PurchaseOrderService {
 
     if (purchaseOrder.getStatus() != PurchaseOrder.Status.DRAFT) {
       throw new IllegalStateException(
-        "Cannot delete order in " + purchaseOrder.getStatus() + " status"
+        "Only purchase orders in DRAFT status can be deleted"
       );
     }
 
@@ -396,13 +303,6 @@ public class PurchaseOrderService {
     purchaseOrder.setStatus(PurchaseOrder.Status.SUBMITTED);
 
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
-    addTrackingEvent(
-      updatedOrder,
-      "Order Submitted",
-      "Purchase order submitted to supplier.",
-      null,
-      null
-    );
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
 
@@ -431,13 +331,6 @@ public class PurchaseOrderService {
     purchaseOrder.setStatus(PurchaseOrder.Status.CONFIRMED);
 
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
-    addTrackingEvent(
-      updatedOrder,
-      "Order Confirmed",
-      "Supplier confirmed the purchase order.",
-      null,
-      null
-    );
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
 
@@ -562,21 +455,5 @@ public class PurchaseOrderService {
    */
   private String generateOrderNumber() {
     return "ORD-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-  }
-
-  /**
-   * Retrieves the tracking history for a specific purchase order.
-   *
-   * @param orderId The ID of the purchase order.
-   * @return A list of tracking event information, ordered by event time.
-   */
-  public List<PurchaseOrderTrackingEventInfo> getTrackingHistory(
-    Integer orderId
-  ) {
-    List<PurchaseOrderTrackingEvent> trackingEvents =
-      purchaseOrderTrackingEventRepository.findByPurchaseOrder_IdOrderByEventTimestampAsc(
-        orderId
-      );
-    return purchaseOrderTrackingEventMapper.toInfoList(trackingEvents);
   }
 }

@@ -116,12 +116,6 @@ public class PurchaseOrder {
   private BigDecimal totalAmount = BigDecimal.ZERO;
 
   /**
-   * Additional notes about the order.
-   */
-  @Column(length = 1000)
-  private String notes;
-
-  /**
    * Items contained in this purchase order.
    */
   @OneToMany(
@@ -132,18 +126,6 @@ public class PurchaseOrder {
   )
   @Builder.Default
   private List<PurchaseOrderItem> items = new ArrayList<>();
-
-  /**
-   * Tracking events for this purchase order.
-   */
-  @OneToMany(
-    mappedBy = "purchaseOrder",
-    cascade = CascadeType.ALL,
-    orphanRemoval = true,
-    fetch = FetchType.LAZY
-  )
-  @Builder.Default
-  private List<PurchaseOrderTrackingEvent> trackingEvents = new ArrayList<>();
 
   /**
    * Timestamp of when the purchase order was created.
@@ -182,18 +164,6 @@ public class PurchaseOrder {
   public PurchaseOrder removeItem(PurchaseOrderItem item) {
     items.remove(item);
     item.setPurchaseOrder(null);
-    return this;
-  }
-
-  /**
-   * Helper method to add a tracking event to this purchase order.
-   *
-   * @param event The tracking event to add
-   * @return This purchase order instance for method chaining
-   */
-  public PurchaseOrder addTrackingEvent(PurchaseOrderTrackingEvent event) {
-    trackingEvents.add(event);
-    event.setPurchaseOrder(this);
     return this;
   }
 }

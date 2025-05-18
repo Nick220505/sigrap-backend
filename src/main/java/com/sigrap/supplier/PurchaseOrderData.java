@@ -3,7 +3,6 @@ package com.sigrap.supplier;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -36,7 +35,6 @@ import lombok.NoArgsConstructor;
  *     .supplierId(1)
  *     .orderDate(LocalDate.now())
  *     .expectedDeliveryDate(LocalDate.now().plusWeeks(1))
- *     .notes("Urgent order for school supplies")
  *     .items(List.of(orderItem1, orderItem2))
  *     .build();
  * </pre></p>
@@ -96,16 +94,6 @@ public class PurchaseOrderData {
     example = "2023-05-25"
   )
   private LocalDate expectedDeliveryDate;
-
-  /**
-   * Additional notes about the order.
-   */
-  @Size(max = 1000, message = "Notes cannot exceed 1000 characters")
-  @Schema(
-    description = "Additional notes about the order",
-    example = "Urgent order for school supplies"
-  )
-  private String notes;
 
   /**
    * The list of items in this order.

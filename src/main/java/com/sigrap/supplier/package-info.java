@@ -5,7 +5,7 @@
  * <ul>
  *   <li>Supplier CRUD operations</li>
  *   <li>Supplier catalog management</li>
- *   <li>Order processing for suppliers, including detailed order tracking</li>
+ *   <li>Order processing for suppliers</li>
  *   <li>Payment tracking</li>
  * </ul></p>
  *
@@ -28,7 +28,6 @@
  *   <li>Payment method management</li>
  *   <li>Supplier categorization</li>
  *   <li>Purchase order creation, status management, and itemization</li>
- *   <li>Detailed event-based tracking for purchase orders</li>
  * </ul></p>
  *
  * <p>Core Components:
@@ -48,10 +47,6 @@
  *   <li>{@link com.sigrap.supplier.PurchaseOrderData} - Input DTO for orders</li>
  *   <li>{@link com.sigrap.supplier.PurchaseOrderInfo} - Output DTO for orders</li>
  *   <li>{@link com.sigrap.supplier.PurchaseOrderItem} - Entity for items in an order</li>
- *   <li>{@link com.sigrap.supplier.PurchaseOrderTrackingEvent} - Entity for order tracking events</li>
- *   <li>{@link com.sigrap.supplier.PurchaseOrderTrackingEventInfo} - Output DTO for tracking events</li>
- *   <li>{@link com.sigrap.supplier.PurchaseOrderTrackingEventMapper} - Mapper for tracking events</li>
- *   <li>{@link com.sigrap.supplier.PurchaseOrderTrackingEventRepository} - Data access for tracking events</li>
  * </ul></p>
  *
  * <p>Domain-specific Enumerations:

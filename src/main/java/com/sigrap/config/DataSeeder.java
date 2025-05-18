@@ -23,8 +23,6 @@ import com.sigrap.sale.SaleReturnRepository;
 import com.sigrap.supplier.PurchaseOrder;
 import com.sigrap.supplier.PurchaseOrderItem;
 import com.sigrap.supplier.PurchaseOrderRepository;
-import com.sigrap.supplier.PurchaseOrderTrackingEvent;
-import com.sigrap.supplier.PurchaseOrderTrackingEventRepository;
 import com.sigrap.supplier.Supplier;
 import com.sigrap.supplier.SupplierRepository;
 import com.sigrap.user.User;
@@ -113,12 +111,6 @@ public class DataSeeder implements CommandLineRunner {
   private final PurchaseOrderRepository purchaseOrderRepository;
 
   /**
-   * Repository for purchase order tracking event database operations.
-   * Used to check if tracking events exist and to save new tracking events during seeding.
-   */
-  private final PurchaseOrderTrackingEventRepository purchaseOrderTrackingEventRepository;
-
-  /**
    * Repository for payment database operations.
    * Used to check if payments exist and to save new payments during seeding.
    */
@@ -153,7 +145,6 @@ public class DataSeeder implements CommandLineRunner {
     seedAttendance();
     seedSuppliers();
     seedPurchaseOrders();
-    seedPurchaseOrderTrackingEvents();
     seedPayments();
     seedCustomers();
     seedSales();
@@ -1176,9 +1167,6 @@ public class DataSeeder implements CommandLineRunner {
       .expectedDeliveryDate(LocalDate.now().minusDays(35))
       .actualDeliveryDate(LocalDate.now().minusDays(34))
       .status(PurchaseOrder.Status.DELIVERED)
-      .notes(
-        "Pedido para abastecer inventario de útiles escolares por temporada de regreso a clases"
-      )
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
       .build();
@@ -1225,7 +1213,6 @@ public class DataSeeder implements CommandLineRunner {
       .expectedDeliveryDate(LocalDate.now().minusDays(20))
       .actualDeliveryDate(LocalDate.now().minusDays(22))
       .status(PurchaseOrder.Status.DELIVERED)
-      .notes("Pedido de materiales artísticos para taller de arte")
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
       .build();
@@ -1262,7 +1249,6 @@ public class DataSeeder implements CommandLineRunner {
       .expectedDeliveryDate(LocalDate.now().minusDays(7))
       .actualDeliveryDate(LocalDate.now().minusDays(8))
       .status(PurchaseOrder.Status.DELIVERED)
-      .notes("Reposición de stock de papel y cartulina")
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
       .build();
@@ -1308,7 +1294,6 @@ public class DataSeeder implements CommandLineRunner {
       .orderDate(LocalDate.now().minusDays(5))
       .expectedDeliveryDate(LocalDate.now().plusDays(3))
       .status(PurchaseOrder.Status.CONFIRMED)
-      .notes("Pedido urgente de marcadores para evento escolar")
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
       .build();
@@ -1334,7 +1319,6 @@ public class DataSeeder implements CommandLineRunner {
       .orderDate(LocalDate.now().minusDays(2))
       .expectedDeliveryDate(LocalDate.now().plusDays(10))
       .status(PurchaseOrder.Status.SUBMITTED)
-      .notes("Pedido para reponer stock de cuadernos")
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
       .build();
@@ -1370,7 +1354,6 @@ public class DataSeeder implements CommandLineRunner {
       .orderDate(LocalDate.now())
       .expectedDeliveryDate(LocalDate.now().plusDays(15))
       .status(PurchaseOrder.Status.DRAFT)
-      .notes("Borrador de pedido para próximo mes")
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
       .build();
@@ -1402,153 +1385,6 @@ public class DataSeeder implements CommandLineRunner {
 
     purchaseOrderRepository.saveAll(purchaseOrders);
     log.info("{} purchase orders seeded successfully.", purchaseOrders.size());
-  }
-
-  private void seedPurchaseOrderTrackingEvents() {
-    if (purchaseOrderTrackingEventRepository.count() == 0) {
-      log.info("Seeding purchase order tracking events...");
-      List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findAll();
-      List<PurchaseOrderTrackingEvent> trackingEvents = new ArrayList<>();
-
-      if (purchaseOrders.isEmpty()) {
-        log.warn(
-          "No purchase orders found to seed tracking events. Skipping this step."
-        );
-        return;
-      }
-
-      for (PurchaseOrder order : purchaseOrders) {
-        LocalDateTime eventDate = order
-          .getOrderDate()
-          .atStartOfDay()
-          .plusHours(random.nextInt(24));
-        String baseLocation = "Bogotá DC";
-
-        trackingEvents.add(
-          PurchaseOrderTrackingEvent.builder()
-            .purchaseOrder(order)
-            .eventTimestamp(eventDate)
-            .status("ORDEN CREADA")
-            .location(baseLocation)
-            .notes("Pedido generado en el sistema.")
-            .build()
-        );
-
-        if (
-          order.getStatus() == PurchaseOrder.Status.CONFIRMED ||
-          order.getStatus() == PurchaseOrder.Status.SHIPPED ||
-          order.getStatus() == PurchaseOrder.Status.DELIVERED ||
-          order.getStatus() == PurchaseOrder.Status.DELIVERED
-        ) {
-          eventDate = eventDate
-            .plusDays(random.nextInt(1) + 1)
-            .plusHours(random.nextInt(12));
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(eventDate)
-              .status("ORDEN CONFIRMADA")
-              .location(order.getSupplier().getAddress())
-              .notes("Proveedor ha confirmado el pedido.")
-              .build()
-          );
-        }
-
-        if (
-          order.getStatus() == PurchaseOrder.Status.SHIPPED ||
-          order.getStatus() == PurchaseOrder.Status.DELIVERED ||
-          order.getStatus() == PurchaseOrder.Status.DELIVERED
-        ) {
-          eventDate = eventDate
-            .plusDays(random.nextInt(2) + 1)
-            .plusHours(random.nextInt(12));
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(eventDate)
-              .status("ORDEN ENVIADA")
-              .location(
-                "Centro de Distribución - " + order.getSupplier().getAddress()
-              )
-              .notes(
-                "El pedido ha sido despachado por el proveedor. Transportadora: Servientrega, Guía: " +
-                "GUIA" +
-                String.format("%05d", order.getId()) +
-                random.nextInt(100)
-              )
-              .build()
-          );
-        }
-
-        if (
-          order.getStatus() == PurchaseOrder.Status.DELIVERED ||
-          order.getStatus() == PurchaseOrder.Status.DELIVERED
-        ) {
-          eventDate = eventDate
-            .plusDays(random.nextInt(3) + 1)
-            .plusHours(random.nextInt(12));
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(eventDate)
-              .status("EN TRÁNSITO")
-              .location(
-                "Punto de control - " + order.getSupplier().getAddress()
-              )
-              .notes("El pedido está en camino a la papelería.")
-              .build()
-          );
-
-          eventDate = eventDate
-            .plusDays(random.nextInt(2) + 1)
-            .plusHours(random.nextInt(12));
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(eventDate)
-              .status("ENTREGADO")
-              .location("Papelería Rosita - " + baseLocation)
-              .notes("El pedido ha sido recibido en la papelería.")
-              .build()
-          );
-        }
-
-        if (order.getStatus() == PurchaseOrder.Status.DELIVERED) {
-          eventDate = eventDate
-            .plusDays(random.nextInt(1) + 1)
-            .plusHours(random.nextInt(12));
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(eventDate)
-              .status("ORDEN COMPLETADA")
-              .location("Papelería Rosita - " + baseLocation)
-              .notes("El pedido ha sido verificado y cerrado.")
-              .build()
-          );
-        }
-
-        if (order.getStatus() == PurchaseOrder.Status.CANCELLED) {
-          eventDate = eventDate
-            .plusDays(random.nextInt(1) + 1)
-            .plusHours(random.nextInt(12));
-          trackingEvents.add(
-            PurchaseOrderTrackingEvent.builder()
-              .purchaseOrder(order)
-              .eventTimestamp(eventDate)
-              .status("ORDEN CANCELADA")
-              .location(baseLocation)
-              .notes("El pedido fue cancelado por el usuario.")
-              .build()
-          );
-        }
-      }
-      purchaseOrderTrackingEventRepository.saveAll(trackingEvents);
-      log.info(
-        "Seeded {} purchase order tracking events.",
-        trackingEvents.size()
-      );
-    }
   }
 
   private void seedPayments() {

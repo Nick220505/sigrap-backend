@@ -13,11 +13,7 @@ import org.mapstruct.MappingTarget;
  */
 @Mapper(
   componentModel = "spring",
-  uses = {
-    PurchaseOrderItemMapper.class,
-    SupplierMapper.class,
-    PurchaseOrderTrackingEventMapper.class,
-  }
+  uses = { PurchaseOrderItemMapper.class, SupplierMapper.class }
 )
 public interface PurchaseOrderMapper {
   /**
@@ -55,7 +51,6 @@ public interface PurchaseOrderMapper {
   @Mapping(target = "actualDeliveryDate", ignore = true)
   @Mapping(target = "totalAmount", ignore = true)
   @Mapping(target = "shipDate", ignore = true)
-  @Mapping(target = "trackingEvents", ignore = true)
   @Mapping(target = "status", constant = "DRAFT")
   PurchaseOrder toEntity(PurchaseOrderData purchaseOrderData);
 
@@ -69,7 +64,6 @@ public interface PurchaseOrderMapper {
   @DataToEntity
   @Mapping(target = "supplier", ignore = true)
   @Mapping(target = "items", ignore = true)
-  @Mapping(target = "trackingEvents", ignore = true)
   @Mapping(target = "orderNumber", ignore = true)
   @Mapping(target = "actualDeliveryDate", ignore = true)
   @Mapping(target = "shipDate", ignore = true)
