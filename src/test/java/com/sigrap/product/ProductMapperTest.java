@@ -1,13 +1,12 @@
 package com.sigrap.product;
 
-import java.math.BigDecimal;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import com.sigrap.category.Category;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import com.sigrap.category.Category;
 
 @SpringBootTest
 class ProductMapperTest {
@@ -26,6 +25,8 @@ class ProductMapperTest {
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
       .category(category)
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     ProductInfo productInfo = productMapper.toInfo(product);
@@ -40,6 +41,8 @@ class ProductMapperTest {
     assertThat(productInfo.getSalePrice()).isEqualByComparingTo(
       new BigDecimal("15.00")
     );
+    assertThat(productInfo.getStock()).isEqualTo(100);
+    assertThat(productInfo.getMinimumStockThreshold()).isEqualTo(10);
     assertThat(productInfo.getCategory()).isNotNull();
     assertThat(productInfo.getCategory().getId()).isEqualTo(1);
     assertThat(productInfo.getCategory().getName()).isEqualTo("Test Category");
@@ -61,6 +64,8 @@ class ProductMapperTest {
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
       .category(null)
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     ProductInfo productInfo = productMapper.toInfo(product);
@@ -75,6 +80,8 @@ class ProductMapperTest {
     assertThat(productInfo.getSalePrice()).isEqualByComparingTo(
       new BigDecimal("15.00")
     );
+    assertThat(productInfo.getStock()).isEqualTo(100);
+    assertThat(productInfo.getMinimumStockThreshold()).isEqualTo(10);
     assertThat(productInfo.getCategory()).isNull();
   }
 
@@ -86,6 +93,8 @@ class ProductMapperTest {
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
       .categoryId(1)
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product product = productMapper.toEntity(productData);
@@ -100,6 +109,8 @@ class ProductMapperTest {
     assertThat(product.getSalePrice()).isEqualByComparingTo(
       new BigDecimal("15.00")
     );
+    assertThat(product.getStock()).isEqualTo(100);
+    assertThat(product.getMinimumStockThreshold()).isEqualTo(10);
     assertThat(product.getCategory()).isNull();
   }
 
@@ -118,6 +129,8 @@ class ProductMapperTest {
       .description("Old Description")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     ProductData productData = ProductData.builder()
@@ -126,6 +139,8 @@ class ProductMapperTest {
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
       .categoryId(1)
+      .stock(200)
+      .minimumStockThreshold(20)
       .build();
 
     productMapper.updateEntityFromData(productData, product);
@@ -139,6 +154,8 @@ class ProductMapperTest {
     assertThat(product.getSalePrice()).isEqualByComparingTo(
       new BigDecimal("30.00")
     );
+    assertThat(product.getStock()).isEqualTo(200);
+    assertThat(product.getMinimumStockThreshold()).isEqualTo(20);
     assertThat(product.getCategory()).isNull();
   }
 
@@ -150,12 +167,16 @@ class ProductMapperTest {
       .description("Original Description")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     ProductData productData = ProductData.builder()
       .name("New Name")
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
+      .stock(200)
+      .minimumStockThreshold(20)
       .build();
 
     productMapper.updateEntityFromData(productData, product);
@@ -169,6 +190,8 @@ class ProductMapperTest {
     assertThat(product.getSalePrice()).isEqualByComparingTo(
       new BigDecimal("30.00")
     );
+    assertThat(product.getStock()).isEqualTo(200);
+    assertThat(product.getMinimumStockThreshold()).isEqualTo(20);
   }
 
   @Test
@@ -179,6 +202,8 @@ class ProductMapperTest {
       .description("Original Description")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product originalProduct = Product.builder()
@@ -187,6 +212,8 @@ class ProductMapperTest {
       .description("Original Description")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     productMapper.updateEntityFromData(null, product);
@@ -201,6 +228,10 @@ class ProductMapperTest {
     );
     assertThat(product.getSalePrice()).isEqualByComparingTo(
       originalProduct.getSalePrice()
+    );
+    assertThat(product.getStock()).isEqualTo(originalProduct.getStock());
+    assertThat(product.getMinimumStockThreshold()).isEqualTo(
+      originalProduct.getMinimumStockThreshold()
     );
   }
 

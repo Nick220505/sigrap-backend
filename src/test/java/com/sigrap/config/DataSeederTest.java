@@ -14,6 +14,8 @@ import com.sigrap.customer.CustomerRepository;
 import com.sigrap.employee.attendance.AttendanceRepository;
 import com.sigrap.employee.schedule.ScheduleRepository;
 import com.sigrap.product.ProductRepository;
+import com.sigrap.sale.SaleRepository;
+import com.sigrap.sale.SaleReturnRepository;
 import com.sigrap.supplier.PurchaseOrderRepository;
 import com.sigrap.supplier.SupplierRepository;
 import com.sigrap.user.User;
@@ -44,13 +46,7 @@ class DataSeederTest {
   private UserRepository userRepository;
 
   @Mock
-  private PasswordEncoder passwordEncoder;
-
-  @Mock
-  private ScheduleRepository scheduleRepository;
-
-  @Mock
-  private AttendanceRepository attendanceRepository;
+  private CustomerRepository customerRepository;
 
   @Mock
   private SupplierRepository supplierRepository;
@@ -59,44 +55,59 @@ class DataSeederTest {
   private PurchaseOrderRepository purchaseOrderRepository;
 
   @Mock
-  private CustomerRepository customerRepository;
+  private AttendanceRepository attendanceRepository;
+
+  @Mock
+  private ScheduleRepository scheduleRepository;
+
+  @Mock
+  private SaleRepository saleRepository;
+
+  @Mock
+  private SaleReturnRepository saleReturnRepository;
+
+  @Mock
+  private PasswordEncoder passwordEncoder;
 
   @InjectMocks
   private DataSeeder dataSeeder;
 
+  private User adminUser;
+  private Category officeCategory;
+
   @BeforeEach
   void setUp() {
-    lenient()
-      .when(passwordEncoder.encode(any()))
-      .thenReturn("encoded-password");
-
-    lenient().when(scheduleRepository.count()).thenReturn(2L);
-    lenient().when(attendanceRepository.count()).thenReturn(2L);
-    lenient().when(supplierRepository.count()).thenReturn(2L);
-    lenient().when(purchaseOrderRepository.count()).thenReturn(2L);
-    lenient().when(customerRepository.count()).thenReturn(2L);
-
-    User mockAdminUser = User.builder()
+    adminUser = User.builder()
       .id(1L)
-      .email("rosita@sigrap.com")
-      .name("Rosita González")
+      .name("Admin User")
+      .email("admin@sigrap.com")
       .password("encoded-password")
       .role(UserRole.ADMINISTRATOR)
       .build();
-    lenient()
-      .when(userRepository.findByEmail("rosita@sigrap.com"))
-      .thenReturn(Optional.of(mockAdminUser));
 
-    User mockEmployeeUser = User.builder()
-      .id(2L)
-      .email("gladys@sigrap.com")
-      .name("Gladys Mendoza")
-      .password("encoded-password")
-      .role(UserRole.EMPLOYEE)
+    officeCategory = Category.builder()
+      .id(1L)
+      .name("Office Supplies")
+      .description("Office supplies and stationery")
       .build();
+
+    // Set up common mocks
     lenient()
-      .when(userRepository.findByEmail("gladys@sigrap.com"))
-      .thenReturn(Optional.of(mockEmployeeUser));
+      .when(passwordEncoder.encode(any()))
+      .thenReturn("encoded-password");
+    lenient()
+      .when(categoryRepository.findById(1L))
+      .thenReturn(Optional.of(officeCategory));
+    lenient().when(userRepository.count()).thenReturn(0L);
+    lenient().when(categoryRepository.count()).thenReturn(0L);
+    lenient().when(productRepository.count()).thenReturn(0L);
+    lenient().when(customerRepository.count()).thenReturn(0L);
+    lenient().when(supplierRepository.count()).thenReturn(0L);
+    lenient().when(purchaseOrderRepository.count()).thenReturn(0L);
+    lenient().when(attendanceRepository.count()).thenReturn(0L);
+    lenient().when(scheduleRepository.count()).thenReturn(0L);
+    lenient().when(saleRepository.count()).thenReturn(2L);
+    lenient().when(saleReturnRepository.count()).thenReturn(1L);
   }
 
   @Test

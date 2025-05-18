@@ -44,6 +44,8 @@ class ProductServiceTest {
       .name("Test Product")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     ProductInfo productInfo = ProductInfo.builder()
@@ -51,6 +53,8 @@ class ProductServiceTest {
       .name("Test Product")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     when(productRepository.findById(id)).thenReturn(Optional.of(product));
@@ -86,6 +90,8 @@ class ProductServiceTest {
       .name("Product 1")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product product2 = Product.builder()
@@ -93,6 +99,8 @@ class ProductServiceTest {
       .name("Product 2")
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     List<Product> products = List.of(product1, product2);
@@ -102,6 +110,8 @@ class ProductServiceTest {
       .name("Product 1")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     ProductInfo productInfo2 = ProductInfo.builder()
@@ -109,6 +119,8 @@ class ProductServiceTest {
       .name("Product 2")
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     List<ProductInfo> productInfos = List.of(productInfo1, productInfo2);
@@ -131,6 +143,8 @@ class ProductServiceTest {
       .description("New Description")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product product = Product.builder()
@@ -138,6 +152,8 @@ class ProductServiceTest {
       .description("New Description")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product savedProduct = Product.builder()
@@ -146,6 +162,8 @@ class ProductServiceTest {
       .description("New Description")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     ProductInfo productInfo = ProductInfo.builder()
@@ -154,6 +172,8 @@ class ProductServiceTest {
       .description("New Description")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     when(productMapper.toEntity(productData)).thenReturn(product);
@@ -178,12 +198,16 @@ class ProductServiceTest {
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
       .categoryId(categoryId.intValue())
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product product = Product.builder()
       .name("New Product")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Category category = Category.builder()
@@ -197,6 +221,8 @@ class ProductServiceTest {
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
       .category(category)
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     ProductInfo productInfo = ProductInfo.builder()
@@ -204,6 +230,8 @@ class ProductServiceTest {
       .name("New Product")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     when(productMapper.toEntity(productData)).thenReturn(product);
@@ -230,12 +258,16 @@ class ProductServiceTest {
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
       .categoryId(categoryId.intValue())
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product product = Product.builder()
       .name("New Product")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     when(productMapper.toEntity(productData)).thenReturn(product);
@@ -257,6 +289,8 @@ class ProductServiceTest {
       .description("Updated Description")
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product existingProduct = Product.builder()
@@ -265,6 +299,8 @@ class ProductServiceTest {
       .description("Original Description")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product updatedProduct = Product.builder()
@@ -273,6 +309,8 @@ class ProductServiceTest {
       .description("Updated Description")
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     ProductInfo productInfo = ProductInfo.builder()
@@ -281,6 +319,8 @@ class ProductServiceTest {
       .description("Updated Description")
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     when(productRepository.findById(id)).thenReturn(
@@ -316,6 +356,8 @@ class ProductServiceTest {
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
       .categoryId(categoryId.intValue())
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product existingProduct = Product.builder()
@@ -323,6 +365,8 @@ class ProductServiceTest {
       .name("Original Product")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Category category = Category.builder()
@@ -336,6 +380,8 @@ class ProductServiceTest {
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
       .category(category)
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     CategoryInfo categoryInfo = CategoryInfo.builder()
@@ -349,6 +395,8 @@ class ProductServiceTest {
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
       .category(categoryInfo)
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     when(productRepository.findById(id)).thenReturn(
@@ -382,6 +430,8 @@ class ProductServiceTest {
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
       .categoryId(null)
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Category category = Category.builder()
@@ -395,6 +445,8 @@ class ProductServiceTest {
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
       .category(category)
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product updatedProduct = Product.builder()
@@ -403,6 +455,8 @@ class ProductServiceTest {
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
       .category(null)
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     ProductInfo productInfo = ProductInfo.builder()
@@ -411,6 +465,8 @@ class ProductServiceTest {
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
       .category(null)
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     when(productRepository.findById(id)).thenReturn(
@@ -435,6 +491,8 @@ class ProductServiceTest {
       .name("Updated Product")
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     when(productRepository.findById(id)).thenReturn(Optional.empty());

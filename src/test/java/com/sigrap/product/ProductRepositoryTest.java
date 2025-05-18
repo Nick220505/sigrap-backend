@@ -1,17 +1,16 @@
 package com.sigrap.product;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.sigrap.config.RepositoryTestConfiguration;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
-import com.sigrap.config.RepositoryTestConfiguration;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -28,6 +27,8 @@ class ProductRepositoryTest {
       .description("Test Description")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product savedProduct = productRepository.save(product);
@@ -41,6 +42,8 @@ class ProductRepositoryTest {
     assertThat(savedProduct.getSalePrice()).isEqualByComparingTo(
       new BigDecimal("15.00")
     );
+    assertThat(savedProduct.getStock()).isEqualTo(100);
+    assertThat(savedProduct.getMinimumStockThreshold()).isEqualTo(10);
   }
 
   @Test
@@ -50,6 +53,8 @@ class ProductRepositoryTest {
       .description("Test Description")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
     Product savedProduct = productRepository.save(product);
 
@@ -71,6 +76,8 @@ class ProductRepositoryTest {
       .description("Description 1")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
 
     Product product2 = Product.builder()
@@ -78,6 +85,8 @@ class ProductRepositoryTest {
       .description("Description 2")
       .costPrice(new BigDecimal("20.00"))
       .salePrice(new BigDecimal("30.00"))
+      .stock(200)
+      .minimumStockThreshold(20)
       .build();
 
     productRepository.save(product1);
@@ -97,6 +106,8 @@ class ProductRepositoryTest {
       .name("Test Product")
       .costPrice(new BigDecimal("10.00"))
       .salePrice(new BigDecimal("15.00"))
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
     Product savedProduct = productRepository.save(product);
 

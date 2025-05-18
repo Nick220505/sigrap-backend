@@ -89,9 +89,7 @@ class AttendanceServiceTest {
     doReturn(Optional.empty())
       .when(attendanceRepository)
       .findByUserIdAndDate(anyLong(), any(LocalDateTime.class));
-    doReturn(testAttendance)
-      .when(attendanceRepository)
-      .save(any(Attendance.class));
+    doReturn(testAttendance).when(attendanceRepository).save(any());
     doReturn(testAttendanceInfo)
       .when(attendanceMapper)
       .toInfo(any(Attendance.class));

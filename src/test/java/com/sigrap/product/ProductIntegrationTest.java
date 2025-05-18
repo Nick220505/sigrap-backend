@@ -62,6 +62,8 @@ class ProductIntegrationTest {
       .costPrice(BigDecimal.valueOf(10.99))
       .salePrice(BigDecimal.valueOf(15.99))
       .category(testCategory)
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
     testProduct = productRepository.save(testProduct);
 
@@ -71,6 +73,8 @@ class ProductIntegrationTest {
       .costPrice(BigDecimal.valueOf(10.99))
       .salePrice(BigDecimal.valueOf(15.99))
       .categoryId(testCategory.getId().intValue())
+      .stock(100)
+      .minimumStockThreshold(10)
       .build();
   }
 

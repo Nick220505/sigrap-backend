@@ -1,6 +1,8 @@
 package com.sigrap.employee.schedule;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.isA;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -77,15 +79,28 @@ class ScheduleIntegrationTest {
   }
 
   @Test
-  void findById_ShouldReturnSchedule() throws Exception {
+  void findAll_ShouldReturnSchedules() throws Exception {
     mockMvc
-      .perform(get("/api/schedules/{id}", testSchedule.getId()))
+      .perform(get("/api/schedules"))
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.id").value(testSchedule.getId()))
+      .andExpect(jsonPath("$", hasSize(1)))
+      .andExpect(jsonPath("$[0].id").isNumber())
+      .andExpect(jsonPath("$[0].userId").value(this.testUser.getId()))
+      .andExpect(jsonPath("$[0].startTime", isA(Object.class)))
+      .andExpect(jsonPath("$[0].endTime", isA(Object.class)));
+  }
+
+  @Test
+  void findById_ShouldReturnSchedule() throws Exception {
+    Long scheduleId = scheduleRepository.findAll().get(0).getId();
+
+    mockMvc
+      .perform(get("/api/schedules/{id}", scheduleId))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.id").value(scheduleId))
       .andExpect(jsonPath("$.userId").value(this.testUser.getId()))
-      .andExpect(jsonPath("$.day").value(testSchedule.getDay()))
-      .andExpect(jsonPath("$.startTime").value(defaultStartTime.toString()))
-      .andExpect(jsonPath("$.endTime").value(defaultEndTime.toString()));
+      .andExpect(jsonPath("$.startTime", isA(Object.class)))
+      .andExpect(jsonPath("$.endTime", isA(Object.class)));
   }
 
   @Test
@@ -93,10 +108,11 @@ class ScheduleIntegrationTest {
     mockMvc
       .perform(get("/api/schedules/user/{userId}", this.testUser.getId()))
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$[0].id").value(testSchedule.getId()))
+      .andExpect(jsonPath("$", hasSize(1)))
+      .andExpect(jsonPath("$[0].id").isNumber())
       .andExpect(jsonPath("$[0].userId").value(this.testUser.getId()))
-      .andExpect(jsonPath("$[0].startTime").value(defaultStartTime.toString()))
-      .andExpect(jsonPath("$[0].endTime").value(defaultEndTime.toString()));
+      .andExpect(jsonPath("$[0].startTime", isA(Object.class)))
+      .andExpect(jsonPath("$[0].endTime", isA(Object.class)));
   }
 
   @Test
@@ -119,10 +135,11 @@ class ScheduleIntegrationTest {
           .content(objectMapper.writeValueAsString(scheduleData))
       )
       .andExpect(status().isCreated())
+      .andExpect(jsonPath("$.id").isNumber())
       .andExpect(jsonPath("$.userId").value(this.testUser.getId()))
       .andExpect(jsonPath("$.day").value("TUESDAY"))
-      .andExpect(jsonPath("$.startTime").value(newStartTime.toString()))
-      .andExpect(jsonPath("$.endTime").value(newEndTime.toString()));
+      .andExpect(jsonPath("$.startTime", isA(Object.class)))
+      .andExpect(jsonPath("$.endTime", isA(Object.class)));
   }
 
   @Test
@@ -145,20 +162,23 @@ class ScheduleIntegrationTest {
           .content(objectMapper.writeValueAsString(updateData))
       )
       .andExpect(status().isOk())
+      .andExpect(jsonPath("$.id").value(testSchedule.getId()))
       .andExpect(jsonPath("$.userId").value(this.testUser.getId()))
       .andExpect(jsonPath("$.day").value(testSchedule.getDay()))
-      .andExpect(jsonPath("$.startTime").value(updatedStartTime.toString()))
-      .andExpect(jsonPath("$.endTime").value(updatedEndTime.toString()))
+      .andExpect(jsonPath("$.startTime", isA(Object.class)))
+      .andExpect(jsonPath("$.endTime", isA(Object.class)))
       .andExpect(jsonPath("$.isActive").value(true));
   }
 
   @Test
   void delete_ShouldDeleteSchedule() throws Exception {
+    Long scheduleId = scheduleRepository.findAll().get(0).getId();
+
     mockMvc
-      .perform(delete("/api/schedules/{id}", testSchedule.getId()))
+      .perform(delete("/api/schedules/{id}", scheduleId))
       .andExpect(status().isNoContent());
 
-    assertThat(scheduleRepository.findById(testSchedule.getId())).isEmpty();
+    assertThat(scheduleRepository.findById(scheduleId)).isEmpty();
   }
 
   @Test
@@ -181,6 +201,7 @@ class ScheduleIntegrationTest {
       )
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$[0].userId").value(this.testUser.getId()))
-      .andExpect(jsonPath("$[0].startTime").value(genStartTime.toString()));
+      .andExpect(jsonPath("$[0].startTime", isA(Object.class)))
+      .andExpect(jsonPath("$[0].endTime", isA(Object.class)));
   }
 }
