@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,7 +34,6 @@ import lombok.NoArgsConstructor;
  *     .productId(1)
  *     .quantity(10)
  *     .unitPrice(new BigDecimal("12.50"))
- *     .notes("Standard quality pens")
  *     .build();
  * </pre></p>
  *
@@ -95,14 +93,4 @@ public class PurchaseOrderItemData {
   @PositiveOrZero(message = "Unit price must be zero or positive")
   @Schema(description = "Unit price of the product", example = "12.50")
   private BigDecimal unitPrice;
-
-  /**
-   * Additional notes about the item.
-   */
-  @Size(max = 500, message = "Notes cannot exceed 500 characters")
-  @Schema(
-    description = "Additional notes about the item",
-    example = "Standard quality pens"
-  )
-  private String notes;
 }

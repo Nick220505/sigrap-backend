@@ -1166,7 +1166,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(100)
       .unitPrice(new BigDecimal("4000"))
       .receivedQuantity(100)
-      .notes("Cuadernos para stock inicial de temporada escolar")
       .build();
 
     PurchaseOrderItem item12 = PurchaseOrderItem.builder()
@@ -1174,7 +1173,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(200)
       .unitPrice(new BigDecimal("500"))
       .receivedQuantity(200)
-      .notes("Lápices HB para stock inicial de temporada escolar")
       .build();
 
     PurchaseOrderItem item13 = PurchaseOrderItem.builder()
@@ -1182,7 +1180,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(150)
       .unitPrice(new BigDecimal("800"))
       .receivedQuantity(150)
-      .notes("Borradores para stock inicial de temporada escolar")
       .build();
 
     item11.setPurchaseOrder(orden1);
@@ -1211,7 +1208,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(50)
       .unitPrice(new BigDecimal("5500"))
       .receivedQuantity(50)
-      .notes("Cajas de colores para taller de arte")
       .build();
 
     PurchaseOrderItem item22 = PurchaseOrderItem.builder()
@@ -1219,7 +1215,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(30)
       .unitPrice(new BigDecimal("7500"))
       .receivedQuantity(30)
-      .notes("Kits geométricos para estudiantes de secundaria")
       .build();
 
     item21.setPurchaseOrder(orden2);
@@ -1246,7 +1241,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(80)
       .unitPrice(new BigDecimal("12000"))
       .receivedQuantity(80)
-      .notes("Resmas de papel para fotocopias e impresiones")
       .build();
 
     PurchaseOrderItem item32 = PurchaseOrderItem.builder()
@@ -1254,7 +1248,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(120)
       .unitPrice(new BigDecimal("700"))
       .receivedQuantity(120)
-      .notes("Cartulinas para proyectos escolares")
       .build();
 
     PurchaseOrderItem item33 = PurchaseOrderItem.builder()
@@ -1262,7 +1255,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(60)
       .unitPrice(new BigDecimal("3500"))
       .receivedQuantity(60)
-      .notes("Blocks de papel iris para manualidades")
       .build();
 
     item31.setPurchaseOrder(orden3);
@@ -1290,7 +1282,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(40)
       .unitPrice(new BigDecimal("5000"))
       .receivedQuantity(0)
-      .notes("Marcadores para taller de cartelería")
       .build();
 
     item41.setPurchaseOrder(orden4);
@@ -1314,7 +1305,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(50)
       .unitPrice(new BigDecimal("4000"))
       .receivedQuantity(0)
-      .notes("Reposición de stock de cuadernos universitarios")
       .build();
 
     PurchaseOrderItem item52 = PurchaseOrderItem.builder()
@@ -1322,7 +1312,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(35)
       .unitPrice(new BigDecimal("9000"))
       .receivedQuantity(0)
-      .notes("Reposición de stock de cuadernos argollados")
       .build();
 
     item51.setPurchaseOrder(orden5);
@@ -1348,7 +1337,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(150)
       .unitPrice(new BigDecimal("500"))
       .receivedQuantity(0)
-      .notes("Stock preventivo para próximo trimestre")
       .build();
 
     PurchaseOrderItem item62 = PurchaseOrderItem.builder()
@@ -1356,7 +1344,6 @@ public class DataSeeder implements CommandLineRunner {
       .quantity(100)
       .unitPrice(new BigDecimal("800"))
       .receivedQuantity(0)
-      .notes("Stock preventivo para próximo trimestre")
       .build();
 
     item61.setPurchaseOrder(orden6);

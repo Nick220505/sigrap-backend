@@ -90,12 +90,6 @@ public class PurchaseOrderItem {
   private Integer receivedQuantity = 0;
 
   /**
-   * Additional notes about the item.
-   */
-  @Column(length = 500)
-  private String notes;
-
-  /**
    * Timestamp of when the item was created.
    * Automatically set during entity creation.
    */

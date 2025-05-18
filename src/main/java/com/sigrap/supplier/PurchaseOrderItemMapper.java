@@ -1,15 +1,13 @@
 package com.sigrap.supplier;
 
-import java.util.List;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-
 import com.sigrap.common.mapping.DataToEntity;
 import com.sigrap.common.mapping.EntityToInfo;
 import com.sigrap.product.Product;
 import com.sigrap.product.ProductMapper;
+import java.util.List;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 /**
  * Mapper interface for converting between PurchaseOrderItem entity and its DTO representations.
