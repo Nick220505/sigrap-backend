@@ -25,7 +25,6 @@ import lombok.NoArgsConstructor;
  * <p>Validation Rules:
  * <ul>
  *   <li>Supplier ID must not be null for creation</li>
- *   <li>Order date must not be null</li>
  *   <li>Items should be valid if provided</li>
  * </ul></p>
  *
@@ -33,8 +32,7 @@ import lombok.NoArgsConstructor;
  * <pre>
  * PurchaseOrderData orderData = PurchaseOrderData.builder()
  *     .supplierId(1)
- *     .orderDate(LocalDate.now())
- *     .expectedDeliveryDate(LocalDate.now().plusWeeks(1))
+ *     .deliveryDate(LocalDate.now().plusWeeks(1))
  *     .items(List.of(orderItem1, orderItem2))
  *     .build();
  * </pre></p>
@@ -66,22 +64,7 @@ public class PurchaseOrderData {
   private Integer supplierId;
 
   /**
-   * The date when the order was placed.
-   *
-   * <p>Validation:
-   * <ul>
-   *   <li>Must not be null</li>
-   * </ul></p>
-   */
-  @NotNull(message = "Order date cannot be null")
-  @Schema(
-    description = "Date when the order was placed",
-    example = "2023-05-15"
-  )
-  private LocalDate orderDate;
-
-  /**
-   * The expected delivery date for the order.
+   * The delivery date for the order.
    *
    * <p>Properties:
    * <ul>
@@ -89,11 +72,8 @@ public class PurchaseOrderData {
    *   <li>Should be a future date</li>
    * </ul></p>
    */
-  @Schema(
-    description = "Expected delivery date for the order",
-    example = "2023-05-25"
-  )
-  private LocalDate expectedDeliveryDate;
+  @Schema(description = "Delivery date for the order", example = "2023-05-25")
+  private LocalDate deliveryDate;
 
   /**
    * The list of items in this order.

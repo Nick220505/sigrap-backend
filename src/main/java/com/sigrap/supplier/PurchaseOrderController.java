@@ -3,10 +3,8 @@ package com.sigrap.supplier;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -166,21 +163,15 @@ public class PurchaseOrderController {
   }
 
   /**
-   * Updates the status of a purchase order to DELIVERED and sets the actual delivery date.
+   * Updates the status of a purchase order to DELIVERED.
    *
    * @param id The ID of the purchase order to mark as delivered
-   * @param actualDeliveryDate The actual delivery date
    * @return The updated purchase order
    */
   @PatchMapping("/{id}/deliver")
   @Operation(summary = "Mark a purchase order as delivered")
-  public PurchaseOrderInfo markAsDelivered(
-    @PathVariable Integer id,
-    @RequestParam @DateTimeFormat(
-      iso = DateTimeFormat.ISO.DATE
-    ) LocalDate actualDeliveryDate
-  ) {
-    return purchaseOrderService.markAsDelivered(id, actualDeliveryDate);
+  public PurchaseOrderInfo markAsDelivered(@PathVariable Integer id) {
+    return purchaseOrderService.markAsDelivered(id);
   }
 
   /**
@@ -196,7 +187,7 @@ public class PurchaseOrderController {
   }
 
   /**
-   * Updates the status of a purchase order to PAID and sets the payment date.
+   * Updates the status of a purchase order to PAID.
    *
    * @param id The ID of the purchase order to mark as paid
    * @return The updated purchase order

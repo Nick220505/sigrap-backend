@@ -1153,9 +1153,7 @@ public class DataSeeder implements CommandLineRunner {
 
     PurchaseOrder orden1 = PurchaseOrder.builder()
       .supplier(panamericana)
-      .orderDate(LocalDate.now().minusDays(45))
-      .expectedDeliveryDate(LocalDate.now().minusDays(35))
-      .actualDeliveryDate(LocalDate.now().minusDays(34))
+      .deliveryDate(LocalDate.now().minusDays(34))
       .status(PurchaseOrderStatus.DELIVERED)
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
@@ -1195,9 +1193,7 @@ public class DataSeeder implements CommandLineRunner {
 
     PurchaseOrder orden2 = PurchaseOrder.builder()
       .supplier(faberCastell)
-      .orderDate(LocalDate.now().minusDays(30))
-      .expectedDeliveryDate(LocalDate.now().minusDays(20))
-      .actualDeliveryDate(LocalDate.now().minusDays(22))
+      .deliveryDate(LocalDate.now().minusDays(22))
       .status(PurchaseOrderStatus.DELIVERED)
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
@@ -1228,9 +1224,7 @@ public class DataSeeder implements CommandLineRunner {
 
     PurchaseOrder orden3 = PurchaseOrder.builder()
       .supplier(officedepot)
-      .orderDate(LocalDate.now().minusDays(15))
-      .expectedDeliveryDate(LocalDate.now().minusDays(7))
-      .actualDeliveryDate(LocalDate.now().minusDays(8))
+      .deliveryDate(LocalDate.now().minusDays(8))
       .status(PurchaseOrderStatus.DELIVERED)
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
@@ -1270,8 +1264,7 @@ public class DataSeeder implements CommandLineRunner {
 
     PurchaseOrder orden4 = PurchaseOrder.builder()
       .supplier(artesco)
-      .orderDate(LocalDate.now().minusDays(5))
-      .expectedDeliveryDate(LocalDate.now().plusDays(3))
+      .deliveryDate(LocalDate.now().plusDays(3))
       .status(PurchaseOrderStatus.CONFIRMED)
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
@@ -1293,8 +1286,7 @@ public class DataSeeder implements CommandLineRunner {
 
     PurchaseOrder orden5 = PurchaseOrder.builder()
       .supplier(norma)
-      .orderDate(LocalDate.now().minusDays(2))
-      .expectedDeliveryDate(LocalDate.now().plusDays(10))
+      .deliveryDate(LocalDate.now().plusDays(10))
       .status(PurchaseOrderStatus.SUBMITTED)
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
@@ -1325,8 +1317,7 @@ public class DataSeeder implements CommandLineRunner {
 
     PurchaseOrder orden6 = PurchaseOrder.builder()
       .supplier(panamericana)
-      .orderDate(LocalDate.now())
-      .expectedDeliveryDate(LocalDate.now().plusDays(15))
+      .deliveryDate(LocalDate.now().plusDays(15))
       .status(PurchaseOrderStatus.DRAFT)
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)

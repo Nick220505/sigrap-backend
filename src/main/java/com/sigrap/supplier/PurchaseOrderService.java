@@ -4,7 +4,6 @@ import com.sigrap.product.Product;
 import com.sigrap.product.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -359,16 +358,12 @@ public class PurchaseOrderService {
    * Updates the status of a purchase order to DELIVERED.
    *
    * @param id The ID of the purchase order to mark as delivered
-   * @param actualDeliveryDate The actual delivery date
    * @return The updated purchase order mapped to PurchaseOrderInfo
    * @throws EntityNotFoundException if the purchase order is not found
    * @throws IllegalStateException if the order is not in SHIPPED status
    */
   @Transactional
-  public PurchaseOrderInfo markAsDelivered(
-    Integer id,
-    LocalDate actualDeliveryDate
-  ) {
+  public PurchaseOrderInfo markAsDelivered(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
       .findById(id)
       .orElseThrow(() ->
@@ -384,7 +379,6 @@ public class PurchaseOrderService {
     }
 
     purchaseOrder.setStatus(PurchaseOrderStatus.DELIVERED);
-    purchaseOrder.setActualDeliveryDate(actualDeliveryDate);
 
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
     return purchaseOrderMapper.toInfo(updatedOrder);
@@ -444,7 +438,6 @@ public class PurchaseOrderService {
     }
 
     purchaseOrder.setStatus(PurchaseOrderStatus.PAID);
-    purchaseOrder.setPaymentDate(LocalDate.now());
 
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
     return purchaseOrderMapper.toInfo(updatedOrder);

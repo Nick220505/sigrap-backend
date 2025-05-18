@@ -59,40 +59,10 @@ public class PurchaseOrderInfo {
   private SupplierInfo supplier;
 
   /**
-   * The date when the order was placed.
+   * The delivery date for the order.
    */
-  @Schema(
-    description = "Date when the order was placed",
-    example = "2023-05-15"
-  )
-  private LocalDate orderDate;
-
-  /**
-   * The expected delivery date for the order.
-   */
-  @Schema(
-    description = "Expected delivery date for the order",
-    example = "2023-05-25"
-  )
-  private LocalDate expectedDeliveryDate;
-
-  /**
-   * The date when the order was shipped.
-   */
-  @Schema(
-    description = "Date when the order was shipped",
-    example = "2023-05-22"
-  )
-  private LocalDate shipDate;
-
-  /**
-   * The actual delivery date when the order was received.
-   */
-  @Schema(
-    description = "Actual delivery date when the order was received",
-    example = "2023-05-23"
-  )
-  private LocalDate actualDeliveryDate;
+  @Schema(description = "Delivery date for the order", example = "2023-05-25")
+  private LocalDate deliveryDate;
 
   /**
    * The current status of the order.

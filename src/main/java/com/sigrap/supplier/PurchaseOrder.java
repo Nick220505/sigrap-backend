@@ -13,7 +13,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -55,29 +54,10 @@ public class PurchaseOrder {
   private Supplier supplier;
 
   /**
-   * Date when the order was placed.
+   * The delivery date for the order.
    */
-  @NotNull
-  @Column(name = "order_date", nullable = false)
-  private LocalDate orderDate;
-
-  /**
-   * Expected delivery date for the order.
-   */
-  @Column(name = "expected_delivery_date")
-  private LocalDate expectedDeliveryDate;
-
-  /**
-   * Date when the order was shipped.
-   */
-  @Column(name = "ship_date")
-  private LocalDate shipDate;
-
-  /**
-   * Actual delivery date when the order was received.
-   */
-  @Column(name = "actual_delivery_date")
-  private LocalDate actualDeliveryDate;
+  @Column(name = "delivery_date")
+  private LocalDate deliveryDate;
 
   /**
    * Current status of the order.
@@ -94,12 +74,6 @@ public class PurchaseOrder {
   @Column(name = "total_amount", nullable = false)
   @Builder.Default
   private BigDecimal totalAmount = BigDecimal.ZERO;
-
-  /**
-   * Date when the order was paid.
-   */
-  @Column(name = "payment_date")
-  private LocalDate paymentDate;
 
   /**
    * Items contained in this purchase order.
