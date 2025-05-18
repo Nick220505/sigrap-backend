@@ -13,7 +13,6 @@ import com.sigrap.category.CategoryRepository;
 import com.sigrap.customer.CustomerRepository;
 import com.sigrap.employee.attendance.AttendanceRepository;
 import com.sigrap.employee.schedule.ScheduleRepository;
-import com.sigrap.payment.PaymentRepository;
 import com.sigrap.product.ProductRepository;
 import com.sigrap.supplier.PurchaseOrderRepository;
 import com.sigrap.supplier.SupplierRepository;
@@ -60,9 +59,6 @@ class DataSeederTest {
   private PurchaseOrderRepository purchaseOrderRepository;
 
   @Mock
-  private PaymentRepository paymentRepository;
-
-  @Mock
   private CustomerRepository customerRepository;
 
   @InjectMocks
@@ -78,7 +74,6 @@ class DataSeederTest {
     lenient().when(attendanceRepository.count()).thenReturn(2L);
     lenient().when(supplierRepository.count()).thenReturn(2L);
     lenient().when(purchaseOrderRepository.count()).thenReturn(2L);
-    lenient().when(paymentRepository.count()).thenReturn(2L);
     lenient().when(customerRepository.count()).thenReturn(2L);
 
     User mockAdminUser = User.builder()

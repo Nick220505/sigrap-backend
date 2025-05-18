@@ -53,15 +53,6 @@ public class PurchaseOrderInfo {
   private Integer id;
 
   /**
-   * The order number for tracking purposes.
-   */
-  @Schema(
-    description = "Order number for tracking purposes",
-    example = "ORD-001"
-  )
-  private String orderNumber;
-
-  /**
    * Information about the supplier for this order.
    */
   @Schema(description = "Information about the supplier for this order")

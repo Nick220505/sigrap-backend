@@ -40,32 +40,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class PurchaseOrder {
 
   /**
-   * Enum defining possible order statuses.
-   */
-  public enum Status {
-    DRAFT,
-    SUBMITTED,
-    CONFIRMED,
-    IN_PROCESS,
-    SHIPPED,
-    DELIVERED,
-    CANCELLED,
-  }
-
-  /**
    * Unique identifier for the purchase order.
    * Auto-generated using identity strategy.
    */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
-
-  /**
-   * Order number for the purchase order.
-   * Used for tracking and referencing orders.
-   */
-  @Column(name = "order_number", unique = true)
-  private String orderNumber;
 
   /**
    * Reference to the supplier this order is placed with.
@@ -105,7 +85,7 @@ public class PurchaseOrder {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private Status status = Status.DRAFT;
+  private PurchaseOrderStatus status = PurchaseOrderStatus.DRAFT;
 
   /**
    * Total amount of the order.
@@ -114,6 +94,12 @@ public class PurchaseOrder {
   @Column(name = "total_amount", nullable = false)
   @Builder.Default
   private BigDecimal totalAmount = BigDecimal.ZERO;
+
+  /**
+   * Date when the order was paid.
+   */
+  @Column(name = "payment_date")
+  private LocalDate paymentDate;
 
   /**
    * Items contained in this purchase order.

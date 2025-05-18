@@ -53,8 +53,7 @@
  * <ul>
  *   <li>{@link com.sigrap.supplier.SupplierStatus} - Possible supplier relationship statuses</li>
  *   <li>{@link com.sigrap.supplier.PaymentMethod} - Supported payment methods</li>
- *   <li>{@link com.sigrap.supplier.PurchaseOrder.Status} - Statuses for purchase orders</li>
- *   <li>{@link com.sigrap.supplier.PurchaseOrderItem.Status} - Statuses for items in an order</li>
+ *   <li>{@link com.sigrap.supplier.PurchaseOrderStatus} - Statuses for purchase orders</li>
  * </ul></p>
  *
  * <p>This package follows the feature-based architecture pattern, where all components
@@ -69,7 +68,6 @@
  *     .email("contact@officedepot.com")
  *     .phone("123-456-7890")
  *     .address("123 Main St, City")
- *     .paymentMethod(PaymentMethod.CREDIT_CARD)
  *     .status(SupplierStatus.ACTIVE)
  *     .build();
  *

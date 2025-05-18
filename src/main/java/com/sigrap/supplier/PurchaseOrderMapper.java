@@ -47,11 +47,11 @@ public interface PurchaseOrderMapper {
   @DataToEntity
   @Mapping(target = "supplier", ignore = true)
   @Mapping(target = "items", ignore = true)
-  @Mapping(target = "orderNumber", ignore = true)
   @Mapping(target = "actualDeliveryDate", ignore = true)
   @Mapping(target = "totalAmount", ignore = true)
   @Mapping(target = "shipDate", ignore = true)
   @Mapping(target = "status", constant = "DRAFT")
+  @Mapping(target = "paymentDate", ignore = true)
   PurchaseOrder toEntity(PurchaseOrderData purchaseOrderData);
 
   /**
@@ -64,12 +64,12 @@ public interface PurchaseOrderMapper {
   @DataToEntity
   @Mapping(target = "supplier", ignore = true)
   @Mapping(target = "items", ignore = true)
-  @Mapping(target = "orderNumber", ignore = true)
   @Mapping(target = "actualDeliveryDate", ignore = true)
   @Mapping(target = "shipDate", ignore = true)
   @Mapping(target = "totalAmount", ignore = true)
   @Mapping(target = "status", ignore = true)
   @Mapping(target = "removeItem", ignore = true)
+  @Mapping(target = "paymentDate", ignore = true)
   void updateEntityFromData(
     PurchaseOrderData purchaseOrderData,
     @MappingTarget PurchaseOrder purchaseOrder

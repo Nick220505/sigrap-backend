@@ -2,6 +2,7 @@ package com.sigrap.supplier;
 
 import java.time.LocalDate;
 import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -26,7 +27,7 @@ public interface PurchaseOrderRepository
    * @param status the status to filter by
    * @return list of purchase orders
    */
-  List<PurchaseOrder> findByStatus(PurchaseOrder.Status status);
+  List<PurchaseOrder> findByStatus(PurchaseOrderStatus status);
 
   /**
    * Find all purchase orders placed between the specified dates.
@@ -48,12 +49,4 @@ public interface PurchaseOrderRepository
     LocalDate start,
     LocalDate end
   );
-
-  /**
-   * Find purchase order by its order number.
-   *
-   * @param orderNumber the order number to find
-   * @return the purchase order if found
-   */
-  PurchaseOrder findByOrderNumber(String orderNumber);
 }

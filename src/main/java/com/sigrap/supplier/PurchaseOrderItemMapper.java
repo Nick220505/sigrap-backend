@@ -1,13 +1,15 @@
 package com.sigrap.supplier;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import com.sigrap.common.mapping.DataToEntity;
 import com.sigrap.common.mapping.EntityToInfo;
 import com.sigrap.product.Product;
 import com.sigrap.product.ProductMapper;
-import java.util.List;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 /**
  * Mapper interface for converting between PurchaseOrderItem entity and its DTO representations.
@@ -23,10 +25,6 @@ public interface PurchaseOrderItemMapper {
    */
   @EntityToInfo
   @Mapping(target = "purchaseOrderId", source = "purchaseOrder.id")
-  @Mapping(
-    target = "status",
-    expression = "java(purchaseOrderItem.getStatus().name())"
-  )
   PurchaseOrderItemInfo toInfo(PurchaseOrderItem purchaseOrderItem);
 
   /**
@@ -49,7 +47,6 @@ public interface PurchaseOrderItemMapper {
   @DataToEntity
   @Mapping(target = "product", ignore = true)
   @Mapping(target = "purchaseOrder", ignore = true)
-  @Mapping(target = "status", constant = "PENDING")
   @Mapping(target = "receivedQuantity", constant = "0")
   @Mapping(target = "totalPrice", ignore = true)
   PurchaseOrderItem toEntity(PurchaseOrderItemData purchaseOrderItemData);
@@ -64,7 +61,6 @@ public interface PurchaseOrderItemMapper {
   @DataToEntity
   @Mapping(target = "product", ignore = true)
   @Mapping(target = "purchaseOrder", ignore = true)
-  @Mapping(target = "status", ignore = true)
   @Mapping(target = "receivedQuantity", ignore = true)
   @Mapping(target = "totalPrice", ignore = true)
   void updateEntityFromData(

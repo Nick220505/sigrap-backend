@@ -3,8 +3,6 @@ package com.sigrap.supplier;
 import com.sigrap.product.Product;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,16 +32,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PurchaseOrderItem {
-
-  /**
-   * Enum defining possible item statuses.
-   */
-  public enum Status {
-    PENDING,
-    RECEIVED,
-    PARTIAL,
-    REJECTED,
-  }
 
   /**
    * Unique identifier for the purchase order item.
@@ -100,14 +88,6 @@ public class PurchaseOrderItem {
   @Column(name = "received_quantity", nullable = false)
   @Builder.Default
   private Integer receivedQuantity = 0;
-
-  /**
-   * Current status of the item.
-   */
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  @Builder.Default
-  private Status status = Status.PENDING;
 
   /**
    * Additional notes about the item.

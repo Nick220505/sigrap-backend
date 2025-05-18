@@ -26,12 +26,4 @@ public interface PurchaseOrderItemRepository
    * @return list of purchase order items
    */
   List<PurchaseOrderItem> findByProduct_Id(Integer productId);
-
-  /**
-   * Find all items with a specific status.
-   *
-   * @param status the status to filter by
-   * @return list of purchase order items
-   */
-  List<PurchaseOrderItem> findByStatus(PurchaseOrderItem.Status status);
 }

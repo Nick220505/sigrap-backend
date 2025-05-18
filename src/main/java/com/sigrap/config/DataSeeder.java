@@ -9,8 +9,6 @@ import com.sigrap.employee.attendance.AttendanceRepository;
 import com.sigrap.employee.attendance.AttendanceStatus;
 import com.sigrap.employee.schedule.Schedule;
 import com.sigrap.employee.schedule.ScheduleRepository;
-import com.sigrap.payment.Payment;
-import com.sigrap.payment.PaymentRepository;
 import com.sigrap.product.Product;
 import com.sigrap.product.ProductRepository;
 import com.sigrap.sale.Sale;
@@ -22,6 +20,7 @@ import com.sigrap.sale.SaleReturnRepository;
 import com.sigrap.supplier.PurchaseOrder;
 import com.sigrap.supplier.PurchaseOrderItem;
 import com.sigrap.supplier.PurchaseOrderRepository;
+import com.sigrap.supplier.PurchaseOrderStatus;
 import com.sigrap.supplier.Supplier;
 import com.sigrap.supplier.SupplierRepository;
 import com.sigrap.user.User;
@@ -110,12 +109,6 @@ public class DataSeeder implements CommandLineRunner {
   private final PurchaseOrderRepository purchaseOrderRepository;
 
   /**
-   * Repository for payment database operations.
-   * Used to check if payments exist and to save new payments during seeding.
-   */
-  private final PaymentRepository paymentRepository;
-
-  /**
    * Repository for customer database operations.
    * Used to check if customers exist and to save new customers during seeding.
    */
@@ -144,7 +137,6 @@ public class DataSeeder implements CommandLineRunner {
     seedAttendance();
     seedSuppliers();
     seedPurchaseOrders();
-    seedPayments();
     seedCustomers();
     seedSales();
     seedSaleReturns();
@@ -1160,12 +1152,11 @@ public class DataSeeder implements CommandLineRunner {
     List<PurchaseOrder> purchaseOrders = new ArrayList<>();
 
     PurchaseOrder orden1 = PurchaseOrder.builder()
-      .orderNumber("OC-2025-001")
       .supplier(panamericana)
       .orderDate(LocalDate.now().minusDays(45))
       .expectedDeliveryDate(LocalDate.now().minusDays(35))
       .actualDeliveryDate(LocalDate.now().minusDays(34))
-      .status(PurchaseOrder.Status.DELIVERED)
+      .status(PurchaseOrderStatus.DELIVERED)
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
       .build();
@@ -1206,12 +1197,11 @@ public class DataSeeder implements CommandLineRunner {
     purchaseOrders.add(orden1);
 
     PurchaseOrder orden2 = PurchaseOrder.builder()
-      .orderNumber("OC-2025-002")
       .supplier(faberCastell)
       .orderDate(LocalDate.now().minusDays(30))
       .expectedDeliveryDate(LocalDate.now().minusDays(20))
       .actualDeliveryDate(LocalDate.now().minusDays(22))
-      .status(PurchaseOrder.Status.DELIVERED)
+      .status(PurchaseOrderStatus.DELIVERED)
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
       .build();
@@ -1242,12 +1232,11 @@ public class DataSeeder implements CommandLineRunner {
     purchaseOrders.add(orden2);
 
     PurchaseOrder orden3 = PurchaseOrder.builder()
-      .orderNumber("OC-2025-003")
       .supplier(officedepot)
       .orderDate(LocalDate.now().minusDays(15))
       .expectedDeliveryDate(LocalDate.now().minusDays(7))
       .actualDeliveryDate(LocalDate.now().minusDays(8))
-      .status(PurchaseOrder.Status.DELIVERED)
+      .status(PurchaseOrderStatus.DELIVERED)
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
       .build();
@@ -1288,11 +1277,10 @@ public class DataSeeder implements CommandLineRunner {
     purchaseOrders.add(orden3);
 
     PurchaseOrder orden4 = PurchaseOrder.builder()
-      .orderNumber("OC-2025-004")
       .supplier(artesco)
       .orderDate(LocalDate.now().minusDays(5))
       .expectedDeliveryDate(LocalDate.now().plusDays(3))
-      .status(PurchaseOrder.Status.CONFIRMED)
+      .status(PurchaseOrderStatus.CONFIRMED)
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
       .build();
@@ -1313,11 +1301,10 @@ public class DataSeeder implements CommandLineRunner {
     purchaseOrders.add(orden4);
 
     PurchaseOrder orden5 = PurchaseOrder.builder()
-      .orderNumber("OC-2025-005")
       .supplier(norma)
       .orderDate(LocalDate.now().minusDays(2))
       .expectedDeliveryDate(LocalDate.now().plusDays(10))
-      .status(PurchaseOrder.Status.SUBMITTED)
+      .status(PurchaseOrderStatus.SUBMITTED)
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
       .build();
@@ -1348,11 +1335,10 @@ public class DataSeeder implements CommandLineRunner {
     purchaseOrders.add(orden5);
 
     PurchaseOrder orden6 = PurchaseOrder.builder()
-      .orderNumber("OC-2025-006")
       .supplier(panamericana)
       .orderDate(LocalDate.now())
       .expectedDeliveryDate(LocalDate.now().plusDays(15))
-      .status(PurchaseOrder.Status.DRAFT)
+      .status(PurchaseOrderStatus.DRAFT)
       .items(new ArrayList<>())
       .totalAmount(BigDecimal.ZERO)
       .build();
@@ -1384,42 +1370,6 @@ public class DataSeeder implements CommandLineRunner {
 
     purchaseOrderRepository.saveAll(purchaseOrders);
     log.info("{} purchase orders seeded successfully.", purchaseOrders.size());
-  }
-
-  private void seedPayments() {
-    if (paymentRepository.count() == 0) {
-      log.info("Seeding payments...");
-      List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findAll();
-      List<Payment> payments = new ArrayList<>();
-
-      if (purchaseOrders.isEmpty()) {
-        log.warn(
-          "No purchase orders found to seed payments. Skipping this step."
-        );
-        return;
-      }
-
-      int paymentCounter = 0;
-
-      for (PurchaseOrder order : purchaseOrders) {
-        if (
-          order.getStatus() == PurchaseOrder.Status.CONFIRMED ||
-          order.getStatus() == PurchaseOrder.Status.SHIPPED ||
-          order.getStatus() == PurchaseOrder.Status.DELIVERED ||
-          order.getStatus() == PurchaseOrder.Status.DELIVERED
-        ) {
-          Payment.PaymentBuilder paymentBuilder = Payment.builder()
-            .purchaseOrder(order)
-            .supplier(order.getSupplier())
-            .amount(order.getTotalAmount());
-
-          payments.add(paymentBuilder.build());
-          paymentCounter++;
-        }
-      }
-      paymentRepository.saveAll(payments);
-      log.info("Seeded {} payments.", payments.size());
-    }
   }
 
   /**

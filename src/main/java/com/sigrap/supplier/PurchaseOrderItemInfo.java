@@ -1,9 +1,11 @@
 package com.sigrap.supplier;
 
-import com.sigrap.product.ProductInfo;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import com.sigrap.product.ProductInfo;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -89,12 +91,6 @@ public class PurchaseOrderItemInfo {
    */
   @Schema(description = "Quantity received so far", example = "5")
   private Integer receivedQuantity;
-
-  /**
-   * The current status of the item.
-   */
-  @Schema(description = "Current status of the item", example = "PARTIAL")
-  private String status;
 
   /**
    * Additional notes about the item.

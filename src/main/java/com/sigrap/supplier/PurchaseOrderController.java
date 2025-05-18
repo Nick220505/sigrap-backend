@@ -81,7 +81,7 @@ public class PurchaseOrderController {
   @GetMapping("/by-status/{status}")
   @Operation(summary = "Get all purchase orders with a specific status")
   public List<PurchaseOrderInfo> findByStatus(
-    @PathVariable PurchaseOrder.Status status
+    @PathVariable PurchaseOrderStatus status
   ) {
     return purchaseOrderService.findByStatus(status);
   }
@@ -193,5 +193,17 @@ public class PurchaseOrderController {
   @Operation(summary = "Cancel a purchase order")
   public PurchaseOrderInfo cancelOrder(@PathVariable Integer id) {
     return purchaseOrderService.cancelOrder(id);
+  }
+
+  /**
+   * Updates the status of a purchase order to PAID and sets the payment date.
+   *
+   * @param id The ID of the purchase order to mark as paid
+   * @return The updated purchase order
+   */
+  @PatchMapping("/{id}/pay")
+  @Operation(summary = "Mark a purchase order as paid")
+  public PurchaseOrderInfo markAsPaid(@PathVariable Integer id) {
+    return purchaseOrderService.markAsPaid(id);
   }
 }

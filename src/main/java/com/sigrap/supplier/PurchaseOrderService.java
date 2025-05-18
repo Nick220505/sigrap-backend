@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,7 +101,7 @@ public class PurchaseOrderService {
    * @return List of purchase orders with the specified status
    */
   @Transactional(readOnly = true)
-  public List<PurchaseOrderInfo> findByStatus(PurchaseOrder.Status status) {
+  public List<PurchaseOrderInfo> findByStatus(PurchaseOrderStatus status) {
     List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findByStatus(
       status
     );
@@ -130,9 +129,6 @@ public class PurchaseOrderService {
         )
       );
     purchaseOrder.setSupplier(supplier);
-
-    String orderNumber = generateOrderNumber();
-    purchaseOrder.setOrderNumber(orderNumber);
 
     PurchaseOrder savedOrder = purchaseOrderRepository.save(purchaseOrder);
 
@@ -174,10 +170,10 @@ public class PurchaseOrderService {
    * Updates an existing purchase order.
    *
    * @param id The ID of the purchase order to update
-   * @param purchaseOrderData The new data for the purchase order
+   * @param purchaseOrderData The data for updating the purchase order
    * @return The updated purchase order mapped to PurchaseOrderInfo
-   * @throws EntityNotFoundException if the purchase order, supplier, or any product is not found
-   * @throws IllegalStateException if the order is not in DRAFT status
+   * @throws EntityNotFoundException if the purchase order is not found
+   * @throws IllegalStateException if the purchase order is not in DRAFT status
    */
   @Transactional
   public PurchaseOrderInfo update(
@@ -190,11 +186,13 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    if (purchaseOrder.getStatus() != PurchaseOrder.Status.DRAFT) {
+    if (purchaseOrder.getStatus() != PurchaseOrderStatus.DRAFT) {
       throw new IllegalStateException(
         "Only purchase orders in DRAFT status can be updated"
       );
     }
+
+    purchaseOrderMapper.updateEntityFromData(purchaseOrderData, purchaseOrder);
 
     if (purchaseOrderData.getSupplierId() != null) {
       Supplier supplier = supplierRepository
@@ -205,16 +203,6 @@ public class PurchaseOrderService {
           )
         );
       purchaseOrder.setSupplier(supplier);
-    }
-
-    if (purchaseOrderData.getOrderDate() != null) {
-      purchaseOrder.setOrderDate(purchaseOrderData.getOrderDate());
-    }
-
-    if (purchaseOrderData.getExpectedDeliveryDate() != null) {
-      purchaseOrder.setExpectedDeliveryDate(
-        purchaseOrderData.getExpectedDeliveryDate()
-      );
     }
 
     if (
@@ -269,7 +257,7 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    if (purchaseOrder.getStatus() != PurchaseOrder.Status.DRAFT) {
+    if (purchaseOrder.getStatus() != PurchaseOrderStatus.DRAFT) {
       throw new IllegalStateException(
         "Only purchase orders in DRAFT status can be deleted"
       );
@@ -294,13 +282,13 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    if (purchaseOrder.getStatus() != PurchaseOrder.Status.DRAFT) {
+    if (purchaseOrder.getStatus() != PurchaseOrderStatus.DRAFT) {
       throw new IllegalStateException(
-        "Cannot submit order in " + purchaseOrder.getStatus() + " status"
+        "Only purchase orders in DRAFT status can be submitted"
       );
     }
 
-    purchaseOrder.setStatus(PurchaseOrder.Status.SUBMITTED);
+    purchaseOrder.setStatus(PurchaseOrderStatus.SUBMITTED);
 
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
     return purchaseOrderMapper.toInfo(updatedOrder);
@@ -322,13 +310,13 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    if (purchaseOrder.getStatus() != PurchaseOrder.Status.SUBMITTED) {
+    if (purchaseOrder.getStatus() != PurchaseOrderStatus.SUBMITTED) {
       throw new IllegalStateException(
         "Cannot confirm order in " + purchaseOrder.getStatus() + " status"
       );
     }
 
-    purchaseOrder.setStatus(PurchaseOrder.Status.CONFIRMED);
+    purchaseOrder.setStatus(PurchaseOrderStatus.CONFIRMED);
 
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
     return purchaseOrderMapper.toInfo(updatedOrder);
@@ -351,8 +339,8 @@ public class PurchaseOrderService {
       );
 
     if (
-      purchaseOrder.getStatus() != PurchaseOrder.Status.CONFIRMED &&
-      purchaseOrder.getStatus() != PurchaseOrder.Status.IN_PROCESS
+      purchaseOrder.getStatus() != PurchaseOrderStatus.CONFIRMED &&
+      purchaseOrder.getStatus() != PurchaseOrderStatus.IN_PROCESS
     ) {
       throw new IllegalStateException(
         "Cannot mark as shipped order in " +
@@ -361,14 +349,14 @@ public class PurchaseOrderService {
       );
     }
 
-    purchaseOrder.setStatus(PurchaseOrder.Status.SHIPPED);
+    purchaseOrder.setStatus(PurchaseOrderStatus.SHIPPED);
 
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
     return purchaseOrderMapper.toInfo(updatedOrder);
   }
 
   /**
-   * Updates the status of a purchase order to DELIVERED and sets the actual delivery date.
+   * Updates the status of a purchase order to DELIVERED.
    *
    * @param id The ID of the purchase order to mark as delivered
    * @param actualDeliveryDate The actual delivery date
@@ -387,7 +375,7 @@ public class PurchaseOrderService {
         new EntityNotFoundException("Purchase order not found with id: " + id)
       );
 
-    if (purchaseOrder.getStatus() != PurchaseOrder.Status.SHIPPED) {
+    if (purchaseOrder.getStatus() != PurchaseOrderStatus.SHIPPED) {
       throw new IllegalStateException(
         "Cannot mark as delivered order in " +
         purchaseOrder.getStatus() +
@@ -395,7 +383,7 @@ public class PurchaseOrderService {
       );
     }
 
-    purchaseOrder.setStatus(PurchaseOrder.Status.DELIVERED);
+    purchaseOrder.setStatus(PurchaseOrderStatus.DELIVERED);
     purchaseOrder.setActualDeliveryDate(actualDeliveryDate);
 
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
@@ -408,7 +396,7 @@ public class PurchaseOrderService {
    * @param id The ID of the purchase order to cancel
    * @return The updated purchase order mapped to PurchaseOrderInfo
    * @throws EntityNotFoundException if the purchase order is not found
-   * @throws IllegalStateException if the order is in DELIVERED or CANCELLED status
+   * @throws IllegalStateException if the order is in DELIVERED status
    */
   @Transactional
   public PurchaseOrderInfo cancelOrder(Integer id) {
@@ -419,15 +407,44 @@ public class PurchaseOrderService {
       );
 
     if (
-      purchaseOrder.getStatus() == PurchaseOrder.Status.DELIVERED ||
-      purchaseOrder.getStatus() == PurchaseOrder.Status.CANCELLED
+      purchaseOrder.getStatus() == PurchaseOrderStatus.DELIVERED ||
+      purchaseOrder.getStatus() == PurchaseOrderStatus.CANCELLED
     ) {
       throw new IllegalStateException(
         "Cannot cancel order in " + purchaseOrder.getStatus() + " status"
       );
     }
 
-    purchaseOrder.setStatus(PurchaseOrder.Status.CANCELLED);
+    purchaseOrder.setStatus(PurchaseOrderStatus.CANCELLED);
+
+    PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
+    return purchaseOrderMapper.toInfo(updatedOrder);
+  }
+
+  /**
+   * Updates the status of a purchase order to PAID.
+   *
+   * @param id The ID of the purchase order to mark as paid
+   * @return The updated purchase order mapped to PurchaseOrderInfo
+   * @throws EntityNotFoundException if the purchase order is not found
+   * @throws IllegalStateException if the order is not in DELIVERED status
+   */
+  @Transactional
+  public PurchaseOrderInfo markAsPaid(Integer id) {
+    PurchaseOrder purchaseOrder = purchaseOrderRepository
+      .findById(id)
+      .orElseThrow(() ->
+        new EntityNotFoundException("Purchase order not found with id: " + id)
+      );
+
+    if (purchaseOrder.getStatus() != PurchaseOrderStatus.DELIVERED) {
+      throw new IllegalStateException(
+        "Cannot mark as paid order in " + purchaseOrder.getStatus() + " status"
+      );
+    }
+
+    purchaseOrder.setStatus(PurchaseOrderStatus.PAID);
+    purchaseOrder.setPaymentDate(LocalDate.now());
 
     PurchaseOrder updatedOrder = purchaseOrderRepository.save(purchaseOrder);
     return purchaseOrderMapper.toInfo(updatedOrder);
@@ -446,14 +463,5 @@ public class PurchaseOrderService {
       .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     purchaseOrder.setTotalAmount(total);
-  }
-
-  /**
-   * Generates a unique order number.
-   *
-   * @return A unique order number
-   */
-  private String generateOrderNumber() {
-    return "ORD-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
   }
 }
