@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -50,6 +50,40 @@ public class SaleController {
   )
   public List<SaleInfo> findAll() {
     return saleService.findAll();
+  }
+
+  /**
+   * Get sales by date range.
+   *
+   * @param startDate The start date (inclusive)
+   * @param endDate   The end date (inclusive)
+   * @return List of sales created within the given date range as SaleInfo DTOs
+   */
+  @GetMapping("/by-date-range")
+  @Operation(
+    summary = "Get sales by date range",
+    description = "Retrieves sales created between the given dates"
+  )
+  @ApiResponse(
+    responseCode = "200",
+    description = "Sales retrieved successfully"
+  )
+  public List<SaleInfo> findByDateRange(
+    @Parameter(
+      description = "Start date (yyyy-MM-dd)"
+    ) @RequestParam @DateTimeFormat(
+      iso = DateTimeFormat.ISO.DATE
+    ) LocalDate startDate,
+    @Parameter(
+      description = "End date (yyyy-MM-dd)"
+    ) @RequestParam @DateTimeFormat(
+      iso = DateTimeFormat.ISO.DATE
+    ) LocalDate endDate
+  ) {
+    return saleService.findByCreatedDateRange(
+      startDate.atStartOfDay(),
+      endDate.atTime(23, 59, 59)
+    );
   }
 
   /**
@@ -127,37 +161,6 @@ public class SaleController {
     @Parameter(description = "ID of the customer") @PathVariable Long customerId
   ) {
     return saleService.findByCustomerId(customerId);
-  }
-
-  /**
-   * Get sales by date range.
-   *
-   * @param startDate The start date (inclusive)
-   * @param endDate   The end date (inclusive)
-   * @return List of sales created within the given date range as SaleInfo DTOs
-   */
-  @GetMapping("/created-between")
-  @Operation(
-    summary = "Get sales by date range",
-    description = "Retrieves sales created between the given dates"
-  )
-  @ApiResponse(
-    responseCode = "200",
-    description = "Sales retrieved successfully"
-  )
-  public List<SaleInfo> findByCreatedDateRange(
-    @Parameter(
-      description = "Start date (yyyy-MM-dd'T'HH:mm:ss)"
-    ) @RequestParam @DateTimeFormat(
-      iso = DateTimeFormat.ISO.DATE_TIME
-    ) LocalDateTime startDate,
-    @Parameter(
-      description = "End date (yyyy-MM-dd'T'HH:mm:ss)"
-    ) @RequestParam @DateTimeFormat(
-      iso = DateTimeFormat.ISO.DATE_TIME
-    ) LocalDateTime endDate
-  ) {
-    return saleService.findByCreatedDateRange(startDate, endDate);
   }
 
   /**
