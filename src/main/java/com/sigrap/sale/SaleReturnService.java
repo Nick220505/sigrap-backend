@@ -10,7 +10,6 @@ import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -242,19 +241,51 @@ public class SaleReturnService {
     SaleReturn saleReturn = saleReturnRepository
       .findById(id)
       .orElseThrow(() ->
-        new EntityNotFoundException("Sales return not found with ID: " + id)
+        new EntityNotFoundException("Sale return not found with id: " + id)
       );
 
-    for (SaleReturnItem item : saleReturn.getItems()) {
+    List<SaleReturnItem> returnItems = saleReturn.getItems();
+
+    for (SaleReturnItem item : returnItems) {
       Product product = item.getProduct();
-      int newStock = product.getStock() - item.getQuantity();
-      if (newStock < 0) {
-        newStock = 0;
-      }
-      product.setStock(newStock);
+      Integer currentStock = product.getStock();
+      product.setStock(currentStock - item.getQuantity());
       productRepository.save(product);
     }
+
     saleReturnRepository.delete(saleReturn);
+  }
+
+  /**
+   * Deletes multiple sale returns by their IDs.
+   * Validates all IDs exist before performing the deletion and adjusts product stock accordingly.
+   *
+   * @param ids List of sale return IDs to delete
+   * @throws EntityNotFoundException if any of the sale returns is not found
+   */
+  @Transactional
+  public void deleteAllById(List<Integer> ids) {
+    // Verify all sale returns exist
+    ids.forEach(id -> {
+      if (!saleReturnRepository.existsById(id)) {
+        throw new EntityNotFoundException(
+          "Sale return with id " + id + " not found"
+        );
+      }
+    });
+
+    ids.forEach(id -> {
+      SaleReturn saleReturn = saleReturnRepository.findById(id).get();
+
+      for (SaleReturnItem item : saleReturn.getItems()) {
+        Product product = item.getProduct();
+        Integer currentStock = product.getStock();
+        product.setStock(currentStock - item.getQuantity());
+        productRepository.save(product);
+      }
+    });
+
+    saleReturnRepository.deleteAllById(ids);
   }
 
   /**
@@ -382,7 +413,7 @@ public class SaleReturnService {
     List<Integer> newItemProductIds = newItemsData
       .stream()
       .map(SaleReturnItemData::getProductId)
-      .collect(Collectors.toList());
+      .toList();
 
     for (SaleReturnItem existingItem : existingItems) {
       if (!newItemProductIds.contains(existingItem.getProduct().getId())) {

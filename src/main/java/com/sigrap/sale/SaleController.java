@@ -2,6 +2,7 @@ package com.sigrap.sale;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -250,5 +251,38 @@ public class SaleController {
     ) @PathVariable Integer id
   ) {
     saleService.delete(id);
+  }
+
+  /**
+   * Deletes multiple sales by their IDs.
+   *
+   * @param ids List of sale IDs to delete
+   */
+  @DeleteMapping("/delete-many")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(
+    summary = "Delete multiple sales",
+    description = "Deletes multiple sales by their IDs"
+  )
+  @ApiResponses(
+    value = {
+      @ApiResponse(
+        responseCode = "204",
+        description = "Sales deleted successfully"
+      ),
+      @ApiResponse(
+        responseCode = "404",
+        description = "One or more sales not found",
+        content = @Content
+      ),
+    }
+  )
+  public void deleteAllById(
+    @Parameter(
+      description = "List of sale IDs to delete",
+      required = true
+    ) @RequestBody List<Integer> ids
+  ) {
+    saleService.deleteAllById(ids);
   }
 }

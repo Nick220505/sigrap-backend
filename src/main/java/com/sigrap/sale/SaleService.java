@@ -222,16 +222,41 @@ public class SaleService {
     Sale sale = saleRepository
       .findById(id)
       .orElseThrow(() ->
-        new EntityNotFoundException("Sale not found with ID: " + id)
+        new EntityNotFoundException("Sale not found with id: " + id)
       );
-
     for (SaleItem item : sale.getItems()) {
       Product product = item.getProduct();
       product.setStock(product.getStock() + item.getQuantity());
       productRepository.save(product);
     }
-
     saleRepository.delete(sale);
+  }
+
+  /**
+   * Deletes multiple sales by their IDs.
+   * Validates all IDs exist before performing the deletion and returns stock for all deleted items.
+   *
+   * @param ids List of sale IDs to delete
+   * @throws EntityNotFoundException if any of the sales is not found
+   */
+  @Transactional
+  public void deleteAllById(List<Integer> ids) {
+    ids.forEach(id -> {
+      if (!saleRepository.existsById(id)) {
+        throw new EntityNotFoundException("Sale with id " + id + " not found");
+      }
+    });
+
+    ids.forEach(id -> {
+      Sale sale = saleRepository.findById(id).get();
+      for (SaleItem item : sale.getItems()) {
+        Product product = item.getProduct();
+        product.setStock(product.getStock() + item.getQuantity());
+        productRepository.save(product);
+      }
+    });
+
+    saleRepository.deleteAllById(ids);
   }
 
   /**
