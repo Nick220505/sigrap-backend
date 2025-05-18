@@ -8,6 +8,7 @@ import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -267,6 +268,9 @@ public class SaleService {
    * @throws IllegalArgumentException if there is insufficient stock for any product
    */
   private void processItems(Sale sale, List<SaleItemData> itemsData) {
+    if (sale.getItems() == null) {
+      sale.setItems(new ArrayList<>());
+    }
     for (SaleItemData itemData : itemsData) {
       Product product = productRepository
         .findById(itemData.getProductId())
@@ -293,7 +297,8 @@ public class SaleService {
         .subtotal(itemData.getSubtotal())
         .build();
 
-      saleItemRepository.save(saleItem);
+      SaleItem savedSaleItem = saleItemRepository.save(saleItem);
+      sale.getItems().add(savedSaleItem);
     }
   }
 

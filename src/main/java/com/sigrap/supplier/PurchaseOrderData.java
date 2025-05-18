@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
  * <p>Usage Example:
  * <pre>
  * PurchaseOrderData orderData = PurchaseOrderData.builder()
- *     .supplierId(1)
+ *     .supplierId(1L)
  *     .deliveryDate(LocalDate.now().plusWeeks(1))
  *     .items(List.of(orderItem1, orderItem2))
  *     .build();
@@ -61,7 +61,7 @@ public class PurchaseOrderData {
    */
   @NotNull(message = "Supplier ID cannot be null")
   @Schema(description = "ID of the supplier for this order", example = "1")
-  private Integer supplierId;
+  private Long supplierId;
 
   /**
    * The delivery date for the order.

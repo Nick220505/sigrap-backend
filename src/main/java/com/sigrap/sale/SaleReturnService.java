@@ -100,7 +100,9 @@ public class SaleReturnService {
     SaleReturn refreshedReturn = saleReturnRepository
       .findById(savedSaleReturn.getId())
       .orElseThrow(() ->
-        new EntityNotFoundException("SaleReturn not found after creation")
+        new EntityNotFoundException(
+          "SaleReturn not found after creation and item processing"
+        )
       );
 
     return saleReturnMapper.toInfo(refreshedReturn);
@@ -130,6 +132,9 @@ public class SaleReturnService {
     Sale originalSale,
     List<SaleReturnItemData> itemsData
   ) {
+    if (saleReturn.getItems() == null) {
+      saleReturn.setItems(new java.util.ArrayList<>());
+    }
     for (SaleReturnItemData itemData : itemsData) {
       Product product = productRepository
         .findById(itemData.getProductId())
@@ -172,7 +177,10 @@ public class SaleReturnService {
         .unitPrice(itemData.getUnitPrice())
         .subtotal(itemData.getSubtotal())
         .build();
-      saleReturnItemRepository.save(saleReturnItem);
+      SaleReturnItem savedSaleReturnItem = saleReturnItemRepository.save(
+        saleReturnItem
+      );
+      saleReturn.getItems().add(savedSaleReturnItem);
     }
   }
 
@@ -265,7 +273,6 @@ public class SaleReturnService {
    */
   @Transactional
   public void deleteAllById(List<Integer> ids) {
-    // Verify all sale returns exist
     ids.forEach(id -> {
       if (!saleReturnRepository.existsById(id)) {
         throw new EntityNotFoundException(
