@@ -27,8 +27,8 @@ public class TestSecurityConfig {
    */
   @Bean
   @Primary
-  @Order(Integer.MIN_VALUE) // Highest precedence to override all other security configs
-  public SecurityFilterChain testSecurityFilterChain(HttpSecurity http)
+  @Order(Integer.MIN_VALUE)
+  SecurityFilterChain testSecurityFilterChain(HttpSecurity http)
     throws Exception {
     http
       .securityMatchers(matchers ->

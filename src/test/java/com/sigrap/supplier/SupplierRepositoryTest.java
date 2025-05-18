@@ -25,7 +25,6 @@ class SupplierRepositoryTest {
 
   @Test
   void findById_shouldReturnSupplier_whenExists() {
-    // Given
     Supplier supplier = Supplier.builder()
       .name("Test Supplier")
       .contactPerson("John Contact")
@@ -35,12 +34,10 @@ class SupplierRepositoryTest {
 
     Supplier savedSupplier = entityManager.persistAndFlush(supplier);
 
-    // When
     Optional<Supplier> foundSupplierOptional = supplierRepository.findById(
       savedSupplier.getId()
     );
 
-    // Then
     assertThat(foundSupplierOptional).isPresent();
     Supplier foundSupplier = foundSupplierOptional.get();
     assertThat(foundSupplier.getId()).isEqualTo(savedSupplier.getId());
@@ -52,16 +49,13 @@ class SupplierRepositoryTest {
 
   @Test
   void findById_shouldReturnEmpty_whenNotExists() {
-    // When
     Optional<Supplier> foundSupplier = supplierRepository.findById(999L);
 
-    // Then
     assertThat(foundSupplier).isEmpty();
   }
 
   @Test
   void findAll_shouldReturnAllSuppliers() {
-    // Given
     Supplier supplier1 = Supplier.builder()
       .name("Supplier 1")
       .email("supplier1@example.com")
@@ -75,10 +69,8 @@ class SupplierRepositoryTest {
     entityManager.persistAndFlush(supplier1);
     entityManager.persistAndFlush(supplier2);
 
-    // When
     List<Supplier> suppliers = supplierRepository.findAll();
 
-    // Then
     assertThat(suppliers).hasSize(2);
     assertThat(suppliers)
       .extracting(Supplier::getName)
@@ -87,7 +79,6 @@ class SupplierRepositoryTest {
 
   @Test
   void save_shouldPersistSupplier() {
-    // Given
     Supplier supplier = Supplier.builder()
       .name("New Supplier")
       .contactPerson("Jane Contact")
@@ -100,10 +91,8 @@ class SupplierRepositoryTest {
       .paymentTerms("Net 30")
       .build();
 
-    // When
     Supplier savedSupplier = supplierRepository.save(supplier);
 
-    // Then
     assertThat(savedSupplier.getId()).isNotNull();
 
     Supplier persistedSupplier = entityManager.find(
@@ -128,7 +117,6 @@ class SupplierRepositoryTest {
 
   @Test
   void delete_shouldRemoveSupplier() {
-    // Given
     Supplier supplier = Supplier.builder()
       .name("Supplier to Delete")
       .email("delete.me@example.com")
@@ -136,11 +124,9 @@ class SupplierRepositoryTest {
 
     Supplier savedSupplier = entityManager.persistAndFlush(supplier);
 
-    // When
     supplierRepository.deleteById(savedSupplier.getId());
     entityManager.flush();
 
-    // Then
     Supplier deletedSupplier = entityManager.find(
       Supplier.class,
       savedSupplier.getId()

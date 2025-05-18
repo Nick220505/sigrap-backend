@@ -23,7 +23,6 @@ public class SaleExportService {
 
   private final SaleService saleService;
 
-  // DIAN business code
   private static final String BUSINESS_CODE = "020";
 
   /**

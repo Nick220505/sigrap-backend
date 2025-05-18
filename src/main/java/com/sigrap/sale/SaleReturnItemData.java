@@ -41,7 +41,7 @@ public class SaleReturnItemData {
   @NotNull(message = "Unit price cannot be null")
   @PositiveOrZero(message = "Unit price must be zero or positive")
   @Schema(description = "Unit price at original sale", example = "10.50")
-  private BigDecimal unitPrice; // This should reflect the price at the time of original sale
+  private BigDecimal unitPrice;
 
   /**
    * The subtotal for this returned item (quantity * unit price).

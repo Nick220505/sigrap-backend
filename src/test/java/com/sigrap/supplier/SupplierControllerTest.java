@@ -46,7 +46,6 @@ class SupplierControllerTest {
 
   @Test
   void findAll_shouldReturnAllSuppliers() throws Exception {
-    // Given
     SupplierInfo supplier1 = SupplierInfo.builder()
       .id(1L)
       .name("Supplier 1")
@@ -63,7 +62,6 @@ class SupplierControllerTest {
 
     when(supplierService.findAll()).thenReturn(suppliers);
 
-    // When & Then
     mockMvc
       .perform(get("/api/suppliers"))
       .andExpect(status().isOk())
@@ -79,7 +77,6 @@ class SupplierControllerTest {
 
   @Test
   void findById_shouldReturnSupplier_whenExists() throws Exception {
-    // Given
     Long id = 1L;
 
     SupplierInfo supplierInfo = SupplierInfo.builder()
@@ -92,7 +89,6 @@ class SupplierControllerTest {
 
     when(supplierService.findById(id)).thenReturn(supplierInfo);
 
-    // When & Then
     mockMvc
       .perform(get("/api/suppliers/{id}", id))
       .andExpect(status().isOk())
@@ -105,7 +101,6 @@ class SupplierControllerTest {
 
   @Test
   void create_shouldCreateSupplier() throws Exception {
-    // Given
     SupplierData supplierData = SupplierData.builder()
       .name("New Supplier")
       .contactPerson("Jane Contact")
@@ -125,7 +120,6 @@ class SupplierControllerTest {
       createdSupplierInfo
     );
 
-    // When & Then
     mockMvc
       .perform(
         post("/api/suppliers")
@@ -144,7 +138,6 @@ class SupplierControllerTest {
 
   @Test
   void update_shouldUpdateSupplier() throws Exception {
-    // Given
     Long id = 1L;
 
     SupplierData supplierData = SupplierData.builder()
@@ -166,7 +159,6 @@ class SupplierControllerTest {
       updatedSupplierInfo
     );
 
-    // When & Then
     mockMvc
       .perform(
         put("/api/suppliers/{id}", id)
@@ -185,11 +177,9 @@ class SupplierControllerTest {
 
   @Test
   void delete_shouldDeleteSupplier() throws Exception {
-    // Given
     Long id = 1L;
     doNothing().when(supplierService).delete(id);
 
-    // When & Then
     mockMvc
       .perform(delete("/api/suppliers/{id}", id))
       .andExpect(status().isNoContent());
@@ -199,11 +189,9 @@ class SupplierControllerTest {
 
   @Test
   void deleteAllById_shouldDeleteMultipleSuppliers() throws Exception {
-    // Given
     List<Long> ids = Arrays.asList(1L, 2L);
     doNothing().when(supplierService).deleteAllById(ids);
 
-    // When & Then
     mockMvc
       .perform(
         delete("/api/suppliers/delete-many")

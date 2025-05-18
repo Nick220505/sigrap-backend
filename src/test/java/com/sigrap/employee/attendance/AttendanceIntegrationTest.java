@@ -41,10 +41,8 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    // Clean up existing data
     attendanceRepository.deleteAll();
 
-    // Create test user
     testUser = User.builder()
       .name("John Doe")
       .email("john.doe@example.com")
@@ -53,7 +51,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
       .build();
     testUser = userRepository.save(testUser);
 
-    // Create test attendance record
     testAttendance = Attendance.builder()
       .user(testUser)
       .date(LocalDateTime.now())
@@ -71,7 +68,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void crudOperations() throws Exception {
-    // Get all attendance records
     mockMvc
       .perform(get("/api/attendance"))
       .andExpect(status().isOk())
@@ -81,7 +77,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
       )
       .andExpect(jsonPath("$[0].userId").value(testUser.getId()));
 
-    // Get attendance by ID
     mockMvc
       .perform(get("/api/attendance/{id}", testAttendance.getId()))
       .andExpect(status().isOk())
@@ -91,7 +86,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
       )
       .andExpect(jsonPath("$.userId").value(testUser.getId()));
 
-    // Create a new attendance record
     AttendanceData newAttendanceData = AttendanceData.builder()
       .userId(testUser.getId())
       .date(LocalDateTime.now())
@@ -118,7 +112,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
       AttendanceInfo.class
     );
 
-    // Update the attendance record
     AttendanceData updateData = AttendanceData.builder()
       .userId(testUser.getId())
       .date(LocalDateTime.now())
@@ -137,12 +130,10 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
       .andExpect(jsonPath("$.id").value(createdAttendance.getId()))
       .andExpect(jsonPath("$.clockOutTime").isNotEmpty());
 
-    // Delete the attendance record
     mockMvc
       .perform(delete("/api/attendance/{id}", createdAttendance.getId()))
       .andExpect(status().isNoContent());
 
-    // Verify the attendance was deleted
     mockMvc
       .perform(get("/api/attendance/{id}", createdAttendance.getId()))
       .andExpect(status().isNotFound());
@@ -151,7 +142,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void findByUser() throws Exception {
-    // Create another attendance record for the same user
     Attendance secondAttendance = Attendance.builder()
       .user(testUser)
       .date(LocalDateTime.now().minusDays(1))
@@ -162,7 +152,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
 
     secondAttendance = attendanceRepository.save(secondAttendance);
 
-    // Find attendance records by user ID
     mockMvc
       .perform(get("/api/attendance/user/{userId}", testUser.getId()))
       .andExpect(status().isOk())
@@ -175,7 +164,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void findByDateRange() throws Exception {
-    // Create attendance records for different dates
     LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
     LocalDateTime lastWeek = LocalDateTime.now().minusWeeks(1);
 
@@ -199,7 +187,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
       Arrays.asList(yesterdayAttendance, lastWeekAttendance)
     );
 
-    // Find attendance records by date range
     String startDate = yesterday.toString();
     String endDate = LocalDateTime.now().toString();
 
@@ -217,11 +204,10 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void findByStatus() throws Exception {
-    // Create attendance records with different statuses
     Attendance lateAttendance = Attendance.builder()
       .user(testUser)
       .date(LocalDateTime.now().minusDays(1))
-      .clockInTime(LocalDateTime.now().minusDays(1).plusHours(1)) // 1 hour late
+      .clockInTime(LocalDateTime.now().minusDays(1).plusHours(1))
       .status(AttendanceStatus.LATE)
       .build();
 
@@ -235,7 +221,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
       Arrays.asList(lateAttendance, absentAttendance)
     );
 
-    // Find attendance records by status LATE
     mockMvc
       .perform(
         get("/api/attendance/status/{status}", AttendanceStatus.LATE.toString())
@@ -246,7 +231,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
         jsonPath("$[0].status").value(AttendanceStatus.LATE.toString())
       );
 
-    // Find attendance records by status ABSENT
     mockMvc
       .perform(
         get(
@@ -260,7 +244,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
         jsonPath("$[0].status").value(AttendanceStatus.ABSENT.toString())
       );
 
-    // Find attendance records by status PRESENT
     mockMvc
       .perform(
         get(
@@ -278,7 +261,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void validationConstraints() throws Exception {
-    // Attempt to create an attendance record with missing required fields
     AttendanceData invalidAttendanceData = AttendanceData.builder().build();
 
     mockMvc
@@ -289,7 +271,6 @@ public class AttendanceIntegrationTest extends BaseIntegrationTest {
       )
       .andExpect(status().isBadRequest());
 
-    // Attempt to create an attendance record with non-existent user
     AttendanceData invalidUserData = AttendanceData.builder()
       .userId(999L)
       .date(LocalDateTime.now())

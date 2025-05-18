@@ -49,9 +49,9 @@ public class UserService implements UserDetailsService {
     return org.springframework.security.core.userdetails.User.builder()
       .username(user.getEmail())
       .password(user.getPassword())
-      .authorities(new ArrayList<>()) // Simplified, actual authorities depend on UserRole
-      .disabled(!user.isEnabled()) // isEnabled now always true
-      .accountLocked(!user.isAccountNonLocked()) // isAccountNonLocked now always true
+      .authorities(new ArrayList<>())
+      .disabled(!user.isEnabled())
+      .accountLocked(!user.isAccountNonLocked())
       .build();
   }
 
@@ -221,7 +221,7 @@ public class UserService implements UserDetailsService {
   @Transactional
   public UserInfo changePassword(
     Long id,
-    String currentPassword, // currentPassword might not be verifiable if not stored or if admin reset
+    String currentPassword,
     String newPassword
   ) {
     com.sigrap.user.User user = userRepository

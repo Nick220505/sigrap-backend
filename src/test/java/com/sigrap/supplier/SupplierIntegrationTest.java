@@ -60,7 +60,6 @@ public class SupplierIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void crudOperations() throws Exception {
-    // Get all suppliers
     mockMvc
       .perform(get("/api/suppliers"))
       .andExpect(status().isOk())
@@ -68,7 +67,6 @@ public class SupplierIntegrationTest extends BaseIntegrationTest {
       .andExpect(jsonPath("$[0].name").value(testSupplier.getName()))
       .andExpect(jsonPath("$[0].email").value(testSupplier.getEmail()));
 
-    // Get supplier by ID
     mockMvc
       .perform(get("/api/suppliers/{id}", testSupplier.getId()))
       .andExpect(status().isOk())
@@ -79,7 +77,6 @@ public class SupplierIntegrationTest extends BaseIntegrationTest {
       )
       .andExpect(jsonPath("$.email").value(testSupplier.getEmail()));
 
-    // Create a new supplier
     SupplierData newSupplierData = SupplierData.builder()
       .name("New Supplier")
       .contactPerson("Jane Contact")
@@ -114,7 +111,6 @@ public class SupplierIntegrationTest extends BaseIntegrationTest {
     );
     Long createdSupplierId = createdSupplier.getId();
 
-    // Update the supplier
     SupplierData updateData = SupplierData.builder()
       .name("Updated Supplier")
       .contactPerson("Updated Contact")
@@ -145,12 +141,10 @@ public class SupplierIntegrationTest extends BaseIntegrationTest {
       .andExpect(jsonPath("$.averageDeliveryTime").value(2))
       .andExpect(jsonPath("$.paymentTerms").value("Net 60"));
 
-    // Delete the supplier
     mockMvc
       .perform(delete("/api/suppliers/{id}", createdSupplierId))
       .andExpect(status().isNoContent());
 
-    // Verify the supplier was deleted
     mockMvc
       .perform(get("/api/suppliers/{id}", createdSupplierId))
       .andExpect(status().isNotFound());
@@ -159,7 +153,6 @@ public class SupplierIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void deleteMany() throws Exception {
-    // Create additional suppliers for multiple delete test
     Supplier supplier1 = Supplier.builder()
       .name("Supplier 1")
       .email("supplier1@example.com")
@@ -175,7 +168,6 @@ public class SupplierIntegrationTest extends BaseIntegrationTest {
     supplier1 = supplierRepository.save(supplier1);
     supplier2 = supplierRepository.save(supplier2);
 
-    // Delete multiple suppliers
     List<Long> idsToDelete = Arrays.asList(
       supplier1.getId(),
       supplier2.getId()
@@ -189,7 +181,6 @@ public class SupplierIntegrationTest extends BaseIntegrationTest {
       )
       .andExpect(status().isNoContent());
 
-    // Verify suppliers were deleted
     for (Long id : idsToDelete) {
       mockMvc
         .perform(get("/api/suppliers/{id}", id))
@@ -200,7 +191,6 @@ public class SupplierIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void validationConstraints() throws Exception {
-    // Attempt to create a supplier with missing required fields
     SupplierData invalidSupplierData = SupplierData.builder()
       .email("invalid@example.com")
       .build();
@@ -213,7 +203,6 @@ public class SupplierIntegrationTest extends BaseIntegrationTest {
       )
       .andExpect(status().isBadRequest());
 
-    // Test with invalid phone number format
     SupplierData invalidPhoneData = SupplierData.builder()
       .name("Invalid Phone Supplier")
       .contactPerson("Test Contact")
@@ -229,7 +218,6 @@ public class SupplierIntegrationTest extends BaseIntegrationTest {
       )
       .andExpect(status().isBadRequest());
 
-    // Test with invalid email format
     SupplierData invalidEmailData = SupplierData.builder()
       .name("Invalid Email Supplier")
       .contactPerson("Test Contact")

@@ -45,12 +45,10 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    // Clean up existing data
     purchaseOrderRepository.deleteAll();
     supplierRepository.deleteAll();
     productRepository.deleteAll();
 
-    // Create test supplier
     testSupplier = Supplier.builder()
       .name("Test Supplier")
       .contactPerson("John Contact")
@@ -59,7 +57,6 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
       .build();
     testSupplier = supplierRepository.save(testSupplier);
 
-    // Create test product
     testProduct = Product.builder()
       .name("Test Product")
       .description("Test Product Description")
@@ -70,7 +67,6 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
       .build();
     testProduct = productRepository.save(testProduct);
 
-    // Create test purchase order
     testPurchaseOrder = PurchaseOrder.builder()
       .supplier(testSupplier)
       .deliveryDate(LocalDate.now().plusDays(7))
@@ -90,7 +86,6 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void crudOperations() throws Exception {
-    // Get all purchase orders
     mockMvc
       .perform(get("/api/purchase-orders"))
       .andExpect(status().isOk())
@@ -105,7 +100,6 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
       )
       .andExpect(jsonPath("$[0].supplier.id").value(testSupplier.getId()));
 
-    // Get purchase order by ID
     mockMvc
       .perform(get("/api/purchase-orders/{id}", testPurchaseOrder.getId()))
       .andExpect(status().isOk())
@@ -120,7 +114,6 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
       )
       .andExpect(jsonPath("$.supplier.id").value(testSupplier.getId()));
 
-    // Create a new purchase order
     PurchaseOrderData newOrderData = PurchaseOrderData.builder()
       .supplierId(testSupplier.getId())
       .deliveryDate(LocalDate.now().plusDays(14))
@@ -143,7 +136,6 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
     );
     Integer createdOrderId = createdOrder.getId();
 
-    // Update the purchase order
     PurchaseOrderData updateData = PurchaseOrderData.builder()
       .supplierId(testSupplier.getId())
       .deliveryDate(LocalDate.now().plusDays(10))
@@ -159,12 +151,10 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
       .andExpect(jsonPath("$.id").value(createdOrderId))
       .andExpect(jsonPath("$.supplier.id").value(testSupplier.getId()));
 
-    // Delete the purchase order
     mockMvc
       .perform(delete("/api/purchase-orders/{id}", createdOrderId))
       .andExpect(status().isNoContent());
 
-    // Verify the purchase order was deleted
     mockMvc
       .perform(get("/api/purchase-orders/{id}", createdOrderId))
       .andExpect(status().isNotFound());
@@ -173,7 +163,6 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void findBySupplier() throws Exception {
-    // Create a second purchase order for the same supplier
     PurchaseOrder secondOrder = PurchaseOrder.builder()
       .supplier(testSupplier)
       .deliveryDate(LocalDate.now().plusDays(5))
@@ -183,7 +172,6 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
 
     secondOrder = purchaseOrderRepository.save(secondOrder);
 
-    // Find purchase orders by supplier ID
     mockMvc
       .perform(
         get("/api/purchase-orders/supplier/{supplierId}", testSupplier.getId())
@@ -198,7 +186,6 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void findByStatus() throws Exception {
-    // Create purchase orders with different statuses
     PurchaseOrder confirmedOrder = PurchaseOrder.builder()
       .supplier(testSupplier)
       .deliveryDate(LocalDate.now().plusDays(5))
@@ -216,21 +203,18 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
     confirmedOrder = purchaseOrderRepository.save(confirmedOrder);
     deliveredOrder = purchaseOrderRepository.save(deliveredOrder);
 
-    // Find purchase orders by status CONFIRMED
     mockMvc
       .perform(get("/api/purchase-orders/status/{status}", "CONFIRMED"))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$").isArray())
       .andExpect(jsonPath("$[0].status").value("CONFIRMED"));
 
-    // Find purchase orders by status DELIVERED
     mockMvc
       .perform(get("/api/purchase-orders/status/{status}", "DELIVERED"))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$").isArray())
       .andExpect(jsonPath("$[0].status").value("DELIVERED"));
 
-    // Find purchase orders by status DRAFT
     mockMvc
       .perform(get("/api/purchase-orders/status/{status}", "DRAFT"))
       .andExpect(status().isOk())
@@ -241,7 +225,6 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void validationConstraints() throws Exception {
-    // Attempt to create a purchase order with missing required fields
     PurchaseOrderData invalidOrderData = PurchaseOrderData.builder().build();
 
     mockMvc
@@ -252,7 +235,6 @@ public class PurchaseOrderIntegrationTest extends BaseIntegrationTest {
       )
       .andExpect(status().isBadRequest());
 
-    // Attempt to create an order with non-existent supplier
     PurchaseOrderData invalidSupplierData = PurchaseOrderData.builder()
       .supplierId(999L)
       .deliveryDate(LocalDate.now().plusDays(10))
