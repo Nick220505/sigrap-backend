@@ -18,6 +18,9 @@ import com.sigrap.product.ProductRepository;
 import com.sigrap.sale.Sale;
 import com.sigrap.sale.SaleItem;
 import com.sigrap.sale.SaleRepository;
+import com.sigrap.sale.SaleReturn;
+import com.sigrap.sale.SaleReturnItem;
+import com.sigrap.sale.SaleReturnRepository;
 import com.sigrap.supplier.PaymentMethod;
 import com.sigrap.supplier.PurchaseOrder;
 import com.sigrap.supplier.PurchaseOrderItem;
@@ -131,6 +134,7 @@ public class DataSeeder implements CommandLineRunner {
   private final CustomerRepository customerRepository;
 
   private final SaleRepository saleRepository;
+  private final SaleReturnRepository saleReturnRepository;
 
   private final Random random = new Random();
 
@@ -156,6 +160,7 @@ public class DataSeeder implements CommandLineRunner {
     seedPayments();
     seedCustomers();
     seedSales();
+    seedSaleReturns();
     log.info("Data seeding completed.");
   }
 
@@ -2084,5 +2089,105 @@ public class DataSeeder implements CommandLineRunner {
     } else {
       log.info("No sales were generated to seed.");
     }
+  }
+
+  /**
+   * Seeds initial sales returns into the database.
+   * Creates a few sample returns based on existing sales and products.
+   * Only executes if the sales_returns table is empty and sales exist.
+   */
+  private void seedSaleReturns() {
+    if (saleReturnRepository.count() > 0) {
+      log.info("Sale returns already exist, skipping seeding.");
+      return;
+    }
+
+    List<Sale> sales = saleRepository.findAll();
+    if (sales.isEmpty()) {
+      log.warn("No sales found, skipping sales returns seeding.");
+      return;
+    }
+
+    List<User> employees = userRepository
+      .findAll()
+      .stream()
+      .filter(
+        user ->
+          user.getRole() == UserRole.EMPLOYEE ||
+          user.getRole() == UserRole.ADMINISTRATOR
+      )
+      .toList();
+
+    if (employees.isEmpty()) {
+      log.warn("No employees found for seeding returns, skipping.");
+      return;
+    }
+
+    log.info("Seeding sales returns...");
+    List<SaleReturn> returnsToCreate = new ArrayList<>();
+    int numberOfReturnsToSeed = Math.min(sales.size(), 5);
+
+    for (int i = 0; i < numberOfReturnsToSeed; i++) {
+      Sale originalSale = sales.get(random.nextInt(sales.size()));
+      if (originalSale.getItems().isEmpty()) {
+        continue;
+      }
+
+      SaleItem itemToReturn = originalSale
+        .getItems()
+        .get(random.nextInt(originalSale.getItems().size()));
+      int quantityToReturn = 1;
+      if (itemToReturn.getQuantity() > 1) {
+        quantityToReturn = random.nextInt(itemToReturn.getQuantity()) + 1;
+      }
+
+      Product productBeingReturned = itemToReturn.getProduct();
+
+      SaleReturn.SaleReturnBuilder returnBuilder = SaleReturn.builder();
+      returnBuilder.originalSale(originalSale);
+      returnBuilder.customer(originalSale.getCustomer());
+      returnBuilder.employee(employees.get(random.nextInt(employees.size())));
+      returnBuilder.reason(getRandomReturnReason());
+      returnBuilder.createdAt(
+        originalSale.getCreatedAt().plusDays(random.nextInt(5) + 1)
+      );
+
+      BigDecimal itemSubtotal = itemToReturn
+        .getUnitPrice()
+        .multiply(BigDecimal.valueOf(quantityToReturn));
+      returnBuilder.totalReturnAmount(itemSubtotal);
+
+      SaleReturn saleReturn = returnBuilder.build();
+
+      SaleReturnItem returnItem = SaleReturnItem.builder()
+        .saleReturn(saleReturn)
+        .product(productBeingReturned)
+        .quantity(quantityToReturn)
+        .unitPrice(itemToReturn.getUnitPrice())
+        .subtotal(itemSubtotal)
+        .build();
+
+      saleReturn.addItem(returnItem);
+
+      returnsToCreate.add(saleReturn);
+    }
+
+    if (!returnsToCreate.isEmpty()) {
+      saleReturnRepository.saveAll(returnsToCreate);
+      log.info("Successfully seeded {} sales returns.", returnsToCreate.size());
+    } else {
+      log.info("No sales returns were generated to seed.");
+    }
+  }
+
+  private String getRandomReturnReason() {
+    String[] reasons = {
+      "Producto defectuoso",
+      "No era la talla correcta",
+      "Cliente cambió de opinión",
+      "Artículo dañado en el envío",
+      "No cumple con las expectativas",
+    };
+    return reasons[random.nextInt(reasons.length)];
   }
 }
