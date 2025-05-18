@@ -55,14 +55,6 @@ public class SupplierData {
   private String name;
 
   /**
-   * Tax identification number or business ID.
-   * Used for billing and legal documentation.
-   */
-  @Schema(description = "Tax ID of the supplier")
-  @Size(max = 20, message = "Tax ID must be less than 20 characters")
-  private String taxId;
-
-  /**
    * Name of the person to contact at the supplier.
    */
   @Schema(description = "Contact person at the supplier")
@@ -130,40 +122,9 @@ public class SupplierData {
   private Integer averageDeliveryTime;
 
   /**
-   * Payment method accepted by the supplier.
-   */
-  @Schema(description = "Payment method accepted by the supplier")
-  private PaymentMethod paymentMethod;
-
-  /**
    * Payment terms agreed with the supplier.
    */
   @Schema(description = "Payment terms (e.g., 'Net 30', 'Cash on Delivery')")
   @Size(max = 100, message = "Payment terms must be less than 100 characters")
   private String paymentTerms;
-
-  /**
-   * Additional notes about the supplier.
-   */
-  @Schema(description = "Additional notes about the supplier")
-  @Size(max = 1000, message = "Notes must be less than 1000 characters")
-  private String notes;
-
-  /**
-   * Current status of the supplier relationship.
-   */
-  @Schema(description = "Status of the supplier relationship", required = true)
-  private SupplierStatus status;
-
-  /**
-   * Supplier rating on a scale of 1-5.
-   */
-  @Schema(description = "Supplier rating (1-5 scale)")
-  private Integer rating;
-
-  /**
-   * Whether this is a preferred supplier.
-   */
-  @Schema(description = "Whether this is a preferred supplier")
-  private Boolean preferred;
 }

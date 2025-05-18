@@ -1,9 +1,12 @@
 package com.sigrap.supplier;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,13 +15,10 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  * Entity class representing a supplier in the system.
@@ -51,13 +51,6 @@ public class Supplier {
   @Size(max = 100)
   @Column(nullable = false)
   private String name;
-
-  /**
-   * Tax identification number or business ID.
-   * Used for billing and legal documentation.
-   */
-  @Size(max = 20)
-  private String taxId;
 
   /**
    * Contact person's name at the supplier company.
@@ -124,45 +117,11 @@ public class Supplier {
   private Integer averageDeliveryTime;
 
   /**
-   * Payment methods accepted by the supplier.
-   * Uses enum to restrict possible values.
-   */
-  @Enumerated(EnumType.STRING)
-  private PaymentMethod paymentMethod;
-
-  /**
    * Payment terms agreed with the supplier (e.g., "Net 30", "Cash on Delivery").
    * Maximum length of 100 characters.
    */
   @Size(max = 100)
   private String paymentTerms;
-
-  /**
-   * General notes about the supplier relationship, special arrangements, etc.
-   * Text field with maximum length of 1000 characters.
-   */
-  @Size(max = 1000)
-  private String notes;
-
-  /**
-   * Status of the supplier relationship.
-   * Uses enum to restrict possible values.
-   */
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private SupplierStatus status;
-
-  /**
-   * Rating of the supplier (1-5 scale).
-   * Used to evaluate supplier performance.
-   */
-  private Integer rating;
-
-  /**
-   * Flag indicating if this is a preferred supplier.
-   * Preferred suppliers may get priority in ordering.
-   */
-  private Boolean preferred;
 
   /**
    * Timestamp of when the supplier record was created.

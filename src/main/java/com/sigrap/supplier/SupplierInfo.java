@@ -1,7 +1,8 @@
 package com.sigrap.supplier;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,7 +32,6 @@ import lombok.NoArgsConstructor;
  *     .id(1)
  *     .name("Office Depot")
  *     .email("contact@officedepot.com")
- *     .status(SupplierStatus.ACTIVE)
  *     .build();
  * </pre></p>
  */
@@ -53,13 +53,6 @@ public class SupplierInfo {
    */
   @Schema(description = "Supplier name", example = "Office Depot")
   private String name;
-
-  /**
-   * Tax identification number or business ID.
-   * Used for billing and legal documentation.
-   */
-  @Schema(description = "Tax ID of the supplier", example = "20487965214")
-  private String taxId;
 
   /**
    * Name of the contact person at the supplier.
@@ -119,43 +112,10 @@ public class SupplierInfo {
   private Integer averageDeliveryTime;
 
   /**
-   * Payment method accepted by the supplier.
-   */
-  @Schema(description = "Payment method", example = "BANK_TRANSFER")
-  private PaymentMethod paymentMethod;
-
-  /**
    * Payment terms for purchases from this supplier.
    */
   @Schema(description = "Payment terms", example = "30 días")
   private String paymentTerms;
-
-  /**
-   * Additional notes about the supplier relationship.
-   */
-  @Schema(
-    description = "Additional notes",
-    example = "Proveedor principal de artículos de oficina y escolares"
-  )
-  private String notes;
-
-  /**
-   * Current status of the supplier relationship.
-   */
-  @Schema(description = "Supplier status", example = "ACTIVE")
-  private SupplierStatus status;
-
-  /**
-   * Supplier rating on a scale of 1-5.
-   */
-  @Schema(description = "Supplier rating (1-5)", example = "4")
-  private Integer rating;
-
-  /**
-   * Whether this is a preferred supplier.
-   */
-  @Schema(description = "Preferred supplier flag", example = "true")
-  private Boolean preferred;
 
   /**
    * Timestamp when the supplier record was created.

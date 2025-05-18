@@ -20,7 +20,6 @@ import com.sigrap.sale.SaleRepository;
 import com.sigrap.sale.SaleReturn;
 import com.sigrap.sale.SaleReturnItem;
 import com.sigrap.sale.SaleReturnRepository;
-import com.sigrap.supplier.PaymentMethod;
 import com.sigrap.supplier.PurchaseOrder;
 import com.sigrap.supplier.PurchaseOrderItem;
 import com.sigrap.supplier.PurchaseOrderRepository;
@@ -28,7 +27,6 @@ import com.sigrap.supplier.PurchaseOrderTrackingEvent;
 import com.sigrap.supplier.PurchaseOrderTrackingEventRepository;
 import com.sigrap.supplier.Supplier;
 import com.sigrap.supplier.SupplierRepository;
-import com.sigrap.supplier.SupplierStatus;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserRole;
@@ -987,172 +985,120 @@ public class DataSeeder implements CommandLineRunner {
       suppliers.add(
         Supplier.builder()
           .name("Office Depot")
-          .taxId("900123456-7")
           .contactPerson("Miguel Sánchez")
           .email("msanchez@officedepot.com.co")
           .phone("(601) 555-2700")
           .address("Carrera 15 # 80-25, Bogotá D.C.")
-          .paymentMethod(PaymentMethod.BANK_TRANSFER)
-          .status(SupplierStatus.ACTIVE)
           .website("https://www.officedepot.com.co")
           .paymentTerms("30 días")
-          .notes(
-            "Proveedor principal de artículos de oficina y escolares en Colombia"
-          )
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
           .name("Panamericana")
-          .taxId("860000123-4")
           .contactPerson("Ana Campos")
           .email("acampos@panamericana.com.co")
           .phone("(601) 337-9000")
           .address("Avenida Chile # 72-41, Bogotá D.C.")
-          .paymentMethod(PaymentMethod.CREDIT_CARD)
-          .status(SupplierStatus.ACTIVE)
           .website("https://www.panamericana.com.co")
           .paymentTerms("15 días")
-          .notes(
-            "Distribuidor mayorista de útiles escolares y de oficina en Colombia"
-          )
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
           .name("Artesco Colombia")
-          .taxId("900567890-1")
           .contactPerson("Roberto Gutiérrez")
           .email("rgutierrez@artesco.com.co")
           .phone("(604) 444-6000")
           .address("Calle 10 # 43E-115, Medellín, Antioquia")
-          .paymentMethod(PaymentMethod.BANK_TRANSFER)
-          .status(SupplierStatus.ACTIVE)
           .website("https://www.artesco.com.co")
           .paymentTerms("45 días")
-          .notes(
-            "Fabricante de útiles escolares de alta calidad con presencia en Colombia"
-          )
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
           .name("Scribe Colombia")
-          .taxId("830000456-7")
           .contactPerson("María Elena Torres")
           .email("metorres@scribe.com.co")
           .phone("(602) 660-2500")
           .address("Carrera 1 # 23-89, Cali, Valle del Cauca")
-          .paymentMethod(PaymentMethod.CHECK)
-          .status(SupplierStatus.ACTIVE)
           .website("https://www.scribe.com.co")
           .paymentTerms("30 días")
-          .notes("Especialista en materiales artísticos y cuadernos")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
           .name("Faber-Castell Colombia")
-          .taxId("800123789-0")
           .contactPerson("Jorge Reátegui")
           .email("jreategui@faber-castell.com.co")
           .phone("(601) 744-4800")
           .address("Autopista Norte Km 19, Chía, Cundinamarca")
-          .paymentMethod(PaymentMethod.BANK_TRANSFER)
-          .status(SupplierStatus.ACTIVE)
           .website("https://www.faber-castell.com.co")
           .paymentTerms("45 días")
-          .notes(
-            "Proveedor global de instrumentos de escritura y dibujo en Colombia"
-          )
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
           .name("Pegaucho")
-          .taxId("890987654-3")
           .contactPerson("Lucía Pérez")
           .email("lperez@pegaucho.com.co")
           .phone("(601) 222-2300")
           .address("Calle 13 # 68-78, Bogotá D.C.")
-          .paymentMethod(PaymentMethod.CASH)
-          .status(SupplierStatus.ACTIVE)
           .website("https://www.pegaucho.com.co")
           .paymentTerms("Contado")
-          .notes("Fabricante colombiano de pegamentos y adhesivos")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
           .name("Norma Colombia")
-          .taxId("800234567-8")
           .contactPerson("Daniel Quispe")
           .email("dquispe@norma.com.co")
           .phone("(601) 423-8000")
           .address("Calle 100 # 19A-50, Bogotá D.C.")
-          .paymentMethod(PaymentMethod.BANK_TRANSFER)
-          .status(SupplierStatus.ACTIVE)
           .website("https://www.norma.com.co")
           .paymentTerms("30 días")
-          .notes("Especialista en cuadernos y productos de papel en Colombia")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
           .name("DistriOffice")
-          .taxId("900876543-2")
           .contactPerson("Patricia Rojas")
           .email("projas@distrioffice.com.co")
           .phone("(604) 333-1800")
           .address("Carrera 48 # 10-45, Medellín, Antioquia")
-          .paymentMethod(PaymentMethod.CHECK)
-          .status(SupplierStatus.INACTIVE)
           .website("https://www.distrioffice.com.co")
           .paymentTerms("45 días")
-          .notes(
-            "Distribuidor de productos importados para oficina, actualmente inactivo"
-          )
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
           .name("Pilot Colombia")
-          .taxId("830765432-1")
           .contactPerson("Carlos Mendoza")
           .email("cmendoza@pilotcolombia.com")
           .phone("(601) 617-5200")
           .address("Carrera 7 # 71-21, Bogotá D.C.")
-          .paymentMethod(PaymentMethod.BANK_TRANSFER)
-          .status(SupplierStatus.ACTIVE)
           .website("https://www.pilotpen.com.co")
           .paymentTerms("30 días")
-          .notes("Importador oficial de productos Pilot en Colombia")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
           .name("Papeles Nacionales S.A.S.")
-          .taxId("860987123-0")
           .contactPerson("Fernando Torres")
           .email("ftorres@papelesnacionales.com.co")
           .phone("(601) 742-9000")
           .address("Zona Franca de Bogotá, Bodega 12, Bogotá D.C.")
-          .paymentMethod(PaymentMethod.BANK_TRANSFER)
-          .status(SupplierStatus.PROBATION)
           .website("https://www.papelesnacionales.com.co")
           .paymentTerms("60 días")
-          .notes(
-            "Fabricante de productos de papel y cuadernos, en periodo de prueba"
-          )
           .build()
       );
 
@@ -1619,12 +1565,12 @@ public class DataSeeder implements CommandLineRunner {
       }
 
       int paymentCounter = 0;
-      PaymentMethod[] paymentMethods = {
-        PaymentMethod.BANK_TRANSFER,
-        PaymentMethod.CREDIT_CARD,
-        PaymentMethod.NEQUI,
-        PaymentMethod.DAVIPLATA,
-        PaymentMethod.CASH,
+      com.sigrap.payment.PaymentMethod[] paymentMethods = {
+        com.sigrap.payment.PaymentMethod.BANK_TRANSFER,
+        com.sigrap.payment.PaymentMethod.CREDIT_CARD,
+        com.sigrap.payment.PaymentMethod.NEQUI,
+        com.sigrap.payment.PaymentMethod.DAVIPLATA,
+        com.sigrap.payment.PaymentMethod.CASH,
       };
 
       for (PurchaseOrder order : purchaseOrders) {

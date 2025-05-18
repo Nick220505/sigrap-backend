@@ -1,6 +1,5 @@
 package com.sigrap.payment;
 
-import com.sigrap.supplier.PaymentMethod;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

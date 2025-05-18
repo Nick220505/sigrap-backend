@@ -1,6 +1,5 @@
 package com.sigrap.payment;
 
-import com.sigrap.supplier.PaymentMethod;
 import com.sigrap.supplier.PurchaseOrder;
 import com.sigrap.supplier.Supplier;
 import jakarta.persistence.Column;

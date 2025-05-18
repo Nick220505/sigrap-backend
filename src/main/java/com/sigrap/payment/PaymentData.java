@@ -1,6 +1,5 @@
 package com.sigrap.payment;
 
-import com.sigrap.supplier.PaymentMethod;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
