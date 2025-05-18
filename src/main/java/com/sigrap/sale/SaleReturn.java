@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
@@ -94,7 +95,9 @@ public class SaleReturn {
   /**
    * Reason for the return.
    */
-  @Column(name = "reason", columnDefinition = "TEXT")
+  @NotNull(message = "Reason cannot be null")
+  @NotEmpty(message = "Reason cannot be empty")
+  @Column(name = "reason", columnDefinition = "TEXT", nullable = false)
   private String reason;
 
   /**

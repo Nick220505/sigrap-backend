@@ -65,6 +65,8 @@ public class SaleReturnData {
   /**
    * Reason for the return.
    */
+  @NotNull(message = "Reason cannot be null")
+  @NotEmpty(message = "Reason cannot be empty")
   @Schema(description = "Reason for the return", example = "Product damaged")
   private String reason;
 }
