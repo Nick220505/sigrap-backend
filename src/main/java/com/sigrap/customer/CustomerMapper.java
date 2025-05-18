@@ -34,13 +34,11 @@ public class CustomerMapper {
 
     return CustomerInfo.builder()
       .id(customer.getId())
-      .firstName(customer.getFirstName())
-      .lastName(customer.getLastName())
+      .fullName(customer.getFullName())
       .documentId(customer.getDocumentId())
       .email(customer.getEmail())
       .phoneNumber(customer.getPhoneNumber())
       .address(customer.getAddress())
-      .status(customer.getStatus())
       .createdAt(customer.getCreatedAt())
       .updatedAt(customer.getUpdatedAt())
       .build();
@@ -72,17 +70,11 @@ public class CustomerMapper {
     }
 
     return Customer.builder()
-      .firstName(customerData.getFirstName())
-      .lastName(customerData.getLastName())
+      .fullName(customerData.getFullName())
       .documentId(customerData.getDocumentId())
       .email(customerData.getEmail())
       .phoneNumber(customerData.getPhoneNumber())
       .address(customerData.getAddress())
-      .status(
-        customerData.getStatus() != null
-          ? customerData.getStatus()
-          : CustomerStatus.ACTIVE
-      )
       .build();
   }
 
@@ -100,15 +92,10 @@ public class CustomerMapper {
       return;
     }
 
-    customer.setFirstName(customerData.getFirstName());
-    customer.setLastName(customerData.getLastName());
+    customer.setFullName(customerData.getFullName());
     customer.setDocumentId(customerData.getDocumentId());
     customer.setEmail(customerData.getEmail());
     customer.setPhoneNumber(customerData.getPhoneNumber());
     customer.setAddress(customerData.getAddress());
-
-    if (customerData.getStatus() != null) {
-      customer.setStatus(customerData.getStatus());
-    }
   }
 }

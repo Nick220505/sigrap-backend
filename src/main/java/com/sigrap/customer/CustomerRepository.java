@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
  * <ul>
  *   <li>Basic CRUD operations</li>
  *   <li>Custom search methods</li>
- *   <li>Status-based queries</li>
  *   <li>Email-based lookup</li>
  * </ul></p>
  */
@@ -37,25 +36,12 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
   boolean existsByEmail(String email);
 
   /**
-   * Finds all customers with the given status.
+   * Finds customers whose full name contains the search term (case insensitive).
    *
-   * @param status The status to filter by
-   * @return List of customers with the specified status
-   */
-  List<Customer> findByStatus(CustomerStatus status);
-
-  /**
-   * Finds customers whose first name or last name contains the search term (case insensitive).
-   *
-   * @param searchTerm The search term to match against names
+   * @param searchTerm The search term to match against the full name
    * @return List of matching customers
    */
-  List<
-    Customer
-  > findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
-    String searchTerm,
-    String searchTerm2
-  );
+  List<Customer> findByFullNameContainingIgnoreCase(String searchTerm);
 
   /**
    * Finds customers created between the specified dates.

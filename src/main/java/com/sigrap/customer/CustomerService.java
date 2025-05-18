@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
  * <p>This service provides:
  * <ul>
  *   <li>Customer CRUD operations</li>
- *   <li>Status management</li>
  *   <li>Customer search functionality</li>
  *   <li>Data validation</li>
  * </ul></p>
@@ -119,40 +118,6 @@ public class CustomerService {
   }
 
   /**
-   * Changes the status of a customer.
-   *
-   * @param id The ID of the customer
-   * @param status The new status to set
-   * @return The updated customer information DTO
-   * @throws EntityNotFoundException if customer with the ID is not found
-   */
-  @Transactional
-  public CustomerInfo updateStatus(Long id, CustomerStatus status) {
-    Customer customer = customerRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Customer not found with ID: " + id)
-      );
-
-    customer.setStatus(status);
-    Customer updatedCustomer = customerRepository.save(customer);
-    return customerMapper.toCustomerInfo(updatedCustomer);
-  }
-
-  /**
-   * Finds customers by their status.
-   *
-   * @param status The status to filter by
-   * @return List of customer information DTOs with the specified status
-   */
-  @Transactional(readOnly = true)
-  public List<CustomerInfo> findByStatus(CustomerStatus status) {
-    return customerMapper.toCustomerInfoList(
-      customerRepository.findByStatus(status)
-    );
-  }
-
-  /**
    * Searches for customers by name.
    *
    * @param searchTerm The search term to match against names
@@ -161,10 +126,7 @@ public class CustomerService {
   @Transactional(readOnly = true)
   public List<CustomerInfo> searchByName(String searchTerm) {
     return customerMapper.toCustomerInfoList(
-      customerRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
-        searchTerm,
-        searchTerm
-      )
+      customerRepository.findByFullNameContainingIgnoreCase(searchTerm)
     );
   }
 

@@ -4,7 +4,6 @@ import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
 import com.sigrap.customer.Customer;
 import com.sigrap.customer.CustomerRepository;
-import com.sigrap.customer.CustomerStatus;
 import com.sigrap.employee.attendance.Attendance;
 import com.sigrap.employee.attendance.AttendanceRepository;
 import com.sigrap.employee.attendance.AttendanceStatus;
@@ -1796,155 +1795,125 @@ public class DataSeeder implements CommandLineRunner {
       customerRepository.saveAll(
         List.of(
           Customer.builder()
-            .firstName("Juan")
-            .lastName("Rodríguez")
+            .fullName("Juan Rodríguez")
             .documentId("1098765432")
             .email("juan.rodriguez@gmail.com")
             .phoneNumber("310-555-1234")
             .address(
               "Calle 45 Sur # 23-18, Barrio Kennedy Central, Bogotá D.C."
             )
-            .status(CustomerStatus.ACTIVE)
             .build(),
           Customer.builder()
-            .firstName("María")
-            .lastName("González")
+            .fullName("María González")
             .documentId("1076543210")
             .email("maria.gonzalez@hotmail.com")
             .phoneNumber("315-555-6789")
             .address(
               "Carrera 72 Sur # 56-24, Apto 402, Barrio Ciudad Kennedy Sur, Bogotá D.C."
             )
-            .status(CustomerStatus.ACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Carlos")
-            .lastName("Pérez")
+            .fullName("Carlos Pérez")
             .documentId("1053789456")
             .email("carlos.perez@outlook.com")
             .phoneNumber("300-555-4321")
             .address("Diagonal 38 Sur # 34-71, Barrio Timiza, Bogotá D.C.")
-            .status(CustomerStatus.ACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Ana")
-            .lastName("Martínez")
+            .fullName("Ana Martínez")
             .documentId("1087654321")
             .email("ana.martinez@gmail.com")
             .phoneNumber("320-555-8765")
             .address(
               "Transversal R1 # 67B-21 Sur, Barrio Bosa Nova, Bogotá D.C."
             )
-            .status(CustomerStatus.INACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Pedro")
-            .lastName("Sánchez")
+            .fullName("Pedro Sánchez")
             .documentId("1012345678")
             .email("pedro.sanchez@yahoo.com")
             .phoneNumber("313-555-2345")
             .address("Calle 69A Sur # 92-41, Barrio El Perdomo, Bogotá D.C.")
-            .status(CustomerStatus.ACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Laura")
-            .lastName("Díaz")
+            .fullName("Laura Díaz")
             .documentId("1034567890")
             .email("laura.diaz@hotmail.com")
             .phoneNumber("318-555-7890")
             .address(
               "Carrera 18M # 69J-06 Sur, Barrio Villa de los Alpes Sur, Bogotá D.C."
             )
-            .status(CustomerStatus.ACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Andrés")
-            .lastName("López")
+            .fullName("Andrés López")
             .documentId("1045678923")
             .email("andres.lopez@gmail.com")
             .phoneNumber("301-555-5432")
             .address(
               "Diagonal 62 Sur # 20F-21, Barrio San Francisco, Bogotá D.C."
             )
-            .status(CustomerStatus.ACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Sofía")
-            .lastName("Ramírez")
+            .fullName("Sofía Ramírez")
             .documentId("1078912345")
             .email("sofia.ramirez@outlook.com")
             .phoneNumber("312-555-9876")
             .address("Calle 43 Sur # 24-27, Barrio Venecia, Bogotá D.C.")
-            .status(CustomerStatus.INACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Javier")
-            .lastName("Torres")
+            .fullName("Javier Torres")
             .documentId("1089012345")
             .email("javier.torres@yahoo.com")
             .phoneNumber("316-555-3456")
             .address("Carrera 80 # 68-23 Sur, Barrio Roma, Bogotá D.C.")
-            .status(CustomerStatus.ACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Daniela")
-            .lastName("Herrera")
+            .fullName("Daniela Herrera")
             .documentId("1023456789")
             .email("daniela.herrera@gmail.com")
             .phoneNumber("314-555-8901")
             .address(
               "Transversal 74F # 40B-54 Sur, Barrio Ciudad Kennedy Oriental, Bogotá D.C."
             )
-            .status(CustomerStatus.ACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Sebastián")
-            .lastName("Castro")
+            .fullName("Sebastián Castro")
             .documentId("1067890123")
             .email("sebastian.castro@hotmail.com")
             .phoneNumber("305-555-6543")
             .address("Calle 68 Sur # 47A-15, Barrio Atlanta, Bogotá D.C.")
-            .status(CustomerStatus.ACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Valentina")
-            .lastName("Ortiz")
+            .fullName("Valentina Ortiz")
             .documentId("1056789012")
             .email("valentina.ortiz@outlook.com")
             .phoneNumber("319-555-0987")
             .address("Carrera 100 # 52-41 Sur, Barrio Corabastos, Bogotá D.C.")
-            .status(CustomerStatus.ACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Camilo")
-            .lastName("Reyes")
+            .fullName("Camilo Reyes")
             .documentId("1032109876")
             .email("camilo.reyes@yahoo.com")
             .phoneNumber("311-555-4567")
             .address(
               "Diagonal 82 Sur # 6-22 Este, Barrio La Aurora, Bogotá D.C."
             )
-            .status(CustomerStatus.INACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Isabella")
-            .lastName("Vargas")
+            .fullName("Isabella Vargas")
             .documentId("1054321098")
             .email("isabella.vargas@gmail.com")
             .phoneNumber("317-555-9012")
             .address(
               "Transversal 70D # 68-12 Sur, Barrio Britalia, Bogotá D.C."
             )
-            .status(CustomerStatus.ACTIVE)
             .build(),
           Customer.builder()
-            .firstName("Santiago")
-            .lastName("Morales")
+            .fullName("Santiago Morales")
             .documentId("1065432109")
             .email("santiago.morales@hotmail.com")
             .phoneNumber("304-555-7654")
             .address("Calle 73 Sur # 87M-15, Barrio Dindalito, Bogotá D.C.")
-            .status(CustomerStatus.BLOCKED)
             .build()
         )
       );

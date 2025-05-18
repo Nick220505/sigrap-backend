@@ -4,7 +4,6 @@
  * <p>The customer module handles all operations related to customers, including:
  * <ul>
  *   <li>Customer registration and management</li>
- *   <li>Customer status tracking</li>
  *   <li>Customer search and filtering</li>
  * </ul></p>
  *

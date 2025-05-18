@@ -1,7 +1,8 @@
 package com.sigrap.customer;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +17,6 @@ import lombok.NoArgsConstructor;
  *   <li>Represents customer read operations</li>
  *   <li>Includes complete customer details</li>
  *   <li>Contains audit timestamps</li>
- *   <li>Provides status information</li>
  * </ul></p>
  */
 @Data
@@ -33,16 +33,10 @@ public class CustomerInfo {
   private Long id;
 
   /**
-   * First name of the customer.
+   * Full name of the customer.
    */
-  @Schema(description = "Customer's first name", example = "John")
-  private String firstName;
-
-  /**
-   * Last name of the customer.
-   */
-  @Schema(description = "Customer's last name", example = "Doe")
-  private String lastName;
+  @Schema(description = "Customer's full name", example = "John Doe")
+  private String fullName;
 
   /**
    * Document ID (identification number) of the customer.
@@ -76,12 +70,6 @@ public class CustomerInfo {
     example = "123 Main St, Anytown"
   )
   private String address;
-
-  /**
-   * Current status of the customer.
-   */
-  @Schema(description = "Customer's status", example = "ACTIVE")
-  private CustomerStatus status;
 
   /**
    * Timestamp when the customer record was created.

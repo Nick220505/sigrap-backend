@@ -36,20 +36,12 @@ import lombok.NoArgsConstructor;
 public class CustomerData {
 
   /**
-   * First name of the customer.
+   * Full name of the customer.
    */
-  @NotBlank(message = "First name is required")
-  @Size(max = 100, message = "First name must be less than 100 characters")
-  @Schema(description = "Customer's first name", example = "John")
-  private String firstName;
-
-  /**
-   * Last name of the customer.
-   */
-  @NotBlank(message = "Last name is required")
-  @Size(max = 100, message = "Last name must be less than 100 characters")
-  @Schema(description = "Customer's last name", example = "Doe")
-  private String lastName;
+  @NotBlank(message = "Full name is required")
+  @Size(max = 200, message = "Full name must be less than 200 characters")
+  @Schema(description = "Customer's full name", example = "John Doe")
+  private String fullName;
 
   /**
    * Document ID (identification number) of the customer.
@@ -89,14 +81,4 @@ public class CustomerData {
     example = "123 Main St, Anytown"
   )
   private String address;
-
-  /**
-   * Current status of the customer.
-   */
-  @Schema(
-    description = "Customer's status (ACTIVE, INACTIVE, BLOCKED)",
-    example = "ACTIVE",
-    defaultValue = "ACTIVE"
-  )
-  private CustomerStatus status;
 }

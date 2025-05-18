@@ -1,20 +1,20 @@
 package com.sigrap.customer;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  * Entity class representing a customer in the system.
@@ -24,7 +24,6 @@ import org.hibernate.annotations.UpdateTimestamp;
  * <ul>
  *   <li>Personal details (name, contact information)</li>
  *   <li>Address information</li>
- *   <li>Status tracking</li>
  *   <li>Audit timestamps</li>
  * </ul></p>
  */
@@ -44,16 +43,10 @@ public class Customer {
   private Long id;
 
   /**
-   * First name of the customer.
+   * Full name of the customer.
    */
-  @Column(name = "first_name", nullable = false)
-  private String firstName;
-
-  /**
-   * Last name of the customer.
-   */
-  @Column(name = "last_name", nullable = false)
-  private String lastName;
+  @Column(name = "full_name", nullable = false)
+  private String fullName;
 
   /**
    * Document ID (identification number) of the customer.
@@ -77,13 +70,6 @@ public class Customer {
    * Physical address of the customer.
    */
   private String address;
-
-  /**
-   * Current status of the customer.
-   */
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private CustomerStatus status;
 
   /**
    * Timestamp when the customer record was created.
