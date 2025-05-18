@@ -29,13 +29,13 @@ public interface PurchaseOrderRepository
   List<PurchaseOrder> findByStatus(PurchaseOrderStatus status);
 
   /**
-   * Find all purchase orders placed between the specified dates.
+   * Find all purchase orders created between the specified dates.
    *
    * @param start the start date (inclusive)
    * @param end the end date (inclusive)
    * @return list of purchase orders
    */
-  List<PurchaseOrder> findByOrderDateBetween(LocalDate start, LocalDate end);
+  List<PurchaseOrder> findByCreatedAtBetween(LocalDate start, LocalDate end);
 
   /**
    * Find all purchase orders with an expected delivery date between the specified dates.
