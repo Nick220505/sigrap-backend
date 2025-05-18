@@ -2,7 +2,6 @@ package com.sigrap.supplier;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -45,8 +44,5 @@ public interface PurchaseOrderRepository
    * @param end the end date (inclusive)
    * @return list of purchase orders
    */
-  List<PurchaseOrder> findByExpectedDeliveryDateBetween(
-    LocalDate start,
-    LocalDate end
-  );
+  List<PurchaseOrder> findByDeliveryDateBetween(LocalDate start, LocalDate end);
 }
