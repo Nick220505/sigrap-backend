@@ -1715,22 +1715,22 @@ public class DataSeeder implements CommandLineRunner {
       // Admin user logs
       auditLogs.add(AuditLog.builder()
           .username(adminUser.getEmail())
-          .action("LOGIN")
-          .entityName("User")
+          .action("INICIO_SESION")
+          .entityName("Usuario")
           .timestamp(LocalDateTime.now().minusDays(7).withHour(8).withMinute(0))
           .build());
 
       auditLogs.add(AuditLog.builder()
           .username(adminUser.getEmail())
-          .action("CREATE")
-          .entityName("Product")
+          .action("CREAR")
+          .entityName("Producto")
           .timestamp(LocalDateTime.now().minusDays(7).withHour(9).withMinute(15))
           .build());
 
       auditLogs.add(AuditLog.builder()
           .username(adminUser.getEmail())
-          .action("UPDATE")
-          .entityName("Supplier")
+          .action("ACTUALIZAR")
+          .entityName("Proveedor")
           .timestamp(LocalDateTime.now().minusDays(6).withHour(10).withMinute(30))
           .build());
     }
@@ -1739,22 +1739,22 @@ public class DataSeeder implements CommandLineRunner {
       // Employee user logs
       auditLogs.add(AuditLog.builder()
           .username(employeeUser.getEmail())
-          .action("LOGIN")
-          .entityName("User")
+          .action("INICIO_SESION")
+          .entityName("Usuario")
           .timestamp(LocalDateTime.now().minusDays(7).withHour(8).withMinute(30))
           .build());
 
       auditLogs.add(AuditLog.builder()
           .username(employeeUser.getEmail())
-          .action("CREATE")
-          .entityName("Sale")
+          .action("CREAR")
+          .entityName("Venta")
           .timestamp(LocalDateTime.now().minusDays(7).withHour(9).withMinute(45))
           .build());
 
       auditLogs.add(AuditLog.builder()
           .username(employeeUser.getEmail())
-          .action("UPDATE")
-          .entityName("Product")
+          .action("ACTUALIZAR")
+          .entityName("Producto")
           .timestamp(LocalDateTime.now().minusDays(7).withHour(9).withMinute(45))
           .build());
     }
