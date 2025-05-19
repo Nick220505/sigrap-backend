@@ -21,16 +21,11 @@ public class AuditLogMapper {
     }
 
     return AuditLogInfo.builder()
-      .id(auditLog.getId())
-      .userId(auditLog.getUserId())
-      .username(auditLog.getUsername())
-      .action(auditLog.getAction())
-      .entityName(auditLog.getEntityName())
-      .entityId(auditLog.getEntityId())
-      .oldValue(auditLog.getOldValue())
-      .newValue(auditLog.getNewValue())
-      .timestamp(auditLog.getTimestamp())
-      .ipAddress(auditLog.getIpAddress())
-      .build();
+        .id(auditLog.getId())
+        .username(auditLog.getUsername())
+        .action(auditLog.getAction())
+        .entityName(auditLog.getEntityName())
+        .timestamp(auditLog.getTimestamp())
+        .build();
   }
 }

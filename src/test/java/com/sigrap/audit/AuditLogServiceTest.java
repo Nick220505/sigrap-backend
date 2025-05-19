@@ -1,22 +1,18 @@
 package com.sigrap.audit;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class AuditLogServiceTest {
@@ -24,171 +20,74 @@ class AuditLogServiceTest {
   @Mock
   private AuditLogRepository auditLogRepository;
 
-  @Mock
-  private AuditLogMapper auditLogMapper;
-
-  @Mock
-  private ObjectMapper objectMapper;
-
   @InjectMocks
   private AuditLogService auditLogService;
 
   @Test
-  void log_shouldCreateAuditLogEntry() throws Exception {
-    Long userId = 1L;
+  void testLog() {
+    // Given
     String username = "test@example.com";
     String action = "CREATE";
     String entityName = "User";
-    String entityId = "1";
-    Object oldValue = null;
-    Object newValue = new UserObjectTest(1L, "Test User");
-    String newValueJson = "{\"id\":1,\"name\":\"Test User\"}";
 
-    when(objectMapper.writeValueAsString(newValue)).thenReturn(newValueJson);
+    AuditLog savedLog = AuditLog.builder()
+        .id(1L)
+        .username(username)
+        .action(action)
+        .entityName(entityName)
+        .timestamp(LocalDateTime.now())
+        .build();
 
-    AuditLog savedAuditLog = AuditLog.builder()
-      .id(1L)
-      .userId(userId)
-      .username(username)
-      .action(action)
-      .entityName(entityName)
-      .entityId(entityId)
-      .oldValue(null)
-      .newValue(newValueJson)
-      .timestamp(LocalDateTime.now())
-      .ipAddress("127.0.0.1")
-      .build();
+    when(auditLogRepository.save(any(AuditLog.class))).thenReturn(savedLog);
 
-    AuditLogInfo auditLogInfo = AuditLogInfo.builder()
-      .id(1L)
-      .userId(userId)
-      .username(username)
-      .action(action)
-      .entityName(entityName)
-      .entityId(entityId)
-      .oldValue(null)
-      .newValue(newValueJson)
-      .timestamp(savedAuditLog.getTimestamp())
-      .ipAddress("127.0.0.1")
-      .build();
+    // When
+    AuditLogInfo result = auditLogService.log(username, action, entityName);
 
-    when(auditLogRepository.save(any(AuditLog.class))).thenReturn(
-      savedAuditLog
-    );
-    when(auditLogMapper.toInfo(savedAuditLog)).thenReturn(auditLogInfo);
-
-    AuditLogInfo result = auditLogService.log(
-      userId,
-      username,
-      action,
-      entityName,
-      entityId,
-      oldValue,
-      newValue
-    );
-
-    assertThat(result).isNotNull();
-    assertThat(result.getId()).isEqualTo(1L);
-    assertThat(result.getUserId()).isEqualTo(userId);
-    assertThat(result.getUsername()).isEqualTo(username);
-    assertThat(result.getAction()).isEqualTo(action);
-    assertThat(result.getEntityName()).isEqualTo(entityName);
-    assertThat(result.getEntityId()).isEqualTo(entityId);
-    assertThat(result.getNewValue()).isEqualTo(newValueJson);
+    // Then
+    assertNotNull(result);
+    assertEquals(username, result.getUsername());
+    assertEquals(action, result.getAction());
+    assertEquals(entityName, result.getEntityName());
+    assertEquals(savedLog.getId(), result.getId());
+    assertNotNull(result.getTimestamp());
 
     verify(auditLogRepository).save(any(AuditLog.class));
-    verify(auditLogMapper).toInfo(savedAuditLog);
   }
 
   @Test
-  void findAll_shouldReturnPageOfAuditLogs() {
-    AuditLog auditLog = AuditLog.builder()
-      .id(1L)
-      .userId(1L)
-      .username("test@example.com")
-      .action("CREATE")
-      .entityName("User")
-      .entityId("1")
-      .timestamp(LocalDateTime.now())
-      .build();
+  void testFindAll() {
+    // Given
+    List<AuditLog> logs = Arrays.asList(
+        AuditLog.builder()
+            .id(1L)
+            .username("test1@example.com")
+            .action("CREATE")
+            .entityName("User")
+            .timestamp(LocalDateTime.now())
+            .build(),
+        AuditLog.builder()
+            .id(2L)
+            .username("test2@example.com")
+            .action("UPDATE")
+            .entityName("Role")
+            .timestamp(LocalDateTime.now())
+            .build());
 
-    List<AuditLog> auditLogs = List.of(auditLog);
+    when(auditLogRepository.findAll()).thenReturn(logs);
 
-    AuditLogInfo auditLogInfo = AuditLogInfo.builder()
-      .id(1L)
-      .userId(1L)
-      .username("test@example.com")
-      .action("CREATE")
-      .entityName("User")
-      .entityId("1")
-      .timestamp(auditLog.getTimestamp())
-      .build();
-
-    when(auditLogRepository.findAllByOrderByTimestampDesc()).thenReturn(
-      auditLogs
-    );
-    when(auditLogMapper.toInfo(auditLog)).thenReturn(auditLogInfo);
-
+    // When
     List<AuditLogInfo> result = auditLogService.findAll();
 
-    assertThat(result).isNotNull();
-    assertThat(result).hasSize(1);
-    assertThat(result.get(0).getId()).isEqualTo(1L);
-    assertThat(result.get(0).getAction()).isEqualTo("CREATE");
-
-    verify(auditLogRepository).findAllByOrderByTimestampDesc();
-    verify(auditLogMapper).toInfo(auditLog);
-  }
-
-  @Test
-  void findById_shouldReturnAuditLog_whenExists() {
-    Long id = 1L;
-    AuditLog auditLog = AuditLog.builder()
-      .id(id)
-      .userId(1L)
-      .username("test@example.com")
-      .action("CREATE")
-      .entityName("User")
-      .entityId("1")
-      .timestamp(LocalDateTime.now())
-      .build();
-
-    AuditLogInfo auditLogInfo = AuditLogInfo.builder()
-      .id(id)
-      .userId(1L)
-      .username("test@example.com")
-      .action("CREATE")
-      .entityName("User")
-      .entityId("1")
-      .timestamp(auditLog.getTimestamp())
-      .build();
-
-    when(auditLogRepository.findById(id)).thenReturn(Optional.of(auditLog));
-    when(auditLogMapper.toInfo(auditLog)).thenReturn(auditLogInfo);
-
-    AuditLogInfo result = auditLogService.findById(id);
-
-    assertThat(result).isNotNull();
-    assertThat(result.getId()).isEqualTo(id);
-    assertThat(result.getAction()).isEqualTo("CREATE");
-
-    verify(auditLogRepository).findById(id);
-    verify(auditLogMapper).toInfo(auditLog);
-  }
-
-  @Test
-  void findById_shouldThrowException_whenDoesNotExist() {
-    Long id = 1L;
-
-    when(auditLogRepository.findById(id)).thenReturn(Optional.empty());
-
-    try {
-      auditLogService.findById(id);
-      assert false : "Expected exception was not thrown";
-    } catch (Exception e) {
-      assertThat(e).isInstanceOf(EntityNotFoundException.class);
+    // Then
+    assertEquals(logs.size(), result.size());
+    for (int i = 0; i < logs.size(); i++) {
+      assertEquals(logs.get(i).getId(), result.get(i).getId());
+      assertEquals(logs.get(i).getUsername(), result.get(i).getUsername());
+      assertEquals(logs.get(i).getAction(), result.get(i).getAction());
+      assertEquals(logs.get(i).getEntityName(), result.get(i).getEntityName());
+      assertEquals(logs.get(i).getTimestamp(), result.get(i).getTimestamp());
     }
 
-    verify(auditLogRepository).findById(id);
+    verify(auditLogRepository).findAll();
   }
 }

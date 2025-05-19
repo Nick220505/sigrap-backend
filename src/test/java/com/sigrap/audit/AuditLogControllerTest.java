@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,8 +34,8 @@ class AuditLogControllerTest {
   @BeforeEach
   void setUp() {
     mockMvc = standaloneSetup(auditLogController)
-      .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
-      .build();
+        .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+        .build();
   }
 
   @Test
@@ -44,8 +45,8 @@ class AuditLogControllerTest {
     when(auditLogService.findById(1L)).thenReturn(auditLogInfo);
 
     mockMvc
-      .perform(get("/api/audit-logs/1").accept(MediaType.APPLICATION_JSON))
-      .andExpect(status().isOk());
+        .perform(get("/api/audit-logs/1").accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
   }
 
   /**
@@ -53,16 +54,11 @@ class AuditLogControllerTest {
    */
   private AuditLogInfo createAuditLogInfo() {
     return AuditLogInfo.builder()
-      .id(1L)
-      .userId(1L)
-      .username("test@example.com")
-      .action("CREATE")
-      .entityName("User")
-      .entityId("1")
-      .oldValue(null)
-      .newValue("{\"id\":1,\"name\":\"Test User\"}")
-      .timestamp(LocalDateTime.of(2025, 5, 1, 10, 0))
-      .ipAddress("127.0.0.1")
-      .build();
+        .id(1L)
+        .username("test@example.com")
+        .action("CREATE")
+        .entityName("User")
+        .timestamp(LocalDateTime.of(2025, 5, 1, 10, 0))
+        .build();
   }
 }

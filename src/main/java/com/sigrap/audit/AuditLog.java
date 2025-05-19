@@ -1,14 +1,14 @@
 package com.sigrap.audit;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,11 +35,6 @@ public class AuditLog {
   private Long id;
 
   /**
-   * The ID of the user who performed the action.
-   */
-  private Long userId;
-
-  /**
    * The username (email) of the user who performed the action.
    * Stored separately in case user records are deleted.
    */
@@ -62,35 +57,8 @@ public class AuditLog {
   private String entityName;
 
   /**
-   * The ID of the entity that was affected.
-   */
-  private String entityId;
-
-  /**
-   * The previous state of the entity, if applicable.
-   * Stored as a JSON string for flexibility.
-   */
-  @Lob
-  @Column(columnDefinition = "TEXT")
-  private String oldValue;
-
-  /**
-   * The new state of the entity, if applicable.
-   * Stored as a JSON string for flexibility.
-   */
-  @Lob
-  @Column(columnDefinition = "TEXT")
-  private String newValue;
-
-  /**
    * The timestamp when the action occurred.
    */
   @NotNull
   private LocalDateTime timestamp;
-
-  /**
-   * The IP address from which the action was performed.
-   * Useful for security auditing.
-   */
-  private String ipAddress;
 }
