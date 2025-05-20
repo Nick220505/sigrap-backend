@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -65,8 +66,7 @@ public class AttendanceService {
    * Records a clock-in for a user.
    *
    * @param userId The ID of the user
-   * @param timestamp The clock-in timestamp
-   * @param notes Optional notes about the clock-in
+   * @param timestamp The clock-in timestamp, or null to use current time in Bogotá, Colombia
    * @return AttendanceInfo containing the created attendance record
    * @throws EntityNotFoundException if the user is not found
    * @throws IllegalStateException if the user already has an active attendance record
@@ -78,16 +78,17 @@ public class AttendanceService {
     entityIdParam = "userId",
     captureDetails = true
   )
-  public AttendanceInfo clockIn(
-    Long userId,
-    LocalDateTime timestamp,
-    String notes
-  ) {
+  public AttendanceInfo clockIn(Long userId, LocalDateTime timestamp) {
     User user = userRepository
       .findById(userId)
       .orElseThrow(() ->
         new EntityNotFoundException("User not found: " + userId)
       );
+
+    // If timestamp is null, use current time in Bogotá, Colombia (UTC-5)
+    if (timestamp == null) {
+      timestamp = LocalDateTime.now(ZoneId.of("America/Bogota"));
+    }
 
     LocalDateTime today = timestamp.toLocalDate().atStartOfDay();
     if (attendanceRepository.findByUserIdAndDate(userId, today).isPresent()) {
@@ -101,7 +102,6 @@ public class AttendanceService {
       .date(today)
       .clockInTime(timestamp)
       .status(AttendanceStatus.PRESENT)
-      .notes(notes)
       .build();
 
     Attendance attendance = attendanceMapper.toEntity(attendanceData);
@@ -113,8 +113,7 @@ public class AttendanceService {
    * Records a clock-out for a user.
    *
    * @param attendanceId The ID of the attendance record
-   * @param timestamp The clock-out timestamp
-   * @param notes Optional notes about the clock-out
+   * @param timestamp The clock-out timestamp, or null to use current time in Bogotá, Colombia
    * @return AttendanceInfo containing the updated attendance record
    * @throws EntityNotFoundException if the attendance record is not found
    */
@@ -125,11 +124,7 @@ public class AttendanceService {
     entityIdParam = "attendanceId",
     captureDetails = true
   )
-  public AttendanceInfo clockOut(
-    Long attendanceId,
-    LocalDateTime timestamp,
-    String notes
-  ) {
+  public AttendanceInfo clockOut(Long attendanceId, LocalDateTime timestamp) {
     Attendance attendance = attendanceRepository
       .findById(attendanceId)
       .orElseThrow(() ->
@@ -140,14 +135,12 @@ public class AttendanceService {
       throw new IllegalStateException("User has already clocked out");
     }
 
-    attendance.setClockOutTime(timestamp);
-    if (notes != null) {
-      attendance.setNotes(
-        attendance.getNotes() != null
-          ? attendance.getNotes() + "; " + notes
-          : notes
-      );
+    // If timestamp is null, use current time in Bogotá, Colombia (UTC-5)
+    if (timestamp == null) {
+      timestamp = LocalDateTime.now(ZoneId.of("America/Bogota"));
     }
+
+    attendance.setClockOutTime(timestamp);
 
     Duration duration = Duration.between(
       attendance.getClockInTime(),

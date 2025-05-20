@@ -85,8 +85,7 @@ public class AttendanceController {
   ) {
     return attendanceService.clockIn(
       clockInData.getUserId(),
-      clockInData.getTimestamp(),
-      clockInData.getNotes()
+      clockInData.getTimestamp()
     );
   }
 
@@ -116,8 +115,7 @@ public class AttendanceController {
   ) {
     return attendanceService.clockOut(
       clockOutData.getAttendanceId(),
-      clockOutData.getTimestamp(),
-      clockOutData.getNotes()
+      clockOutData.getTimestamp()
     );
   }
 

@@ -22,8 +22,7 @@ import lombok.NoArgsConstructor;
  * <p>Validation Rules:
  * <ul>
  *   <li>User ID must not be null</li>
- *   <li>Timestamp must not be null</li>
- *   <li>Notes are optional</li>
+ *   <li>Timestamp is optional - if not provided, current time in Bogotá will be used</li>
  * </ul></p>
  */
 @Data
@@ -43,21 +42,11 @@ public class ClockInData {
 
   /**
    * Timestamp of the clock-in.
-   * Must not be null.
+   * If null, current time in Bogotá, Colombia will be used.
    */
-  @NotNull(message = "Timestamp cannot be null")
   @Schema(
-    description = "Timestamp of the clock-in",
+    description = "Timestamp of the clock-in (optional - server time will be used if not provided)",
     example = "2024-01-15T09:00:00"
   )
   private LocalDateTime timestamp;
-
-  /**
-   * Optional notes about the clock-in.
-   */
-  @Schema(
-    description = "Optional notes about the clock-in",
-    example = "On time arrival"
-  )
-  private String notes;
 }
