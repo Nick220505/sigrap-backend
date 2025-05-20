@@ -3,6 +3,7 @@ package com.sigrap.audit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +87,7 @@ public class AuditLogService {
       .action(action)
       .entityName(entityName)
       .entityId(entityId)
-      .timestamp(LocalDateTime.now())
+      .timestamp(LocalDateTime.now(ZoneId.of("America/Bogota")))
       .sourceIp(sourceIp)
       .userAgent(userAgent)
       .details(details)

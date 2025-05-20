@@ -1,6 +1,7 @@
 package com.sigrap.audit;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import lombok.Builder;
 import lombok.Data;
@@ -37,9 +38,12 @@ public class AuditEvent {
 
   /**
    * The timestamp when the action occurred.
+   * Uses Colombia/Bogota timezone (UTC-5).
    */
   @Builder.Default
-  private LocalDateTime timestamp = LocalDateTime.now();
+  private LocalDateTime timestamp = LocalDateTime.now(
+    ZoneId.of("America/Bogota")
+  );
 
   /**
    * The IP address of the client that initiated the action.

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sigrap.config.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,15 @@ public class AuditUtils {
   private final SecurityUtils securityUtils;
 
   /**
+   * Gets the current timestamp in Colombia/Bogota timezone (UTC-5).
+   *
+   * @return LocalDateTime representing the current time in Colombia/Bogota timezone
+   */
+  public static LocalDateTime getCurrentTimestamp() {
+    return LocalDateTime.now(ZoneId.of("America/Bogota"));
+  }
+
+  /**
    * Gets the current authenticated username.
    *
    * @return The username or "anonymous" if not authenticated
@@ -31,6 +42,7 @@ public class AuditUtils {
     try {
       return securityUtils.getCurrentUsername();
     } catch (Exception e) {
+      log.debug("Could not get current username: {}", e.getMessage());
       return "anonymous";
     }
   }
@@ -49,7 +61,8 @@ public class AuditUtils {
     AuditEvent.AuditEventBuilder builder = AuditEvent.builder()
       .username(getCurrentUsername())
       .action(action)
-      .entityName(entityName);
+      .entityName(entityName)
+      .timestamp(getCurrentTimestamp());
 
     populateHttpRequestDetails(builder);
     return builder;
