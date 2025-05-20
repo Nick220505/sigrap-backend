@@ -99,8 +99,12 @@ class AttendanceIntegrationTest extends BaseIntegrationTest {
   @WithMockUser(roles = "ADMIN")
   void findByDateRange() throws Exception {
     LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
-    LocalDateTime lastWeek = LocalDateTime.now().minusWeeks(1);
+    LocalDateTime today = LocalDateTime.now();
 
+    // Clear previous test attendance
+    attendanceRepository.deleteAll();
+
+    // Create yesterday's attendance
     Attendance yesterdayAttendance = Attendance.builder()
       .user(testUser)
       .date(yesterday)
@@ -109,20 +113,21 @@ class AttendanceIntegrationTest extends BaseIntegrationTest {
       .status(AttendanceStatus.PRESENT)
       .build();
 
-    Attendance lastWeekAttendance = Attendance.builder()
+    // Create today's attendance
+    Attendance todayAttendance = Attendance.builder()
       .user(testUser)
-      .date(lastWeek)
-      .clockInTime(lastWeek)
-      .clockOutTime(lastWeek.plusHours(8))
+      .date(today)
+      .clockInTime(today)
+      .clockOutTime(today.plusHours(8))
       .status(AttendanceStatus.PRESENT)
       .build();
 
     attendanceRepository.saveAll(
-      Arrays.asList(yesterdayAttendance, lastWeekAttendance)
+      Arrays.asList(yesterdayAttendance, todayAttendance)
     );
 
-    String startDate = yesterday.toString();
-    String endDate = LocalDateTime.now().toString();
+    String startDate = yesterday.minusHours(1).toString();
+    String endDate = today.plusHours(1).toString();
 
     mockMvc
       .perform(
