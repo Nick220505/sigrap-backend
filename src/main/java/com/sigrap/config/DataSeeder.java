@@ -880,11 +880,11 @@ public class DataSeeder implements CommandLineRunner {
       }
 
       for (String day : List.of(
-        "MONDAY",
-        "TUESDAY",
-        "WEDNESDAY",
-        "THURSDAY",
-        "FRIDAY"
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes"
       )) {
         schedules.add(
           Schedule.builder()
@@ -901,7 +901,7 @@ public class DataSeeder implements CommandLineRunner {
         schedules.add(
           Schedule.builder()
             .user(user)
-            .day("SATURDAY")
+            .day("Sabado")
             .startTime(defaultStartTime)
             .endTime(saturdayEndTime)
             .isActive(true)
