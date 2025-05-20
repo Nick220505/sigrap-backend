@@ -29,7 +29,6 @@ import org.hibernate.annotations.UpdateTimestamp;
  *   <li>Clock-in and clock-out times</li>
  *   <li>Total hours worked</li>
  *   <li>Attendance status (present, absent, late)</li>
- *   <li>Notes or comments about attendance</li>
  * </ul></p>
  */
 @Entity
@@ -90,12 +89,6 @@ public class Attendance {
   @NotNull(message = "Status cannot be null")
   @Builder.Default
   private AttendanceStatus status = AttendanceStatus.PRESENT;
-
-  /**
-   * Additional notes or comments about the attendance.
-   */
-  @Column(columnDefinition = "TEXT")
-  private String notes;
 
   /**
    * Timestamp of when the attendance record was created.

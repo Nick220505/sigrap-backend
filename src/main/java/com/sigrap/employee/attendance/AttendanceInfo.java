@@ -81,15 +81,6 @@ public class AttendanceInfo {
   private AttendanceStatus status;
 
   /**
-   * Additional notes or comments about the attendance.
-   */
-  @Schema(
-    description = "Additional notes about the attendance",
-    example = "User arrived on time"
-  )
-  private String notes;
-
-  /**
    * Timestamp of when the attendance record was created.
    */
   @Schema(

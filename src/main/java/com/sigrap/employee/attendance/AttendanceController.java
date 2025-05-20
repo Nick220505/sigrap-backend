@@ -178,7 +178,6 @@ public class AttendanceController {
    *
    * @param id The ID of the attendance record
    * @param status The new status
-   * @param notes Optional notes about the status change
    * @return AttendanceInfo containing the updated attendance record
    */
   @PutMapping("/{id}/status")
@@ -198,14 +197,9 @@ public class AttendanceController {
     @Parameter(
       description = "ID of the attendance record"
     ) @PathVariable Long id,
-    @Parameter(
-      description = "New status"
-    ) @RequestParam AttendanceStatus status,
-    @Parameter(description = "Optional notes") @RequestParam(
-      required = false
-    ) String notes
+    @Parameter(description = "New status") @RequestParam AttendanceStatus status
   ) {
-    return attendanceService.updateStatus(id, status, notes);
+    return attendanceService.updateStatus(id, status);
   }
 
   /**

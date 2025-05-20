@@ -34,6 +34,12 @@ public class AttendanceService {
   private final AttendanceMapper attendanceMapper;
   private final UserRepository userRepository;
 
+  private static final int LATE_THRESHOLD_MINUTES = 5;
+  private static final int EARLY_DEPARTURE_THRESHOLD_MINUTES = 30;
+
+  private static final LocalTime STANDARD_START_TIME = LocalTime.of(8, 0);
+  private static final LocalTime STANDARD_END_TIME = LocalTime.of(17, 0);
+
   /**
    * Retrieves all attendance records.
    *
@@ -85,7 +91,6 @@ public class AttendanceService {
         new EntityNotFoundException("User not found: " + userId)
       );
 
-    // If timestamp is null, use current time in Bogotá, Colombia (UTC-5)
     if (timestamp == null) {
       timestamp = LocalDateTime.now(ZoneId.of("America/Bogota"));
     }
@@ -97,11 +102,13 @@ public class AttendanceService {
       );
     }
 
+    AttendanceStatus status = determineClockInStatus(timestamp.toLocalTime());
+
     AttendanceData attendanceData = AttendanceData.builder()
       .userId(user.getId())
       .date(today)
       .clockInTime(timestamp)
-      .status(AttendanceStatus.PRESENT)
+      .status(status)
       .build();
 
     Attendance attendance = attendanceMapper.toEntity(attendanceData);
@@ -135,7 +142,6 @@ public class AttendanceService {
       throw new IllegalStateException("User has already clocked out");
     }
 
-    // If timestamp is null, use current time in Bogotá, Colombia (UTC-5)
     if (timestamp == null) {
       timestamp = LocalDateTime.now(ZoneId.of("America/Bogota"));
     }
@@ -148,8 +154,55 @@ public class AttendanceService {
     );
     attendance.setTotalHours(duration.toMinutes() / 60.0);
 
+    if (attendance.getStatus() != AttendanceStatus.ON_LEAVE) {
+      AttendanceStatus clockOutStatus = determineClockOutStatus(
+        timestamp.toLocalTime()
+      );
+
+      if (
+        attendance.getStatus() != AttendanceStatus.LATE ||
+        clockOutStatus != AttendanceStatus.EARLY_DEPARTURE
+      ) {
+        attendance.setStatus(clockOutStatus);
+      }
+    }
+
     Attendance savedAttendance = attendanceRepository.save(attendance);
     return attendanceMapper.toInfo(savedAttendance);
+  }
+
+  /**
+   * Determines the attendance status based on clock-in time.
+   *
+   * @param clockInTime The time when the employee clocked in
+   * @return LATE if more than threshold minutes late, PRESENT otherwise
+   */
+  private AttendanceStatus determineClockInStatus(LocalTime clockInTime) {
+    if (
+      clockInTime.isAfter(
+        STANDARD_START_TIME.plusMinutes(LATE_THRESHOLD_MINUTES)
+      )
+    ) {
+      return AttendanceStatus.LATE;
+    }
+    return AttendanceStatus.PRESENT;
+  }
+
+  /**
+   * Determines the attendance status based on clock-out time.
+   *
+   * @param clockOutTime The time when the employee clocked out
+   * @return EARLY_DEPARTURE if leaving before standard end time - threshold, PRESENT otherwise
+   */
+  private AttendanceStatus determineClockOutStatus(LocalTime clockOutTime) {
+    if (
+      clockOutTime.isBefore(
+        STANDARD_END_TIME.minusMinutes(EARLY_DEPARTURE_THRESHOLD_MINUTES)
+      )
+    ) {
+      return AttendanceStatus.EARLY_DEPARTURE;
+    }
+    return AttendanceStatus.PRESENT;
   }
 
   /**
@@ -210,7 +263,6 @@ public class AttendanceService {
    *
    * @param id The ID of the attendance record
    * @param status The new status
-   * @param notes Optional notes about the status change
    * @return AttendanceInfo containing the updated attendance record
    * @throws EntityNotFoundException if the attendance record is not found
    */
@@ -221,11 +273,7 @@ public class AttendanceService {
     entityIdParam = "id",
     captureDetails = true
   )
-  public AttendanceInfo updateStatus(
-    Long id,
-    AttendanceStatus status,
-    String notes
-  ) {
+  public AttendanceInfo updateStatus(Long id, AttendanceStatus status) {
     Attendance attendance = attendanceRepository
       .findById(id)
       .orElseThrow(() ->
@@ -233,9 +281,6 @@ public class AttendanceService {
       );
 
     attendance.setStatus(status);
-    if (notes != null) {
-      attendance.setNotes(notes);
-    }
 
     Attendance savedAttendance = attendanceRepository.save(attendance);
     return attendanceMapper.toInfo(savedAttendance);

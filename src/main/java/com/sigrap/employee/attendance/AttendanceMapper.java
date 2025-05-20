@@ -56,7 +56,6 @@ public class AttendanceMapper {
       .clockOutTime(attendance.getClockOutTime())
       .totalHours(attendance.getTotalHours())
       .status(attendance.getStatus())
-      .notes(attendance.getNotes())
       .createdAt(attendance.getCreatedAt())
       .updatedAt(attendance.getUpdatedAt())
       .build();
@@ -101,7 +100,6 @@ public class AttendanceMapper {
       .clockInTime(attendanceData.getClockInTime())
       .clockOutTime(attendanceData.getClockOutTime())
       .status(attendanceData.getStatus())
-      .notes(attendanceData.getNotes())
       .build();
 
     calculateTotalHours(attendance);
@@ -148,9 +146,6 @@ public class AttendanceMapper {
     }
     if (attendanceData.getStatus() != null) {
       attendance.setStatus(attendanceData.getStatus());
-    }
-    if (attendanceData.getNotes() != null) {
-      attendance.setNotes(attendanceData.getNotes());
     }
 
     calculateTotalHours(attendance);

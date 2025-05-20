@@ -29,6 +29,7 @@ import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserRole;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -881,7 +882,6 @@ public class DataSeeder implements CommandLineRunner {
         continue;
       }
 
-      // Regular schedules for weekdays
       schedules.add(
         Schedule.builder()
           .user(user)
@@ -937,7 +937,6 @@ public class DataSeeder implements CommandLineRunner {
           .build()
       );
 
-      // Saturday schedule as Holiday type
       schedules.add(
         Schedule.builder()
           .user(user)
@@ -949,7 +948,6 @@ public class DataSeeder implements CommandLineRunner {
           .build()
       );
 
-      // Extra hours schedule for Wednesday
       schedules.add(
         Schedule.builder()
           .user(user)
@@ -978,47 +976,167 @@ public class DataSeeder implements CommandLineRunner {
     List<User> users = userRepository.findAll();
     LocalDateTime now = LocalDateTime.now();
 
-    for (User user : users) {
-      if (!"gladys@sigrap.com".equals(user.getEmail())) {
-        continue;
-      }
+    User gladys = users
+      .stream()
+      .filter(user -> "gladys@sigrap.com".equals(user.getEmail()))
+      .findFirst()
+      .orElse(null);
 
-      for (int i = 0; i < 7; i++) {
-        LocalDateTime date = now.minusDays(i);
-
-        if (
-          date.getDayOfWeek().getValue() > 5 &&
-          !"gladys@sigrap.com".equals(user.getEmail())
-        ) {
-          continue;
-        }
-
-        AttendanceStatus status = AttendanceStatus.PRESENT;
-        String notes = "Asistencia regular";
-
-        if (i == 2) {
-          status = AttendanceStatus.LATE;
-          notes = "Llegó 15 minutos tarde debido al tráfico";
-        } else if (i == 5) {
-          status = AttendanceStatus.ON_LEAVE;
-          notes = "Permiso por asuntos personales";
-        }
-
-        attendanceRecords.add(
-          Attendance.builder()
-            .user(user)
-            .date(date)
-            .clockInTime(date.withHour(8).withMinute(0))
-            .clockOutTime(date.withHour(17).withMinute(0))
-            .status(status)
-            .notes(notes)
-            .build()
-        );
-      }
+    if (gladys == null) {
+      log.warn("Employee Gladys not found, skipping attendance seeding.");
+      return;
     }
+
+    LocalDateTime mondayDate = now.minusDays(now.getDayOfWeek().getValue() - 1);
+    LocalDateTime mondayClockIn = mondayDate.withHour(8).withMinute(5);
+    LocalDateTime mondayClockOut = mondayDate.withHour(17).withMinute(10);
+    double mondayHours = calculateHoursWorked(mondayClockIn, mondayClockOut);
+
+    attendanceRecords.add(
+      Attendance.builder()
+        .user(gladys)
+        .date(mondayDate.toLocalDate().atStartOfDay())
+        .clockInTime(mondayClockIn)
+        .clockOutTime(mondayClockOut)
+        .totalHours(mondayHours)
+        .status(AttendanceStatus.PRESENT)
+        .build()
+    );
+
+    LocalDateTime tuesdayDate = mondayDate.plusDays(1);
+    LocalDateTime tuesdayClockIn = tuesdayDate.withHour(8).withMinute(45);
+    LocalDateTime tuesdayClockOut = tuesdayDate.withHour(17).withMinute(15);
+    double tuesdayHours = calculateHoursWorked(tuesdayClockIn, tuesdayClockOut);
+
+    attendanceRecords.add(
+      Attendance.builder()
+        .user(gladys)
+        .date(tuesdayDate.toLocalDate().atStartOfDay())
+        .clockInTime(tuesdayClockIn)
+        .clockOutTime(tuesdayClockOut)
+        .totalHours(tuesdayHours)
+        .status(AttendanceStatus.LATE)
+        .build()
+    );
+
+    LocalDateTime wednesdayDate = tuesdayDate.plusDays(1);
+    LocalDateTime wednesdayClockIn = wednesdayDate.withHour(8).withMinute(0);
+    LocalDateTime wednesdayClockOut = wednesdayDate.withHour(15).withMinute(30);
+    double wednesdayHours = calculateHoursWorked(
+      wednesdayClockIn,
+      wednesdayClockOut
+    );
+
+    attendanceRecords.add(
+      Attendance.builder()
+        .user(gladys)
+        .date(wednesdayDate.toLocalDate().atStartOfDay())
+        .clockInTime(wednesdayClockIn)
+        .clockOutTime(wednesdayClockOut)
+        .totalHours(wednesdayHours)
+        .status(AttendanceStatus.EARLY_DEPARTURE)
+        .build()
+    );
+
+    LocalDateTime thursdayDate = wednesdayDate.plusDays(1);
+    LocalDateTime thursdayClockIn = thursdayDate.withHour(7).withMinute(55);
+    LocalDateTime thursdayClockOut = thursdayDate.withHour(17).withMinute(5);
+    double thursdayHours = calculateHoursWorked(
+      thursdayClockIn,
+      thursdayClockOut
+    );
+
+    attendanceRecords.add(
+      Attendance.builder()
+        .user(gladys)
+        .date(thursdayDate.toLocalDate().atStartOfDay())
+        .clockInTime(thursdayClockIn)
+        .clockOutTime(thursdayClockOut)
+        .totalHours(thursdayHours)
+        .status(AttendanceStatus.PRESENT)
+        .build()
+    );
+
+    LocalDateTime fridayDate = thursdayDate.plusDays(1);
+
+    attendanceRecords.add(
+      Attendance.builder()
+        .user(gladys)
+        .date(fridayDate.toLocalDate().atStartOfDay())
+        .clockInTime(null)
+        .clockOutTime(null)
+        .totalHours(null)
+        .status(AttendanceStatus.ON_LEAVE)
+        .build()
+    );
+
+    LocalDateTime prevMondayDate = mondayDate.minusDays(7);
+    LocalDateTime prevMondayClockIn = prevMondayDate.withHour(8).withMinute(2);
+    LocalDateTime prevMondayClockOut = prevMondayDate
+      .withHour(17)
+      .withMinute(0);
+    double prevMondayHours = calculateHoursWorked(
+      prevMondayClockIn,
+      prevMondayClockOut
+    );
+
+    attendanceRecords.add(
+      Attendance.builder()
+        .user(gladys)
+        .date(prevMondayDate.toLocalDate().atStartOfDay())
+        .clockInTime(prevMondayClockIn)
+        .clockOutTime(prevMondayClockOut)
+        .totalHours(prevMondayHours)
+        .status(AttendanceStatus.PRESENT)
+        .build()
+    );
+
+    LocalDateTime prevTuesdayDate = prevMondayDate.plusDays(1);
+    LocalDateTime prevTuesdayClockIn = prevTuesdayDate
+      .withHour(7)
+      .withMinute(50);
+    LocalDateTime prevTuesdayClockOut = prevTuesdayDate
+      .withHour(17)
+      .withMinute(10);
+    double prevTuesdayHours = calculateHoursWorked(
+      prevTuesdayClockIn,
+      prevTuesdayClockOut
+    );
+
+    attendanceRecords.add(
+      Attendance.builder()
+        .user(gladys)
+        .date(prevTuesdayDate.toLocalDate().atStartOfDay())
+        .clockInTime(prevTuesdayClockIn)
+        .clockOutTime(prevTuesdayClockOut)
+        .totalHours(prevTuesdayHours)
+        .status(AttendanceStatus.PRESENT)
+        .build()
+    );
 
     attendanceRepository.saveAll(attendanceRecords);
     log.info("Attendance records seeded successfully.");
+  }
+
+  /**
+   * Calculate hours worked between clock-in and clock-out times.
+   *
+   * @param clockIn Clock-in time
+   * @param clockOut Clock-out time
+   * @return Hours worked as a double with 2 decimal places
+   */
+  private double calculateHoursWorked(
+    LocalDateTime clockIn,
+    LocalDateTime clockOut
+  ) {
+    if (clockIn == null || clockOut == null) {
+      return 0.0;
+    }
+
+    Duration duration = Duration.between(clockIn, clockOut);
+    double hours = duration.toMinutes() / 60.0;
+
+    return Math.round(hours * 100.0) / 100.0;
   }
 
   /**

@@ -73,13 +73,4 @@ public class AttendanceData {
   @NotNull(message = "Status cannot be null")
   @Schema(description = "Status of the attendance", example = "PRESENT")
   private AttendanceStatus status;
-
-  /**
-   * Additional notes or comments about the attendance.
-   */
-  @Schema(
-    description = "Additional notes about the attendance",
-    example = "User arrived on time"
-  )
-  private String notes;
 }
