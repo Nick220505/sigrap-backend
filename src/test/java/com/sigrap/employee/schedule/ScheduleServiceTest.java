@@ -241,4 +241,110 @@ class ScheduleServiceTest {
     );
     assertEquals("User not found: 1", exception.getMessage());
   }
+
+  @Test
+  void copyScheduleFromPreviousWeek_withValidData_shouldCopySchedules() {
+    Long userId = 1L;
+    List<Schedule> existingSchedules = List.of(
+      Schedule.builder()
+        .id(1L)
+        .user(testUser)
+        .day("MONDAY")
+        .startTime(testStartTime)
+        .endTime(testEndTime)
+        .isActive(true)
+        .build(),
+      Schedule.builder()
+        .id(2L)
+        .user(testUser)
+        .day("TUESDAY")
+        .startTime(testStartTime)
+        .endTime(testEndTime)
+        .isActive(true)
+        .build()
+    );
+
+    List<ScheduleInfo> expectedInfos = List.of(
+      scheduleInfo,
+      ScheduleInfo.builder()
+        .id(2L)
+        .userId(1L)
+        .userName("John Doe")
+        .day("TUESDAY")
+        .startTime(testStartTime)
+        .endTime(testEndTime)
+        .isActive(true)
+        .build()
+    );
+
+    when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+    when(scheduleRepository.findByUserIdAndIsActive(userId, true)).thenReturn(
+      existingSchedules
+    );
+    when(scheduleRepository.saveAll(any())).thenReturn(existingSchedules);
+    when(scheduleMapper.toInfoList(existingSchedules)).thenReturn(
+      expectedInfos
+    );
+
+    List<ScheduleInfo> result = scheduleService.copyScheduleFromPreviousWeek(
+      userId
+    );
+
+    assertNotNull(result);
+    assertEquals(2, result.size());
+    verify(scheduleRepository).findByUserIdAndIsActive(userId, true);
+    verify(scheduleRepository).saveAll(any());
+  }
+
+  @Test
+  void copyScheduleFromPreviousWeek_withInvalidUserId_shouldThrowException() {
+    Long userId = 1L;
+    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+    EntityNotFoundException exception = assertThrows(
+      EntityNotFoundException.class,
+      () -> scheduleService.copyScheduleFromPreviousWeek(userId)
+    );
+    assertEquals("User not found: 1", exception.getMessage());
+  }
+
+  @Test
+  void findActiveSchedulesByUserId_shouldReturnOnlyActiveSchedules() {
+    Long userId = 1L;
+    List<Schedule> activeSchedules = List.of(schedule);
+    List<ScheduleInfo> expectedInfos = List.of(scheduleInfo);
+
+    when(scheduleRepository.findByUserIdAndIsActive(userId, true)).thenReturn(
+      activeSchedules
+    );
+    when(scheduleMapper.toInfoList(activeSchedules)).thenReturn(expectedInfos);
+
+    List<ScheduleInfo> result = scheduleService.findActiveSchedulesByUserId(
+      userId
+    );
+
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    assertEquals(scheduleInfo, result.get(0));
+    verify(scheduleRepository).findByUserIdAndIsActive(userId, true);
+  }
+
+  @Test
+  void findActiveSchedulesByDay_shouldReturnOnlyActiveSchedules() {
+    String day = "MONDAY";
+    List<Schedule> activeSchedules = List.of(schedule);
+    List<ScheduleInfo> expectedInfos = List.of(scheduleInfo);
+
+    when(scheduleRepository.findByDayAndIsActive(day, true)).thenReturn(
+      activeSchedules
+    );
+    when(scheduleMapper.toInfoList(activeSchedules)).thenReturn(expectedInfos);
+
+    List<ScheduleInfo> result = scheduleService.findActiveSchedulesByDay(day);
+
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    assertEquals(scheduleInfo, result.get(0));
+    verify(scheduleRepository).findByDayAndIsActive(day, true);
+  }
 }

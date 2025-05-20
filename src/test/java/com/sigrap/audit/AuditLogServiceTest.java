@@ -12,12 +12,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +29,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class AuditLogServiceTest {
@@ -450,7 +453,6 @@ class AuditLogServiceTest {
 
   @Test
   void countActionsByType_returnsListOfCounts() {
-    // Create a properly typed List<Object[]>
     List<Object[]> expectedCounts = new ArrayList<>();
     expectedCounts.add(new Object[] { "CREATE", 10L });
 
@@ -464,5 +466,42 @@ class AuditLogServiceTest {
     List<Object[]> result = auditLogService.countActionsByType(start, end);
 
     assertEquals(expectedCounts, result);
+  }
+
+  @Test
+  void findByEntityNameAndTimestampBetween_returnsPageOfAuditLogInfo() {
+    String entityName = "USER";
+    LocalDateTime startTime = now.minusDays(7);
+    LocalDateTime endTime = now;
+    Page<AuditLog> auditLogPage = new PageImpl<>(List.of(testAuditLog));
+    Page<AuditLogInfo> expectedPage = new PageImpl<>(List.of(testAuditLogInfo));
+
+    when(
+      auditLogRepository.findByEntityNameAndTimestampBetweenOrderByTimestampDesc(
+        eq(entityName),
+        eq(startTime),
+        eq(endTime),
+        eq(pageable)
+      )
+    ).thenReturn(auditLogPage);
+    when(auditLogMapper.toInfoPage(auditLogPage)).thenReturn(expectedPage);
+
+    Page<AuditLogInfo> result =
+      auditLogService.findByEntityNameAndTimestampBetween(
+        entityName,
+        startTime,
+        endTime,
+        pageable
+      );
+
+    assertEquals(expectedPage, result);
+    verify(
+      auditLogRepository
+    ).findByEntityNameAndTimestampBetweenOrderByTimestampDesc(
+      entityName,
+      startTime,
+      endTime,
+      pageable
+    );
   }
 }
