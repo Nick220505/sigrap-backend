@@ -1827,7 +1827,7 @@ public class DataSeeder implements CommandLineRunner {
         AuditLog.builder()
           .username(adminUser.getEmail())
           .action("INICIO_SESION")
-          .entityName("Usuario")
+          .entityName("USUARIO")
           .timestamp(LocalDateTime.now().minusDays(7).withHour(8).withMinute(0))
           .build()
       );
@@ -1836,7 +1836,7 @@ public class DataSeeder implements CommandLineRunner {
         AuditLog.builder()
           .username(adminUser.getEmail())
           .action("CREAR")
-          .entityName("Producto")
+          .entityName("PRODUCTO")
           .timestamp(
             LocalDateTime.now().minusDays(7).withHour(9).withMinute(15)
           )
@@ -1847,7 +1847,7 @@ public class DataSeeder implements CommandLineRunner {
         AuditLog.builder()
           .username(adminUser.getEmail())
           .action("ACTUALIZAR")
-          .entityName("Proveedor")
+          .entityName("PROVEEDOR")
           .timestamp(
             LocalDateTime.now().minusDays(6).withHour(10).withMinute(30)
           )
@@ -1860,7 +1860,7 @@ public class DataSeeder implements CommandLineRunner {
         AuditLog.builder()
           .username(employeeUser.getEmail())
           .action("INICIO_SESION")
-          .entityName("Usuario")
+          .entityName("USUARIO")
           .timestamp(
             LocalDateTime.now().minusDays(7).withHour(8).withMinute(30)
           )
@@ -1871,7 +1871,7 @@ public class DataSeeder implements CommandLineRunner {
         AuditLog.builder()
           .username(employeeUser.getEmail())
           .action("CREAR")
-          .entityName("Venta")
+          .entityName("VENTA")
           .timestamp(
             LocalDateTime.now().minusDays(7).withHour(9).withMinute(45)
           )
@@ -1882,7 +1882,7 @@ public class DataSeeder implements CommandLineRunner {
         AuditLog.builder()
           .username(employeeUser.getEmail())
           .action("ACTUALIZAR")
-          .entityName("Producto")
+          .entityName("PRODUCTO")
           .timestamp(
             LocalDateTime.now().minusDays(7).withHour(9).withMinute(45)
           )
