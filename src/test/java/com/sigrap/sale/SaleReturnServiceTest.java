@@ -581,4 +581,354 @@ class SaleReturnServiceTest {
 
     assertTrue(exception.getMessage().contains("was not in the original sale"));
   }
+
+  @Test
+  void update_shouldHandleReturnItemsUpdatesCorrectly() {
+    when(saleReturnRepository.findById(1)).thenReturn(
+      Optional.of(testSaleReturn)
+    );
+    when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
+    when(productRepository.findById(1)).thenReturn(Optional.of(testProduct));
+
+    List<SaleReturnItem> existingItems = Collections.singletonList(
+      testSaleReturnItem
+    );
+    when(saleReturnItemRepository.findBySaleReturn(testSaleReturn)).thenReturn(
+      existingItems
+    );
+
+    SaleReturnItemData updatedItemData = SaleReturnItemData.builder()
+      .productId(1)
+      .quantity(4)
+      .unitPrice(new BigDecimal("50.00"))
+      .subtotal(new BigDecimal("200.00"))
+      .build();
+
+    SaleReturnData updateData = SaleReturnData.builder()
+      .originalSaleId(1)
+      .customerId(1L)
+      .employeeId(1L)
+      .totalReturnAmount(new BigDecimal("200.00"))
+      .reason("Updated reason")
+      .items(Collections.singletonList(updatedItemData))
+      .build();
+
+    when(saleReturnRepository.save(any(SaleReturn.class))).thenReturn(
+      testSaleReturn
+    );
+    when(saleReturnItemRepository.save(any(SaleReturnItem.class))).thenReturn(
+      testSaleReturnItem
+    );
+    when(saleReturnMapper.toInfo(any(SaleReturn.class))).thenReturn(
+      testSaleReturnInfo
+    );
+
+    saleReturnService.update(1, updateData);
+
+    verify(productRepository).save(testProduct);
+    assertEquals(4, testSaleReturnItem.getQuantity());
+  }
+
+  @Test
+  void update_shouldHandleItemRemovalCorrectly() {
+    when(saleReturnRepository.findById(1)).thenReturn(
+      Optional.of(testSaleReturn)
+    );
+    when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
+
+    List<SaleReturnItem> existingItems = Collections.singletonList(
+      testSaleReturnItem
+    );
+    when(saleReturnItemRepository.findBySaleReturn(testSaleReturn)).thenReturn(
+      existingItems
+    );
+
+    SaleReturnData updateData = SaleReturnData.builder()
+      .originalSaleId(1)
+      .customerId(1L)
+      .employeeId(1L)
+      .totalReturnAmount(BigDecimal.ZERO)
+      .reason("Removed all items")
+      .items(Collections.emptyList())
+      .build();
+
+    when(saleReturnRepository.save(any(SaleReturn.class))).thenReturn(
+      testSaleReturn
+    );
+    when(saleReturnMapper.toInfo(any(SaleReturn.class))).thenReturn(
+      testSaleReturnInfo
+    );
+
+    saleReturnService.update(1, updateData);
+
+    verify(saleReturnItemRepository).delete(testSaleReturnItem);
+    verify(productRepository).save(testProduct);
+  }
+
+  @Test
+  void update_shouldHandleAddingNewItemCorrectly() {
+    when(saleReturnRepository.findById(1)).thenReturn(
+      Optional.of(testSaleReturn)
+    );
+    when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
+
+    Product product2 = Product.builder()
+      .id(2)
+      .name("Second Product")
+      .stock(50)
+      .build();
+
+    SaleItem saleItem2 = SaleItem.builder()
+      .id(2)
+      .product(product2)
+      .quantity(5)
+      .unitPrice(new BigDecimal("30.00"))
+      .subtotal(new BigDecimal("150.00"))
+      .build();
+
+    testSale.getItems().add(saleItem2);
+
+    List<SaleReturnItem> existingItems = Collections.singletonList(
+      testSaleReturnItem
+    );
+    when(saleReturnItemRepository.findBySaleReturn(testSaleReturn)).thenReturn(
+      existingItems
+    );
+    when(productRepository.findById(1)).thenReturn(Optional.of(testProduct));
+    when(productRepository.findById(2)).thenReturn(Optional.of(product2));
+
+    SaleReturnItemData existingItemData = SaleReturnItemData.builder()
+      .productId(1)
+      .quantity(5)
+      .unitPrice(new BigDecimal("50.00"))
+      .subtotal(new BigDecimal("250.00"))
+      .build();
+
+    SaleReturnItemData newItemData = SaleReturnItemData.builder()
+      .productId(2)
+      .quantity(2)
+      .unitPrice(new BigDecimal("30.00"))
+      .subtotal(new BigDecimal("60.00"))
+      .build();
+
+    SaleReturnData updateData = SaleReturnData.builder()
+      .originalSaleId(1)
+      .customerId(1L)
+      .employeeId(1L)
+      .totalReturnAmount(new BigDecimal("310.00"))
+      .reason("Added new item")
+      .items(Arrays.asList(existingItemData, newItemData))
+      .build();
+
+    when(saleReturnRepository.save(any(SaleReturn.class))).thenReturn(
+      testSaleReturn
+    );
+    when(saleReturnItemRepository.save(any(SaleReturnItem.class))).thenReturn(
+      testSaleReturnItem
+    );
+    when(saleReturnMapper.toInfo(any(SaleReturn.class))).thenReturn(
+      testSaleReturnInfo
+    );
+
+    saleReturnService.update(1, updateData);
+
+    verify(productRepository).save(product2);
+    assertEquals(52, product2.getStock());
+  }
+
+  @Test
+  void update_shouldThrowException_whenNewItemProductNotInOriginalSale() {
+    when(saleReturnRepository.findById(1)).thenReturn(
+      Optional.of(testSaleReturn)
+    );
+    when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
+
+    Product newProduct = Product.builder()
+      .id(3)
+      .name("Not In Sale Product")
+      .stock(30)
+      .build();
+
+    List<SaleReturnItem> existingItems = Collections.singletonList(
+      testSaleReturnItem
+    );
+    when(saleReturnItemRepository.findBySaleReturn(testSaleReturn)).thenReturn(
+      existingItems
+    );
+    when(productRepository.findById(1)).thenReturn(Optional.of(testProduct));
+    when(productRepository.findById(3)).thenReturn(Optional.of(newProduct));
+
+    SaleReturnItemData existingItemData = SaleReturnItemData.builder()
+      .productId(1)
+      .quantity(5)
+      .unitPrice(new BigDecimal("50.00"))
+      .subtotal(new BigDecimal("250.00"))
+      .build();
+
+    SaleReturnItemData invalidItemData = SaleReturnItemData.builder()
+      .productId(3)
+      .quantity(2)
+      .unitPrice(new BigDecimal("40.00"))
+      .subtotal(new BigDecimal("80.00"))
+      .build();
+
+    SaleReturnData updateData = SaleReturnData.builder()
+      .originalSaleId(1)
+      .customerId(1L)
+      .employeeId(1L)
+      .totalReturnAmount(new BigDecimal("330.00"))
+      .reason("Invalid item added")
+      .items(Arrays.asList(existingItemData, invalidItemData))
+      .build();
+
+    assertThrows(IllegalArgumentException.class, () ->
+      saleReturnService.update(1, updateData)
+    );
+  }
+
+  @Test
+  void update_shouldThrowException_whenNewItemQuantityExceedsPurchasedQuantity() {
+    when(saleReturnRepository.findById(1)).thenReturn(
+      Optional.of(testSaleReturn)
+    );
+    when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
+    when(productRepository.findById(1)).thenReturn(Optional.of(testProduct));
+
+    List<SaleReturnItem> existingItems = Collections.singletonList(
+      testSaleReturnItem
+    );
+    when(saleReturnItemRepository.findBySaleReturn(testSaleReturn)).thenReturn(
+      existingItems
+    );
+
+    SaleReturnItemData invalidItemData = SaleReturnItemData.builder()
+      .productId(1)
+      .quantity(15)
+      .unitPrice(new BigDecimal("50.00"))
+      .subtotal(new BigDecimal("750.00"))
+      .build();
+
+    SaleReturnData updateData = SaleReturnData.builder()
+      .originalSaleId(1)
+      .customerId(1L)
+      .employeeId(1L)
+      .totalReturnAmount(new BigDecimal("750.00"))
+      .reason("Excessive quantity")
+      .items(Collections.singletonList(invalidItemData))
+      .build();
+
+    assertThrows(IllegalArgumentException.class, () ->
+      saleReturnService.update(1, updateData)
+    );
+  }
+
+  @Test
+  void processReturnItems_shouldCreateNewItemsCorrectly() {
+    when(productRepository.findById(1)).thenReturn(Optional.of(testProduct));
+    when(saleReturnItemRepository.save(any(SaleReturnItem.class))).thenReturn(
+      testSaleReturnItem
+    );
+
+    testSaleReturn.setItems(null);
+
+    SaleReturnItemData itemData = SaleReturnItemData.builder()
+      .productId(1)
+      .quantity(3)
+      .unitPrice(new BigDecimal("50.00"))
+      .subtotal(new BigDecimal("150.00"))
+      .build();
+
+    testSale.setItems(Collections.singletonList(testSaleItem));
+    testSaleItem.setProduct(testProduct);
+    testSaleItem.setQuantity(10);
+
+    when(
+      saleRepository.findById(testSaleReturnData.getOriginalSaleId())
+    ).thenReturn(Optional.of(testSale));
+    when(
+      customerRepository.findById(testSaleReturnData.getCustomerId())
+    ).thenReturn(Optional.of(testCustomer));
+    when(
+      userRepository.findById(testSaleReturnData.getEmployeeId())
+    ).thenReturn(Optional.of(testEmployee));
+    when(saleReturnMapper.toEntity(testSaleReturnData)).thenReturn(
+      testSaleReturn
+    );
+    when(saleReturnRepository.save(testSaleReturn)).thenReturn(testSaleReturn);
+    when(saleReturnRepository.findById(testSaleReturn.getId())).thenReturn(
+      Optional.of(testSaleReturn)
+    );
+    when(saleReturnMapper.toInfo(testSaleReturn)).thenReturn(
+      testSaleReturnInfo
+    );
+
+    saleReturnService.create(testSaleReturnData);
+
+    verify(productRepository).save(testProduct);
+    assertTrue(
+      testSaleReturn.getItems() != null && !testSaleReturn.getItems().isEmpty()
+    );
+  }
+
+  @Test
+  void calculateTotalReturnAmount_shouldCalculateCorrectly() {
+    SaleReturnItem item1 = SaleReturnItem.builder()
+      .id(1)
+      .subtotal(new BigDecimal("100.00"))
+      .build();
+
+    SaleReturnItem item2 = SaleReturnItem.builder()
+      .id(2)
+      .subtotal(new BigDecimal("150.00"))
+      .build();
+
+    SaleReturnItem item3 = SaleReturnItem.builder()
+      .id(3)
+      .subtotal(new BigDecimal("75.50"))
+      .build();
+
+    List<SaleReturnItem> items = Arrays.asList(item1, item2, item3);
+    testSaleReturn.setItems(items);
+
+    when(saleReturnRepository.save(testSaleReturn)).thenReturn(testSaleReturn);
+    when(saleReturnMapper.toInfo(testSaleReturn)).thenReturn(
+      testSaleReturnInfo
+    );
+
+    SaleReturnData updateData = SaleReturnData.builder()
+      .originalSaleId(1)
+      .customerId(1L)
+      .employeeId(1L)
+      .reason("Testing total calculation")
+      .items(Collections.emptyList())
+      .build();
+
+    when(saleReturnRepository.findById(1)).thenReturn(
+      Optional.of(testSaleReturn)
+    );
+    when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
+    when(saleReturnItemRepository.findBySaleReturn(testSaleReturn)).thenReturn(
+      Collections.emptyList()
+    );
+
+    saleReturnService.update(1, updateData);
+
+    verify(saleReturnRepository).save(testSaleReturn);
+    assertEquals(
+      new BigDecimal("325.50"),
+      testSaleReturn.getTotalReturnAmount()
+    );
+  }
 }

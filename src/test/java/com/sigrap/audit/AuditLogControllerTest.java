@@ -52,11 +52,8 @@ class AuditLogControllerTest {
 
   @BeforeEach
   void setUp() {
-    // Setup authentication
     setupMockAuthentication();
-
     now = LocalDateTime.now();
-
     auditLogs = List.of(
       AuditLogInfo.builder()
         .id(1L)
@@ -87,8 +84,6 @@ class AuditLogControllerTest {
         .durationMs(150L)
         .build()
     );
-
-    // Mock user repository for security
     User adminUser = User.builder()
       .id(1L)
       .name("Admin User")
@@ -96,25 +91,20 @@ class AuditLogControllerTest {
       .password("encoded_password")
       .role(UserRole.ADMINISTRATOR)
       .build();
-
     when(userRepository.findByEmail("admin@example.com")).thenReturn(
       Optional.of(adminUser)
     );
   }
 
   private void setupMockAuthentication() {
-    // Create authentication with ADMIN role
     var authorities = Collections.singletonList(
       new SimpleGrantedAuthority("ROLE_ADMINISTRATOR")
     );
-
     var authentication = new UsernamePasswordAuthenticationToken(
       "admin@example.com",
       null,
       authorities
     );
-
-    // Set the authentication in the SecurityContext
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
