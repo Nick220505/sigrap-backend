@@ -1,5 +1,6 @@
 package com.sigrap.supplier;
 
+import com.sigrap.audit.Auditable;
 import com.sigrap.product.Product;
 import com.sigrap.product.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -115,6 +116,7 @@ public class PurchaseOrderService {
    * @throws EntityNotFoundException if the specified supplier or any product is not found
    */
   @Transactional
+  @Auditable(action = "CREAR", entity = "ORDEN_COMPRA", captureDetails = true)
   public PurchaseOrderInfo create(PurchaseOrderData purchaseOrderData) {
     PurchaseOrder purchaseOrder = purchaseOrderMapper.toEntity(
       purchaseOrderData
@@ -175,6 +177,12 @@ public class PurchaseOrderService {
    * @throws IllegalStateException if the purchase order is not in DRAFT status
    */
   @Transactional
+  @Auditable(
+    action = "ACTUALIZAR",
+    entity = "ORDEN_COMPRA",
+    entityIdParam = "id",
+    captureDetails = true
+  )
   public PurchaseOrderInfo update(
     Integer id,
     PurchaseOrderData purchaseOrderData
@@ -249,6 +257,7 @@ public class PurchaseOrderService {
    * @throws IllegalStateException if the order is not in DRAFT status
    */
   @Transactional
+  @Auditable(action = "ELIMINAR", entity = "ORDEN_COMPRA", entityIdParam = "id")
   public void delete(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
       .findById(id)
@@ -274,6 +283,7 @@ public class PurchaseOrderService {
    * @throws IllegalStateException if the order is not in DRAFT status
    */
   @Transactional
+  @Auditable(action = "ENVIAR", entity = "ORDEN_COMPRA", entityIdParam = "id")
   public PurchaseOrderInfo submitOrder(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
       .findById(id)
@@ -302,6 +312,11 @@ public class PurchaseOrderService {
    * @throws IllegalStateException if the order is not in SUBMITTED status
    */
   @Transactional
+  @Auditable(
+    action = "CONFIRMAR",
+    entity = "ORDEN_COMPRA",
+    entityIdParam = "id"
+  )
   public PurchaseOrderInfo confirmOrder(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
       .findById(id)
@@ -330,6 +345,11 @@ public class PurchaseOrderService {
    * @throws IllegalStateException if the order is not in CONFIRMED status
    */
   @Transactional
+  @Auditable(
+    action = "MARCAR_ENVIADO",
+    entity = "ORDEN_COMPRA",
+    entityIdParam = "id"
+  )
   public PurchaseOrderInfo markAsShipped(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
       .findById(id)
@@ -363,6 +383,11 @@ public class PurchaseOrderService {
    * @throws IllegalStateException if the order is not in SHIPPED status
    */
   @Transactional
+  @Auditable(
+    action = "MARCAR_ENTREGADO",
+    entity = "ORDEN_COMPRA",
+    entityIdParam = "id"
+  )
   public PurchaseOrderInfo markAsDelivered(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
       .findById(id)
@@ -393,6 +418,7 @@ public class PurchaseOrderService {
    * @throws IllegalStateException if the order is in DELIVERED status
    */
   @Transactional
+  @Auditable(action = "CANCELAR", entity = "ORDEN_COMPRA", entityIdParam = "id")
   public PurchaseOrderInfo cancelOrder(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
       .findById(id)
@@ -424,6 +450,11 @@ public class PurchaseOrderService {
    * @throws IllegalStateException if the order is not in DELIVERED status
    */
   @Transactional
+  @Auditable(
+    action = "MARCAR_PAGADO",
+    entity = "ORDEN_COMPRA",
+    entityIdParam = "id"
+  )
   public PurchaseOrderInfo markAsPaid(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
       .findById(id)

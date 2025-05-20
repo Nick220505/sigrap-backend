@@ -1,5 +1,6 @@
 package com.sigrap.category;
 
+import com.sigrap.audit.Auditable;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +63,7 @@ public class CategoryService {
    * @return The created category mapped to CategoryInfo
    */
   @Transactional
+  @Auditable(action = "CREAR", entity = "CATEGORIA", captureDetails = true)
   public CategoryInfo create(CategoryData categoryData) {
     Category category = categoryMapper.toEntity(categoryData);
     Category savedCategory = categoryRepository.save(category);
@@ -77,6 +79,12 @@ public class CategoryService {
    * @throws EntityNotFoundException if the category is not found
    */
   @Transactional
+  @Auditable(
+    action = "ACTUALIZAR",
+    entity = "CATEGORIA",
+    entityIdParam = "id",
+    captureDetails = true
+  )
   public CategoryInfo update(Long id, CategoryData categoryData) {
     Category category = categoryRepository
       .findById(id)
@@ -93,6 +101,7 @@ public class CategoryService {
    * @throws EntityNotFoundException if the category is not found
    */
   @Transactional
+  @Auditable(action = "ELIMINAR", entity = "CATEGORIA", entityIdParam = "id")
   public void delete(Long id) {
     Category category = categoryRepository
       .findById(id)
@@ -108,6 +117,11 @@ public class CategoryService {
    * @throws EntityNotFoundException if any of the categories is not found
    */
   @Transactional
+  @Auditable(
+    action = "ELIMINAR_LOTE",
+    entity = "CATEGORIA",
+    captureDetails = true
+  )
   public void deleteAllById(List<Long> ids) {
     ids.forEach(id -> {
       if (!categoryRepository.existsById(id)) {

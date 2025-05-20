@@ -1,5 +1,6 @@
 package com.sigrap.sale;
 
+import com.sigrap.audit.Auditable;
 import com.sigrap.customer.Customer;
 import com.sigrap.customer.CustomerRepository;
 import com.sigrap.product.Product;
@@ -53,6 +54,11 @@ public class SaleReturnService {
    *                                  quantity to return exceeds quantity purchased).
    */
   @Transactional
+  @Auditable(
+    action = "CREAR",
+    entity = "DEVOLUCION_VENTA",
+    captureDetails = true
+  )
   public SaleReturnInfo create(SaleReturnData saleReturnData) {
     Sale originalSale = saleRepository
       .findById(saleReturnData.getOriginalSaleId())
@@ -245,6 +251,11 @@ public class SaleReturnService {
    * @throws EntityNotFoundException if no sales return is found with the given ID.
    */
   @Transactional
+  @Auditable(
+    action = "ELIMINAR",
+    entity = "DEVOLUCION_VENTA",
+    entityIdParam = "id"
+  )
   public void delete(Integer id) {
     SaleReturn saleReturn = saleReturnRepository
       .findById(id)
@@ -272,6 +283,11 @@ public class SaleReturnService {
    * @throws EntityNotFoundException if any of the sale returns is not found
    */
   @Transactional
+  @Auditable(
+    action = "ELIMINAR_LOTE",
+    entity = "DEVOLUCION_VENTA",
+    entityIdParam = "ids"
+  )
   public void deleteAllById(List<Integer> ids) {
     ids.forEach(id -> {
       if (!saleReturnRepository.existsById(id)) {
@@ -323,6 +339,12 @@ public class SaleReturnService {
    *                                  or if any item validation fails (e.g., returning more than purchased).
    */
   @Transactional
+  @Auditable(
+    action = "ACTUALIZAR",
+    entity = "DEVOLUCION_VENTA",
+    entityIdParam = "id",
+    captureDetails = true
+  )
   public SaleReturnInfo update(Integer id, SaleReturnData saleReturnData) {
     SaleReturn existingSaleReturn = saleReturnRepository
       .findById(id)

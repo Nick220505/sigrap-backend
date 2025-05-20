@@ -1,5 +1,6 @@
 package com.sigrap.customer;
 
+import com.sigrap.audit.Auditable;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -60,6 +61,7 @@ public class CustomerService {
    * @throws IllegalArgumentException if a customer with the same email already exists
    */
   @Transactional
+  @Auditable(action = "CREAR", entity = "CLIENTE", captureDetails = true)
   public CustomerInfo create(CustomerData customerData) {
     if (customerRepository.existsByEmail(customerData.getEmail())) {
       throw new IllegalArgumentException(
@@ -82,6 +84,12 @@ public class CustomerService {
    * @throws IllegalArgumentException if trying to update to an email that's already taken by another customer
    */
   @Transactional
+  @Auditable(
+    action = "ACTUALIZAR",
+    entity = "CLIENTE",
+    entityIdParam = "id",
+    captureDetails = true
+  )
   public CustomerInfo update(Long id, CustomerData customerData) {
     Customer customer = customerRepository
       .findById(id)
@@ -110,6 +118,7 @@ public class CustomerService {
    * @throws EntityNotFoundException if customer with the ID is not found
    */
   @Transactional
+  @Auditable(action = "ELIMINAR", entity = "CLIENTE", entityIdParam = "id")
   public void delete(Long id) {
     if (!customerRepository.existsById(id)) {
       throw new EntityNotFoundException("Customer not found with ID: " + id);

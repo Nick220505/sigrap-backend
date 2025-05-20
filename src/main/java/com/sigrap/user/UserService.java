@@ -1,5 +1,6 @@
 package com.sigrap.user;
 
+import com.sigrap.audit.Auditable;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -106,6 +107,7 @@ public class UserService implements UserDetailsService {
    * @throws IllegalArgumentException if a user already exists with the email
    */
   @Transactional
+  @Auditable(action = "CREAR", entity = "USUARIO", captureDetails = true)
   public UserInfo create(UserData userData) {
     if (userRepository.existsByEmail(userData.getEmail())) {
       throw new IllegalArgumentException(
@@ -136,6 +138,12 @@ public class UserService implements UserDetailsService {
    * @throws IllegalArgumentException if the email is already in use by another user
    */
   @Transactional
+  @Auditable(
+    action = "ACTUALIZAR",
+    entity = "USUARIO",
+    entityIdParam = "id",
+    captureDetails = true
+  )
   public UserInfo update(Long id, UserData userData) {
     com.sigrap.user.User user = userRepository
       .findById(id)
@@ -173,6 +181,7 @@ public class UserService implements UserDetailsService {
    * @throws EntityNotFoundException if the user is not found
    */
   @Transactional
+  @Auditable(action = "ELIMINAR", entity = "USUARIO", entityIdParam = "id")
   public void delete(Long id) {
     if (!userRepository.existsById(id)) {
       throw new EntityNotFoundException("User not found: " + id);
@@ -187,6 +196,11 @@ public class UserService implements UserDetailsService {
    * @throws EntityNotFoundException if any user is not found
    */
   @Transactional
+  @Auditable(
+    action = "ELIMINAR_LOTE",
+    entity = "USUARIO",
+    captureDetails = true
+  )
   public void deleteAllById(List<Long> ids) {
     for (Long id : ids) {
       if (!userRepository.existsById(id)) {
@@ -204,6 +218,12 @@ public class UserService implements UserDetailsService {
    * @return UserInfo containing the updated profile information
    */
   @Transactional
+  @Auditable(
+    action = "ACTUALIZAR_PERFIL",
+    entity = "USUARIO",
+    entityIdParam = "id",
+    captureDetails = true
+  )
   public UserInfo updateProfile(Long id, UserData userData) {
     return update(id, userData);
   }
@@ -219,6 +239,7 @@ public class UserService implements UserDetailsService {
    * @throws IllegalArgumentException if the current password is incorrect
    */
   @Transactional
+  @Auditable(action = "CAMBIAR_CLAVE", entity = "USUARIO", entityIdParam = "id")
   public UserInfo changePassword(
     Long id,
     String currentPassword,

@@ -118,17 +118,14 @@ class SaleMapperTest {
 
   @Test
   void toInfo_shouldMapSaleToSaleInfo() {
-    // Arrange
     when(customerMapper.toCustomerInfo(testCustomer)).thenReturn(
       testCustomerInfo
     );
     when(userMapper.toInfo(testEmployee)).thenReturn(testUserInfo);
     when(productMapper.toInfo(testProduct)).thenReturn(testProductInfo);
 
-    // Act
     SaleInfo result = saleMapper.toInfo(testSale);
 
-    // Assert
     assertNotNull(result);
     assertEquals(testSale.getId(), result.getId());
     assertEquals(testSale.getTotalAmount(), result.getTotalAmount());
@@ -144,16 +141,13 @@ class SaleMapperTest {
 
   @Test
   void toInfo_shouldReturnNull_whenSaleIsNull() {
-    // Act
     SaleInfo result = saleMapper.toInfo(null);
 
-    // Assert
     assertNull(result);
   }
 
   @Test
   void toInfoList_shouldMapSaleListToSaleInfoList() {
-    // Arrange
     List<Sale> sales = Arrays.asList(testSale, testSale);
 
     when(customerMapper.toCustomerInfo(any(Customer.class))).thenReturn(
@@ -162,33 +156,26 @@ class SaleMapperTest {
     when(userMapper.toInfo(any(User.class))).thenReturn(testUserInfo);
     when(productMapper.toInfo(any(Product.class))).thenReturn(testProductInfo);
 
-    // Act
     List<SaleInfo> result = saleMapper.toInfoList(sales);
 
-    // Assert
     assertNotNull(result);
     assertEquals(2, result.size());
   }
 
   @Test
   void toInfoList_shouldReturnEmptyList_whenSalesIsNull() {
-    // Act
     List<SaleInfo> result = saleMapper.toInfoList(null);
 
-    // Assert
     assertNotNull(result);
     assertTrue(result.isEmpty());
   }
 
   @Test
   void toSaleItemInfo_shouldMapSaleItemToSaleItemInfo() {
-    // Arrange
     when(productMapper.toInfo(testProduct)).thenReturn(testProductInfo);
 
-    // Act
     SaleItemInfo result = saleMapper.toSaleItemInfo(testSaleItem);
 
-    // Assert
     assertNotNull(result);
     assertEquals(testSaleItem.getId(), result.getId());
     assertEquals(testProductInfo, result.getProduct());
@@ -199,44 +186,35 @@ class SaleMapperTest {
 
   @Test
   void toSaleItemInfo_shouldReturnNull_whenSaleItemIsNull() {
-    // Act
     SaleItemInfo result = saleMapper.toSaleItemInfo(null);
 
-    // Assert
     assertNull(result);
   }
 
   @Test
   void toSaleItemInfoList_shouldMapSaleItemListToSaleItemInfoList() {
-    // Arrange
     List<SaleItem> saleItems = Arrays.asList(testSaleItem, testSaleItem);
 
     when(productMapper.toInfo(any(Product.class))).thenReturn(testProductInfo);
 
-    // Act
     List<SaleItemInfo> result = saleMapper.toSaleItemInfoList(saleItems);
 
-    // Assert
     assertNotNull(result);
     assertEquals(2, result.size());
   }
 
   @Test
   void toSaleItemInfoList_shouldReturnEmptyList_whenSaleItemsIsNull() {
-    // Act
     List<SaleItemInfo> result = saleMapper.toSaleItemInfoList(null);
 
-    // Assert
     assertNotNull(result);
     assertTrue(result.isEmpty());
   }
 
   @Test
   void toEntity_shouldMapSaleDataToSale() {
-    // Act
     Sale result = saleMapper.toEntity(testSaleData);
 
-    // Assert
     assertNotNull(result);
     assertEquals(testSaleData.getTotalAmount(), result.getTotalAmount());
     assertEquals(testSaleData.getTaxAmount(), result.getTaxAmount());
@@ -248,19 +226,15 @@ class SaleMapperTest {
 
   @Test
   void toEntity_shouldReturnNull_whenSaleDataIsNull() {
-    // Act
     Sale result = saleMapper.toEntity(null);
 
-    // Assert
     assertNull(result);
   }
 
   @Test
   void toSaleItemEntity_shouldMapSaleItemDataToSaleItem() {
-    // Act
     SaleItem result = saleMapper.toSaleItemEntity(testSaleItemData);
 
-    // Assert
     assertNotNull(result);
     assertEquals(testSaleItemData.getQuantity(), result.getQuantity());
     assertEquals(testSaleItemData.getUnitPrice(), result.getUnitPrice());
@@ -271,30 +245,25 @@ class SaleMapperTest {
 
   @Test
   void toSaleItemEntity_shouldReturnNull_whenSaleItemDataIsNull() {
-    // Act
     SaleItem result = saleMapper.toSaleItemEntity(null);
 
-    // Assert
     assertNull(result);
   }
 
   @Test
   void toSaleItemEntityList_shouldMapSaleItemDataListToSaleItemList() {
-    // Arrange
     List<SaleItemData> saleItemDataList = Arrays.asList(
       testSaleItemData,
       testSaleItemData
     );
     IntFunction<Product> getProduct = id -> testProduct;
 
-    // Act
     List<SaleItem> result = saleMapper.toSaleItemEntityList(
       saleItemDataList,
       testSale,
       getProduct
     );
 
-    // Assert
     assertNotNull(result);
     assertEquals(2, result.size());
     for (SaleItem item : result) {
@@ -306,24 +275,20 @@ class SaleMapperTest {
 
   @Test
   void toSaleItemEntityList_shouldReturnEmptyList_whenSaleItemDataListIsNull() {
-    // Arrange
     IntFunction<Product> getProduct = id -> testProduct;
 
-    // Act
     List<SaleItem> result = saleMapper.toSaleItemEntityList(
       null,
       testSale,
       getProduct
     );
 
-    // Assert
     assertNotNull(result);
     assertTrue(result.isEmpty());
   }
 
   @Test
   void updateEntityFromData_shouldUpdateSaleWithSaleData() {
-    // Arrange
     Sale saleToUpdate = Sale.builder()
       .totalAmount(BigDecimal.ONE)
       .taxAmount(BigDecimal.ONE)
@@ -331,10 +296,8 @@ class SaleMapperTest {
       .finalAmount(BigDecimal.ONE)
       .build();
 
-    // Act
     saleMapper.updateEntityFromData(saleToUpdate, testSaleData);
 
-    // Assert
     assertEquals(testSaleData.getTotalAmount(), saleToUpdate.getTotalAmount());
     assertEquals(testSaleData.getTaxAmount(), saleToUpdate.getTaxAmount());
     assertEquals(
@@ -346,13 +309,11 @@ class SaleMapperTest {
 
   @Test
   void updateEntityFromData_shouldDoNothing_whenSaleIsNull() {
-    // This should not throw any exception
     saleMapper.updateEntityFromData(null, testSaleData);
   }
 
   @Test
   void updateEntityFromData_shouldDoNothing_whenSaleDataIsNull() {
-    // Arrange
     Sale originalSale = Sale.builder()
       .totalAmount(BigDecimal.ONE)
       .taxAmount(BigDecimal.ONE)
@@ -366,10 +327,8 @@ class SaleMapperTest {
       .finalAmount(BigDecimal.ONE)
       .build();
 
-    // Act
     saleMapper.updateEntityFromData(saleToUpdate, null);
 
-    // Assert - sale should not be changed
     assertEquals(originalSale.getTotalAmount(), saleToUpdate.getTotalAmount());
     assertEquals(originalSale.getTaxAmount(), saleToUpdate.getTaxAmount());
     assertEquals(
@@ -381,20 +340,16 @@ class SaleMapperTest {
 
   @Test
   void setCustomerAndEmployee_shouldUpdateSaleWithCustomerAndEmployee() {
-    // Arrange
     Sale saleToUpdate = Sale.builder().build();
 
-    // Act
     saleMapper.setCustomerAndEmployee(saleToUpdate, testCustomer, testEmployee);
 
-    // Assert
     assertEquals(testCustomer, saleToUpdate.getCustomer());
     assertEquals(testEmployee, saleToUpdate.getEmployee());
   }
 
   @Test
   void setCustomerAndEmployee_shouldDoNothing_whenSaleIsNull() {
-    // This should not throw any exception
     saleMapper.setCustomerAndEmployee(null, testCustomer, testEmployee);
   }
 }

@@ -119,17 +119,14 @@ class SaleReturnMapperTest {
 
   @Test
   void toInfo_shouldMapSaleReturnToSaleReturnInfo() {
-    // Arrange
     when(customerMapper.toCustomerInfo(testCustomer)).thenReturn(
       testCustomerInfo
     );
     when(userMapper.toInfo(testEmployee)).thenReturn(testUserInfo);
     when(productMapper.toInfo(testProduct)).thenReturn(testProductInfo);
 
-    // Act
     SaleReturnInfo result = saleReturnMapper.toInfo(testSaleReturn);
 
-    // Assert
     assertNotNull(result);
     assertEquals(testSaleReturn.getId(), result.getId());
     assertEquals(testSale.getId(), result.getOriginalSaleId());
@@ -147,16 +144,13 @@ class SaleReturnMapperTest {
 
   @Test
   void toInfo_shouldReturnNull_whenSaleReturnIsNull() {
-    // Act
     SaleReturnInfo result = saleReturnMapper.toInfo(null);
 
-    // Assert
     assertNull(result);
   }
 
   @Test
   void toInfo_shouldHandleNullOriginalSale() {
-    // Arrange
     testSaleReturn.setOriginalSale(null);
     when(customerMapper.toCustomerInfo(testCustomer)).thenReturn(
       testCustomerInfo
@@ -164,17 +158,14 @@ class SaleReturnMapperTest {
     when(userMapper.toInfo(testEmployee)).thenReturn(testUserInfo);
     when(productMapper.toInfo(testProduct)).thenReturn(testProductInfo);
 
-    // Act
     SaleReturnInfo result = saleReturnMapper.toInfo(testSaleReturn);
 
-    // Assert
     assertNotNull(result);
     assertNull(result.getOriginalSaleId());
   }
 
   @Test
   void toInfoList_shouldMapSaleReturnListToSaleReturnInfoList() {
-    // Arrange
     List<SaleReturn> saleReturns = Arrays.asList(
       testSaleReturn,
       testSaleReturn
@@ -186,35 +177,28 @@ class SaleReturnMapperTest {
     when(userMapper.toInfo(any(User.class))).thenReturn(testUserInfo);
     when(productMapper.toInfo(any(Product.class))).thenReturn(testProductInfo);
 
-    // Act
     List<SaleReturnInfo> result = saleReturnMapper.toInfoList(saleReturns);
 
-    // Assert
     assertNotNull(result);
     assertEquals(2, result.size());
   }
 
   @Test
   void toInfoList_shouldReturnEmptyList_whenSaleReturnsIsNull() {
-    // Act
     List<SaleReturnInfo> result = saleReturnMapper.toInfoList(null);
 
-    // Assert
     assertNotNull(result);
     assertTrue(result.isEmpty());
   }
 
   @Test
   void toSaleReturnItemInfo_shouldMapSaleReturnItemToSaleReturnItemInfo() {
-    // Arrange
     when(productMapper.toInfo(testProduct)).thenReturn(testProductInfo);
 
-    // Act
     SaleReturnItemInfo result = saleReturnMapper.toSaleReturnItemInfo(
       testSaleReturnItem
     );
 
-    // Assert
     assertNotNull(result);
     assertEquals(testSaleReturnItem.getId(), result.getId());
     assertEquals(testProductInfo, result.getProduct());
@@ -225,16 +209,13 @@ class SaleReturnMapperTest {
 
   @Test
   void toSaleReturnItemInfo_shouldReturnNull_whenSaleReturnItemIsNull() {
-    // Act
     SaleReturnItemInfo result = saleReturnMapper.toSaleReturnItemInfo(null);
 
-    // Assert
     assertNull(result);
   }
 
   @Test
   void toSaleReturnItemInfoList_shouldMapSaleReturnItemListToSaleReturnItemInfoList() {
-    // Arrange
     List<SaleReturnItem> saleReturnItems = Arrays.asList(
       testSaleReturnItem,
       testSaleReturnItem
@@ -242,34 +223,28 @@ class SaleReturnMapperTest {
 
     when(productMapper.toInfo(any(Product.class))).thenReturn(testProductInfo);
 
-    // Act
     List<SaleReturnItemInfo> result = saleReturnMapper.toSaleReturnItemInfoList(
       saleReturnItems
     );
 
-    // Assert
     assertNotNull(result);
     assertEquals(2, result.size());
   }
 
   @Test
   void toSaleReturnItemInfoList_shouldReturnEmptyList_whenSaleReturnItemsIsNull() {
-    // Act
     List<SaleReturnItemInfo> result = saleReturnMapper.toSaleReturnItemInfoList(
       null
     );
 
-    // Assert
     assertNotNull(result);
     assertTrue(result.isEmpty());
   }
 
   @Test
   void toEntity_shouldMapSaleReturnDataToSaleReturn() {
-    // Act
     SaleReturn result = saleReturnMapper.toEntity(testSaleReturnData);
 
-    // Assert
     assertNotNull(result);
     assertEquals(
       testSaleReturnData.getTotalReturnAmount(),
@@ -283,21 +258,17 @@ class SaleReturnMapperTest {
 
   @Test
   void toEntity_shouldReturnNull_whenSaleReturnDataIsNull() {
-    // Act
     SaleReturn result = saleReturnMapper.toEntity(null);
 
-    // Assert
     assertNull(result);
   }
 
   @Test
   void toSaleReturnItemEntity_shouldMapSaleReturnItemDataToSaleReturnItem() {
-    // Act
     SaleReturnItem result = saleReturnMapper.toSaleReturnItemEntity(
       testSaleReturnItemData
     );
 
-    // Assert
     assertNotNull(result);
     assertEquals(testSaleReturnItemData.getQuantity(), result.getQuantity());
     assertEquals(testSaleReturnItemData.getUnitPrice(), result.getUnitPrice());
@@ -308,30 +279,25 @@ class SaleReturnMapperTest {
 
   @Test
   void toSaleReturnItemEntity_shouldReturnNull_whenSaleReturnItemDataIsNull() {
-    // Act
     SaleReturnItem result = saleReturnMapper.toSaleReturnItemEntity(null);
 
-    // Assert
     assertNull(result);
   }
 
   @Test
   void toSaleReturnItemEntityList_shouldMapSaleReturnItemDataListToSaleReturnItemList() {
-    // Arrange
     List<SaleReturnItemData> saleReturnItemDataList = Arrays.asList(
       testSaleReturnItemData,
       testSaleReturnItemData
     );
     IntFunction<Product> getProduct = id -> testProduct;
 
-    // Act
     List<SaleReturnItem> result = saleReturnMapper.toSaleReturnItemEntityList(
       saleReturnItemDataList,
       testSaleReturn,
       getProduct
     );
 
-    // Assert
     assertNotNull(result);
     assertEquals(2, result.size());
     for (SaleReturnItem item : result) {
@@ -343,36 +309,30 @@ class SaleReturnMapperTest {
 
   @Test
   void toSaleReturnItemEntityList_shouldReturnEmptyList_whenSaleReturnItemDataListIsNull() {
-    // Arrange
     IntFunction<Product> getProduct = id -> testProduct;
 
-    // Act
     List<SaleReturnItem> result = saleReturnMapper.toSaleReturnItemEntityList(
       null,
       testSaleReturn,
       getProduct
     );
 
-    // Assert
     assertNotNull(result);
     assertTrue(result.isEmpty());
   }
 
   @Test
   void updateEntityFromData_shouldUpdateSaleReturnWithSaleReturnData() {
-    // Arrange
     SaleReturn saleReturnToUpdate = SaleReturn.builder()
       .totalReturnAmount(BigDecimal.ONE)
       .reason("Old reason")
       .build();
 
-    // Act
     saleReturnMapper.updateEntityFromData(
       saleReturnToUpdate,
       testSaleReturnData
     );
 
-    // Assert
     assertEquals(
       testSaleReturnData.getTotalReturnAmount(),
       saleReturnToUpdate.getTotalReturnAmount()
@@ -385,13 +345,11 @@ class SaleReturnMapperTest {
 
   @Test
   void updateEntityFromData_shouldDoNothing_whenSaleReturnIsNull() {
-    // This should not throw any exception
     saleReturnMapper.updateEntityFromData(null, testSaleReturnData);
   }
 
   @Test
   void updateEntityFromData_shouldDoNothing_whenSaleReturnDataIsNull() {
-    // Arrange
     BigDecimal originalAmount = BigDecimal.ONE;
     String originalReason = "Original reason";
 
@@ -400,10 +358,8 @@ class SaleReturnMapperTest {
       .reason(originalReason)
       .build();
 
-    // Act
     saleReturnMapper.updateEntityFromData(saleReturnToUpdate, null);
 
-    // Assert - saleReturn should not be changed
     assertEquals(originalAmount, saleReturnToUpdate.getTotalReturnAmount());
     assertEquals(originalReason, saleReturnToUpdate.getReason());
   }

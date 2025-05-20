@@ -1,5 +1,6 @@
 package com.sigrap.sale;
 
+import com.sigrap.audit.Auditable;
 import com.sigrap.customer.Customer;
 import com.sigrap.customer.CustomerRepository;
 import com.sigrap.product.Product;
@@ -119,6 +120,7 @@ public class SaleService {
    * @throws IllegalArgumentException if there is insufficient stock for any product
    */
   @Transactional
+  @Auditable(action = "CREAR", entity = "VENTA", captureDetails = true)
   public SaleInfo create(SaleData saleData) {
     Sale sale = saleMapper.toEntity(saleData);
 
@@ -164,6 +166,12 @@ public class SaleService {
    * @throws IllegalArgumentException if there is insufficient stock for any product
    */
   @Transactional
+  @Auditable(
+    action = "ACTUALIZAR",
+    entity = "VENTA",
+    entityIdParam = "id",
+    captureDetails = true
+  )
   public SaleInfo update(Integer id, SaleData saleData) {
     Sale existingSale = saleRepository
       .findById(id)
@@ -219,6 +227,7 @@ public class SaleService {
    * @throws EntityNotFoundException if the sale is not found
    */
   @Transactional
+  @Auditable(action = "ELIMINAR", entity = "VENTA", entityIdParam = "id")
   public void delete(Integer id) {
     Sale sale = saleRepository
       .findById(id)
@@ -241,6 +250,7 @@ public class SaleService {
    * @throws EntityNotFoundException if any of the sales is not found
    */
   @Transactional
+  @Auditable(action = "ELIMINAR_LOTE", entity = "VENTA", captureDetails = true)
   public void deleteAllById(List<Integer> ids) {
     ids.forEach(id -> {
       if (!saleRepository.existsById(id)) {

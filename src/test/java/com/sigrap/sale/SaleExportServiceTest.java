@@ -70,14 +70,11 @@ class SaleExportServiceTest {
   }
 
   @AfterEach
-  void tearDown() {
-    // Clean up any temporary files created during tests
-  }
+  void tearDown() {}
 
   @Test
   void generateDailySalesReport_createsFileWithCorrectContent()
     throws IOException {
-    // Arrange
     LocalDateTime startOfDay = testDate.atStartOfDay();
     LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
 
@@ -87,19 +84,17 @@ class SaleExportServiceTest {
 
     String tempDir = System.getProperty("java.io.tmpdir");
 
-    // Act
     String filePath = saleExportService.generateDailySalesReport(
       testDate,
       tempDir
     );
 
-    // Assert
     assertTrue(filePath.contains("PAPELERIA020_15-05-23.txt"));
     Path path = Path.of(filePath);
     assertTrue(Files.exists(path));
 
     List<String> lines = Files.readAllLines(path);
-    assertEquals(3, lines.size()); // Header + 2 sales
+    assertEquals(3, lines.size());
     assertEquals(
       "CÉDULA_CLIENTE|FECHA_VENTA|VALOR_TOTAL|VALOR_TOTAL_CON_IVA",
       lines.get(0)
@@ -107,14 +102,12 @@ class SaleExportServiceTest {
     assertTrue(lines.get(1).startsWith("123456789|15/05/2023|100|119"));
     assertTrue(lines.get(2).startsWith("987654321|15/05/2023|200|238"));
 
-    // Clean up
     Files.deleteIfExists(path);
   }
 
   @Test
   void generateDailySalesReportContent_returnsCorrectContent()
     throws IOException {
-    // Arrange
     LocalDateTime startOfDay = testDate.atStartOfDay();
     LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
 
@@ -122,14 +115,12 @@ class SaleExportServiceTest {
       mockSales
     );
 
-    // Act
     String content = saleExportService.generateDailySalesReportContent(
       testDate
     );
 
-    // Assert
     String[] lines = content.split("\\r?\\n");
-    assertEquals(3, lines.length); // Header + 2 sales
+    assertEquals(3, lines.length);
     assertEquals(
       "CÉDULA_CLIENTE|FECHA_VENTA|VALOR_TOTAL|VALOR_TOTAL_CON_IVA",
       lines[0]
@@ -141,7 +132,6 @@ class SaleExportServiceTest {
   @Test
   void generateDailySalesReport_withNoSales_createFileWithHeaderOnly()
     throws IOException {
-    // Arrange
     LocalDateTime startOfDay = testDate.atStartOfDay();
     LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
 
@@ -151,31 +141,27 @@ class SaleExportServiceTest {
 
     String tempDir = System.getProperty("java.io.tmpdir");
 
-    // Act
     String filePath = saleExportService.generateDailySalesReport(
       testDate,
       tempDir
     );
 
-    // Assert
     Path path = Path.of(filePath);
     assertTrue(Files.exists(path));
 
     List<String> lines = Files.readAllLines(path);
-    assertEquals(1, lines.size()); // Only header
+    assertEquals(1, lines.size());
     assertEquals(
       "CÉDULA_CLIENTE|FECHA_VENTA|VALOR_TOTAL|VALOR_TOTAL_CON_IVA",
       lines.get(0)
     );
 
-    // Clean up
     Files.deleteIfExists(path);
   }
 
   @Test
   void generateDailySalesReport_createsDirectoryIfNotExists()
     throws IOException {
-    // Arrange
     LocalDateTime startOfDay = testDate.atStartOfDay();
     LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
 
@@ -189,18 +175,15 @@ class SaleExportServiceTest {
       System.currentTimeMillis();
     Path tempDirPath = Path.of(tempDir);
 
-    // Act
     String filePath = saleExportService.generateDailySalesReport(
       testDate,
       tempDir
     );
 
-    // Assert
     assertTrue(Files.exists(tempDirPath));
     Path path = Path.of(filePath);
     assertTrue(Files.exists(path));
 
-    // Clean up
     Files.deleteIfExists(path);
     Files.deleteIfExists(tempDirPath);
   }
@@ -208,11 +191,10 @@ class SaleExportServiceTest {
   @Test
   void generateDailySalesReportContent_handlesNullDocumentId()
     throws IOException {
-    // Arrange
     CustomerInfo customerWithNullId = CustomerInfo.builder()
       .id(3L)
       .fullName("Null ID Customer")
-      .documentId(null) // Explicitly null document ID
+      .documentId(null)
       .build();
 
     SaleInfo saleWithNullCustomerDoc = SaleInfo.builder()
@@ -235,14 +217,12 @@ class SaleExportServiceTest {
       salesWithNull
     );
 
-    // Act
     String content = saleExportService.generateDailySalesReportContent(
       testDate
     );
 
-    // Assert
     String[] lines = content.split("\\r?\\n");
-    assertEquals(2, lines.length); // Header + 1 valid sale (null ID sale should be skipped)
+    assertEquals(2, lines.length);
     assertEquals(
       "CÉDULA_CLIENTE|FECHA_VENTA|VALOR_TOTAL|VALOR_TOTAL_CON_IVA",
       lines[0]

@@ -42,7 +42,6 @@ class SaleExportControllerTest {
   @WithMockUser(roles = "ADMIN")
   void generateDailySalesReport_withAUTOExportPath_returnsFileContent()
     throws Exception {
-    // Arrange
     String reportContent =
       "CÉDULA_CLIENTE|FECHA_VENTA|VALOR_TOTAL|VALOR_TOTAL_CON_IVA\n" +
       "123456789|15/06/2023|100|119";
@@ -53,7 +52,6 @@ class SaleExportControllerTest {
       saleExportService.generateDailySalesReportContent(eq(testDate))
     ).thenReturn(reportContent);
 
-    // Act & Assert
     mockMvc
       .perform(
         get("/api/sales/export/daily")
@@ -78,7 +76,6 @@ class SaleExportControllerTest {
   @WithMockUser(roles = "ADMIN")
   void generateDailySalesReport_withCustomExportPath_returnsFilePath()
     throws Exception {
-    // Arrange
     String exportPath = "/custom/path";
     String generatedFilePath =
       exportPath + "/PAPELERIA020_" + formattedDate + ".txt";
@@ -87,7 +84,6 @@ class SaleExportControllerTest {
       saleExportService.generateDailySalesReport(eq(testDate), eq(exportPath))
     ).thenReturn(generatedFilePath);
 
-    // Act & Assert
     mockMvc
       .perform(
         get("/api/sales/export/daily")
@@ -101,7 +97,6 @@ class SaleExportControllerTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void generateDailySalesReport_withNoDate_usesTodaysDate() throws Exception {
-    // Arrange
     String exportPath = "/custom/path";
     String generatedFilePath = "/custom/path/PAPELERIA020_some-date.txt";
 
@@ -112,7 +107,6 @@ class SaleExportControllerTest {
       )
     ).thenReturn(generatedFilePath);
 
-    // Act & Assert
     mockMvc
       .perform(get("/api/sales/export/daily").param("exportPath", exportPath))
       .andExpect(status().isOk())
@@ -123,7 +117,6 @@ class SaleExportControllerTest {
   @WithMockUser(roles = "ADMIN")
   void generateDailySalesReport_withIOException_returnsErrorMessage()
     throws Exception {
-    // Arrange
     String exportPath = "/invalid/path";
     String errorMessage = "Error writing to file";
 
@@ -134,7 +127,6 @@ class SaleExportControllerTest {
       )
     ).thenThrow(new IOException(errorMessage));
 
-    // Act & Assert
     mockMvc
       .perform(get("/api/sales/export/daily").param("exportPath", exportPath))
       .andExpect(status().isInternalServerError())

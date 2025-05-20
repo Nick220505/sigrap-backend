@@ -1,5 +1,6 @@
 package com.sigrap.employee.schedule;
 
+import com.sigrap.audit.Auditable;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -67,6 +68,7 @@ public class ScheduleService {
    * @throws EntityNotFoundException if the referenced user is not found
    */
   @Transactional
+  @Auditable(action = "CREAR", entity = "HORARIO", captureDetails = true)
   public ScheduleInfo create(ScheduleData data) {
     User user = userRepository
       .findById(data.getUserId())
@@ -87,6 +89,12 @@ public class ScheduleService {
    * @throws EntityNotFoundException if the schedule or user is not found
    */
   @Transactional
+  @Auditable(
+    action = "ACTUALIZAR",
+    entity = "HORARIO",
+    entityIdParam = "id",
+    captureDetails = true
+  )
   public ScheduleInfo update(Long id, ScheduleData data) {
     Schedule schedule = scheduleRepository
       .findById(id)
@@ -106,6 +114,7 @@ public class ScheduleService {
    * @throws EntityNotFoundException if the schedule is not found
    */
   @Transactional
+  @Auditable(action = "ELIMINAR", entity = "HORARIO", entityIdParam = "id")
   public void delete(Long id) {
     if (!scheduleRepository.existsById(id)) {
       throw new EntityNotFoundException("Schedule not found: " + id);
@@ -147,6 +156,7 @@ public class ScheduleService {
    * @throws EntityNotFoundException if the user is not found
    */
   @Transactional
+  @Auditable(action = "CREAR", entity = "HORARIO", captureDetails = true)
   public List<ScheduleInfo> generateWeeklySchedule(
     Long userId,
     ScheduleData data
@@ -199,6 +209,7 @@ public class ScheduleService {
    * @throws EntityNotFoundException if the user is not found
    */
   @Transactional
+  @Auditable(action = "CREAR", entity = "HORARIO", captureDetails = true)
   public List<ScheduleInfo> copyScheduleFromPreviousWeek(Long userId) {
     User user = userRepository
       .findById(userId)

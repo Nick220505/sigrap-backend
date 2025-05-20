@@ -1,5 +1,6 @@
 package com.sigrap.supplier;
 
+import com.sigrap.audit.Auditable;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +65,7 @@ public class SupplierService {
    * @return The created supplier mapped to SupplierInfo
    */
   @Transactional
+  @Auditable(action = "CREAR", entity = "PROVEEDOR", captureDetails = true)
   public SupplierInfo create(SupplierData supplierData) {
     Supplier supplier = supplierMapper.toEntity(supplierData);
     Supplier savedSupplier = supplierRepository.save(supplier);
@@ -79,6 +81,12 @@ public class SupplierService {
    * @throws EntityNotFoundException if the supplier is not found
    */
   @Transactional
+  @Auditable(
+    action = "ACTUALIZAR",
+    entity = "PROVEEDOR",
+    entityIdParam = "id",
+    captureDetails = true
+  )
   public SupplierInfo update(Long id, SupplierData supplierData) {
     Supplier supplier = supplierRepository
       .findById(id)
@@ -97,6 +105,7 @@ public class SupplierService {
    * @throws EntityNotFoundException if the supplier is not found
    */
   @Transactional
+  @Auditable(action = "ELIMINAR", entity = "PROVEEDOR", entityIdParam = "id")
   public void delete(Long id) {
     Supplier supplier = supplierRepository
       .findById(id)
@@ -114,6 +123,11 @@ public class SupplierService {
    * @throws EntityNotFoundException if any of the suppliers is not found
    */
   @Transactional
+  @Auditable(
+    action = "ELIMINAR_LOTE",
+    entity = "PROVEEDOR",
+    captureDetails = true
+  )
   public void deleteAllById(List<Long> ids) {
     ids.forEach(id -> {
       if (!supplierRepository.existsById(id)) {

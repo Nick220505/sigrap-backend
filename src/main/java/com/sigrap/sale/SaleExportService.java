@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service for exporting sales data to flat files.
@@ -34,6 +35,7 @@ public class SaleExportService {
    * @return The path of the generated file
    * @throws IOException If an error occurs while writing the file
    */
+  @Transactional(readOnly = true)
   public String generateDailySalesReport(LocalDate date, String exportPath)
     throws IOException {
     LocalDateTime startOfDay = date.atStartOfDay();
@@ -70,6 +72,7 @@ public class SaleExportService {
    * @return The report content as a String
    * @throws IOException If an error occurs while writing the file
    */
+  @Transactional(readOnly = true)
   public String generateDailySalesReportContent(LocalDate date)
     throws IOException {
     LocalDateTime startOfDay = date.atStartOfDay();
@@ -114,5 +117,85 @@ public class SaleExportService {
         writer.newLine();
       }
     }
+  }
+
+  /**
+   * Exports sales data to Excel format for a specified date range.
+   *
+   * @param startDate The start date of the report period
+   * @param endDate The end date of the report period
+   * @return Excel file as byte array
+   */
+  @Transactional(readOnly = true)
+  public byte[] exportSalesToExcel(
+    LocalDateTime startDate,
+    LocalDateTime endDate
+  ) throws IOException {
+    List<SaleInfo> sales = saleService.findByCreatedDateRange(
+      startDate,
+      endDate
+    );
+    return generateExcelFile(sales);
+  }
+
+  /**
+   * Exports all sales data to Excel format.
+   *
+   * @return Excel file as byte array
+   */
+  @Transactional(readOnly = true)
+  public byte[] exportAllSalesToExcel() throws IOException {
+    List<SaleInfo> sales = saleService.findAll();
+    return generateExcelFile(sales);
+  }
+
+  /**
+   * Generates an Excel file containing sales data.
+   *
+   * @param sales List of sales to include in the export
+   * @return Excel file as byte array
+   */
+  private byte[] generateExcelFile(List<SaleInfo> sales) throws IOException {
+    throw new UnsupportedOperationException("Method not implemented");
+  }
+
+  /**
+   * Exports sales data to CSV format for a specified date range.
+   *
+   * @param startDate The start date of the report period
+   * @param endDate The end date of the report period
+   * @return CSV content as string
+   */
+  @Transactional(readOnly = true)
+  public String exportSalesToCsv(
+    LocalDateTime startDate,
+    LocalDateTime endDate
+  ) {
+    List<SaleInfo> sales = saleService.findByCreatedDateRange(
+      startDate,
+      endDate
+    );
+    return generateCsvContent(sales);
+  }
+
+  /**
+   * Exports all sales data to CSV format.
+   *
+   * @return CSV content as string
+   */
+  @Transactional(readOnly = true)
+  public String exportAllSalesToCsv() {
+    List<SaleInfo> sales = saleService.findAll();
+    return generateCsvContent(sales);
+  }
+
+  /**
+   * Generates CSV content for sales data.
+   *
+   * @param sales List of sales to include in the export
+   * @return CSV content as string
+   */
+  private String generateCsvContent(List<SaleInfo> sales) {
+    throw new UnsupportedOperationException("Method not implemented");
   }
 }

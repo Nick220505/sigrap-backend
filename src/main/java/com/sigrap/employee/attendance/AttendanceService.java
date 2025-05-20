@@ -1,10 +1,13 @@
 package com.sigrap.employee.attendance;
 
+import com.sigrap.audit.Auditable;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -69,6 +72,12 @@ public class AttendanceService {
    * @throws IllegalStateException if the user already has an active attendance record
    */
   @Transactional
+  @Auditable(
+    action = "REGISTRAR_ENTRADA",
+    entity = "ASISTENCIA",
+    entityIdParam = "userId",
+    captureDetails = true
+  )
   public AttendanceInfo clockIn(
     Long userId,
     LocalDateTime timestamp,
@@ -110,6 +119,12 @@ public class AttendanceService {
    * @throws EntityNotFoundException if the attendance record is not found
    */
   @Transactional
+  @Auditable(
+    action = "REGISTRAR_SALIDA",
+    entity = "ASISTENCIA",
+    entityIdParam = "attendanceId",
+    captureDetails = true
+  )
   public AttendanceInfo clockOut(
     Long attendanceId,
     LocalDateTime timestamp,
@@ -163,8 +178,14 @@ public class AttendanceService {
    * @return List of AttendanceInfo DTOs
    */
   @Transactional(readOnly = true)
-  public List<AttendanceInfo> findByDate(LocalDateTime date) {
-    List<Attendance> attendances = attendanceRepository.findByDate(date);
+  public List<AttendanceInfo> findByDate(LocalDate date) {
+    LocalDateTime startOfDay = date.atStartOfDay();
+    LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+
+    List<Attendance> attendances = attendanceRepository.findByDateBetween(
+      startOfDay,
+      endOfDay
+    );
     return attendanceMapper.toInfoList(attendances);
   }
 
@@ -201,6 +222,12 @@ public class AttendanceService {
    * @throws EntityNotFoundException if the attendance record is not found
    */
   @Transactional
+  @Auditable(
+    action = "ACTUALIZAR",
+    entity = "ASISTENCIA",
+    entityIdParam = "id",
+    captureDetails = true
+  )
   public AttendanceInfo updateStatus(
     Long id,
     AttendanceStatus status,

@@ -1,15 +1,13 @@
 package com.sigrap.product;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.sigrap.audit.Auditable;
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
-
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service class for managing product operations.
@@ -77,6 +75,7 @@ public class ProductService {
    * @throws EntityNotFoundException if the specified category is not found
    */
   @Transactional
+  @Auditable(action = "CREAR", entity = "PRODUCTO", captureDetails = true)
   public ProductInfo create(ProductData productData) {
     Product product = productMapper.toEntity(productData);
 
@@ -103,6 +102,12 @@ public class ProductService {
    * @throws EntityNotFoundException if the product or specified category is not found
    */
   @Transactional
+  @Auditable(
+    action = "ACTUALIZAR",
+    entity = "PRODUCTO",
+    entityIdParam = "id",
+    captureDetails = true
+  )
   public ProductInfo update(Integer id, ProductData productData) {
     Product product = productRepository
       .findById(id)
@@ -134,6 +139,7 @@ public class ProductService {
    * @throws EntityNotFoundException if the product is not found
    */
   @Transactional
+  @Auditable(action = "ELIMINAR", entity = "PRODUCTO", entityIdParam = "id")
   public void delete(Integer id) {
     Product product = productRepository
       .findById(id)
@@ -151,6 +157,11 @@ public class ProductService {
    * @throws EntityNotFoundException if any of the products is not found
    */
   @Transactional
+  @Auditable(
+    action = "ELIMINAR_LOTE",
+    entity = "PRODUCTO",
+    captureDetails = true
+  )
   public void deleteAllById(List<Integer> ids) {
     ids.forEach(id -> {
       if (!productRepository.existsById(id)) {

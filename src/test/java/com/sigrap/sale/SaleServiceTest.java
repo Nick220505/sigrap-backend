@@ -12,24 +12,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.IntFunction;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import com.sigrap.customer.Customer;
 import com.sigrap.customer.CustomerInfo;
 import com.sigrap.customer.CustomerRepository;
@@ -39,8 +21,23 @@ import com.sigrap.user.User;
 import com.sigrap.user.UserInfo;
 import com.sigrap.user.UserRepository;
 import com.sigrap.user.UserRole;
-
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.IntFunction;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class SaleServiceTest {
@@ -94,7 +91,7 @@ class SaleServiceTest {
     testProduct = Product.builder()
       .id(1)
       .name("Test Product")
-      .stock(100) // Initial stock
+      .stock(100)
       .build();
 
     testSaleItem = SaleItem.builder()
@@ -166,23 +163,19 @@ class SaleServiceTest {
 
   @Test
   void findAll_shouldReturnAllSales() {
-    // Arrange
     List<Sale> sales = Arrays.asList(testSale, testSale);
     List<SaleInfo> expected = Arrays.asList(testSaleInfo, testSaleInfo);
 
     when(saleRepository.findAll()).thenReturn(sales);
     when(saleMapper.toInfoList(sales)).thenReturn(expected);
 
-    // Act
     List<SaleInfo> result = saleService.findAll();
 
-    // Assert
     assertEquals(expected, result);
   }
 
   @Test
   void findByEmployeeId_shouldReturnEmployeesSales() {
-    // Arrange
     List<Sale> employeeSales = Arrays.asList(testSale, testSale);
     List<SaleInfo> expected = Arrays.asList(testSaleInfo, testSaleInfo);
 
@@ -190,19 +183,15 @@ class SaleServiceTest {
     when(saleRepository.findByEmployee(testEmployee)).thenReturn(employeeSales);
     when(saleMapper.toInfoList(employeeSales)).thenReturn(expected);
 
-    // Act
     List<SaleInfo> result = saleService.findByEmployeeId(1L);
 
-    // Assert
     assertEquals(expected, result);
   }
 
   @Test
   void findByEmployeeId_shouldThrowException_whenEmployeeNotFound() {
-    // Arrange
     when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
-    // Act & Assert
     assertThrows(EntityNotFoundException.class, () ->
       saleService.findByEmployeeId(999L)
     );
@@ -210,7 +199,6 @@ class SaleServiceTest {
 
   @Test
   void findByCustomerId_shouldReturnCustomersSales() {
-    // Arrange
     List<Sale> customerSales = Arrays.asList(testSale, testSale);
     List<SaleInfo> expected = Arrays.asList(testSaleInfo, testSaleInfo);
 
@@ -218,19 +206,15 @@ class SaleServiceTest {
     when(saleRepository.findByCustomer(testCustomer)).thenReturn(customerSales);
     when(saleMapper.toInfoList(customerSales)).thenReturn(expected);
 
-    // Act
     List<SaleInfo> result = saleService.findByCustomerId(1L);
 
-    // Assert
     assertEquals(expected, result);
   }
 
   @Test
   void findByCustomerId_shouldThrowException_whenCustomerNotFound() {
-    // Arrange
     when(customerRepository.findById(999L)).thenReturn(Optional.empty());
 
-    // Act & Assert
     assertThrows(EntityNotFoundException.class, () ->
       saleService.findByCustomerId(999L)
     );
@@ -238,7 +222,6 @@ class SaleServiceTest {
 
   @Test
   void findByCreatedDateRange_shouldReturnSalesInDateRange() {
-    // Arrange
     LocalDateTime startDate = LocalDateTime.of(2023, 1, 1, 0, 0);
     LocalDateTime endDate = LocalDateTime.of(2023, 1, 31, 23, 59);
     List<Sale> dateRangeSales = Arrays.asList(testSale, testSale);
@@ -249,42 +232,34 @@ class SaleServiceTest {
     );
     when(saleMapper.toInfoList(dateRangeSales)).thenReturn(expected);
 
-    // Act
     List<SaleInfo> result = saleService.findByCreatedDateRange(
       startDate,
       endDate
     );
 
-    // Assert
     assertEquals(expected, result);
   }
 
   @Test
   void findById_shouldReturnSale_whenFound() {
-    // Arrange
     when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
     when(saleMapper.toInfo(testSale)).thenReturn(testSaleInfo);
 
-    // Act
     SaleInfo result = saleService.findById(1);
 
-    // Assert
     assertEquals(testSaleInfo, result);
   }
 
   @Test
   void findById_shouldThrowException_whenNotFound() {
-    // Arrange
     when(saleRepository.findById(999)).thenReturn(Optional.empty());
 
-    // Act & Assert
     assertThrows(EntityNotFoundException.class, () -> saleService.findById(999)
     );
   }
 
   @Test
   void create_shouldCreateSaleAndAdjustStock() {
-    // Arrange
     when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
     when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
     when(saleMapper.toEntity(testSaleData)).thenReturn(testSale);
@@ -301,10 +276,8 @@ class SaleServiceTest {
     when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
     when(saleMapper.toInfo(testSale)).thenReturn(testSaleInfo);
 
-    // Act
     SaleInfo result = saleService.create(testSaleData);
 
-    // Assert
     assertEquals(testSaleInfo, result);
     verify(saleMapper).setCustomerAndEmployee(
       testSale,
@@ -312,15 +285,13 @@ class SaleServiceTest {
       testEmployee
     );
     verify(productRepository).save(testProduct);
-    assertEquals(98, testProduct.getStock()); // 100 - 2
+    assertEquals(98, testProduct.getStock());
   }
 
   @Test
   void create_shouldThrowException_whenCustomerNotFound() {
-    // Arrange
     when(customerRepository.findById(1L)).thenReturn(Optional.empty());
 
-    // Act & Assert
     assertThrows(EntityNotFoundException.class, () ->
       saleService.create(testSaleData)
     );
@@ -328,11 +299,9 @@ class SaleServiceTest {
 
   @Test
   void create_shouldThrowException_whenEmployeeNotFound() {
-    // Arrange
     when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
     when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-    // Add this mock to avoid NullPointerException
     Sale dummySale = Sale.builder()
       .id(1)
       .customer(testCustomer)
@@ -340,7 +309,6 @@ class SaleServiceTest {
       .build();
     when(saleMapper.toEntity(any(SaleData.class))).thenReturn(dummySale);
 
-    // Act & Assert
     assertThrows(EntityNotFoundException.class, () ->
       saleService.create(testSaleData)
     );
@@ -348,7 +316,6 @@ class SaleServiceTest {
 
   @Test
   void create_shouldThrowException_whenProductNotFound() {
-    // Arrange
     when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
     when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
     when(saleMapper.toEntity(testSaleData)).thenReturn(testSale);
@@ -362,12 +329,10 @@ class SaleServiceTest {
       )
     ).thenAnswer(invocation -> {
       IntFunction<Product> productFunction = invocation.getArgument(2);
-      // This will throw the EntityNotFoundException
       productFunction.apply(1);
       return null;
     });
 
-    // Act & Assert
     assertThrows(EntityNotFoundException.class, () ->
       saleService.create(testSaleData)
     );
@@ -375,11 +340,10 @@ class SaleServiceTest {
 
   @Test
   void create_shouldThrowException_whenInsufficientStock() {
-    // Arrange
     Product lowStockProduct = Product.builder()
       .id(1)
       .name("Low Stock Product")
-      .stock(1) // Only 1 in stock, but trying to sell 2
+      .stock(1)
       .build();
 
     when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
@@ -397,7 +361,6 @@ class SaleServiceTest {
       )
     ).thenReturn(Collections.singletonList(testSaleItem));
 
-    // Act & Assert
     assertThrows(IllegalArgumentException.class, () ->
       saleService.create(testSaleData)
     );
@@ -405,31 +368,25 @@ class SaleServiceTest {
 
   @Test
   void delete_shouldDeleteSaleAndAdjustStock() {
-    // Arrange
     when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
     doNothing().when(saleRepository).delete(testSale);
 
-    // Act
     saleService.delete(1);
 
-    // Assert
     verify(productRepository).save(testProduct);
-    assertEquals(102, testProduct.getStock()); // 100 + 2
+    assertEquals(102, testProduct.getStock());
     verify(saleRepository).delete(testSale);
   }
 
   @Test
   void delete_shouldThrowException_whenSaleNotFound() {
-    // Arrange
     when(saleRepository.findById(999)).thenReturn(Optional.empty());
 
-    // Act & Assert
     assertThrows(EntityNotFoundException.class, () -> saleService.delete(999));
   }
 
   @Test
   void deleteAllById_shouldDeleteMultipleSalesAndAdjustStock() {
-    // Arrange
     List<Integer> ids = Arrays.asList(1, 2);
 
     Sale sale2 = Sale.builder().id(2).build();
@@ -446,25 +403,21 @@ class SaleServiceTest {
     when(saleRepository.findById(2)).thenReturn(Optional.of(sale2));
     doNothing().when(saleRepository).deleteAllById(anyList());
 
-    // Act
     saleService.deleteAllById(ids);
 
-    // Assert
     verify(saleRepository).deleteAllById(idsCaptor.capture());
     assertEquals(ids, idsCaptor.getValue());
     verify(productRepository, times(2)).save(testProduct);
-    assertEquals(105, testProduct.getStock()); // 100 + 2 + 3
+    assertEquals(105, testProduct.getStock());
   }
 
   @Test
   void deleteAllById_shouldThrowException_whenAnySaleNotFound() {
-    // Arrange
     List<Integer> ids = Arrays.asList(1, 999);
 
     when(saleRepository.existsById(1)).thenReturn(true);
     when(saleRepository.existsById(999)).thenReturn(false);
 
-    // Act & Assert
     assertThrows(EntityNotFoundException.class, () ->
       saleService.deleteAllById(ids)
     );
@@ -473,10 +426,8 @@ class SaleServiceTest {
 
   @Test
   void update_shouldThrowException_whenSaleNotFound() {
-    // Arrange
     when(saleRepository.findById(999)).thenReturn(Optional.empty());
 
-    // Act & Assert
     assertThrows(EntityNotFoundException.class, () ->
       saleService.update(999, testSaleData)
     );
@@ -484,15 +435,13 @@ class SaleServiceTest {
 
   @Test
   void update_shouldAdjustStockCorrectly_whenQuantityChanges() {
-    // Arrange
     when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
     when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
     when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
 
-    // Updated data with a different quantity
     SaleItemData updatedItemData = SaleItemData.builder()
       .productId(1)
-      .quantity(5) // Original was 2
+      .quantity(5)
       .unitPrice(new BigDecimal("50.00"))
       .subtotal(new BigDecimal("250.00"))
       .build();
@@ -514,37 +463,29 @@ class SaleServiceTest {
     when(saleMapper.toInfo(testSale)).thenReturn(testSaleInfo);
     when(saleRepository.save(testSale)).thenReturn(testSale);
 
-    // Mock the product's stock changes for assertion - set initial stock to 100
     doAnswer(invocation -> {
       Product p = invocation.getArgument(0);
-      // Save current stock value for assertion
       return p;
     })
       .when(productRepository)
       .save(any(Product.class));
 
-    // Act
     SaleInfo result = saleService.update(1, updatedData);
 
-    // Assert
     assertEquals(testSaleInfo, result);
     verify(productRepository).save(testProduct);
-    // Stock calculation is adjusted for the test to match the algorithm in service
     assertEquals(97, testProduct.getStock());
-    // Reset stock for subsequent tests
     testProduct.setStock(100);
   }
 
   @Test
   void update_shouldAdjustStockCorrectly_whenProductChanges() {
-    // Arrange
     when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
     when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
     when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
 
-    // Updated data with a different product
     SaleItemData updatedItemData = SaleItemData.builder()
-      .productId(2) // Different product
+      .productId(2)
       .quantity(2)
       .unitPrice(new BigDecimal("60.00"))
       .subtotal(new BigDecimal("120.00"))
@@ -574,29 +515,23 @@ class SaleServiceTest {
     when(saleMapper.toInfo(testSale)).thenReturn(testSaleInfo);
     when(saleRepository.save(testSale)).thenReturn(testSale);
 
-    // Act
     SaleInfo result = saleService.update(1, updatedData);
 
-    // Assert
     assertEquals(testSaleInfo, result);
     verify(productRepository).save(testProduct);
     verify(productRepository).save(newProduct);
-    // Original product stock should be: 100 (initial) + 2 (returned) = 102
     assertEquals(102, testProduct.getStock());
-    // New product stock should be: 50 (initial) - 2 (used) = 48
     assertEquals(48, newProduct.getStock());
   }
 
   @Test
   void create_shouldThrowException_whenItemHasProductNotFound() {
-    // Arrange
     when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
     when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
     when(saleMapper.toEntity(testSaleData)).thenReturn(testSale);
     when(saleRepository.save(testSale)).thenReturn(testSale);
     when(productRepository.findById(1)).thenReturn(Optional.empty());
 
-    // Act & Assert
     assertThrows(EntityNotFoundException.class, () ->
       saleService.create(testSaleData)
     );
@@ -604,14 +539,12 @@ class SaleServiceTest {
 
   @Test
   void update_shouldHandleNewItems() {
-    // Arrange
     when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
     when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
     when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
 
-    // Updated data with a different item
     SaleItemData newItemData = SaleItemData.builder()
-      .productId(2) // New product
+      .productId(2)
       .quantity(3)
       .unitPrice(new BigDecimal("30.00"))
       .subtotal(new BigDecimal("90.00"))
@@ -641,18 +574,15 @@ class SaleServiceTest {
     when(saleMapper.toInfo(testSale)).thenReturn(testSaleInfo);
     when(saleRepository.save(testSale)).thenReturn(testSale);
 
-    // Act
     SaleInfo result = saleService.update(1, updatedData);
 
-    // Assert
     assertEquals(testSaleInfo, result);
     verify(productRepository).save(newProduct);
-    assertEquals(17, newProduct.getStock()); // 20 - 3
+    assertEquals(17, newProduct.getStock());
   }
 
   @Test
   void returnStockForRemovedItems_shouldNotAdjustStockWhenItemsMatch() {
-    // Arrange
     when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
     when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
     when(userRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
@@ -663,7 +593,6 @@ class SaleServiceTest {
     when(saleMapper.toInfo(testSale)).thenReturn(testSaleInfo);
     when(saleRepository.save(testSale)).thenReturn(testSale);
 
-    // Same data as original
     SaleData sameData = SaleData.builder()
       .customerId(1L)
       .employeeId(1L)
@@ -674,34 +603,28 @@ class SaleServiceTest {
       .items(Collections.singletonList(testSaleItemData))
       .build();
 
-    // Reset product stock to 100 before test and track changes
     testProduct.setStock(100);
-    final int[] stockValues = { 100 }; // To track stock changes
+    final int[] stockValues = { 100 };
 
     doAnswer(invocation -> {
       Product p = invocation.getArgument(0);
-      stockValues[0] = p.getStock(); // Track the stock value
+      stockValues[0] = p.getStock();
       return p;
     })
       .when(productRepository)
       .save(any(Product.class));
 
-    // Act
     SaleInfo result = saleService.update(1, sameData);
 
-    // Assert
     assertEquals(testSaleInfo, result);
-    // Product stock should remain the same after update with same items
     assertEquals(100, stockValues[0]);
   }
 
   @Test
   void update_shouldThrowExceptionWhenCustomerNotFound() {
-    // Arrange
     when(saleRepository.findById(1)).thenReturn(Optional.of(testSale));
     when(customerRepository.findById(1L)).thenReturn(Optional.empty());
 
-    // Act & Assert
     assertThrows(EntityNotFoundException.class, () ->
       saleService.update(1, testSaleData)
     );
