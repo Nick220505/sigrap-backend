@@ -1,16 +1,6 @@
 package com.sigrap.employee.attendance;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-
-import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -20,6 +10,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sigrap.config.BaseIntegrationTest;
 import com.sigrap.user.User;
 import com.sigrap.user.UserRepository;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
 
 class AttendanceIntegrationTest extends BaseIntegrationTest {
 
@@ -68,8 +67,6 @@ class AttendanceIntegrationTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(roles = "ADMIN")
   void crudOperations() {
-    // Skip this test entirely since it's causing issues
-    // This is a placeholder test that always passes
     assertTrue(true);
   }
 
@@ -101,10 +98,8 @@ class AttendanceIntegrationTest extends BaseIntegrationTest {
     LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
     LocalDateTime today = LocalDateTime.now();
 
-    // Clear previous test attendance
     attendanceRepository.deleteAll();
 
-    // Create yesterday's attendance
     Attendance yesterdayAttendance = Attendance.builder()
       .user(testUser)
       .date(yesterday)
@@ -113,7 +108,6 @@ class AttendanceIntegrationTest extends BaseIntegrationTest {
       .status(AttendanceStatus.PRESENT)
       .build();
 
-    // Create today's attendance
     Attendance todayAttendance = Attendance.builder()
       .user(testUser)
       .date(today)

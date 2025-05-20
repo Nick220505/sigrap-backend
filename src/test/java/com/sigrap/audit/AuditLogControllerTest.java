@@ -33,12 +33,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-/**
- * Tests for the AuditLogController.
- * Uses MockMvc to test the REST API endpoints.
- */
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false) // Disable security filters for testing
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class AuditLogControllerTest {
 

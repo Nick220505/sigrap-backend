@@ -122,7 +122,6 @@ class DataSeederTest {
       .description("Office supplies and stationery")
       .build();
 
-    // Setup products
     products = new ArrayList<>();
     Product pencil = Product.builder()
       .id(1)
@@ -136,7 +135,6 @@ class DataSeederTest {
       .build();
     products.add(pencil);
 
-    // Setup suppliers
     suppliers = new ArrayList<>();
     Supplier supplier = Supplier.builder()
       .id(1L)
@@ -147,7 +145,6 @@ class DataSeederTest {
       .build();
     suppliers.add(supplier);
 
-    // Setup customers
     customers = new ArrayList<>();
     Customer customer = Customer.builder()
       .id(1L)
@@ -158,7 +155,6 @@ class DataSeederTest {
       .build();
     customers.add(customer);
 
-    // Setup sales
     sales = new ArrayList<>();
     Sale sale = Sale.builder()
       .id(1)
@@ -182,7 +178,6 @@ class DataSeederTest {
     sale.getItems().add(saleItem);
     sales.add(sale);
 
-    // Default mocks
     lenient()
       .when(passwordEncoder.encode(any()))
       .thenReturn("encoded-password");
@@ -201,7 +196,6 @@ class DataSeederTest {
     lenient().when(saleReturnRepository.count()).thenReturn(0L);
     lenient().when(auditLogRepository.count()).thenReturn(0L);
 
-    // Mock findAll methods
     List<User> users = new ArrayList<>();
     users.add(adminUser);
     users.add(employeeUser);
@@ -351,10 +345,8 @@ class DataSeederTest {
     LocalDateTime clockIn = LocalDateTime.of(2023, 1, 1, 8, 0);
     LocalDateTime clockOut = LocalDateTime.of(2023, 1, 1, 17, 0);
 
-    // Create a spy to access the private method
     DataSeeder dataSeederSpy = Mockito.spy(dataSeeder);
 
-    // Use reflection to make the private method accessible
     java.lang.reflect.Method method =
       DataSeeder.class.getDeclaredMethod(
           "calculateHoursWorked",
@@ -418,10 +410,8 @@ class DataSeederTest {
 
   @Test
   void testFindSupplierByName() throws Exception {
-    // Create a spy to access the private method
     DataSeeder dataSeederSpy = Mockito.spy(dataSeeder);
 
-    // Use reflection to make the private method accessible
     java.lang.reflect.Method method =
       DataSeeder.class.getDeclaredMethod(
           "findSupplierByName",
@@ -441,10 +431,8 @@ class DataSeederTest {
 
   @Test
   void testFindProductByName() throws Exception {
-    // Create a spy to access the private method
     DataSeeder dataSeederSpy = Mockito.spy(dataSeeder);
 
-    // Use reflection to make the private method accessible
     java.lang.reflect.Method method =
       DataSeeder.class.getDeclaredMethod(
           "findProductByName",
@@ -460,7 +448,6 @@ class DataSeederTest {
 
   @Test
   void testCalculateOrderTotal() throws Exception {
-    // Create a purchase order with items
     PurchaseOrder order = new PurchaseOrder();
     List<PurchaseOrderItem> items = new ArrayList<>();
 
@@ -476,10 +463,8 @@ class DataSeederTest {
     items.add(item2);
     order.setItems(items);
 
-    // Create a spy to access the private method
     DataSeeder dataSeederSpy = Mockito.spy(dataSeeder);
 
-    // Use reflection to make the private method accessible
     java.lang.reflect.Method method =
       DataSeeder.class.getDeclaredMethod(
           "calculateOrderTotal",
@@ -574,17 +559,14 @@ class DataSeederTest {
 
   @Test
   void testGetRandomReturnReason() throws Exception {
-    // Create a spy to access the private method
     DataSeeder dataSeederSpy = Mockito.spy(dataSeeder);
 
-    // Use reflection to make the private method accessible
     java.lang.reflect.Method method =
       DataSeeder.class.getDeclaredMethod("getRandomReturnReason");
     method.setAccessible(true);
 
     String reason = (String) method.invoke(dataSeederSpy);
 
-    // Just verify it returns a non-empty string
     assert reason != null && !reason.isEmpty();
   }
 
@@ -592,7 +574,6 @@ class DataSeederTest {
   void testSeedAuditLogs_WhenAuditLogsEmpty() throws Exception {
     when(auditLogRepository.count()).thenReturn(0L);
 
-    // Mock userRepository.findAll() to return a list with at least one user
     List<User> users = new ArrayList<>();
     User adminUser = User.builder()
       .id(1L)

@@ -10,11 +10,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +23,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -57,7 +55,6 @@ class UserServiceTest {
       .documentId("123456789")
       .lastLogin(now)
       .build();
-    // Note: Assuming the User class doesn't have setEnabled and setAccountNonLocked methods    // If these methods are needed, they would need to be implemented in the User class
 
     userInfo = UserInfo.builder()
       .id(1L)
@@ -323,7 +320,6 @@ class UserServiceTest {
 
   @Test
   void updateProfile_delegatesToUpdate() {
-    // This test verifies that updateProfile delegates to update
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(userRepository.existsByEmail(anyString())).thenReturn(false);
     when(userRepository.existsByDocumentId(anyString())).thenReturn(false);

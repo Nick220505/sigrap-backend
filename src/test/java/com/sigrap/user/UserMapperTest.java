@@ -83,7 +83,6 @@ class UserMapperTest {
     assertEquals(user.getLastLogin(), result.getLastLogin());
     assertEquals(user.getCreatedAt(), result.getCreatedAt());
     assertEquals(user.getUpdatedAt(), result.getUpdatedAt());
-    // Password should not be in UserInfo
   }
 
   @Test
@@ -129,7 +128,7 @@ class UserMapperTest {
     assertNotNull(result);
     assertEquals(userData.getName(), result.getName());
     assertEquals(userData.getEmail(), result.getEmail());
-    assertEquals("encoded_password", result.getPassword()); // Password should be encoded
+    assertEquals("encoded_password", result.getPassword());
     assertEquals(userData.getPhone(), result.getPhone());
     assertEquals(userData.getRole(), result.getRole());
     assertEquals(userData.getDocumentId(), result.getDocumentId());
@@ -143,20 +142,18 @@ class UserMapperTest {
     User result = userMapper.toEntity(userData);
 
     assertNotNull(result);
-    assertEquals(UserRole.EMPLOYEE, result.getRole()); // Default role should be EMPLOYEE
+    assertEquals(UserRole.EMPLOYEE, result.getRole());
   }
 
   @Test
   void updateEntityFromData_withNullUser_doesNothing() {
     userMapper.updateEntityFromData(null, userData);
-    // No exception should be thrown
   }
 
   @Test
   void updateEntityFromData_withNullUserData_doesNothing() {
     User userToUpdate = new User();
     userMapper.updateEntityFromData(userToUpdate, null);
-    // User should remain unchanged
   }
 
   @Test
@@ -196,11 +193,10 @@ class UserMapperTest {
 
     UserData partialData = new UserData();
     partialData.setName("New Name");
-    // All other fields are null
 
     userMapper.updateEntityFromData(userToUpdate, partialData);
 
-    assertEquals("New Name", userToUpdate.getName()); // Only name should be updated
+    assertEquals("New Name", userToUpdate.getName());
     assertEquals("old@example.com", userToUpdate.getEmail());
     assertEquals("old_password", userToUpdate.getPassword());
     assertEquals("1111111111", userToUpdate.getPhone());
@@ -218,11 +214,11 @@ class UserMapperTest {
 
     UserData dataWithEmptyPassword = new UserData();
     dataWithEmptyPassword.setName("New Name");
-    dataWithEmptyPassword.setPassword(""); // Empty password
+    dataWithEmptyPassword.setPassword("");
 
     userMapper.updateEntityFromData(userToUpdate, dataWithEmptyPassword);
 
     assertEquals("New Name", userToUpdate.getName());
-    assertEquals("old_password", userToUpdate.getPassword()); // Password should remain unchanged
+    assertEquals("old_password", userToUpdate.getPassword());
   }
 }

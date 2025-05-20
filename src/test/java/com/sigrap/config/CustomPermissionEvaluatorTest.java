@@ -36,7 +36,6 @@ class CustomPermissionEvaluatorTest {
 
   @BeforeEach
   void setUp() {
-    // Set up admin authentication
     Collection<GrantedAuthority> adminAuthorities = List.of(
       new SimpleGrantedAuthority("ROLE_ADMINISTRATOR")
     );
@@ -46,7 +45,6 @@ class CustomPermissionEvaluatorTest {
       adminAuthorities
     );
 
-    // Set up employee authentication
     Collection<GrantedAuthority> employeeAuthorities = List.of(
       new SimpleGrantedAuthority("ROLE_EMPLOYEE")
     );
@@ -56,25 +54,21 @@ class CustomPermissionEvaluatorTest {
       employeeAuthorities
     );
 
-    // Set up invalid authentication
     invalidAuthentication = new UsernamePasswordAuthenticationToken(
       "invalid@example.com",
       "password"
     );
 
-    // Mock admin user
     User adminUser = User.builder()
       .email("admin@example.com")
       .role(UserRole.ADMINISTRATOR)
       .build();
 
-    // Mock employee user
     User employeeUser = User.builder()
       .email("employee@example.com")
       .role(UserRole.EMPLOYEE)
       .build();
 
-    // Set up repository responses with lenient to handle unnecessary stubbing
     lenient()
       .when(userRepository.findByEmail("admin@example.com"))
       .thenReturn(Optional.of(adminUser));
@@ -216,7 +210,6 @@ class CustomPermissionEvaluatorTest {
     assertFalse(result);
   }
 
-  // Tests for overloaded hasPermission method with targetId
   @Test
   void hasPermission_withNullAuthenticationAndTargetId_returnsFalse() {
     boolean result = permissionEvaluator.hasPermission(
@@ -354,7 +347,6 @@ class CustomPermissionEvaluatorTest {
     assertTrue(result);
   }
 
-  // Helper classes for testing
   private static class DummyEntity {}
 
   private static class Product {}
