@@ -81,6 +81,13 @@ public class Schedule {
   private LocalTime endTime;
 
   /**
+   * Type of schedule (Regular, Horas Extra, Festivo).
+   */
+  @Column(name = "type")
+  @Builder.Default
+  private String type = "Regular";
+
+  /**
    * Whether this schedule is currently active.
    */
   @Column(name = "is_active")

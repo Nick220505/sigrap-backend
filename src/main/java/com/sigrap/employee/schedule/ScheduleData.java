@@ -50,7 +50,7 @@ public class ScheduleData {
    * Must not be blank.
    */
   @NotBlank(message = "Day cannot be blank")
-  @Schema(description = "Day of the week", example = "MONDAY")
+  @Schema(description = "Day of the week", example = "Lunes")
   private String day;
 
   /**
@@ -68,6 +68,12 @@ public class ScheduleData {
   @NotNull(message = "End time cannot be null")
   @Schema(description = "End time of the shift", example = "17:00")
   private LocalTime endTime;
+
+  /**
+   * Type of schedule (Regular, Horas Extra, Festivo).
+   */
+  @Schema(description = "Type of schedule", example = "Regular")
+  private String type;
 
   /**
    * Whether this schedule is active.

@@ -41,6 +41,7 @@ public class ScheduleMapper {
       .day(schedule.getDay())
       .startTime(schedule.getStartTime())
       .endTime(schedule.getEndTime())
+      .type(schedule.getType())
       .isActive(schedule.getIsActive())
       .createdAt(schedule.getCreatedAt())
       .updatedAt(schedule.getUpdatedAt())
@@ -78,6 +79,7 @@ public class ScheduleMapper {
       .day(data.getDay())
       .startTime(data.getStartTime())
       .endTime(data.getEndTime())
+      .type(Optional.ofNullable(data.getType()).orElse("Regular"))
       .isActive(Optional.ofNullable(data.getIsActive()).orElse(true))
       .build();
   }
@@ -101,6 +103,9 @@ public class ScheduleMapper {
     }
     if (data.getEndTime() != null) {
       entity.setEndTime(data.getEndTime());
+    }
+    if (data.getType() != null) {
+      entity.setType(data.getType());
     }
     if (data.getIsActive() != null) {
       entity.setIsActive(data.getIsActive());

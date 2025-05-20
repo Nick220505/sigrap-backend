@@ -48,7 +48,7 @@ public class ScheduleInfo {
   /**
    * Day of the week for this schedule.
    */
-  @Schema(description = "Day of the week", example = "MONDAY")
+  @Schema(description = "Day of the week", example = "Lunes")
   private String day;
 
   /**
@@ -62,6 +62,12 @@ public class ScheduleInfo {
    */
   @Schema(description = "End time of the shift", example = "17:00")
   private LocalTime endTime;
+
+  /**
+   * Type of schedule (Regular, Horas Extra, Festivo).
+   */
+  @Schema(description = "Type of schedule", example = "Regular")
+  private String type;
 
   /**
    * Whether this schedule is active.

@@ -873,41 +873,93 @@ public class DataSeeder implements CommandLineRunner {
     LocalTime defaultStartTime = LocalTime.of(8, 0);
     LocalTime defaultEndTime = LocalTime.of(17, 0);
     LocalTime saturdayEndTime = LocalTime.of(13, 0);
+    LocalTime extraHoursStartTime = LocalTime.of(18, 0);
+    LocalTime extraHoursEndTime = LocalTime.of(21, 0);
 
     for (User user : users) {
       if (!"gladys@sigrap.com".equals(user.getEmail())) {
         continue;
       }
 
-      for (String day : List.of(
-        "Lunes",
-        "Martes",
-        "Miércoles",
-        "Jueves",
-        "Viernes"
-      )) {
-        schedules.add(
-          Schedule.builder()
-            .user(user)
-            .day(day)
-            .startTime(defaultStartTime)
-            .endTime(defaultEndTime)
-            .isActive(true)
-            .build()
-        );
-      }
+      // Regular schedules for weekdays
+      schedules.add(
+        Schedule.builder()
+          .user(user)
+          .day("Lunes")
+          .startTime(defaultStartTime)
+          .endTime(defaultEndTime)
+          .type("Regular")
+          .isActive(true)
+          .build()
+      );
 
-      if ("gladys@sigrap.com".equals(user.getEmail())) {
-        schedules.add(
-          Schedule.builder()
-            .user(user)
-            .day("Sabado")
-            .startTime(defaultStartTime)
-            .endTime(saturdayEndTime)
-            .isActive(true)
-            .build()
-        );
-      }
+      schedules.add(
+        Schedule.builder()
+          .user(user)
+          .day("Martes")
+          .startTime(defaultStartTime)
+          .endTime(defaultEndTime)
+          .type("Regular")
+          .isActive(true)
+          .build()
+      );
+
+      schedules.add(
+        Schedule.builder()
+          .user(user)
+          .day("Miércoles")
+          .startTime(defaultStartTime)
+          .endTime(defaultEndTime)
+          .type("Regular")
+          .isActive(true)
+          .build()
+      );
+
+      schedules.add(
+        Schedule.builder()
+          .user(user)
+          .day("Jueves")
+          .startTime(defaultStartTime)
+          .endTime(defaultEndTime)
+          .type("Regular")
+          .isActive(true)
+          .build()
+      );
+
+      schedules.add(
+        Schedule.builder()
+          .user(user)
+          .day("Viernes")
+          .startTime(defaultStartTime)
+          .endTime(defaultEndTime)
+          .type("Regular")
+          .isActive(true)
+          .build()
+      );
+
+      // Saturday schedule as Holiday type
+      schedules.add(
+        Schedule.builder()
+          .user(user)
+          .day("Sábado")
+          .startTime(defaultStartTime)
+          .endTime(saturdayEndTime)
+          .type("Festivo")
+          .isActive(true)
+          .build()
+      );
+
+      // Extra hours schedule for Wednesday
+      schedules.add(
+        Schedule.builder()
+          .user(user)
+          .day("Miércoles")
+          .startTime(extraHoursStartTime)
+          .endTime(extraHoursEndTime)
+          .type("Horas Extra")
+          .isActive(true)
+          .build()
+      );
     }
 
     scheduleRepository.saveAll(schedules);
