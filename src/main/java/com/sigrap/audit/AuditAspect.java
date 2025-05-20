@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sigrap.config.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +81,7 @@ public class AuditAspect {
       .action(action)
       .entityName(entityName)
       .entityId(entityId)
-      .timestamp(LocalDateTime.now());
+      .timestamp(LocalDateTime.now(ZoneId.of("America/Bogota")));
 
     populateHttpRequestDetails(eventBuilder);
 
