@@ -395,4 +395,72 @@ class SecurityUtilsTest {
 
     assertFalse(result);
   }
+
+  @Test
+  void hasPermission_whenProductResourceAndCreateAction_returnsTrue() {
+    Authentication auth = new TestingAuthenticationToken(
+      "employee@example.com",
+      "password"
+    );
+    SecurityContextHolder.getContext().setAuthentication(auth);
+
+    when(userRepository.findByEmail("employee@example.com")).thenReturn(
+      Optional.of(employeeUser)
+    );
+
+    boolean result = securityUtils.hasPermission("Product", "CREATE");
+
+    assertTrue(result);
+  }
+
+  @Test
+  void hasPermission_whenProductResourceAndUpdateAction_returnsTrue() {
+    Authentication auth = new TestingAuthenticationToken(
+      "employee@example.com",
+      "password"
+    );
+    SecurityContextHolder.getContext().setAuthentication(auth);
+
+    when(userRepository.findByEmail("employee@example.com")).thenReturn(
+      Optional.of(employeeUser)
+    );
+
+    boolean result = securityUtils.hasPermission("Product", "UPDATE");
+
+    assertTrue(result);
+  }
+
+  @Test
+  void hasPermission_whenCustomerResourceAndCreateAction_returnsTrue() {
+    Authentication auth = new TestingAuthenticationToken(
+      "employee@example.com",
+      "password"
+    );
+    SecurityContextHolder.getContext().setAuthentication(auth);
+
+    when(userRepository.findByEmail("employee@example.com")).thenReturn(
+      Optional.of(employeeUser)
+    );
+
+    boolean result = securityUtils.hasPermission("Customer", "CREATE");
+
+    assertTrue(result);
+  }
+
+  @Test
+  void hasPermission_whenCustomerResourceAndUpdateAction_returnsTrue() {
+    Authentication auth = new TestingAuthenticationToken(
+      "employee@example.com",
+      "password"
+    );
+    SecurityContextHolder.getContext().setAuthentication(auth);
+
+    when(userRepository.findByEmail("employee@example.com")).thenReturn(
+      Optional.of(employeeUser)
+    );
+
+    boolean result = securityUtils.hasPermission("Customer", "UPDATE");
+
+    assertTrue(result);
+  }
 }
