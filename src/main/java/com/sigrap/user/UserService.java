@@ -264,14 +264,13 @@ public class UserService implements UserDetailsService {
    */
   @Transactional
   public void registerSuccessfulLogin(String email) {
-    com.sigrap.user.User user = userRepository
+    userRepository
       .findByEmail(email)
-      .orElseThrow(() ->
-        new EntityNotFoundException("User not found with email: " + email)
-      );
-    user.setLastLogin(
-      ZonedDateTime.now(ZoneId.of("America/Bogota")).toLocalDateTime()
-    );
-    userRepository.save(user);
+      .ifPresent(user -> {
+        user.setLastLogin(
+          ZonedDateTime.now(ZoneId.of("America/Bogota")).toLocalDateTime()
+        );
+        userRepository.save(user);
+      });
   }
 }
