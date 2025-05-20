@@ -50,7 +50,6 @@ class AttendanceRepositoryTest {
       .clockOutTime(LocalDateTime.now().plusHours(8))
       .totalHours(8.0)
       .status(AttendanceStatus.PRESENT)
-      .notes("Regular day")
       .build();
     entityManager.persist(testAttendance);
     entityManager.flush();

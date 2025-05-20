@@ -52,19 +52,16 @@ class AttendanceControllerTest {
       .clockOutTime(LocalDateTime.now().plusHours(8))
       .totalHours(8.0)
       .status(AttendanceStatus.PRESENT)
-      .notes("Regular day")
       .build();
 
     testClockInData = ClockInData.builder()
       .userId(1L)
       .timestamp(LocalDateTime.now())
-      .notes("On time")
       .build();
 
     testClockOutData = ClockOutData.builder()
       .attendanceId(1L)
       .timestamp(LocalDateTime.now().plusHours(8))
-      .notes("Regular end of shift")
       .build();
   }
 
@@ -84,8 +81,7 @@ class AttendanceControllerTest {
     when(
       attendanceService.clockIn(
         eq(testClockInData.getUserId()),
-        any(LocalDateTime.class),
-        eq(testClockInData.getNotes())
+        any(LocalDateTime.class)
       )
     ).thenReturn(testAttendanceInfo);
 
@@ -105,8 +101,7 @@ class AttendanceControllerTest {
     when(
       attendanceService.clockOut(
         eq(testClockOutData.getAttendanceId()),
-        any(LocalDateTime.class),
-        eq(testClockOutData.getNotes())
+        any(LocalDateTime.class)
       )
     ).thenReturn(testAttendanceInfo);
 

@@ -52,7 +52,6 @@ class AttendanceServiceTest {
       .clockInTime(LocalDateTime.now())
       .clockOutTime(null)
       .status(AttendanceStatus.PRESENT)
-      .notes("Regular day")
       .build();
 
     testAttendanceInfo = AttendanceInfo.builder()
@@ -64,7 +63,6 @@ class AttendanceServiceTest {
       .clockOutTime(LocalDateTime.now().plusHours(8))
       .totalHours(8.0)
       .status(AttendanceStatus.PRESENT)
-      .notes("Regular day")
       .build();
   }
 
@@ -94,11 +92,7 @@ class AttendanceServiceTest {
       .when(attendanceMapper)
       .toInfo(any(Attendance.class));
 
-    AttendanceInfo result = attendanceService.clockIn(
-      1L,
-      LocalDateTime.now(),
-      "On time"
-    );
+    AttendanceInfo result = attendanceService.clockIn(1L, LocalDateTime.now());
 
     assertNotNull(result);
     assertEquals(testAttendanceInfo.getId(), result.getId());
@@ -117,11 +111,7 @@ class AttendanceServiceTest {
       .when(attendanceMapper)
       .toInfo(any(Attendance.class));
 
-    AttendanceInfo result = attendanceService.clockOut(
-      1L,
-      LocalDateTime.now(),
-      "Regular end of shift"
-    );
+    AttendanceInfo result = attendanceService.clockOut(1L, LocalDateTime.now());
 
     assertNotNull(result);
     assertEquals(testAttendanceInfo.getId(), result.getId());

@@ -5,18 +5,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import com.sigrap.user.User;
-import com.sigrap.user.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.sigrap.user.User;
+import com.sigrap.user.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class AttendanceMapperTest {
@@ -55,7 +58,6 @@ class AttendanceMapperTest {
       .clockOutTime(clockOutTime)
       .totalHours(8.0)
       .status(AttendanceStatus.PRESENT)
-      .notes("Regular day")
       .build();
 
     testAttendanceInfo = AttendanceInfo.builder()
@@ -67,7 +69,6 @@ class AttendanceMapperTest {
       .clockOutTime(clockOutTime)
       .totalHours(8.0)
       .status(AttendanceStatus.PRESENT)
-      .notes("Regular day")
       .build();
 
     testAttendanceData = AttendanceData.builder()
@@ -76,7 +77,6 @@ class AttendanceMapperTest {
       .clockInTime(clockInTime)
       .clockOutTime(clockOutTime)
       .status(AttendanceStatus.PRESENT)
-      .notes("Regular day")
       .build();
   }
 
@@ -93,7 +93,6 @@ class AttendanceMapperTest {
     assertEquals(testAttendance.getClockOutTime(), result.getClockOutTime());
     assertEquals(testAttendance.getTotalHours(), result.getTotalHours());
     assertEquals(testAttendance.getStatus(), result.getStatus());
-    assertEquals(testAttendance.getNotes(), result.getNotes());
   }
 
   @Test
@@ -125,7 +124,6 @@ class AttendanceMapperTest {
     );
     assertEquals(testAttendance.getTotalHours(), result.get(0).getTotalHours());
     assertEquals(testAttendance.getStatus(), result.get(0).getStatus());
-    assertEquals(testAttendance.getNotes(), result.get(0).getNotes());
   }
 
   @Test
@@ -154,7 +152,6 @@ class AttendanceMapperTest {
     );
     assertEquals(8.0, result.getTotalHours());
     assertEquals(testAttendanceData.getStatus(), result.getStatus());
-    assertEquals(testAttendanceData.getNotes(), result.getNotes());
   }
 
   @Test
@@ -185,7 +182,6 @@ class AttendanceMapperTest {
       .clockOutTime(clockOutTime.minusDays(1))
       .totalHours(7.0)
       .status(AttendanceStatus.LATE)
-      .notes("Old attendance")
       .build();
 
     attendanceMapper.updateEntityFromData(
@@ -207,7 +203,6 @@ class AttendanceMapperTest {
       testAttendanceData.getStatus(),
       existingAttendance.getStatus()
     );
-    assertEquals(testAttendanceData.getNotes(), existingAttendance.getNotes());
   }
 
   @Test
@@ -220,7 +215,6 @@ class AttendanceMapperTest {
       .clockOutTime(clockOutTime.minusDays(1))
       .totalHours(7.0)
       .status(AttendanceStatus.LATE)
-      .notes("Old attendance")
       .build();
 
     attendanceMapper.updateEntityFromData(existingAttendance, null);
@@ -234,6 +228,5 @@ class AttendanceMapperTest {
     );
     assertEquals(7.0, existingAttendance.getTotalHours());
     assertEquals(AttendanceStatus.LATE, existingAttendance.getStatus());
-    assertEquals("Old attendance", existingAttendance.getNotes());
   }
 }
