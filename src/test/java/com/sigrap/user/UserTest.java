@@ -8,7 +8,6 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class UserTest {
@@ -102,8 +101,7 @@ class UserTest {
   }
 
   @Test
-  @Disabled("documentId validation is not required")
-  void shouldValidateDocumentIdNotBlank() {
+  void shouldAllowEmptyDocumentId() {
     User user = User.builder()
       .name("Test User")
       .email("test@example.com")
@@ -112,10 +110,11 @@ class UserTest {
       .build();
 
     Set<ConstraintViolation<User>> violations = validator.validate(user);
+    assertThat(violations).isEmpty();
     assertThat(
       violations
         .stream()
-        .noneMatch(v -> v.getPropertyPath().toString().equals("documentId"))
-    ).isTrue();
+        .anyMatch(v -> v.getPropertyPath().toString().equals("documentId"))
+    ).isFalse();
   }
 }
