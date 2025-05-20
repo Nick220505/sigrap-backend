@@ -1,13 +1,5 @@
 package com.sigrap.config;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,11 +8,19 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.sigrap.audit.AuditLogRepository;
 import com.sigrap.category.Category;
 import com.sigrap.category.CategoryRepository;
 import com.sigrap.customer.CustomerRepository;
@@ -69,6 +69,9 @@ class DataSeederTest {
   private SaleReturnRepository saleReturnRepository;
 
   @Mock
+  private AuditLogRepository auditLogRepository;
+
+  @Mock
   private PasswordEncoder passwordEncoder;
 
   @InjectMocks
@@ -109,6 +112,7 @@ class DataSeederTest {
     lenient().when(scheduleRepository.count()).thenReturn(0L);
     lenient().when(saleRepository.count()).thenReturn(2L);
     lenient().when(saleReturnRepository.count()).thenReturn(1L);
+    lenient().when(auditLogRepository.count()).thenReturn(0L);
   }
 
   @Test
@@ -181,5 +185,42 @@ class DataSeederTest {
     dataSeeder.run();
 
     verify(userRepository, never()).saveAll(anyList());
+  }
+
+  @Test
+  void testSeedAuditLogs_WhenAuditLogsEmpty() throws Exception {
+    when(auditLogRepository.count()).thenReturn(0L);
+
+    // Mock userRepository.findAll() to return a list with at least one user
+    List<User> users = new ArrayList<>();
+    User adminUser = User.builder()
+      .id(1L)
+      .name("Admin")
+      .email("rosita@sigrap.com")
+      .role(UserRole.ADMINISTRATOR)
+      .build();
+    User employeeUser = User.builder()
+      .id(2L)
+      .name("Employee")
+      .email("gladys@sigrap.com")
+      .role(UserRole.EMPLOYEE)
+      .build();
+    users.add(adminUser);
+    users.add(employeeUser);
+
+    when(userRepository.findAll()).thenReturn(users);
+
+    dataSeeder.run();
+
+    verify(auditLogRepository, times(1)).saveAll(anyList());
+  }
+
+  @Test
+  void testSeedAuditLogs_WhenAuditLogsExist() throws Exception {
+    when(auditLogRepository.count()).thenReturn(5L);
+
+    dataSeeder.run();
+
+    verify(auditLogRepository, never()).saveAll(anyList());
   }
 }

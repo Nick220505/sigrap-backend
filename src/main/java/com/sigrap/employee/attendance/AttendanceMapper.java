@@ -38,10 +38,19 @@ public class AttendanceMapper {
       return null;
     }
 
+    User user = attendance.getUser();
+    Long userId = null;
+    String userName = null;
+
+    if (user != null) {
+      userId = user.getId();
+      userName = user.getName();
+    }
+
     return AttendanceInfo.builder()
       .id(attendance.getId())
-      .userId(attendance.getUser().getId())
-      .userName(attendance.getUser().getName())
+      .userId(userId)
+      .userName(userName)
       .date(attendance.getDate())
       .clockInTime(attendance.getClockInTime())
       .clockOutTime(attendance.getClockOutTime())

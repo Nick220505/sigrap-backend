@@ -131,7 +131,6 @@ public class SaleService {
           "Customer not found with ID: " + saleData.getCustomerId()
         )
       );
-    sale.setCustomer(customer);
 
     User employee = userRepository
       .findById(saleData.getEmployeeId())
@@ -140,7 +139,8 @@ public class SaleService {
           "Employee not found with ID: " + saleData.getEmployeeId()
         )
       );
-    sale.setEmployee(employee);
+
+    saleMapper.setCustomerAndEmployee(sale, customer, employee);
 
     Sale savedSale = saleRepository.save(sale);
 
@@ -190,18 +190,19 @@ public class SaleService {
           "Customer not found with ID: " + saleData.getCustomerId()
         )
       );
-    existingSale.setCustomer(customer);
 
+    User employee = existingSale.getEmployee();
     if (!existingSale.getEmployee().getId().equals(saleData.getEmployeeId())) {
-      User employee = userRepository
+      employee = userRepository
         .findById(saleData.getEmployeeId())
         .orElseThrow(() ->
           new EntityNotFoundException(
             "Employee not found with ID: " + saleData.getEmployeeId()
           )
         );
-      existingSale.setEmployee(employee);
     }
+
+    saleMapper.setCustomerAndEmployee(existingSale, customer, employee);
 
     Sale updatedSale = saleRepository.save(existingSale);
 
