@@ -987,15 +987,22 @@ public class DataSeeder implements CommandLineRunner {
       return;
     }
 
-    LocalDateTime mondayDate = now.minusDays(now.getDayOfWeek().getValue() - 1);
-    LocalDateTime mondayClockIn = mondayDate.withHour(8).withMinute(5);
-    LocalDateTime mondayClockOut = mondayDate.withHour(17).withMinute(10);
+    LocalDateTime lastWeekMonday = now
+      .minusWeeks(1)
+      .with(
+        java.time.temporal.TemporalAdjusters.previousOrSame(
+          java.time.DayOfWeek.MONDAY
+        )
+      );
+
+    LocalDateTime mondayClockIn = lastWeekMonday.withHour(8).withMinute(5);
+    LocalDateTime mondayClockOut = lastWeekMonday.withHour(17).withMinute(10);
     double mondayHours = calculateHoursWorked(mondayClockIn, mondayClockOut);
 
     attendanceRecords.add(
       Attendance.builder()
         .user(gladys)
-        .date(mondayDate.toLocalDate().atStartOfDay())
+        .date(lastWeekMonday.toLocalDate().atStartOfDay())
         .clockInTime(mondayClockIn)
         .clockOutTime(mondayClockOut)
         .totalHours(mondayHours)
@@ -1003,15 +1010,15 @@ public class DataSeeder implements CommandLineRunner {
         .build()
     );
 
-    LocalDateTime tuesdayDate = mondayDate.plusDays(1);
-    LocalDateTime tuesdayClockIn = tuesdayDate.withHour(8).withMinute(45);
-    LocalDateTime tuesdayClockOut = tuesdayDate.withHour(17).withMinute(15);
+    LocalDateTime lastWeekTuesday = lastWeekMonday.plusDays(1);
+    LocalDateTime tuesdayClockIn = lastWeekTuesday.withHour(8).withMinute(45);
+    LocalDateTime tuesdayClockOut = lastWeekTuesday.withHour(17).withMinute(15);
     double tuesdayHours = calculateHoursWorked(tuesdayClockIn, tuesdayClockOut);
 
     attendanceRecords.add(
       Attendance.builder()
         .user(gladys)
-        .date(tuesdayDate.toLocalDate().atStartOfDay())
+        .date(lastWeekTuesday.toLocalDate().atStartOfDay())
         .clockInTime(tuesdayClockIn)
         .clockOutTime(tuesdayClockOut)
         .totalHours(tuesdayHours)
@@ -1019,9 +1026,13 @@ public class DataSeeder implements CommandLineRunner {
         .build()
     );
 
-    LocalDateTime wednesdayDate = tuesdayDate.plusDays(1);
-    LocalDateTime wednesdayClockIn = wednesdayDate.withHour(8).withMinute(0);
-    LocalDateTime wednesdayClockOut = wednesdayDate.withHour(15).withMinute(30);
+    LocalDateTime lastWeekWednesday = lastWeekTuesday.plusDays(1);
+    LocalDateTime wednesdayClockIn = lastWeekWednesday
+      .withHour(8)
+      .withMinute(0);
+    LocalDateTime wednesdayClockOut = lastWeekWednesday
+      .withHour(15)
+      .withMinute(30);
     double wednesdayHours = calculateHoursWorked(
       wednesdayClockIn,
       wednesdayClockOut
@@ -1030,7 +1041,7 @@ public class DataSeeder implements CommandLineRunner {
     attendanceRecords.add(
       Attendance.builder()
         .user(gladys)
-        .date(wednesdayDate.toLocalDate().atStartOfDay())
+        .date(lastWeekWednesday.toLocalDate().atStartOfDay())
         .clockInTime(wednesdayClockIn)
         .clockOutTime(wednesdayClockOut)
         .totalHours(wednesdayHours)
@@ -1038,9 +1049,11 @@ public class DataSeeder implements CommandLineRunner {
         .build()
     );
 
-    LocalDateTime thursdayDate = wednesdayDate.plusDays(1);
-    LocalDateTime thursdayClockIn = thursdayDate.withHour(7).withMinute(55);
-    LocalDateTime thursdayClockOut = thursdayDate.withHour(17).withMinute(5);
+    LocalDateTime lastWeekThursday = lastWeekWednesday.plusDays(1);
+    LocalDateTime thursdayClockIn = lastWeekThursday.withHour(7).withMinute(55);
+    LocalDateTime thursdayClockOut = lastWeekThursday
+      .withHour(17)
+      .withMinute(5);
     double thursdayHours = calculateHoursWorked(
       thursdayClockIn,
       thursdayClockOut
@@ -1049,7 +1062,7 @@ public class DataSeeder implements CommandLineRunner {
     attendanceRecords.add(
       Attendance.builder()
         .user(gladys)
-        .date(thursdayDate.toLocalDate().atStartOfDay())
+        .date(lastWeekThursday.toLocalDate().atStartOfDay())
         .clockInTime(thursdayClockIn)
         .clockOutTime(thursdayClockOut)
         .totalHours(thursdayHours)
@@ -1057,12 +1070,12 @@ public class DataSeeder implements CommandLineRunner {
         .build()
     );
 
-    LocalDateTime fridayDate = thursdayDate.plusDays(1);
+    LocalDateTime lastWeekFriday = lastWeekThursday.plusDays(1);
 
     attendanceRecords.add(
       Attendance.builder()
         .user(gladys)
-        .date(fridayDate.toLocalDate().atStartOfDay())
+        .date(lastWeekFriday.toLocalDate().atStartOfDay())
         .clockInTime(null)
         .clockOutTime(null)
         .totalHours(null)
@@ -1070,52 +1083,11 @@ public class DataSeeder implements CommandLineRunner {
         .build()
     );
 
-    LocalDateTime prevMondayDate = mondayDate.minusDays(7);
-    LocalDateTime prevMondayClockIn = prevMondayDate.withHour(8).withMinute(2);
-    LocalDateTime prevMondayClockOut = prevMondayDate
-      .withHour(17)
-      .withMinute(0);
-    double prevMondayHours = calculateHoursWorked(
-      prevMondayClockIn,
-      prevMondayClockOut
-    );
-
-    attendanceRecords.add(
-      Attendance.builder()
-        .user(gladys)
-        .date(prevMondayDate.toLocalDate().atStartOfDay())
-        .clockInTime(prevMondayClockIn)
-        .clockOutTime(prevMondayClockOut)
-        .totalHours(prevMondayHours)
-        .status(AttendanceStatus.PRESENT)
-        .build()
-    );
-
-    LocalDateTime prevTuesdayDate = prevMondayDate.plusDays(1);
-    LocalDateTime prevTuesdayClockIn = prevTuesdayDate
-      .withHour(7)
-      .withMinute(50);
-    LocalDateTime prevTuesdayClockOut = prevTuesdayDate
-      .withHour(17)
-      .withMinute(10);
-    double prevTuesdayHours = calculateHoursWorked(
-      prevTuesdayClockIn,
-      prevTuesdayClockOut
-    );
-
-    attendanceRecords.add(
-      Attendance.builder()
-        .user(gladys)
-        .date(prevTuesdayDate.toLocalDate().atStartOfDay())
-        .clockInTime(prevTuesdayClockIn)
-        .clockOutTime(prevTuesdayClockOut)
-        .totalHours(prevTuesdayHours)
-        .status(AttendanceStatus.PRESENT)
-        .build()
-    );
-
     attendanceRepository.saveAll(attendanceRecords);
-    log.info("Attendance records seeded successfully.");
+    log.info(
+      "Attendance records seeded successfully ({} records).",
+      attendanceRecords.size()
+    );
   }
 
   /**
