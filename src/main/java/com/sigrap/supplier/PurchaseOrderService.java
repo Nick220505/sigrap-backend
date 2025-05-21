@@ -212,18 +212,29 @@ public class PurchaseOrderService {
       purchaseOrder.setSupplier(supplier);
     }
 
-    if (
-      purchaseOrderData.getItems() != null &&
-      !purchaseOrderData.getItems().isEmpty()
-    ) {
-      purchaseOrderItemRepository.deleteAll(purchaseOrder.getItems());
-      purchaseOrder.getItems().clear();
+    if (purchaseOrderData.getItems() != null) {
+      List<PurchaseOrderItem> currentItems = new ArrayList<>(
+        purchaseOrder.getItems()
+      );
 
-      List<PurchaseOrderItem> items = new ArrayList<>();
+      for (PurchaseOrderItem existingItem : currentItems) {
+        boolean found = false;
+        for (PurchaseOrderItemData itemData : purchaseOrderData.getItems()) {
+          if (
+            itemData.getId() != null &&
+            itemData.getId().equals(existingItem.getId())
+          ) {
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          purchaseOrder.removeItem(existingItem);
+        }
+      }
 
       for (PurchaseOrderItemData itemData : purchaseOrderData.getItems()) {
-        PurchaseOrderItem item = purchaseOrderItemMapper.toEntity(itemData);
-
         Product product = productRepository
           .findById(itemData.getProductId())
           .orElseThrow(() ->
@@ -232,16 +243,30 @@ public class PurchaseOrderService {
             )
           );
 
-        item.setProduct(product);
-        item.setPurchaseOrder(purchaseOrder);
-        item.setTotalPrice(
-          product.getCostPrice().multiply(new BigDecimal(item.getQuantity()))
-        );
-        items.add(item);
-      }
+        if (itemData.getId() != null) {
+          PurchaseOrderItem existingItem = purchaseOrder
+            .getItems()
+            .stream()
+            .filter(item -> item.getId().equals(itemData.getId()))
+            .findFirst()
+            .orElse(null);
 
-      purchaseOrderItemRepository.saveAll(items);
-      purchaseOrder.setItems(items);
+          if (existingItem != null) {
+            existingItem.setProduct(product);
+            existingItem.setQuantity(itemData.getQuantity());
+            existingItem.setUnitPrice(itemData.getUnitPrice());
+            existingItem.calculateTotalPrice();
+          }
+        } else {
+          PurchaseOrderItem newItem = purchaseOrderItemMapper.toEntity(
+            itemData
+          );
+          newItem.setProduct(product);
+          newItem.setUnitPrice(itemData.getUnitPrice());
+          newItem.calculateTotalPrice();
+          purchaseOrder.addItem(newItem);
+        }
+      }
     }
 
     calculateTotalAmount(purchaseOrder);
