@@ -291,12 +291,23 @@ class PurchaseOrderServiceTest {
     updatedOrder.setTotalAmount(new BigDecimal("100.00"));
     updatedOrder.setItems(new ArrayList<>());
 
+    // Create new test item data with no ID to ensure toEntity is called
+    PurchaseOrderItemData newItemData = PurchaseOrderItemData.builder()
+      .productId(1)
+      .quantity(15)
+      .unitPrice(new BigDecimal("10.00"))
+      .build();
+
+    // Update testPurchaseOrderData to include the new item data
+    List<PurchaseOrderItemData> updatedItems = new ArrayList<>();
+    updatedItems.add(newItemData);
+    testPurchaseOrderData.setItems(updatedItems);
+
     when(purchaseOrderRepository.findById(1)).thenReturn(
       Optional.of(testPurchaseOrder)
     );
     when(supplierRepository.findById(1L)).thenReturn(Optional.of(testSupplier));
     when(purchaseOrderRepository.save(any())).thenReturn(updatedOrder);
-    doNothing().when(purchaseOrderItemRepository).deleteAll(any());
     when(productRepository.findById(1)).thenReturn(Optional.of(testProduct));
     when(purchaseOrderItemMapper.toEntity(any())).thenReturn(
       testPurchaseOrderItem
@@ -313,6 +324,7 @@ class PurchaseOrderServiceTest {
 
     verify(purchaseOrderRepository).findById(1);
     verify(purchaseOrderMapper).updateEntityFromData(any(), any());
+    verify(purchaseOrderItemMapper).toEntity(any());
     verify(purchaseOrderRepository, atLeastOnce()).save(any());
   }
 
