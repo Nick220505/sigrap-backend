@@ -42,7 +42,7 @@ SIGRAP is a comprehensive management system designed specifically to streamline 
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/sigrap-backend.git
+git clone https://github.com/Nick220505/sigrap-backend.git
 cd sigrap-backend
 ```
 
