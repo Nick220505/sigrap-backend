@@ -116,7 +116,3 @@ src/
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📧 Contact
-
-- **Project** - [GitHub Repository](https://github.com/your-username/sigrap-backend)
