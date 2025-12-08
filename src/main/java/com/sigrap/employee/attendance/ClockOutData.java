@@ -12,18 +12,23 @@ import lombok.NoArgsConstructor;
  * Data Transfer Object (DTO) for clock-out requests.
  * Contains validated data for recording employee clock-outs.
  *
- * <p>This class:
+ * <p>
+ * This class:
  * <ul>
- *   <li>Validates clock-out input data</li>
- *   <li>Supports clock-out operations</li>
- *   <li>Manages clock-out information</li>
- * </ul></p>
+ * <li>Validates clock-out input data</li>
+ * <li>Supports clock-out operations</li>
+ * <li>Manages clock-out information</li>
+ * </ul>
+ * </p>
  *
- * <p>Validation Rules:
+ * <p>
+ * Validation Rules:
  * <ul>
- *   <li>Attendance ID must not be null</li>
- *   <li>Timestamp is optional - if not provided, current time in Bogotá will be used</li>
- * </ul></p>
+ * <li>Attendance ID must not be null</li>
+ * <li>Timestamp is optional - if not provided, current time in Bogota will be
+ * used</li>
+ * </ul>
+ * </p>
  */
 @Data
 @Builder
@@ -42,11 +47,8 @@ public class ClockOutData {
 
   /**
    * Timestamp of the clock-out.
-   * If null, current time in Bogotá, Colombia will be used.
+   * If null, current time in Bogota, Colombia will be used.
    */
-  @Schema(
-    description = "Timestamp of the clock-out (optional - server time will be used if not provided)",
-    example = "2024-01-15T17:00:00"
-  )
+  @Schema(description = "Timestamp of the clock-out (optional - server time will be used if not provided)", example = "2024-01-15T17:00:00")
   private LocalDateTime timestamp;
 }

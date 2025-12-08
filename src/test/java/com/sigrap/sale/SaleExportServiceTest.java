@@ -25,208 +25,193 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class SaleExportServiceTest {
 
-  @Mock
-  private SaleService saleService;
+    @Mock
+    private SaleService saleService;
 
-  @InjectMocks
-  private SaleExportService saleExportService;
+    @InjectMocks
+    private SaleExportService saleExportService;
 
-  private List<SaleInfo> mockSales;
-  private LocalDate testDate;
+    private List<SaleInfo> mockSales;
+    private LocalDate testDate;
 
-  @BeforeEach
-  void setUp() {
-    testDate = LocalDate.of(2023, 5, 15);
+    @BeforeEach
+    void setUp() {
+        testDate = LocalDate.of(2023, 5, 15);
 
-    CustomerInfo customer1 = CustomerInfo.builder()
-      .id(1L)
-      .fullName("Test Customer")
-      .documentId("123456789")
-      .build();
+        CustomerInfo customer1 = CustomerInfo.builder()
+                .id(1L)
+                .fullName("Test Customer")
+                .documentId("123456789")
+                .build();
 
-    CustomerInfo customer2 = CustomerInfo.builder()
-      .id(2L)
-      .fullName("Other Customer")
-      .documentId("987654321")
-      .build();
+        CustomerInfo customer2 = CustomerInfo.builder()
+                .id(2L)
+                .fullName("Other Customer")
+                .documentId("987654321")
+                .build();
 
-    SaleInfo sale1 = SaleInfo.builder()
-      .id(1)
-      .totalAmount(new BigDecimal("100.00"))
-      .finalAmount(new BigDecimal("119.00"))
-      .customer(customer1)
-      .createdAt(LocalDateTime.of(testDate, LocalTime.of(10, 30)))
-      .build();
+        SaleInfo sale1 = SaleInfo.builder()
+                .id(1)
+                .totalAmount(new BigDecimal("100.00"))
+                .finalAmount(new BigDecimal("119.00"))
+                .customer(customer1)
+                .createdAt(LocalDateTime.of(testDate, LocalTime.of(10, 30)))
+                .build();
 
-    SaleInfo sale2 = SaleInfo.builder()
-      .id(2)
-      .totalAmount(new BigDecimal("200.00"))
-      .finalAmount(new BigDecimal("238.00"))
-      .customer(customer2)
-      .createdAt(LocalDateTime.of(testDate, LocalTime.of(14, 45)))
-      .build();
+        SaleInfo sale2 = SaleInfo.builder()
+                .id(2)
+                .totalAmount(new BigDecimal("200.00"))
+                .finalAmount(new BigDecimal("238.00"))
+                .customer(customer2)
+                .createdAt(LocalDateTime.of(testDate, LocalTime.of(14, 45)))
+                .build();
 
-    mockSales = Arrays.asList(sale1, sale2);
-  }
+        mockSales = Arrays.asList(sale1, sale2);
+    }
 
-  @AfterEach
-  void tearDown() {}
+    @AfterEach
+    void tearDown() {
+    }
 
-  @Test
-  void generateDailySalesReport_createsFileWithCorrectContent()
-    throws IOException {
-    LocalDateTime startOfDay = testDate.atStartOfDay();
-    LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
+    @Test
+    void generateDailySalesReport_createsFileWithCorrectContent()
+            throws IOException {
+        LocalDateTime startOfDay = testDate.atStartOfDay();
+        LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
 
-    when(saleService.findByCreatedDateRange(startOfDay, endOfDay)).thenReturn(
-      mockSales
-    );
+        when(saleService.findByCreatedDateRange(startOfDay, endOfDay)).thenReturn(
+                mockSales);
 
-    String tempDir = System.getProperty("java.io.tmpdir");
+        String tempDir = System.getProperty("java.io.tmpdir");
 
-    String filePath = saleExportService.generateDailySalesReport(
-      testDate,
-      tempDir
-    );
+        String filePath = saleExportService.generateDailySalesReport(
+                testDate,
+                tempDir);
 
-    assertTrue(filePath.contains("PAPELERIA020_15-05-23.txt"));
-    Path path = Path.of(filePath);
-    assertTrue(Files.exists(path));
+        assertTrue(filePath.contains("STATIONERY020_15-05-23.txt"));
+        Path path = Path.of(filePath);
+        assertTrue(Files.exists(path));
 
-    List<String> lines = Files.readAllLines(path);
-    assertEquals(3, lines.size());
-    assertEquals(
-      "CÉDULA_CLIENTE|FECHA_VENTA|VALOR_TOTAL|VALOR_TOTAL_CON_IVA",
-      lines.get(0)
-    );
-    assertTrue(lines.get(1).startsWith("123456789|15/05/2023|100|119"));
-    assertTrue(lines.get(2).startsWith("987654321|15/05/2023|200|238"));
+        List<String> lines = Files.readAllLines(path);
+        assertEquals(3, lines.size());
+        assertEquals(
+                "CUSTOMER_ID|SALE_DATE|TOTAL_AMOUNT|TOTAL_AMOUNT_WITH_TAX",
+                lines.get(0));
+        assertTrue(lines.get(1).startsWith("123456789|15/05/2023|100|119"));
+        assertTrue(lines.get(2).startsWith("987654321|15/05/2023|200|238"));
 
-    Files.deleteIfExists(path);
-  }
+        Files.deleteIfExists(path);
+    }
 
-  @Test
-  void generateDailySalesReportContent_returnsCorrectContent()
-    throws IOException {
-    LocalDateTime startOfDay = testDate.atStartOfDay();
-    LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
+    @Test
+    void generateDailySalesReportContent_returnsCorrectContent()
+            throws IOException {
+        LocalDateTime startOfDay = testDate.atStartOfDay();
+        LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
 
-    when(saleService.findByCreatedDateRange(startOfDay, endOfDay)).thenReturn(
-      mockSales
-    );
+        when(saleService.findByCreatedDateRange(startOfDay, endOfDay)).thenReturn(
+                mockSales);
 
-    String content = saleExportService.generateDailySalesReportContent(
-      testDate
-    );
+        String content = saleExportService.generateDailySalesReportContent(
+                testDate);
 
-    String[] lines = content.split("\\r?\\n");
-    assertEquals(3, lines.length);
-    assertEquals(
-      "CÉDULA_CLIENTE|FECHA_VENTA|VALOR_TOTAL|VALOR_TOTAL_CON_IVA",
-      lines[0]
-    );
-    assertTrue(lines[1].startsWith("123456789|15/05/2023|100|119"));
-    assertTrue(lines[2].startsWith("987654321|15/05/2023|200|238"));
-  }
+        String[] lines = content.split("\\r?\\n");
+        assertEquals(3, lines.length);
+        assertEquals(
+                "CUSTOMER_ID|SALE_DATE|TOTAL_AMOUNT|TOTAL_AMOUNT_WITH_TAX",
+                lines[0]);
+        assertTrue(lines[1].startsWith("123456789|15/05/2023|100|119"));
+        assertTrue(lines[2].startsWith("987654321|15/05/2023|200|238"));
+    }
 
-  @Test
-  void generateDailySalesReport_withNoSales_createFileWithHeaderOnly()
-    throws IOException {
-    LocalDateTime startOfDay = testDate.atStartOfDay();
-    LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
+    @Test
+    void generateDailySalesReport_withNoSales_createFileWithHeaderOnly()
+            throws IOException {
+        LocalDateTime startOfDay = testDate.atStartOfDay();
+        LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
 
-    when(saleService.findByCreatedDateRange(startOfDay, endOfDay)).thenReturn(
-      List.of()
-    );
+        when(saleService.findByCreatedDateRange(startOfDay, endOfDay)).thenReturn(
+                List.of());
 
-    String tempDir = System.getProperty("java.io.tmpdir");
+        String tempDir = System.getProperty("java.io.tmpdir");
 
-    String filePath = saleExportService.generateDailySalesReport(
-      testDate,
-      tempDir
-    );
+        String filePath = saleExportService.generateDailySalesReport(
+                testDate,
+                tempDir);
 
-    Path path = Path.of(filePath);
-    assertTrue(Files.exists(path));
+        Path path = Path.of(filePath);
+        assertTrue(Files.exists(path));
 
-    List<String> lines = Files.readAllLines(path);
-    assertEquals(1, lines.size());
-    assertEquals(
-      "CÉDULA_CLIENTE|FECHA_VENTA|VALOR_TOTAL|VALOR_TOTAL_CON_IVA",
-      lines.get(0)
-    );
+        List<String> lines = Files.readAllLines(path);
+        assertEquals(1, lines.size());
+        assertEquals(
+                "CUSTOMER_ID|SALE_DATE|TOTAL_AMOUNT|TOTAL_AMOUNT_WITH_TAX",
+                lines.get(0));
 
-    Files.deleteIfExists(path);
-  }
+        Files.deleteIfExists(path);
+    }
 
-  @Test
-  void generateDailySalesReport_createsDirectoryIfNotExists()
-    throws IOException {
-    LocalDateTime startOfDay = testDate.atStartOfDay();
-    LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
+    @Test
+    void generateDailySalesReport_createsDirectoryIfNotExists()
+            throws IOException {
+        LocalDateTime startOfDay = testDate.atStartOfDay();
+        LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
 
-    when(saleService.findByCreatedDateRange(startOfDay, endOfDay)).thenReturn(
-      mockSales
-    );
+        when(saleService.findByCreatedDateRange(startOfDay, endOfDay)).thenReturn(
+                mockSales);
 
-    String tempDir =
-      System.getProperty("java.io.tmpdir") +
-      "/sigrap_test_" +
-      System.currentTimeMillis();
-    Path tempDirPath = Path.of(tempDir);
+        String tempDir = System.getProperty("java.io.tmpdir") +
+                "/sigrap_test_" +
+                System.currentTimeMillis();
+        Path tempDirPath = Path.of(tempDir);
 
-    String filePath = saleExportService.generateDailySalesReport(
-      testDate,
-      tempDir
-    );
+        String filePath = saleExportService.generateDailySalesReport(
+                testDate,
+                tempDir);
 
-    assertTrue(Files.exists(tempDirPath));
-    Path path = Path.of(filePath);
-    assertTrue(Files.exists(path));
+        assertTrue(Files.exists(tempDirPath));
+        Path path = Path.of(filePath);
+        assertTrue(Files.exists(path));
 
-    Files.deleteIfExists(path);
-    Files.deleteIfExists(tempDirPath);
-  }
+        Files.deleteIfExists(path);
+        Files.deleteIfExists(tempDirPath);
+    }
 
-  @Test
-  void generateDailySalesReportContent_handlesNullDocumentId()
-    throws IOException {
-    CustomerInfo customerWithNullId = CustomerInfo.builder()
-      .id(3L)
-      .fullName("Null ID Customer")
-      .documentId(null)
-      .build();
+    @Test
+    void generateDailySalesReportContent_handlesNullDocumentId()
+            throws IOException {
+        CustomerInfo customerWithNullId = CustomerInfo.builder()
+                .id(3L)
+                .fullName("Null ID Customer")
+                .documentId(null)
+                .build();
 
-    SaleInfo saleWithNullCustomerDoc = SaleInfo.builder()
-      .id(3)
-      .totalAmount(new BigDecimal("300.00"))
-      .finalAmount(new BigDecimal("357.00"))
-      .customer(customerWithNullId)
-      .createdAt(LocalDateTime.of(testDate, LocalTime.of(16, 20)))
-      .build();
+        SaleInfo saleWithNullCustomerDoc = SaleInfo.builder()
+                .id(3)
+                .totalAmount(new BigDecimal("300.00"))
+                .finalAmount(new BigDecimal("357.00"))
+                .customer(customerWithNullId)
+                .createdAt(LocalDateTime.of(testDate, LocalTime.of(16, 20)))
+                .build();
 
-    List<SaleInfo> salesWithNull = Arrays.asList(
-      mockSales.get(0),
-      saleWithNullCustomerDoc
-    );
+        List<SaleInfo> salesWithNull = Arrays.asList(
+                mockSales.get(0),
+                saleWithNullCustomerDoc);
 
-    LocalDateTime startOfDay = testDate.atStartOfDay();
-    LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
+        LocalDateTime startOfDay = testDate.atStartOfDay();
+        LocalDateTime endOfDay = testDate.atTime(LocalTime.MAX);
 
-    when(saleService.findByCreatedDateRange(startOfDay, endOfDay)).thenReturn(
-      salesWithNull
-    );
+        when(saleService.findByCreatedDateRange(startOfDay, endOfDay)).thenReturn(
+                salesWithNull);
 
-    String content = saleExportService.generateDailySalesReportContent(
-      testDate
-    );
+        String content = saleExportService.generateDailySalesReportContent(
+                testDate);
 
-    String[] lines = content.split("\\r?\\n");
-    assertEquals(2, lines.length);
-    assertEquals(
-      "CÉDULA_CLIENTE|FECHA_VENTA|VALOR_TOTAL|VALOR_TOTAL_CON_IVA",
-      lines[0]
-    );
-    assertTrue(lines[1].startsWith("123456789"));
-  }
+        String[] lines = content.split("\\r?\\n");
+        assertEquals(2, lines.length);
+        assertEquals(
+                "CUSTOMER_ID|SALE_DATE|TOTAL_AMOUNT|TOTAL_AMOUNT_WITH_TAX",
+                lines[0]);
+        assertTrue(lines[1].startsWith("123456789"));
+    }
 }

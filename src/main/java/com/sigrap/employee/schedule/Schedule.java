@@ -23,13 +23,15 @@ import org.hibernate.annotations.UpdateTimestamp;
  * Entity class representing user work schedules.
  * Tracks user work hours and shift assignments.
  *
- * <p>This entity maintains schedule information including:
+ * <p>
+ * This entity maintains schedule information including:
  * <ul>
- *   <li>Work days and times</li>
- *   <li>Shift assignments</li>
- *   <li>Schedule status</li>
- *   <li>Audit information</li>
- * </ul></p>
+ * <li>Work days and times</li>
+ * <li>Shift assignments</li>
+ * <li>Schedule status</li>
+ * <li>Audit information</li>
+ * </ul>
+ * </p>
  */
 @Entity
 @Table(name = "schedules")
@@ -81,7 +83,7 @@ public class Schedule {
   private LocalTime endTime;
 
   /**
-   * Type of schedule (Regular, Horas Extra, Festivo).
+   * Type of schedule (Regular, Overtime, Holiday).
    */
   @Column(name = "type")
   @Builder.Default

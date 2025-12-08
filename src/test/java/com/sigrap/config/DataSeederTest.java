@@ -314,16 +314,16 @@ class DataSeederTest {
     when(attendanceRepository.count()).thenReturn(0L);
 
     List<User> users = new ArrayList<>();
-    User gladysUser = User.builder()
+    User extraEmployeeUser = User.builder()
       .id(3L)
-      .name("Gladys")
-      .email("gladys@sigrap.com")
+      .name("Extra Employee")
+      .email("extra.employee@sigrap.com")
       .password("encoded-password")
       .role(UserRole.EMPLOYEE)
       .build();
     users.add(adminUser);
     users.add(employeeUser);
-    users.add(gladysUser);
+    users.add(extraEmployeeUser);
     when(userRepository.findAll()).thenReturn(users);
 
     dataSeeder.run();
@@ -578,13 +578,13 @@ class DataSeederTest {
     User adminUser = User.builder()
       .id(1L)
       .name("Admin")
-      .email("rosita@sigrap.com")
+      .email("admin@sigrap.com")
       .role(UserRole.ADMINISTRATOR)
       .build();
     User employeeUser = User.builder()
       .id(2L)
       .name("Employee")
-      .email("gladys@sigrap.com")
+      .email("employee@sigrap.com")
       .role(UserRole.EMPLOYEE)
       .build();
     users.add(adminUser);

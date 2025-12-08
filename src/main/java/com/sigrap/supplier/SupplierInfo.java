@@ -12,28 +12,35 @@ import lombok.NoArgsConstructor;
  * Response object containing supplier information.
  * Used for returning supplier data in API responses.
  *
- * <p>This class:
+ * <p>
+ * This class:
  * <ul>
- *   <li>Represents supplier read operations</li>
- *   <li>Includes audit information</li>
- *   <li>Contains complete supplier details</li>
- * </ul></p>
+ * <li>Represents supplier read operations</li>
+ * <li>Includes audit information</li>
+ * <li>Contains complete supplier details</li>
+ * </ul>
+ * </p>
  *
- * <p>Key Features:
+ * <p>
+ * Key Features:
  * <ul>
- *   <li>Immutable supplier data</li>
- *   <li>Timestamp tracking</li>
- *   <li>Complete supplier representation</li>
- * </ul></p>
+ * <li>Immutable supplier data</li>
+ * <li>Timestamp tracking</li>
+ * <li>Complete supplier representation</li>
+ * </ul>
+ * </p>
  *
- * <p>Usage Example:
+ * <p>
+ * Usage Example:
+ * 
  * <pre>
  * SupplierInfo info = SupplierInfo.builder()
  *     .id(1)
  *     .name("Office Depot")
  *     .email("contact@officedepot.com")
  *     .build();
- * </pre></p>
+ * </pre>
+ * </p>
  */
 @Data
 @Builder
@@ -57,7 +64,7 @@ public class SupplierInfo {
   /**
    * Name of the contact person at the supplier.
    */
-  @Schema(description = "Contact person", example = "Miguel Sánchez")
+  @Schema(description = "Contact person", example = "Michael Johnson")
   private String contactPerson;
 
   /**
@@ -81,28 +88,19 @@ public class SupplierInfo {
   /**
    * Physical address of the supplier's location.
    */
-  @Schema(
-    description = "Physical address",
-    example = "Av. Javier Prado Este 2558, San Borja, Lima"
-  )
+  @Schema(description = "Physical address", example = "1500 Main Street, New York, NY 10001")
   private String address;
 
   /**
    * Website URL of the supplier.
    */
-  @Schema(
-    description = "Website URL",
-    example = "https://www.officedepot.com.pe"
-  )
+  @Schema(description = "Website URL", example = "https://www.officedepot.com")
   private String website;
 
   /**
    * Description of products or services the supplier provides.
    */
-  @Schema(
-    description = "Products or services provided",
-    example = "Artículos de oficina y escolares"
-  )
+  @Schema(description = "Products or services provided", example = "Office and school supplies")
   private String productsProvided;
 
   /**
@@ -114,7 +112,7 @@ public class SupplierInfo {
   /**
    * Payment terms for purchases from this supplier.
    */
-  @Schema(description = "Payment terms", example = "30 días")
+  @Schema(description = "Payment terms", example = "30 days")
   private String paymentTerms;
 
   /**

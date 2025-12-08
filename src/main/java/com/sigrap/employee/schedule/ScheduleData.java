@@ -13,28 +13,30 @@ import lombok.NoArgsConstructor;
  * Data Transfer Object (DTO) for creating and updating schedules.
  * Contains validated schedule data for input operations.
  *
- * <p>This class:
+ * <p>
+ * This class:
  * <ul>
- *   <li>Validates schedule input data</li>
- *   <li>Supports create operations</li>
- *   <li>Supports update operations</li>
- *   <li>Manages schedule information</li>
- * </ul></p>
+ * <li>Validates schedule input data</li>
+ * <li>Supports create operations</li>
+ * <li>Supports update operations</li>
+ * <li>Manages schedule information</li>
+ * </ul>
+ * </p>
  *
- * <p>Validation Rules:
+ * <p>
+ * Validation Rules:
  * <ul>
- *   <li>Required fields must not be blank</li>
- *   <li>Times must be valid</li>
- *   <li>User ID must reference existing user</li>
- * </ul></p>
+ * <li>Required fields must not be blank</li>
+ * <li>Times must be valid</li>
+ * <li>User ID must reference existing user</li>
+ * </ul>
+ * </p>
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(
-  description = "Data transfer object for creating or updating a schedule"
-)
+@Schema(description = "Data transfer object for creating or updating a schedule")
 public class ScheduleData {
 
   /**
@@ -70,7 +72,7 @@ public class ScheduleData {
   private LocalTime endTime;
 
   /**
-   * Type of schedule (Regular, Horas Extra, Festivo).
+   * Type of schedule (Regular, Overtime, Holiday).
    */
   @Schema(description = "Type of schedule", example = "Regular")
   private String type;

@@ -12,13 +12,15 @@ import lombok.NoArgsConstructor;
  * Response object containing schedule information.
  * Used for returning schedule data in API responses.
  *
- * <p>This class:
+ * <p>
+ * This class:
  * <ul>
- *   <li>Represents schedule read operations</li>
- *   <li>Includes complete schedule details</li>
- *   <li>Contains audit timestamps</li>
- *   <li>Provides status information</li>
- * </ul></p>
+ * <li>Represents schedule read operations</li>
+ * <li>Includes complete schedule details</li>
+ * <li>Contains audit timestamps</li>
+ * <li>Provides status information</li>
+ * </ul>
+ * </p>
  */
 @Data
 @Builder
@@ -64,7 +66,7 @@ public class ScheduleInfo {
   private LocalTime endTime;
 
   /**
-   * Type of schedule (Regular, Horas Extra, Festivo).
+   * Type of schedule (Regular, Overtime, Holiday).
    */
   @Schema(description = "Type of schedule", example = "Regular")
   private String type;
@@ -78,18 +80,12 @@ public class ScheduleInfo {
   /**
    * Timestamp of when the schedule was created.
    */
-  @Schema(
-    description = "Creation timestamp of the schedule",
-    example = "2023-01-15T09:00:00"
-  )
+  @Schema(description = "Creation timestamp of the schedule", example = "2023-01-15T09:00:00")
   private LocalDateTime createdAt;
 
   /**
    * Timestamp of when the schedule was last updated.
    */
-  @Schema(
-    description = "Last update timestamp of the schedule",
-    example = "2023-01-15T09:00:00"
-  )
+  @Schema(description = "Last update timestamp of the schedule", example = "2023-01-15T09:00:00")
   private LocalDateTime updatedAt;
 }

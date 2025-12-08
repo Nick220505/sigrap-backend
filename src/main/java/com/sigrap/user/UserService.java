@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service class for user management operations and implementing Spring Security's UserDetailsService.
+ * Service class for user management operations and implementing Spring
+ * Security's UserDetailsService.
  * Handles user authentication and user management operations.
  */
 @Service
@@ -40,20 +41,18 @@ public class UserService implements UserDetailsService {
    */
   @Override
   public UserDetails loadUserByUsername(String email)
-    throws UsernameNotFoundException {
+      throws UsernameNotFoundException {
     com.sigrap.user.User user = userRepository
-      .findByEmail(email)
-      .orElseThrow(() ->
-        new UsernameNotFoundException("User not found with email: " + email)
-      );
+        .findByEmail(email)
+        .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
     return org.springframework.security.core.userdetails.User.builder()
-      .username(user.getEmail())
-      .password(user.getPassword())
-      .authorities(new ArrayList<>())
-      .disabled(!user.isEnabled())
-      .accountLocked(!user.isAccountNonLocked())
-      .build();
+        .username(user.getEmail())
+        .password(user.getPassword())
+        .authorities(new ArrayList<>())
+        .disabled(!user.isEnabled())
+        .accountLocked(!user.isAccountNonLocked())
+        .build();
   }
 
   /**
@@ -77,8 +76,8 @@ public class UserService implements UserDetailsService {
   @Transactional(readOnly = true)
   public UserInfo findById(Long id) {
     com.sigrap.user.User user = userRepository
-      .findById(id)
-      .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
     return userMapper.toInfo(user);
   }
 
@@ -92,10 +91,8 @@ public class UserService implements UserDetailsService {
   @Transactional(readOnly = true)
   public UserInfo findByEmail(String email) {
     com.sigrap.user.User user = userRepository
-      .findByEmail(email)
-      .orElseThrow(() ->
-        new EntityNotFoundException("User not found with email: " + email)
-      );
+        .findByEmail(email)
+        .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + email));
     return userMapper.toInfo(user);
   }
 
@@ -107,20 +104,16 @@ public class UserService implements UserDetailsService {
    * @throws IllegalArgumentException if a user already exists with the email
    */
   @Transactional
-  @Auditable(action = "CREAR", entity = "USUARIO", captureDetails = true)
+  @Auditable(action = "CREATE", entity = "USER", captureDetails = true)
   public UserInfo create(UserData userData) {
     if (userRepository.existsByEmail(userData.getEmail())) {
       throw new IllegalArgumentException(
-        "Email already in use: " + userData.getEmail()
-      );
+          "Email already in use: " + userData.getEmail());
     }
-    if (
-      userData.getDocumentId() != null &&
-      userRepository.existsByDocumentId(userData.getDocumentId())
-    ) {
+    if (userData.getDocumentId() != null &&
+        userRepository.existsByDocumentId(userData.getDocumentId())) {
       throw new IllegalArgumentException(
-        "Document ID already in use: " + userData.getDocumentId()
-      );
+          "Document ID already in use: " + userData.getDocumentId());
     }
 
     com.sigrap.user.User user = userMapper.toEntity(userData);
@@ -131,41 +124,31 @@ public class UserService implements UserDetailsService {
   /**
    * Updates an existing user.
    *
-   * @param id The ID of the user to update
+   * @param id       The ID of the user to update
    * @param userData The new data for the user
    * @return UserInfo containing the updated user's information
-   * @throws EntityNotFoundException if the user is not found
-   * @throws IllegalArgumentException if the email is already in use by another user
+   * @throws EntityNotFoundException  if the user is not found
+   * @throws IllegalArgumentException if the email is already in use by another
+   *                                  user
    */
   @Transactional
-  @Auditable(
-    action = "ACTUALIZAR",
-    entity = "USUARIO",
-    entityIdParam = "id",
-    captureDetails = true
-  )
+  @Auditable(action = "UPDATE", entity = "USER", entityIdParam = "id", captureDetails = true)
   public UserInfo update(Long id, UserData userData) {
     com.sigrap.user.User user = userRepository
-      .findById(id)
-      .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
 
-    if (
-      userData.getEmail() != null &&
-      !userData.getEmail().equals(user.getEmail()) &&
-      userRepository.existsByEmail(userData.getEmail())
-    ) {
+    if (userData.getEmail() != null &&
+        !userData.getEmail().equals(user.getEmail()) &&
+        userRepository.existsByEmail(userData.getEmail())) {
       throw new IllegalArgumentException(
-        "Email already in use: " + userData.getEmail()
-      );
+          "Email already in use: " + userData.getEmail());
     }
-    if (
-      userData.getDocumentId() != null &&
-      !userData.getDocumentId().equals(user.getDocumentId()) &&
-      userRepository.existsByDocumentId(userData.getDocumentId())
-    ) {
+    if (userData.getDocumentId() != null &&
+        !userData.getDocumentId().equals(user.getDocumentId()) &&
+        userRepository.existsByDocumentId(userData.getDocumentId())) {
       throw new IllegalArgumentException(
-        "Document ID already in use: " + userData.getDocumentId()
-      );
+          "Document ID already in use: " + userData.getDocumentId());
     }
 
     userMapper.updateEntityFromData(user, userData);
@@ -181,7 +164,7 @@ public class UserService implements UserDetailsService {
    * @throws EntityNotFoundException if the user is not found
    */
   @Transactional
-  @Auditable(action = "ELIMINAR", entity = "USUARIO", entityIdParam = "id")
+  @Auditable(action = "DELETE", entity = "USER", entityIdParam = "id")
   public void delete(Long id) {
     if (!userRepository.existsById(id)) {
       throw new EntityNotFoundException("User not found: " + id);
@@ -196,11 +179,7 @@ public class UserService implements UserDetailsService {
    * @throws EntityNotFoundException if any user is not found
    */
   @Transactional
-  @Auditable(
-    action = "ELIMINAR_LOTE",
-    entity = "USUARIO",
-    captureDetails = true
-  )
+  @Auditable(action = "BATCH_DELETE", entity = "USER", captureDetails = true)
   public void deleteAllById(List<Long> ids) {
     for (Long id : ids) {
       if (!userRepository.existsById(id)) {
@@ -213,17 +192,12 @@ public class UserService implements UserDetailsService {
   /**
    * Updates a user's profile information.
    *
-   * @param id The ID of the user to update
+   * @param id       The ID of the user to update
    * @param userData The new profile data
    * @return UserInfo containing the updated profile information
    */
   @Transactional
-  @Auditable(
-    action = "ACTUALIZAR_PERFIL",
-    entity = "USUARIO",
-    entityIdParam = "id",
-    captureDetails = true
-  )
+  @Auditable(action = "UPDATE_PROFILE", entity = "USER", entityIdParam = "id", captureDetails = true)
   public UserInfo updateProfile(Long id, UserData userData) {
     return update(id, userData);
   }
@@ -231,23 +205,22 @@ public class UserService implements UserDetailsService {
   /**
    * Changes a user's password.
    *
-   * @param id The ID of the user
+   * @param id              The ID of the user
    * @param currentPassword The current password for verification
-   * @param newPassword The new password to set
+   * @param newPassword     The new password to set
    * @return UserInfo containing the user's information
-   * @throws EntityNotFoundException if the user is not found
+   * @throws EntityNotFoundException  if the user is not found
    * @throws IllegalArgumentException if the current password is incorrect
    */
   @Transactional
-  @Auditable(action = "CAMBIAR_CLAVE", entity = "USUARIO", entityIdParam = "id")
+  @Auditable(action = "CHANGE_PASSWORD", entity = "USER", entityIdParam = "id")
   public UserInfo changePassword(
-    Long id,
-    String currentPassword,
-    String newPassword
-  ) {
+      Long id,
+      String currentPassword,
+      String newPassword) {
     com.sigrap.user.User user = userRepository
-      .findById(id)
-      .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
 
     UserData passwordUpdate = new UserData();
     passwordUpdate.setPassword(newPassword);
@@ -265,12 +238,11 @@ public class UserService implements UserDetailsService {
   @Transactional
   public void registerSuccessfulLogin(String email) {
     userRepository
-      .findByEmail(email)
-      .ifPresent(user -> {
-        user.setLastLogin(
-          ZonedDateTime.now(ZoneId.of("America/Bogota")).toLocalDateTime()
-        );
-        userRepository.save(user);
-      });
+        .findByEmail(email)
+        .ifPresent(user -> {
+          user.setLastLogin(
+              ZonedDateTime.now(ZoneId.of("America/Bogota")).toLocalDateTime());
+          userRepository.save(user);
+        });
   }
 }

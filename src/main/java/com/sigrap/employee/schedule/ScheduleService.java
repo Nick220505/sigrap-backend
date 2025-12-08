@@ -16,13 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
  * Service class for schedule management operations.
  * Handles business logic for schedule-related functionality.
  *
- * <p>This service provides:
+ * <p>
+ * This service provides:
  * <ul>
- *   <li>Schedule CRUD operations</li>
- *   <li>Weekly schedule generation</li>
- *   <li>Schedule copying</li>
- *   <li>Schedule search functionality</li>
- * </ul></p>
+ * <li>Schedule CRUD operations</li>
+ * <li>Weekly schedule generation</li>
+ * <li>Schedule copying</li>
+ * <li>Schedule search functionality</li>
+ * </ul>
+ * </p>
  */
 @Service
 @RequiredArgsConstructor
@@ -53,10 +55,8 @@ public class ScheduleService {
   @Transactional(readOnly = true)
   public ScheduleInfo findById(Long id) {
     Schedule schedule = scheduleRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Schedule not found: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Schedule not found: " + id));
     return scheduleMapper.toInfo(schedule);
   }
 
@@ -68,13 +68,11 @@ public class ScheduleService {
    * @throws EntityNotFoundException if the referenced user is not found
    */
   @Transactional
-  @Auditable(action = "CREAR", entity = "HORARIO", captureDetails = true)
+  @Auditable(action = "CREATE", entity = "SCHEDULE", captureDetails = true)
   public ScheduleInfo create(ScheduleData data) {
     User user = userRepository
-      .findById(data.getUserId())
-      .orElseThrow(() ->
-        new EntityNotFoundException("User not found: " + data.getUserId())
-      );
+        .findById(data.getUserId())
+        .orElseThrow(() -> new EntityNotFoundException("User not found: " + data.getUserId()));
     Schedule schedule = scheduleMapper.toEntity(data, user);
     schedule = scheduleRepository.save(schedule);
     return scheduleMapper.toInfo(schedule);
@@ -83,24 +81,17 @@ public class ScheduleService {
   /**
    * Updates an existing schedule.
    *
-   * @param id The ID of the schedule to update
+   * @param id   The ID of the schedule to update
    * @param data The new data for the schedule
    * @return ScheduleInfo containing the updated schedule's information
    * @throws EntityNotFoundException if the schedule or user is not found
    */
   @Transactional
-  @Auditable(
-    action = "ACTUALIZAR",
-    entity = "HORARIO",
-    entityIdParam = "id",
-    captureDetails = true
-  )
+  @Auditable(action = "UPDATE", entity = "SCHEDULE", entityIdParam = "id", captureDetails = true)
   public ScheduleInfo update(Long id, ScheduleData data) {
     Schedule schedule = scheduleRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Schedule not found: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Schedule not found: " + id));
 
     scheduleMapper.updateEntity(schedule, data);
     schedule = scheduleRepository.save(schedule);
@@ -114,7 +105,7 @@ public class ScheduleService {
    * @throws EntityNotFoundException if the schedule is not found
    */
   @Transactional
-  @Auditable(action = "ELIMINAR", entity = "HORARIO", entityIdParam = "id")
+  @Auditable(action = "DELETE", entity = "SCHEDULE", entityIdParam = "id")
   public void delete(Long id) {
     if (!scheduleRepository.existsById(id)) {
       throw new EntityNotFoundException("Schedule not found: " + id);
@@ -148,50 +139,48 @@ public class ScheduleService {
 
   /**
    * Generates a weekly schedule for a user.
-   * The input ScheduleData's startTime and endTime (LocalTime) will be used for all days.
+   * The input ScheduleData's startTime and endTime (LocalTime) will be used for
+   * all days.
    *
    * @param userId The ID of the user
-   * @param data The base schedule data to use (containing LocalTime for start/end and optionally isActive)
+   * @param data   The base schedule data to use (containing LocalTime for
+   *               start/end and optionally isActive)
    * @return List of ScheduleInfo DTOs for the generated schedules
    * @throws EntityNotFoundException if the user is not found
    */
   @Transactional
-  @Auditable(action = "CREAR", entity = "HORARIO", captureDetails = true)
+  @Auditable(action = "CREATE", entity = "SCHEDULE", captureDetails = true)
   public List<ScheduleInfo> generateWeeklySchedule(
-    Long userId,
-    ScheduleData data
-  ) {
+      Long userId,
+      ScheduleData data) {
     User user = userRepository
-      .findById(userId)
-      .orElseThrow(() ->
-        new EntityNotFoundException("User not found: " + userId)
-      );
+        .findById(userId)
+        .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
 
     List<ScheduleInfo> weeklySchedules = new ArrayList<>();
     LocalTime startTime = data.getStartTime();
     LocalTime endTime = data.getEndTime();
     boolean isActiveForWeek = Optional.ofNullable(data.getIsActive()).orElse(
-      true
-    );
+        true);
 
     String[] daysOfWeek = {
-      "MONDAY",
-      "TUESDAY",
-      "WEDNESDAY",
-      "THURSDAY",
-      "FRIDAY",
-      "SATURDAY",
-      "SUNDAY",
+        "MONDAY",
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY",
+        "FRIDAY",
+        "SATURDAY",
+        "SUNDAY",
     };
 
     for (String day : daysOfWeek) {
       ScheduleData dailyData = ScheduleData.builder()
-        .userId(userId)
-        .day(day)
-        .startTime(startTime)
-        .endTime(endTime)
-        .isActive(isActiveForWeek)
-        .build();
+          .userId(userId)
+          .day(day)
+          .startTime(startTime)
+          .endTime(endTime)
+          .isActive(isActiveForWeek)
+          .build();
 
       Schedule schedule = scheduleMapper.toEntity(dailyData, user);
       schedule = scheduleRepository.save(schedule);
@@ -209,32 +198,28 @@ public class ScheduleService {
    * @throws EntityNotFoundException if the user is not found
    */
   @Transactional
-  @Auditable(action = "CREAR", entity = "HORARIO", captureDetails = true)
+  @Auditable(action = "CREATE", entity = "SCHEDULE", captureDetails = true)
   public List<ScheduleInfo> copyScheduleFromPreviousWeek(Long userId) {
     User user = userRepository
-      .findById(userId)
-      .orElseThrow(() ->
-        new EntityNotFoundException("User not found: " + userId)
-      );
+        .findById(userId)
+        .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
 
-    List<Schedule> previousSchedules =
-      scheduleRepository.findByUserIdAndIsActive(userId, true);
+    List<Schedule> previousSchedules = scheduleRepository.findByUserIdAndIsActive(userId, true);
 
     if (previousSchedules.isEmpty()) {
       throw new IllegalStateException(
-        "No active schedules found to copy from for user: " + userId
-      );
+          "No active schedules found to copy from for user: " + userId);
     }
 
     List<Schedule> newSchedules = new ArrayList<>();
     for (Schedule prevSchedule : previousSchedules) {
       ScheduleData copiedData = ScheduleData.builder()
-        .userId(user.getId())
-        .day(prevSchedule.getDay())
-        .startTime(prevSchedule.getStartTime())
-        .endTime(prevSchedule.getEndTime())
-        .isActive(prevSchedule.getIsActive())
-        .build();
+          .userId(user.getId())
+          .day(prevSchedule.getDay())
+          .startTime(prevSchedule.getStartTime())
+          .endTime(prevSchedule.getEndTime())
+          .isActive(prevSchedule.getIsActive())
+          .build();
       Schedule newSchedule = scheduleMapper.toEntity(copiedData, user);
       newSchedules.add(newSchedule);
     }
@@ -252,9 +237,8 @@ public class ScheduleService {
   @Transactional(readOnly = true)
   public List<ScheduleInfo> findActiveSchedulesByUserId(Long userId) {
     List<Schedule> schedules = scheduleRepository.findByUserIdAndIsActive(
-      userId,
-      true
-    );
+        userId,
+        true);
     return scheduleMapper.toInfoList(schedules);
   }
 
@@ -267,9 +251,8 @@ public class ScheduleService {
   @Transactional(readOnly = true)
   public List<ScheduleInfo> findActiveSchedulesByDay(String day) {
     List<Schedule> schedules = scheduleRepository.findByDayAndIsActive(
-      day,
-      true
-    );
+        day,
+        true);
     return scheduleMapper.toInfoList(schedules);
   }
 }

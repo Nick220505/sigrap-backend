@@ -173,75 +173,75 @@ public class DataSeeder implements CommandLineRunner {
       categoryRepository.saveAll(
         List.of(
           Category.builder()
-            .name("Útiles Escolares")
+            .name("School Supplies")
             .description(
-              "Artículos básicos para estudiantes de primaria y secundaria."
+              "Basic supplies for elementary, middle, and high school students."
             )
             .build(),
           Category.builder()
-            .name("Artículos de Oficina")
+            .name("Office Supplies")
             .description(
-              "Suministros profesionales para el trabajo administrativo y de oficina."
+              "Professional supplies for office and administrative work."
             )
             .build(),
           Category.builder()
-            .name("Papelería General")
+            .name("General Stationery")
             .description(
-              "Papeles, sobres, cuadernos y otros artículos de uso cotidiano."
+              "Paper, envelopes, notebooks, and other everyday stationery items."
             )
             .build(),
           Category.builder()
-            .name("Regalos y Detalles")
+            .name("Gifts and Wrapping")
             .description(
-              "Artículos decorativos, tarjetas y empaques para obsequios."
+              "Decorative items, greeting cards, and gift packaging."
             )
             .build(),
           Category.builder()
-            .name("Tecnología Básica")
+            .name("Basic Technology")
             .description(
-              "Accesorios de computación, almacenamiento y dispositivos sencillos."
+              "Computer accessories, storage devices, and simple electronics."
             )
             .build(),
           Category.builder()
-            .name("Arte y Dibujo")
+            .name("Art and Drawing")
             .description(
-              "Materiales para expresión artística, dibujo técnico y manualidades creativas."
+              "Materials for artistic expression, technical drawing, and crafts."
             )
             .build(),
           Category.builder()
-            .name("Escritura")
+            .name("Writing Instruments")
             .description(
-              "Bolígrafos, lápices, marcadores y otros instrumentos de escritura."
+              "Pens, pencils, markers, and other writing tools."
             )
             .build(),
           Category.builder()
-            .name("Cuadernos y Libretas")
+            .name("Notebooks and Journals")
             .description(
-              "Diversos formatos de cuadernos para diferentes usos escolares y profesionales."
+              "Different notebook formats for school and professional use."
             )
             .build(),
           Category.builder()
-            .name("Organización y Archivo")
+            .name("Organization and Filing")
             .description(
-              "Productos para clasificar, almacenar y organizar documentos."
+              "Products to sort, store, and organize documents."
             )
             .build(),
           Category.builder()
-            .name("Mochilas y Bolsos")
+            .name("Backpacks and Bags")
             .description(
-              "Soluciones para transportar materiales escolares y de oficina."
+              "Solutions for carrying school and office materials."
             )
             .build(),
           Category.builder()
-            .name("Material Didáctico")
+            .name("Educational Materials")
             .description(
-              "Recursos educativos para facilitar el aprendizaje en diferentes áreas."
+              "Learning resources to support education across different subjects."
             )
             .build(),
           Category.builder()
-            .name("Manualidades")
+            .name("Craft Supplies")
             .description(
-              "Materiales diversos para proyectos creativos y decorativos."
+              "Various materials for creative and decorative projects."
             )
             .build()
         )
@@ -271,549 +271,549 @@ public class DataSeeder implements CommandLineRunner {
       productRepository.saveAll(
         List.of(
           Product.builder()
-            .name("Cuaderno Universitario Norma")
+            .name("Norma College Ruled Notebook")
             .description(
-              "Cuaderno universitario de 100 hojas, cuadriculado, pasta dura"
+              "College-ruled notebook with 100 sheets, grid layout, hard cover"
             )
-            .costPrice(new BigDecimal("4000"))
-            .salePrice(new BigDecimal("7000"))
+            .costPrice(new BigDecimal("3.00"))
+            .salePrice(new BigDecimal("4.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(0))
             .build(),
           Product.builder()
-            .name("Lápiz Mirado HB")
-            .description("Lápiz grafito HB, cuerpo hexagonal con goma incluida")
-            .costPrice(new BigDecimal("500"))
-            .salePrice(new BigDecimal("1000"))
+            .name("HB Woodcase Pencil")
+            .description("HB graphite woodcase pencil with eraser and hexagonal body")
+            .costPrice(new BigDecimal("0.25"))
+            .salePrice(new BigDecimal("0.49"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(0))
             .build(),
           Product.builder()
-            .name("Caja de Colores Faber-Castell x12")
+            .name("Faber-Castell Colored Pencils, 12-Pack")
             .description(
-              "Caja de 12 lápices de colores, punta resistente, colores vivos"
+              "Box of 12 colored pencils with durable tips and vibrant colors"
             )
-            .costPrice(new BigDecimal("5500"))
-            .salePrice(new BigDecimal("9500"))
+            .costPrice(new BigDecimal("4.00"))
+            .salePrice(new BigDecimal("6.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(0))
             .build(),
           Product.builder()
-            .name("Kit Geométrico Faber-Castell")
+            .name("Faber-Castell Geometry Set")
             .description(
-              "Kit de regla 30cm, escuadras, transportador y compás de precisión"
+              "Geometry set with 12-inch ruler, triangles, protractor, and precision compass"
             )
-            .costPrice(new BigDecimal("7500"))
-            .salePrice(new BigDecimal("12000"))
+            .costPrice(new BigDecimal("4.50"))
+            .salePrice(new BigDecimal("7.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(0))
             .build(),
           Product.builder()
-            .name("Borrador Nata Pelikan")
+            .name("Soft Vinyl Eraser")
             .description(
-              "Borrador de nata, suave, no mancha el papel, alta durabilidad"
+              "Soft vinyl eraser that removes graphite cleanly without smudging"
             )
-            .costPrice(new BigDecimal("800"))
-            .salePrice(new BigDecimal("1500"))
+            .costPrice(new BigDecimal("0.30"))
+            .salePrice(new BigDecimal("0.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(0))
             .build(),
           Product.builder()
-            .name("Grapadora Metálica Rank")
+            .name("Metal Desktop Stapler")
             .description(
-              "Grapadora metálica de escritorio, capacidad 20 hojas, color negro"
+              "Metal desktop stapler, 20-sheet capacity, black finish"
             )
-            .costPrice(new BigDecimal("8000"))
-            .salePrice(new BigDecimal("15000"))
+            .costPrice(new BigDecimal("6.00"))
+            .salePrice(new BigDecimal("10.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(1))
             .build(),
           Product.builder()
-            .name("Perforadora de Papel Rank")
+            .name("Two-Hole Paper Punch")
             .description(
-              "Perforadora metálica de 2 huecos, capacidad 20 hojas, color negro"
+              "Metal 2-hole paper punch, 20-sheet capacity, black finish"
             )
-            .costPrice(new BigDecimal("10000"))
-            .salePrice(new BigDecimal("18000"))
+            .costPrice(new BigDecimal("7.00"))
+            .salePrice(new BigDecimal("12.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(1))
             .build(),
           Product.builder()
-            .name("Caja de Clips Estándar x100")
+            .name("Standard Paper Clips, 100-Pack")
             .description(
-              "Caja con 100 clips metálicos estándar, 33mm, acabado plateado"
+              "Box of 100 standard metal paper clips, 33 mm, silver finish"
             )
-            .costPrice(new BigDecimal("1500"))
-            .salePrice(new BigDecimal("3000"))
+            .costPrice(new BigDecimal("1.00"))
+            .salePrice(new BigDecimal("2.49"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(1))
             .build(),
           Product.builder()
-            .name("Set de Bandejas Organizadoras x3")
+            .name("Stackable Letter Trays, 3-Pack")
             .description(
-              "Set de 3 bandejas plásticas apilables para documentos, color negro"
+              "Set of 3 stackable plastic letter trays for documents, black"
             )
-            .costPrice(new BigDecimal("12000"))
-            .salePrice(new BigDecimal("22000"))
+            .costPrice(new BigDecimal("7.50"))
+            .salePrice(new BigDecimal("13.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(1))
             .build(),
           Product.builder()
-            .name("Dispensador de Cinta Adhesiva")
+            .name("Desktop Tape Dispenser")
             .description(
-              "Dispensador de cinta adhesiva de escritorio, base pesada antideslizante"
+              "Desktop tape dispenser with weighted, non-slip base"
             )
-            .costPrice(new BigDecimal("3500"))
-            .salePrice(new BigDecimal("6500"))
+            .costPrice(new BigDecimal("3.00"))
+            .salePrice(new BigDecimal("5.49"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(1))
             .build(),
           Product.builder()
-            .name("Resma Papel Bond A4")
+            .name("A4 Copy Paper Ream (500 Sheets)")
             .description(
-              "Resma de papel bond A4, 75g, 500 hojas, blanco, multifuncional"
+              "Ream of A4 copy paper, 75 gsm, 500 sheets, bright white"
             )
-            .costPrice(new BigDecimal("12000"))
-            .salePrice(new BigDecimal("20000"))
+            .costPrice(new BigDecimal("4.00"))
+            .salePrice(new BigDecimal("7.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(2))
             .build(),
           Product.builder()
-            .name("Sobre Manila Carta x50")
+            .name("Letter-Size Manila Envelopes, 50-Pack")
             .description(
-              "Paquete de 50 sobres manila tamaño carta, color kraft"
+              "Pack of 50 letter-size manila envelopes, kraft color"
             )
-            .costPrice(new BigDecimal("6000"))
-            .salePrice(new BigDecimal("11000"))
+            .costPrice(new BigDecimal("3.00"))
+            .salePrice(new BigDecimal("5.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(2))
             .build(),
           Product.builder()
-            .name("Cartulina Blanca Pliego")
+            .name("White Cardstock Sheet")
             .description(
-              "Pliego de cartulina blanca, 70x100cm, 180g, acabado mate"
+              "White cardstock sheet, 27x39 in, 180 gsm, matte finish"
             )
-            .costPrice(new BigDecimal("700"))
-            .salePrice(new BigDecimal("1300"))
+            .costPrice(new BigDecimal("0.25"))
+            .salePrice(new BigDecimal("0.75"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(2))
             .build(),
           Product.builder()
-            .name("Block Iris Carta")
+            .name("Letter-Size Colored Paper Pad")
             .description(
-              "Block de papel iris tamaño carta, 20 hojas, colores surtidos"
+              "Letter-size pad of colored paper, 20 sheets, assorted colors"
             )
-            .costPrice(new BigDecimal("3500"))
-            .salePrice(new BigDecimal("6000"))
+            .costPrice(new BigDecimal("2.50"))
+            .salePrice(new BigDecimal("4.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(2))
             .build(),
           Product.builder()
-            .name("Papel Adhesivo Carta x20")
+            .name("Letter-Size Adhesive Paper, 20-Pack")
             .description(
-              "Paquete de 20 hojas de papel adhesivo blanco, tamaño carta"
+              "Pack of 20 white letter-size adhesive paper sheets"
             )
-            .costPrice(new BigDecimal("4000"))
-            .salePrice(new BigDecimal("7500"))
+            .costPrice(new BigDecimal("5.00"))
+            .salePrice(new BigDecimal("8.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(2))
             .build(),
           Product.builder()
-            .name("Tarjeta Felicitación Surtida")
+            .name("Assorted Greeting Card with Envelope")
             .description(
-              "Tarjeta de felicitación con sobre, diseños variados para toda ocasión"
+              "Greeting card with envelope, assorted designs for any occasion"
             )
-            .costPrice(new BigDecimal("1500"))
-            .salePrice(new BigDecimal("3500"))
+            .costPrice(new BigDecimal("1.00"))
+            .salePrice(new BigDecimal("2.49"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(3))
             .build(),
           Product.builder()
-            .name("Papel de Regalo Surtido")
+            .name("Assorted Gift Wrap Sheet")
             .description(
-              "Pliego de papel de regalo, diseños variados, 70x100cm"
+              "Gift wrap sheet, 27x39 in, assorted designs"
             )
-            .costPrice(new BigDecimal("1000"))
-            .salePrice(new BigDecimal("2000"))
+            .costPrice(new BigDecimal("0.75"))
+            .salePrice(new BigDecimal("1.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(3))
             .build(),
           Product.builder()
-            .name("Muñeco Anime Pequeño")
+            .name("Small Anime Figurine")
             .description(
-              "Figura decorativa de personaje anime, 10cm de altura, varios modelos"
+              "Decorative anime character figurine, 4 in tall, assorted characters"
             )
-            .costPrice(new BigDecimal("6000"))
-            .salePrice(new BigDecimal("12000"))
+            .costPrice(new BigDecimal("4.00"))
+            .salePrice(new BigDecimal("7.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(3))
             .build(),
           Product.builder()
-            .name("Caja de Regalo Decorada")
+            .name("Decorative Gift Box, Medium")
             .description(
-              "Caja de regalo decorativa, tamaño mediano, con moño incluido"
+              "Medium decorative gift box with bow, suitable for gifts"
             )
-            .costPrice(new BigDecimal("2500"))
-            .salePrice(new BigDecimal("5500"))
+            .costPrice(new BigDecimal("2.00"))
+            .salePrice(new BigDecimal("4.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(3))
             .build(),
           Product.builder()
-            .name("Set Tarjetas Motivacionales x10")
+            .name("Motivational Quote Cards, 10-Pack")
             .description(
-              "Conjunto de 10 tarjetas pequeñas con mensajes motivacionales"
+              "Set of 10 small cards with inspirational messages, assorted designs"
             )
-            .costPrice(new BigDecimal("3000"))
-            .salePrice(new BigDecimal("6000"))
+            .costPrice(new BigDecimal("2.50"))
+            .salePrice(new BigDecimal("4.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(3))
             .build(),
           Product.builder()
-            .name("Memoria USB 16GB")
+            .name("16GB USB 2.0 Flash Drive")
             .description(
-              "Memoria USB 16GB, conexión 2.0, carcasa plástica resistente"
+              "16 GB USB 2.0 flash drive with durable plastic housing"
             )
-            .costPrice(new BigDecimal("15000"))
-            .salePrice(new BigDecimal("25000"))
+            .costPrice(new BigDecimal("5.00"))
+            .salePrice(new BigDecimal("9.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(4))
             .build(),
           Product.builder()
-            .name("Mouse Óptico USB")
+            .name("Wired Optical USB Mouse")
             .description(
-              "Mouse óptico USB con cable, resolución 1000 DPI, diseño ergonómico"
+              "Wired optical USB mouse, 1000 DPI resolution, ergonomic design"
             )
-            .costPrice(new BigDecimal("12000"))
-            .salePrice(new BigDecimal("20000"))
+            .costPrice(new BigDecimal("4.00"))
+            .salePrice(new BigDecimal("7.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(4))
             .build(),
           Product.builder()
-            .name("Funda para Laptop 14\"")
+            .name("14-Inch Laptop Sleeve")
             .description(
-              "Funda protectora para laptop de 14 pulgadas, acolchada, impermeable"
+              "Padded, water-resistant sleeve for 14-inch laptops"
             )
-            .costPrice(new BigDecimal("18000"))
-            .salePrice(new BigDecimal("30000"))
+            .costPrice(new BigDecimal("6.00"))
+            .salePrice(new BigDecimal("11.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(4))
             .build(),
           Product.builder()
-            .name("Audífonos con Cable")
+            .name("Wired On-Ear Headphones")
             .description(
-              "Audífonos con cable, conector 3.5mm, control de volumen integrado"
+              "Wired on-ear headphones with 3.5 mm connector and in-line volume control"
             )
-            .costPrice(new BigDecimal("8000"))
-            .salePrice(new BigDecimal("15000"))
+            .costPrice(new BigDecimal("4.00"))
+            .salePrice(new BigDecimal("7.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(4))
             .build(),
           Product.builder()
-            .name("Adaptador HDMI a VGA")
+            .name("HDMI to VGA Adapter")
             .description(
-              "Adaptador conversor de HDMI a VGA, compatible con PC y dispositivos móviles"
+              "HDMI to VGA adapter compatible with PCs and mobile devices"
             )
-            .costPrice(new BigDecimal("10000"))
-            .salePrice(new BigDecimal("18000"))
+            .costPrice(new BigDecimal("6.00"))
+            .salePrice(new BigDecimal("11.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(4))
             .build(),
           Product.builder()
-            .name("Set Acuarelas x12")
+            .name("Watercolor Paint Set, 12 Colors")
             .description(
-              "Set de 12 pastillas de acuarela con pincel incluido, colores surtidos"
+              "Set of 12 watercolor pans with brush, assorted vibrant colors"
             )
-            .costPrice(new BigDecimal("7000"))
-            .salePrice(new BigDecimal("14000"))
+            .costPrice(new BigDecimal("5.00"))
+            .salePrice(new BigDecimal("9.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(5))
             .build(),
           Product.builder()
-            .name("Block Papel Acuarela A4")
+            .name("A4 Watercolor Paper Pad")
             .description(
-              "Block de papel para acuarela, 10 hojas, 300g, tamaño A4, grano fino"
+              "A4 watercolor paper pad, 10 sheets, 140 lb (300 gsm), cold press"
             )
-            .costPrice(new BigDecimal("6000"))
-            .salePrice(new BigDecimal("12000"))
+            .costPrice(new BigDecimal("4.00"))
+            .salePrice(new BigDecimal("7.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(5))
             .build(),
           Product.builder()
-            .name("Set Pinceles Artísticos x5")
+            .name("Artist Brush Set, 5-Pack")
             .description(
-              "Set de 5 pinceles de diferentes tamaños para técnicas húmedas"
+              "Set of 5 assorted-size brushes for wet media techniques"
             )
-            .costPrice(new BigDecimal("5000"))
-            .salePrice(new BigDecimal("10000"))
+            .costPrice(new BigDecimal("3.00"))
+            .salePrice(new BigDecimal("5.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(5))
             .build(),
           Product.builder()
-            .name("Lienzo para Pintura 30x40cm")
+            .name("Stretched Canvas 12x16 in")
             .description(
-              "Lienzo de algodón montado en bastidor de madera, 30x40cm, imprimado"
+              "Pre-primed cotton canvas on wooden frame, 12x16 in"
             )
-            .costPrice(new BigDecimal("9000"))
-            .salePrice(new BigDecimal("16000"))
+            .costPrice(new BigDecimal("6.00"))
+            .salePrice(new BigDecimal("10.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(5))
             .build(),
           Product.builder()
-            .name("Lápices de Dibujo Profesionales x6")
+            .name("Professional Drawing Pencils, 6-Pack")
             .description(
-              "Set de 6 lápices de grafito para dibujo artístico, diferentes durezas"
+              "Set of 6 graphite drawing pencils in assorted hardness grades"
             )
-            .costPrice(new BigDecimal("8000"))
-            .salePrice(new BigDecimal("15000"))
+            .costPrice(new BigDecimal("4.00"))
+            .salePrice(new BigDecimal("7.49"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(5))
             .build(),
           Product.builder()
-            .name("Bolígrafo Kilométrico 100 x12")
+            .name("Ballpoint Pens, 12-Pack")
             .description(
-              "Caja de 12 bolígrafos Kilométrico 100, punta media, color azul"
+              "Box of 12 medium-point blue ballpoint pens"
             )
-            .costPrice(new BigDecimal("6000"))
-            .salePrice(new BigDecimal("10000"))
+            .costPrice(new BigDecimal("2.50"))
+            .salePrice(new BigDecimal("4.49"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(6))
             .build(),
           Product.builder()
-            .name("Pluma Estilográfica Básica")
+            .name("Classic Fountain Pen")
             .description(
-              "Pluma estilográfica con cartucho recargable, cuerpo metálico, punta fina"
+              "Metal-body fountain pen with refillable cartridge and fine nib"
             )
-            .costPrice(new BigDecimal("12000"))
-            .salePrice(new BigDecimal("22000"))
+            .costPrice(new BigDecimal("7.00"))
+            .salePrice(new BigDecimal("13.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(6))
             .build(),
           Product.builder()
-            .name("Marcadores Permanentes x4")
+            .name("Permanent Markers, 4-Pack")
             .description(
-              "Set de 4 marcadores permanentes, colores básicos, punta biselada"
+              "Set of 4 permanent markers, assorted basic colors, chisel tip"
             )
-            .costPrice(new BigDecimal("5000"))
-            .salePrice(new BigDecimal("9000"))
+            .costPrice(new BigDecimal("3.00"))
+            .salePrice(new BigDecimal("5.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(6))
             .build(),
           Product.builder()
-            .name("Resaltadores Neón x5")
+            .name("Neon Highlighters, 5-Pack")
             .description(
-              "Set de 5 resaltadores en colores neón, punta biselada, tinta fluorescente"
+              "Set of 5 neon highlighters, chisel tip, fluorescent ink"
             )
-            .costPrice(new BigDecimal("6000"))
-            .salePrice(new BigDecimal("11000"))
+            .costPrice(new BigDecimal("3.00"))
+            .salePrice(new BigDecimal("5.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(6))
             .build(),
           Product.builder()
-            .name("Lápiz Corrector Líquido")
+            .name("Liquid Correction Pen")
             .description(
-              "Lápiz corrector líquido de secado rápido, punta metálica de precisión"
+              "Liquid correction pen with fast-drying formula and precision metal tip"
             )
-            .costPrice(new BigDecimal("2500"))
-            .salePrice(new BigDecimal("4500"))
+            .costPrice(new BigDecimal("1.50"))
+            .salePrice(new BigDecimal("2.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(6))
             .build(),
           Product.builder()
-            .name("Cuaderno Argollado 5 Materias")
+            .name("5-Subject Spiral Notebook")
             .description(
-              "Cuaderno argollado de 5 materias, 200 hojas, separadores de colores"
+              "5-subject spiral notebook, 200 sheets, color dividers"
             )
-            .costPrice(new BigDecimal("9000"))
-            .salePrice(new BigDecimal("16000"))
+            .costPrice(new BigDecimal("5.00"))
+            .salePrice(new BigDecimal("8.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(7))
             .build(),
           Product.builder()
-            .name("Libreta de Bolsillo Cuadriculada")
+            .name("Pocket Grid Notebook")
             .description(
-              "Libreta de bolsillo, 80 hojas cuadriculadas, tapa dura, 9x14cm"
+              "Pocket-size grid notebook, 80 sheets, hard cover, 3.5x5.5 in"
             )
-            .costPrice(new BigDecimal("2500"))
-            .salePrice(new BigDecimal("5000"))
+            .costPrice(new BigDecimal("1.50"))
+            .salePrice(new BigDecimal("2.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(7))
             .build(),
           Product.builder()
-            .name("Agenda Anual Ejecutiva")
+            .name("Executive Daily Planner")
             .description(
-              "Agenda anual ejecutiva, una página por día, tapa dura, cinta separadora"
+              "Executive daily planner, one page per day, hard cover, ribbon marker"
             )
-            .costPrice(new BigDecimal("15000"))
-            .salePrice(new BigDecimal("25000"))
+            .costPrice(new BigDecimal("7.00"))
+            .salePrice(new BigDecimal("12.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(7))
             .build(),
           Product.builder()
-            .name("Block de Notas Adhesivas Neón")
+            .name("Neon Sticky Notes Block")
             .description(
-              "Block de 5 colores neón de notas adhesivas, 100 hojas cada color"
+              "Block of sticky notes in 5 neon colors, 100 sheets per color"
             )
-            .costPrice(new BigDecimal("3000"))
-            .salePrice(new BigDecimal("6000"))
+            .costPrice(new BigDecimal("2.00"))
+            .salePrice(new BigDecimal("3.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(7))
             .build(),
           Product.builder()
-            .name("Diario Personal con Candado")
+            .name("Personal Diary with Lock")
             .description(
-              "Diario personal con candado, tapa acolchada, 200 páginas, 15x21cm"
+              "Personal diary with lock, padded cover, 200 pages, 6x8 in"
             )
-            .costPrice(new BigDecimal("12000"))
-            .salePrice(new BigDecimal("20000"))
+            .costPrice(new BigDecimal("6.00"))
+            .salePrice(new BigDecimal("11.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(7))
             .build(),
           Product.builder()
-            .name("Archivador AZ Carta")
+            .name("Letter-Size Lever Arch File")
             .description(
-              "Archivador AZ tamaño carta, lomo ancho, con palanca y gancho"
+              "Letter-size lever arch file with wide spine and metal mechanism"
             )
-            .costPrice(new BigDecimal("8000"))
-            .salePrice(new BigDecimal("15000"))
+            .costPrice(new BigDecimal("4.00"))
+            .salePrice(new BigDecimal("7.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(8))
             .build(),
           Product.builder()
-            .name("Carpeta Plástica con Gancho")
+            .name("Plastic File Folder with Fastener")
             .description(
-              "Carpeta plástica con gancho legajador, colores surtidos, tamaño carta"
+              "Plastic file folder with fastener, letter-size, assorted colors"
             )
-            .costPrice(new BigDecimal("2000"))
-            .salePrice(new BigDecimal("4000"))
+            .costPrice(new BigDecimal("1.50"))
+            .salePrice(new BigDecimal("2.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(8))
             .build(),
           Product.builder()
-            .name("Separadores Plásticos x5")
+            .name("Plastic Divider Set, 5 Tabs")
             .description(
-              "Juego de 5 separadores plásticos, colores surtidos, tamaño carta"
+              "Set of 5 plastic dividers, letter-size, assorted colors"
             )
-            .costPrice(new BigDecimal("1500"))
-            .salePrice(new BigDecimal("3000"))
+            .costPrice(new BigDecimal("1.25"))
+            .salePrice(new BigDecimal("2.49"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(8))
             .build(),
           Product.builder()
-            .name("Caja Organizadora Plástica")
+            .name("Clear Plastic Storage Box, 5L")
             .description(
-              "Caja organizadora plástica con tapa, capacidad 5 litros, transparente"
+              "Clear plastic storage box with lid, 5-liter capacity"
             )
-            .costPrice(new BigDecimal("7000"))
-            .salePrice(new BigDecimal("12000"))
+            .costPrice(new BigDecimal("4.00"))
+            .salePrice(new BigDecimal("7.49"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(8))
             .build(),
           Product.builder()
-            .name("Mochila Escolar Básica")
+            .name("Basic School Backpack")
             .description(
-              "Mochila escolar con 2 compartimientos, bolsillo lateral, acolchada"
+              "Basic school backpack with two compartments and side pocket"
             )
-            .costPrice(new BigDecimal("25000"))
-            .salePrice(new BigDecimal("45000"))
+            .costPrice(new BigDecimal("12.00"))
+            .salePrice(new BigDecimal("24.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(9))
             .build(),
           Product.builder()
-            .name("Cartuchera de Tela Simple")
+            .name("Simple Fabric Pencil Case")
             .description(
-              "Cartuchera de tela con cierre, capacidad para 10 lápices, diseños surtidos"
+              "Fabric pencil case with zipper, holds up to 10 pencils, assorted designs"
             )
-            .costPrice(new BigDecimal("4000"))
-            .salePrice(new BigDecimal("8000"))
+            .costPrice(new BigDecimal("2.00"))
+            .salePrice(new BigDecimal("3.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(9))
             .build(),
           Product.builder()
-            .name("Ábaco Infantil de Colores")
+            .name("Color Counting Abacus")
             .description(
-              "Ábaco de madera con cuentas de colores, 10 filas, 10 cuentas por fila"
+              "Wooden abacus with colorful beads, 10 rows of 10 beads each"
             )
-            .costPrice(new BigDecimal("15000"))
-            .salePrice(new BigDecimal("25000"))
+            .costPrice(new BigDecimal("6.00"))
+            .salePrice(new BigDecimal("11.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(10))
             .build(),
           Product.builder()
-            .name("Mapamundi Didáctico")
+            .name("Educational World Map Poster")
             .description(
-              "Mapamundi escolar didáctico plastificado, 50x70cm, doble cara"
+              "Laminated educational world map poster, 20x28 in, double-sided"
             )
-            .costPrice(new BigDecimal("12000"))
-            .salePrice(new BigDecimal("20000"))
+            .costPrice(new BigDecimal("4.00"))
+            .salePrice(new BigDecimal("7.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(10))
             .build(),
           Product.builder()
-            .name("Set Arcilla para Modelar")
+            .name("Modeling Clay Set, 4 Colors")
             .description(
-              "Set de arcilla para modelar, 4 colores básicos, no tóxica, 500g"
+              "Set of modeling clay in 4 basic colors, non-toxic, 17.6 oz total"
             )
-            .costPrice(new BigDecimal("8000"))
-            .salePrice(new BigDecimal("14000"))
+            .costPrice(new BigDecimal("3.50"))
+            .salePrice(new BigDecimal("6.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(11))
             .build(),
           Product.builder()
-            .name("Kit Bisutería Básico")
+            .name("Basic Jewelry Craft Kit")
             .description(
-              "Kit para elaboración de bisutería, incluye cuentas, hilos y herramientas"
+              "Jewelry-making kit with assorted beads, cords, and tools"
             )
-            .costPrice(new BigDecimal("18000"))
-            .salePrice(new BigDecimal("30000"))
+            .costPrice(new BigDecimal("7.00"))
+            .salePrice(new BigDecimal("13.99"))
             .stock(random.nextInt(131) + 20)
             .minimumStockThreshold(random.nextInt(16) + 5)
             .category(categories.get(11))
@@ -836,21 +836,21 @@ public class DataSeeder implements CommandLineRunner {
       log.info("Seeding users...");
 
       User adminUser = User.builder()
-        .name("Rosita González")
-        .email("rosita@sigrap.com")
-        .password(passwordEncoder.encode("Rosita123*"))
+        .name("Admin User")
+        .email("admin@sigrap.com")
+        .password(passwordEncoder.encode("Admin123*"))
         .role(UserRole.ADMINISTRATOR)
-        .documentId("12345678")
-        .phone("+573001234567")
+        .documentId("100000001")
+        .phone("+1-555-0100")
         .build();
 
       User employeeUser = User.builder()
-        .name("Gladys Mendoza")
-        .email("gladys@sigrap.com")
-        .password(passwordEncoder.encode("Gladys123*"))
+        .name("Employee User")
+        .email("employee@sigrap.com")
+        .password(passwordEncoder.encode("Employee123*"))
         .role(UserRole.EMPLOYEE)
-        .documentId("87654321")
-        .phone("+573109876543")
+        .documentId("100000002")
+        .phone("+1-555-0101")
         .build();
 
       userRepository.saveAll(List.of(adminUser, employeeUser));
@@ -878,14 +878,14 @@ public class DataSeeder implements CommandLineRunner {
     LocalTime extraHoursEndTime = LocalTime.of(21, 0);
 
     for (User user : users) {
-      if (!"gladys@sigrap.com".equals(user.getEmail())) {
+      if (!"employee@sigrap.com".equals(user.getEmail())) {
         continue;
       }
 
       schedules.add(
         Schedule.builder()
           .user(user)
-          .day("Lunes")
+          .day("Monday")
           .startTime(defaultStartTime)
           .endTime(defaultEndTime)
           .type("Regular")
@@ -896,7 +896,7 @@ public class DataSeeder implements CommandLineRunner {
       schedules.add(
         Schedule.builder()
           .user(user)
-          .day("Martes")
+          .day("Tuesday")
           .startTime(defaultStartTime)
           .endTime(defaultEndTime)
           .type("Regular")
@@ -907,7 +907,7 @@ public class DataSeeder implements CommandLineRunner {
       schedules.add(
         Schedule.builder()
           .user(user)
-          .day("Miércoles")
+          .day("Wednesday")
           .startTime(defaultStartTime)
           .endTime(defaultEndTime)
           .type("Regular")
@@ -918,7 +918,7 @@ public class DataSeeder implements CommandLineRunner {
       schedules.add(
         Schedule.builder()
           .user(user)
-          .day("Jueves")
+          .day("Thursday")
           .startTime(defaultStartTime)
           .endTime(defaultEndTime)
           .type("Regular")
@@ -929,7 +929,7 @@ public class DataSeeder implements CommandLineRunner {
       schedules.add(
         Schedule.builder()
           .user(user)
-          .day("Viernes")
+          .day("Friday")
           .startTime(defaultStartTime)
           .endTime(defaultEndTime)
           .type("Regular")
@@ -940,10 +940,10 @@ public class DataSeeder implements CommandLineRunner {
       schedules.add(
         Schedule.builder()
           .user(user)
-          .day("Sábado")
+          .day("Saturday")
           .startTime(defaultStartTime)
           .endTime(saturdayEndTime)
-          .type("Festivo")
+          .type("Weekend")
           .isActive(true)
           .build()
       );
@@ -951,10 +951,10 @@ public class DataSeeder implements CommandLineRunner {
       schedules.add(
         Schedule.builder()
           .user(user)
-          .day("Miércoles")
+          .day("Wednesday")
           .startTime(extraHoursStartTime)
           .endTime(extraHoursEndTime)
-          .type("Horas Extra")
+          .type("Overtime")
           .isActive(true)
           .build()
       );
@@ -976,14 +976,14 @@ public class DataSeeder implements CommandLineRunner {
     List<User> users = userRepository.findAll();
     LocalDateTime now = LocalDateTime.now();
 
-    User gladys = users
+    User targetEmployee = users
       .stream()
-      .filter(user -> "gladys@sigrap.com".equals(user.getEmail()))
+      .filter(user -> "employee@sigrap.com".equals(user.getEmail()))
       .findFirst()
       .orElse(null);
 
-    if (gladys == null) {
-      log.warn("Employee Gladys not found, skipping attendance seeding.");
+    if (targetEmployee == null) {
+      log.warn("Target employee not found, skipping attendance seeding.");
       return;
     }
 
@@ -1001,7 +1001,7 @@ public class DataSeeder implements CommandLineRunner {
 
     attendanceRecords.add(
       Attendance.builder()
-        .user(gladys)
+        .user(targetEmployee)
         .date(lastWeekMonday.toLocalDate().atStartOfDay())
         .clockInTime(mondayClockIn)
         .clockOutTime(mondayClockOut)
@@ -1017,7 +1017,7 @@ public class DataSeeder implements CommandLineRunner {
 
     attendanceRecords.add(
       Attendance.builder()
-        .user(gladys)
+        .user(targetEmployee)
         .date(lastWeekTuesday.toLocalDate().atStartOfDay())
         .clockInTime(tuesdayClockIn)
         .clockOutTime(tuesdayClockOut)
@@ -1040,7 +1040,7 @@ public class DataSeeder implements CommandLineRunner {
 
     attendanceRecords.add(
       Attendance.builder()
-        .user(gladys)
+        .user(targetEmployee)
         .date(lastWeekWednesday.toLocalDate().atStartOfDay())
         .clockInTime(wednesdayClockIn)
         .clockOutTime(wednesdayClockOut)
@@ -1061,7 +1061,7 @@ public class DataSeeder implements CommandLineRunner {
 
     attendanceRecords.add(
       Attendance.builder()
-        .user(gladys)
+        .user(targetEmployee)
         .date(lastWeekThursday.toLocalDate().atStartOfDay())
         .clockInTime(thursdayClockIn)
         .clockOutTime(thursdayClockOut)
@@ -1074,7 +1074,7 @@ public class DataSeeder implements CommandLineRunner {
 
     attendanceRecords.add(
       Attendance.builder()
-        .user(gladys)
+        .user(targetEmployee)
         .date(lastWeekFriday.toLocalDate().atStartOfDay())
         .clockInTime(null)
         .clockOutTime(null)
@@ -1125,120 +1125,120 @@ public class DataSeeder implements CommandLineRunner {
       suppliers.add(
         Supplier.builder()
           .name("Office Depot")
-          .contactPerson("Miguel Sánchez")
-          .email("msanchez@officedepot.com.co")
-          .phone("(601) 555-2700")
-          .address("Carrera 15 # 80-25, Bogotá D.C.")
-          .website("https://www.officedepot.com.co")
-          .paymentTerms("30 días")
+          .contactPerson("Michael Sanders")
+          .email("msanders@officedepot.com")
+          .phone("(214) 555-2700")
+          .address("123 Market St, Dallas, TX 75201")
+          .website("https://www.officedepot.com")
+          .paymentTerms("Net 30 days")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Panamericana")
-          .contactPerson("Ana Campos")
-          .email("acampos@panamericana.com.co")
-          .phone("(601) 337-9000")
-          .address("Avenida Chile # 72-41, Bogotá D.C.")
-          .website("https://www.panamericana.com.co")
-          .paymentTerms("15 días")
+          .name("Downtown Stationery")
+          .contactPerson("Amy Campbell")
+          .email("amy.campbell@downtownstationery.com")
+          .phone("(312) 555-1900")
+          .address("200 W Lake St, Chicago, IL 60606")
+          .website("https://www.downtownstationery.com")
+          .paymentTerms("Net 15 days")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Artesco Colombia")
-          .contactPerson("Roberto Gutiérrez")
-          .email("rgutierrez@artesco.com.co")
-          .phone("(604) 444-6000")
-          .address("Calle 10 # 43E-115, Medellín, Antioquia")
-          .website("https://www.artesco.com.co")
-          .paymentTerms("45 días")
+          .name("Artisan Art Supplies")
+          .contactPerson("Robert Gutierrez")
+          .email("robert.gutierrez@artisanart.com")
+          .phone("(206) 555-4400")
+          .address("410 Pine St, Seattle, WA 98101")
+          .website("https://www.artisanart.com")
+          .paymentTerms("Net 45 days")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Scribe Colombia")
-          .contactPerson("María Elena Torres")
-          .email("metorres@scribe.com.co")
-          .phone("(602) 660-2500")
-          .address("Carrera 1 # 23-89, Cali, Valle del Cauca")
-          .website("https://www.scribe.com.co")
-          .paymentTerms("30 días")
+          .name("Scribe Paper Co.")
+          .contactPerson("Mary Torres")
+          .email("mary.torres@scribepaper.com")
+          .phone("(303) 555-6600")
+          .address("1500 Blake St, Denver, CO 80202")
+          .website("https://www.scribepaper.com")
+          .paymentTerms("Net 30 days")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Faber-Castell Colombia")
-          .contactPerson("Jorge Reátegui")
-          .email("jreategui@faber-castell.com.co")
-          .phone("(601) 744-4800")
-          .address("Autopista Norte Km 19, Chía, Cundinamarca")
-          .website("https://www.faber-castell.com.co")
-          .paymentTerms("45 días")
+          .name("Faber-Castell USA")
+          .contactPerson("George Reategui")
+          .email("george.reategui@faber-castell.com")
+          .phone("(216) 555-4800")
+          .address("500 Artway Dr, Cleveland, OH 44115")
+          .website("https://www.faber-castell.com")
+          .paymentTerms("Net 45 days")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Pegaucho")
-          .contactPerson("Lucía Pérez")
-          .email("lperez@pegaucho.com.co")
-          .phone("(601) 222-2300")
-          .address("Calle 13 # 68-78, Bogotá D.C.")
-          .website("https://www.pegaucho.com.co")
-          .paymentTerms("Contado")
+          .name("QuickBond Adhesives")
+          .contactPerson("Lucy Perez")
+          .email("lucy.perez@quickbond.com")
+          .phone("(305) 555-2300")
+          .address("890 Industrial Rd, Miami, FL 33101")
+          .website("https://www.quickbond.com")
+          .paymentTerms("Cash on delivery")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Norma Colombia")
-          .contactPerson("Daniel Quispe")
-          .email("dquispe@norma.com.co")
-          .phone("(601) 423-8000")
-          .address("Calle 100 # 19A-50, Bogotá D.C.")
-          .website("https://www.norma.com.co")
-          .paymentTerms("30 días")
+          .name("Norma USA")
+          .contactPerson("Daniel Quinn")
+          .email("daniel.quinn@normausa.com")
+          .phone("(973) 555-8000")
+          .address("250 Stationery Blvd, Newark, NJ 07102")
+          .website("https://www.normausa.com")
+          .paymentTerms("Net 30 days")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("DistriOffice")
-          .contactPerson("Patricia Rojas")
-          .email("projas@distrioffice.com.co")
-          .phone("(604) 333-1800")
-          .address("Carrera 48 # 10-45, Medellín, Antioquia")
-          .website("https://www.distrioffice.com.co")
-          .paymentTerms("45 días")
+          .name("DistriOffice USA")
+          .contactPerson("Patricia Rogers")
+          .email("patricia.rogers@distriofficeusa.com")
+          .phone("(213) 555-1800")
+          .address("4100 Sunset Blvd, Los Angeles, CA 90029")
+          .website("https://www.distriofficeusa.com")
+          .paymentTerms("Net 45 days")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Pilot Colombia")
+          .name("Pilot USA")
           .contactPerson("Carlos Mendoza")
-          .email("cmendoza@pilotcolombia.com")
-          .phone("(601) 617-5200")
-          .address("Carrera 7 # 71-21, Bogotá D.C.")
-          .website("https://www.pilotpen.com.co")
-          .paymentTerms("30 días")
+          .email("carlos.mendoza@pilotusa.com")
+          .phone("(818) 555-5200")
+          .address("100 Pilot Plaza, Burbank, CA 91502")
+          .website("https://www.pilotpen.us")
+          .paymentTerms("Net 30 days")
           .build()
       );
 
       suppliers.add(
         Supplier.builder()
-          .name("Papeles Nacionales S.A.S.")
+          .name("National Paper Co.")
           .contactPerson("Fernando Torres")
-          .email("ftorres@papelesnacionales.com.co")
-          .phone("(601) 742-9000")
-          .address("Zona Franca de Bogotá, Bodega 12, Bogotá D.C.")
-          .website("https://www.papelesnacionales.com.co")
-          .paymentTerms("60 días")
+          .email("fernando.torres@nationalpaper.com")
+          .phone("(412) 555-9000")
+          .address("75 Mill Rd, Pittsburgh, PA 15222")
+          .website("https://www.nationalpaper.com")
+          .paymentTerms("Net 60 days")
           .build()
       );
 
@@ -1269,48 +1269,69 @@ public class DataSeeder implements CommandLineRunner {
       return;
     }
 
-    Supplier panamericana = findSupplierByName(suppliers, "Panamericana");
-    Supplier faberCastell = findSupplierByName(
+    Supplier downtownStationerySupplier = findSupplierByName(
       suppliers,
-      "Faber-Castell Colombia"
+      "Downtown Stationery"
     );
-    Supplier artesco = findSupplierByName(suppliers, "Artesco Colombia");
-    Supplier officedepot = findSupplierByName(suppliers, "Office Depot");
-    Supplier norma = findSupplierByName(suppliers, "Norma Colombia");
+    Supplier faberCastellSupplier = findSupplierByName(
+      suppliers,
+      "Faber-Castell USA"
+    );
+    Supplier artisanArtSuppliesSupplier = findSupplierByName(
+      suppliers,
+      "Artisan Art Supplies"
+    );
+    Supplier officeDepotSupplier = findSupplierByName(
+      suppliers,
+      "Office Depot"
+    );
+    Supplier normaUsaSupplier = findSupplierByName(suppliers, "Norma USA");
 
-    Product cuadernoUniversitario = findProductByName(
+    Product normaNotebook = findProductByName(
       products,
-      "Cuaderno Universitario Norma"
+      "Norma College Ruled Notebook"
     );
-    Product lapizMirado = findProductByName(products, "Lápiz Mirado HB");
-    Product cajaColores = findProductByName(
+    Product hbWoodcasePencil = findProductByName(
       products,
-      "Caja de Colores Faber-Castell x12"
+      "HB Woodcase Pencil"
     );
-    Product kitGeometrico = findProductByName(
+    Product coloredPencils12Pack = findProductByName(
       products,
-      "Kit Geométrico Faber-Castell"
+      "Faber-Castell Colored Pencils, 12-Pack"
     );
-    Product borrador = findProductByName(products, "Borrador Nata Pelikan");
-    Product resmaA4 = findProductByName(products, "Resma Papel Bond A4");
-    Product cartulinaBlanca = findProductByName(
+    Product geometrySet = findProductByName(
       products,
-      "Cartulina Blanca Pliego"
+      "Faber-Castell Geometry Set"
     );
-    Product blockIris = findProductByName(products, "Block Iris Carta");
-    Product marcadoresPermanentes = findProductByName(
+    Product softVinylEraser = findProductByName(
       products,
-      "Marcadores Permanentes x4"
+      "Soft Vinyl Eraser"
     );
-    Product cuadernoArgollado = findProductByName(
+    Product a4CopyPaperReam = findProductByName(
       products,
-      "Cuaderno Argollado 5 Materias"
+      "A4 Copy Paper Ream (500 Sheets)"
+    );
+    Product whiteCardstockSheet = findProductByName(
+      products,
+      "White Cardstock Sheet"
+    );
+    Product coloredPaperPad = findProductByName(
+      products,
+      "Letter-Size Colored Paper Pad"
+    );
+    Product permanentMarkers4Pack = findProductByName(
+      products,
+      "Permanent Markers, 4-Pack"
+    );
+    Product spiralNotebook5Subject = findProductByName(
+      products,
+      "5-Subject Spiral Notebook"
     );
 
     List<PurchaseOrder> purchaseOrders = new ArrayList<>();
 
-    PurchaseOrder orden1 = PurchaseOrder.builder()
-      .supplier(panamericana)
+    PurchaseOrder order1 = PurchaseOrder.builder()
+      .supplier(downtownStationerySupplier)
       .deliveryDate(LocalDate.now().minusDays(34))
       .status(PurchaseOrderStatus.DELIVERED)
       .items(new ArrayList<>())
@@ -1318,39 +1339,39 @@ public class DataSeeder implements CommandLineRunner {
       .build();
 
     PurchaseOrderItem item11 = PurchaseOrderItem.builder()
-      .product(cuadernoUniversitario)
+      .product(normaNotebook)
       .quantity(100)
-      .unitPrice(new BigDecimal("4000"))
+      .unitPrice(new BigDecimal("3.00"))
       .receivedQuantity(100)
       .build();
 
     PurchaseOrderItem item12 = PurchaseOrderItem.builder()
-      .product(lapizMirado)
+      .product(hbWoodcasePencil)
       .quantity(200)
-      .unitPrice(new BigDecimal("500"))
+      .unitPrice(new BigDecimal("0.25"))
       .receivedQuantity(200)
       .build();
 
     PurchaseOrderItem item13 = PurchaseOrderItem.builder()
-      .product(borrador)
+      .product(softVinylEraser)
       .quantity(150)
-      .unitPrice(new BigDecimal("800"))
+      .unitPrice(new BigDecimal("0.30"))
       .receivedQuantity(150)
       .build();
 
-    item11.setPurchaseOrder(orden1);
-    item12.setPurchaseOrder(orden1);
-    item13.setPurchaseOrder(orden1);
-    orden1.getItems().add(item11);
-    orden1.getItems().add(item12);
-    orden1.getItems().add(item13);
+    item11.setPurchaseOrder(order1);
+    item12.setPurchaseOrder(order1);
+    item13.setPurchaseOrder(order1);
+    order1.getItems().add(item11);
+    order1.getItems().add(item12);
+    order1.getItems().add(item13);
 
-    BigDecimal total1 = calculateOrderTotal(orden1);
-    orden1.setTotalAmount(total1);
-    purchaseOrders.add(orden1);
+    BigDecimal total1 = calculateOrderTotal(order1);
+    order1.setTotalAmount(total1);
+    purchaseOrders.add(order1);
 
-    PurchaseOrder orden2 = PurchaseOrder.builder()
-      .supplier(faberCastell)
+    PurchaseOrder order2 = PurchaseOrder.builder()
+      .supplier(faberCastellSupplier)
       .deliveryDate(LocalDate.now().minusDays(22))
       .status(PurchaseOrderStatus.DELIVERED)
       .items(new ArrayList<>())
@@ -1358,30 +1379,30 @@ public class DataSeeder implements CommandLineRunner {
       .build();
 
     PurchaseOrderItem item21 = PurchaseOrderItem.builder()
-      .product(cajaColores)
+      .product(coloredPencils12Pack)
       .quantity(50)
-      .unitPrice(new BigDecimal("5500"))
+      .unitPrice(new BigDecimal("4.00"))
       .receivedQuantity(50)
       .build();
 
     PurchaseOrderItem item22 = PurchaseOrderItem.builder()
-      .product(kitGeometrico)
+      .product(geometrySet)
       .quantity(30)
-      .unitPrice(new BigDecimal("7500"))
+      .unitPrice(new BigDecimal("4.50"))
       .receivedQuantity(30)
       .build();
 
-    item21.setPurchaseOrder(orden2);
-    item22.setPurchaseOrder(orden2);
-    orden2.getItems().add(item21);
-    orden2.getItems().add(item22);
+    item21.setPurchaseOrder(order2);
+    item22.setPurchaseOrder(order2);
+    order2.getItems().add(item21);
+    order2.getItems().add(item22);
 
-    BigDecimal total2 = calculateOrderTotal(orden2);
-    orden2.setTotalAmount(total2);
-    purchaseOrders.add(orden2);
+    BigDecimal total2 = calculateOrderTotal(order2);
+    order2.setTotalAmount(total2);
+    purchaseOrders.add(order2);
 
-    PurchaseOrder orden3 = PurchaseOrder.builder()
-      .supplier(officedepot)
+    PurchaseOrder order3 = PurchaseOrder.builder()
+      .supplier(officeDepotSupplier)
       .deliveryDate(LocalDate.now().minusDays(8))
       .status(PurchaseOrderStatus.DELIVERED)
       .items(new ArrayList<>())
@@ -1389,39 +1410,39 @@ public class DataSeeder implements CommandLineRunner {
       .build();
 
     PurchaseOrderItem item31 = PurchaseOrderItem.builder()
-      .product(resmaA4)
+      .product(a4CopyPaperReam)
       .quantity(80)
-      .unitPrice(new BigDecimal("12000"))
+      .unitPrice(new BigDecimal("4.00"))
       .receivedQuantity(80)
       .build();
 
     PurchaseOrderItem item32 = PurchaseOrderItem.builder()
-      .product(cartulinaBlanca)
+      .product(whiteCardstockSheet)
       .quantity(120)
-      .unitPrice(new BigDecimal("700"))
+      .unitPrice(new BigDecimal("0.25"))
       .receivedQuantity(120)
       .build();
 
     PurchaseOrderItem item33 = PurchaseOrderItem.builder()
-      .product(blockIris)
+      .product(coloredPaperPad)
       .quantity(60)
-      .unitPrice(new BigDecimal("3500"))
+      .unitPrice(new BigDecimal("2.50"))
       .receivedQuantity(60)
       .build();
 
-    item31.setPurchaseOrder(orden3);
-    item32.setPurchaseOrder(orden3);
-    item33.setPurchaseOrder(orden3);
-    orden3.getItems().add(item31);
-    orden3.getItems().add(item32);
-    orden3.getItems().add(item33);
+    item31.setPurchaseOrder(order3);
+    item32.setPurchaseOrder(order3);
+    item33.setPurchaseOrder(order3);
+    order3.getItems().add(item31);
+    order3.getItems().add(item32);
+    order3.getItems().add(item33);
 
-    BigDecimal total3 = calculateOrderTotal(orden3);
-    orden3.setTotalAmount(total3);
-    purchaseOrders.add(orden3);
+    BigDecimal total3 = calculateOrderTotal(order3);
+    order3.setTotalAmount(total3);
+    purchaseOrders.add(order3);
 
-    PurchaseOrder orden4 = PurchaseOrder.builder()
-      .supplier(artesco)
+    PurchaseOrder order4 = PurchaseOrder.builder()
+      .supplier(artisanArtSuppliesSupplier)
       .deliveryDate(LocalDate.now().plusDays(3))
       .status(PurchaseOrderStatus.CONFIRMED)
       .items(new ArrayList<>())
@@ -1429,21 +1450,21 @@ public class DataSeeder implements CommandLineRunner {
       .build();
 
     PurchaseOrderItem item41 = PurchaseOrderItem.builder()
-      .product(marcadoresPermanentes)
+      .product(permanentMarkers4Pack)
       .quantity(40)
-      .unitPrice(new BigDecimal("5000"))
+      .unitPrice(new BigDecimal("3.00"))
       .receivedQuantity(0)
       .build();
 
-    item41.setPurchaseOrder(orden4);
-    orden4.getItems().add(item41);
+    item41.setPurchaseOrder(order4);
+    order4.getItems().add(item41);
 
-    BigDecimal total4 = calculateOrderTotal(orden4);
-    orden4.setTotalAmount(total4);
-    purchaseOrders.add(orden4);
+    BigDecimal total4 = calculateOrderTotal(order4);
+    order4.setTotalAmount(total4);
+    purchaseOrders.add(order4);
 
-    PurchaseOrder orden5 = PurchaseOrder.builder()
-      .supplier(norma)
+    PurchaseOrder order5 = PurchaseOrder.builder()
+      .supplier(normaUsaSupplier)
       .deliveryDate(LocalDate.now().plusDays(10))
       .status(PurchaseOrderStatus.SUBMITTED)
       .items(new ArrayList<>())
@@ -1451,30 +1472,30 @@ public class DataSeeder implements CommandLineRunner {
       .build();
 
     PurchaseOrderItem item51 = PurchaseOrderItem.builder()
-      .product(cuadernoUniversitario)
+      .product(normaNotebook)
       .quantity(50)
-      .unitPrice(new BigDecimal("4000"))
+      .unitPrice(new BigDecimal("3.00"))
       .receivedQuantity(0)
       .build();
 
     PurchaseOrderItem item52 = PurchaseOrderItem.builder()
-      .product(cuadernoArgollado)
+      .product(spiralNotebook5Subject)
       .quantity(35)
-      .unitPrice(new BigDecimal("9000"))
+      .unitPrice(new BigDecimal("5.00"))
       .receivedQuantity(0)
       .build();
 
-    item51.setPurchaseOrder(orden5);
-    item52.setPurchaseOrder(orden5);
-    orden5.getItems().add(item51);
-    orden5.getItems().add(item52);
+    item51.setPurchaseOrder(order5);
+    item52.setPurchaseOrder(order5);
+    order5.getItems().add(item51);
+    order5.getItems().add(item52);
 
-    BigDecimal total5 = calculateOrderTotal(orden5);
-    orden5.setTotalAmount(total5);
-    purchaseOrders.add(orden5);
+    BigDecimal total5 = calculateOrderTotal(order5);
+    order5.setTotalAmount(total5);
+    purchaseOrders.add(order5);
 
-    PurchaseOrder orden6 = PurchaseOrder.builder()
-      .supplier(panamericana)
+    PurchaseOrder order6 = PurchaseOrder.builder()
+      .supplier(downtownStationerySupplier)
       .deliveryDate(LocalDate.now().plusDays(15))
       .status(PurchaseOrderStatus.DRAFT)
       .items(new ArrayList<>())
@@ -1482,27 +1503,27 @@ public class DataSeeder implements CommandLineRunner {
       .build();
 
     PurchaseOrderItem item61 = PurchaseOrderItem.builder()
-      .product(lapizMirado)
+      .product(hbWoodcasePencil)
       .quantity(150)
-      .unitPrice(new BigDecimal("500"))
+      .unitPrice(new BigDecimal("0.25"))
       .receivedQuantity(0)
       .build();
 
     PurchaseOrderItem item62 = PurchaseOrderItem.builder()
-      .product(borrador)
+      .product(softVinylEraser)
       .quantity(100)
-      .unitPrice(new BigDecimal("800"))
+      .unitPrice(new BigDecimal("0.30"))
       .receivedQuantity(0)
       .build();
 
-    item61.setPurchaseOrder(orden6);
-    item62.setPurchaseOrder(orden6);
-    orden6.getItems().add(item61);
-    orden6.getItems().add(item62);
+    item61.setPurchaseOrder(order6);
+    item62.setPurchaseOrder(order6);
+    order6.getItems().add(item61);
+    order6.getItems().add(item62);
 
-    BigDecimal total6 = calculateOrderTotal(orden6);
-    orden6.setTotalAmount(total6);
-    purchaseOrders.add(orden6);
+    BigDecimal total6 = calculateOrderTotal(order6);
+    order6.setTotalAmount(total6);
+    purchaseOrders.add(order6);
 
     purchaseOrderRepository.saveAll(purchaseOrders);
     log.info("{} purchase orders seeded successfully.", purchaseOrders.size());
@@ -1566,125 +1587,109 @@ public class DataSeeder implements CommandLineRunner {
       customerRepository.saveAll(
         List.of(
           Customer.builder()
-            .fullName("Juan Rodríguez")
-            .documentId("1098765432")
-            .email("juan.rodriguez@gmail.com")
-            .phoneNumber("310-555-1234")
-            .address(
-              "Calle 45 Sur # 23-18, Barrio Kennedy Central, Bogotá D.C."
-            )
+            .fullName("John Smith")
+            .documentId("200000001")
+            .email("john.smith@example.com")
+            .phoneNumber("(212) 555-0101")
+            .address("145 West 34th St, New York, NY 10001")
             .build(),
           Customer.builder()
-            .fullName("María González")
-            .documentId("1076543210")
-            .email("maria.gonzalez@hotmail.com")
-            .phoneNumber("315-555-6789")
-            .address(
-              "Carrera 72 Sur # 56-24, Apto 402, Barrio Ciudad Kennedy Sur, Bogotá D.C."
-            )
+            .fullName("Emily Johnson")
+            .documentId("200000002")
+            .email("emily.johnson@example.com")
+            .phoneNumber("(415) 555-0102")
+            .address("600 Market St Apt 4B, San Francisco, CA 94104")
             .build(),
           Customer.builder()
-            .fullName("Carlos Pérez")
-            .documentId("1053789456")
-            .email("carlos.perez@outlook.com")
-            .phoneNumber("300-555-4321")
-            .address("Diagonal 38 Sur # 34-71, Barrio Timiza, Bogotá D.C.")
+            .fullName("Michael Brown")
+            .documentId("200000003")
+            .email("michael.brown@example.com")
+            .phoneNumber("(773) 555-0103")
+            .address("8200 N Clark St, Chicago, IL 60626")
             .build(),
           Customer.builder()
-            .fullName("Ana Martínez")
-            .documentId("1087654321")
-            .email("ana.martinez@gmail.com")
-            .phoneNumber("320-555-8765")
-            .address(
-              "Transversal R1 # 67B-21 Sur, Barrio Bosa Nova, Bogotá D.C."
-            )
+            .fullName("Sarah Davis")
+            .documentId("200000004")
+            .email("sarah.davis@example.com")
+            .phoneNumber("(305) 555-0104")
+            .address("150 Ocean Dr, Miami Beach, FL 33139")
             .build(),
           Customer.builder()
-            .fullName("Pedro Sánchez")
-            .documentId("1012345678")
-            .email("pedro.sanchez@yahoo.com")
-            .phoneNumber("313-555-2345")
-            .address("Calle 69A Sur # 92-41, Barrio El Perdomo, Bogotá D.C.")
+            .fullName("David Wilson")
+            .documentId("200000005")
+            .email("david.wilson@example.com")
+            .phoneNumber("(469) 555-0105")
+            .address("420 Main St, Dallas, TX 75202")
             .build(),
           Customer.builder()
-            .fullName("Laura Díaz")
-            .documentId("1034567890")
-            .email("laura.diaz@hotmail.com")
-            .phoneNumber("318-555-7890")
-            .address(
-              "Carrera 18M # 69J-06 Sur, Barrio Villa de los Alpes Sur, Bogotá D.C."
-            )
+            .fullName("Olivia Martinez")
+            .documentId("200000006")
+            .email("olivia.martinez@example.com")
+            .phoneNumber("(602) 555-0106")
+            .address("700 E Camelback Rd, Phoenix, AZ 85014")
             .build(),
           Customer.builder()
-            .fullName("Andrés López")
-            .documentId("1045678923")
-            .email("andres.lopez@gmail.com")
-            .phoneNumber("301-555-5432")
-            .address(
-              "Diagonal 62 Sur # 20F-21, Barrio San Francisco, Bogotá D.C."
-            )
+            .fullName("Andrew Thompson")
+            .documentId("200000007")
+            .email("andrew.thompson@example.com")
+            .phoneNumber("(404) 555-0107")
+            .address("250 Peachtree St NE, Atlanta, GA 30303")
             .build(),
           Customer.builder()
-            .fullName("Sofía Ramírez")
-            .documentId("1078912345")
-            .email("sofia.ramirez@outlook.com")
-            .phoneNumber("312-555-9876")
-            .address("Calle 43 Sur # 24-27, Barrio Venecia, Bogotá D.C.")
+            .fullName("Sophia Ramirez")
+            .documentId("200000008")
+            .email("sophia.ramirez@example.com")
+            .phoneNumber("(206) 555-0108")
+            .address("900 S Jackson St, Seattle, WA 98104")
             .build(),
           Customer.builder()
-            .fullName("Javier Torres")
-            .documentId("1089012345")
-            .email("javier.torres@yahoo.com")
-            .phoneNumber("316-555-3456")
-            .address("Carrera 80 # 68-23 Sur, Barrio Roma, Bogotá D.C.")
+            .fullName("Jacob Torres")
+            .documentId("200000009")
+            .email("jacob.torres@example.com")
+            .phoneNumber("(702) 555-0109")
+            .address("500 Fremont St, Las Vegas, NV 89101")
             .build(),
           Customer.builder()
-            .fullName("Daniela Herrera")
-            .documentId("1023456789")
-            .email("daniela.herrera@gmail.com")
-            .phoneNumber("314-555-8901")
-            .address(
-              "Transversal 74F # 40B-54 Sur, Barrio Ciudad Kennedy Oriental, Bogotá D.C."
-            )
+            .fullName("Daniela Harris")
+            .documentId("200000010")
+            .email("daniela.harris@example.com")
+            .phoneNumber("(303) 555-0110")
+            .address("1800 Larimer St, Denver, CO 80202")
             .build(),
           Customer.builder()
-            .fullName("Sebastián Castro")
-            .documentId("1067890123")
-            .email("sebastian.castro@hotmail.com")
-            .phoneNumber("305-555-6543")
-            .address("Calle 68 Sur # 47A-15, Barrio Atlanta, Bogotá D.C.")
+            .fullName("Sebastian Carter")
+            .documentId("200000011")
+            .email("sebastian.carter@example.com")
+            .phoneNumber("(512) 555-0111")
+            .address("400 Congress Ave, Austin, TX 78701")
             .build(),
           Customer.builder()
-            .fullName("Valentina Ortiz")
-            .documentId("1056789012")
-            .email("valentina.ortiz@outlook.com")
-            .phoneNumber("319-555-0987")
-            .address("Carrera 100 # 52-41 Sur, Barrio Corabastos, Bogotá D.C.")
+            .fullName("Victoria Ortiz")
+            .documentId("200000012")
+            .email("victoria.ortiz@example.com")
+            .phoneNumber("(215) 555-0112")
+            .address("700 S 4th St, Philadelphia, PA 19147")
             .build(),
           Customer.builder()
-            .fullName("Camilo Reyes")
-            .documentId("1032109876")
-            .email("camilo.reyes@yahoo.com")
-            .phoneNumber("311-555-4567")
-            .address(
-              "Diagonal 82 Sur # 6-22 Este, Barrio La Aurora, Bogotá D.C."
-            )
+            .fullName("Cameron Reyes")
+            .documentId("200000013")
+            .email("cameron.reyes@example.com")
+            .phoneNumber("(916) 555-0113")
+            .address("500 J St, Sacramento, CA 95814")
             .build(),
           Customer.builder()
             .fullName("Isabella Vargas")
-            .documentId("1054321098")
-            .email("isabella.vargas@gmail.com")
-            .phoneNumber("317-555-9012")
-            .address(
-              "Transversal 70D # 68-12 Sur, Barrio Britalia, Bogotá D.C."
-            )
+            .documentId("200000014")
+            .email("isabella.vargas@example.com")
+            .phoneNumber("(713) 555-0114")
+            .address("1200 McKinney St, Houston, TX 77010")
             .build(),
           Customer.builder()
-            .fullName("Santiago Morales")
-            .documentId("1065432109")
-            .email("santiago.morales@hotmail.com")
-            .phoneNumber("304-555-7654")
-            .address("Calle 73 Sur # 87M-15, Barrio Dindalito, Bogotá D.C.")
+            .fullName("Samuel Morris")
+            .documentId("200000015")
+            .email("samuel.morris@example.com")
+            .phoneNumber("(617) 555-0115")
+            .address("800 Boylston St, Boston, MA 02199")
             .build()
         )
       );
@@ -1923,11 +1928,11 @@ public class DataSeeder implements CommandLineRunner {
 
   private String getRandomReturnReason() {
     String[] reasons = {
-      "Producto defectuoso",
-      "No era la talla correcta",
-      "Cliente cambió de opinión",
-      "Artículo dañado en el envío",
-      "No cumple con las expectativas",
+      "Defective product",
+      "Incorrect size",
+      "Customer changed mind",
+      "Item damaged during shipping",
+      "Did not meet expectations",
     };
     return reasons[random.nextInt(reasons.length)];
   }
@@ -1954,13 +1959,13 @@ public class DataSeeder implements CommandLineRunner {
 
     User adminUser = users
       .stream()
-      .filter(u -> "rosita@sigrap.com".equals(u.getEmail()))
+      .filter(u -> "admin@sigrap.com".equals(u.getEmail()))
       .findFirst()
       .orElse(null);
 
     User employeeUser = users
       .stream()
-      .filter(u -> "gladys@sigrap.com".equals(u.getEmail()))
+      .filter(u -> "employee@sigrap.com".equals(u.getEmail()))
       .findFirst()
       .orElse(null);
 
@@ -1968,8 +1973,8 @@ public class DataSeeder implements CommandLineRunner {
       auditLogs.add(
         AuditLog.builder()
           .username(adminUser.getEmail())
-          .action("INICIO_SESION")
-          .entityName("USUARIO")
+          .action("LOGIN")
+          .entityName("USER")
           .timestamp(LocalDateTime.now().minusDays(7).withHour(8).withMinute(0))
           .build()
       );
@@ -1977,8 +1982,8 @@ public class DataSeeder implements CommandLineRunner {
       auditLogs.add(
         AuditLog.builder()
           .username(adminUser.getEmail())
-          .action("CREAR")
-          .entityName("PRODUCTO")
+          .action("CREATE")
+          .entityName("PRODUCT")
           .timestamp(
             LocalDateTime.now().minusDays(7).withHour(9).withMinute(15)
           )
@@ -1988,8 +1993,8 @@ public class DataSeeder implements CommandLineRunner {
       auditLogs.add(
         AuditLog.builder()
           .username(adminUser.getEmail())
-          .action("ACTUALIZAR")
-          .entityName("PROVEEDOR")
+          .action("UPDATE")
+          .entityName("SUPPLIER")
           .timestamp(
             LocalDateTime.now().minusDays(6).withHour(10).withMinute(30)
           )
@@ -2001,8 +2006,8 @@ public class DataSeeder implements CommandLineRunner {
       auditLogs.add(
         AuditLog.builder()
           .username(employeeUser.getEmail())
-          .action("INICIO_SESION")
-          .entityName("USUARIO")
+          .action("LOGIN")
+          .entityName("USER")
           .timestamp(
             LocalDateTime.now().minusDays(7).withHour(8).withMinute(30)
           )
@@ -2012,8 +2017,8 @@ public class DataSeeder implements CommandLineRunner {
       auditLogs.add(
         AuditLog.builder()
           .username(employeeUser.getEmail())
-          .action("CREAR")
-          .entityName("VENTA")
+          .action("CREATE")
+          .entityName("SALE")
           .timestamp(
             LocalDateTime.now().minusDays(7).withHour(9).withMinute(45)
           )
@@ -2023,8 +2028,8 @@ public class DataSeeder implements CommandLineRunner {
       auditLogs.add(
         AuditLog.builder()
           .username(employeeUser.getEmail())
-          .action("ACTUALIZAR")
-          .entityName("PRODUCTO")
+          .action("UPDATE")
+          .entityName("PRODUCT")
           .timestamp(
             LocalDateTime.now().minusDays(7).withHour(9).withMinute(45)
           )

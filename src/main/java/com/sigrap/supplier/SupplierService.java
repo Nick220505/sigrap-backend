@@ -9,7 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service class for managing supplier operations.
- * Handles business logic for creating, reading, updating, and deleting suppliers.
+ * Handles business logic for creating, reading, updating, and deleting
+ * suppliers.
  */
 @Service
 @RequiredArgsConstructor
@@ -35,10 +36,10 @@ public class SupplierService {
   @Transactional(readOnly = true)
   public List<SupplierInfo> findAll() {
     return supplierRepository
-      .findAll()
-      .stream()
-      .map(supplierMapper::toInfo)
-      .toList();
+        .findAll()
+        .stream()
+        .map(supplierMapper::toInfo)
+        .toList();
   }
 
   /**
@@ -51,10 +52,8 @@ public class SupplierService {
   @Transactional(readOnly = true)
   public SupplierInfo findById(Long id) {
     Supplier supplier = supplierRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Supplier not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Supplier not found with id: " + id));
     return supplierMapper.toInfo(supplier);
   }
 
@@ -65,7 +64,7 @@ public class SupplierService {
    * @return The created supplier mapped to SupplierInfo
    */
   @Transactional
-  @Auditable(action = "CREAR", entity = "PROVEEDOR", captureDetails = true)
+  @Auditable(action = "CREATE", entity = "SUPPLIER", captureDetails = true)
   public SupplierInfo create(SupplierData supplierData) {
     Supplier supplier = supplierMapper.toEntity(supplierData);
     Supplier savedSupplier = supplierRepository.save(supplier);
@@ -75,24 +74,17 @@ public class SupplierService {
   /**
    * Updates an existing supplier.
    *
-   * @param id The ID of the supplier to update
+   * @param id           The ID of the supplier to update
    * @param supplierData The new data for the supplier
    * @return The updated supplier mapped to SupplierInfo
    * @throws EntityNotFoundException if the supplier is not found
    */
   @Transactional
-  @Auditable(
-    action = "ACTUALIZAR",
-    entity = "PROVEEDOR",
-    entityIdParam = "id",
-    captureDetails = true
-  )
+  @Auditable(action = "UPDATE", entity = "SUPPLIER", entityIdParam = "id", captureDetails = true)
   public SupplierInfo update(Long id, SupplierData supplierData) {
     Supplier supplier = supplierRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Supplier not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Supplier not found with id: " + id));
     supplierMapper.updateEntityFromData(supplierData, supplier);
     Supplier updatedSupplier = supplierRepository.save(supplier);
     return supplierMapper.toInfo(updatedSupplier);
@@ -105,13 +97,11 @@ public class SupplierService {
    * @throws EntityNotFoundException if the supplier is not found
    */
   @Transactional
-  @Auditable(action = "ELIMINAR", entity = "PROVEEDOR", entityIdParam = "id")
+  @Auditable(action = "DELETE", entity = "SUPPLIER", entityIdParam = "id")
   public void delete(Long id) {
     Supplier supplier = supplierRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Supplier not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Supplier not found with id: " + id));
     supplierRepository.delete(supplier);
   }
 
@@ -123,17 +113,12 @@ public class SupplierService {
    * @throws EntityNotFoundException if any of the suppliers is not found
    */
   @Transactional
-  @Auditable(
-    action = "ELIMINAR_LOTE",
-    entity = "PROVEEDOR",
-    captureDetails = true
-  )
+  @Auditable(action = "BATCH_DELETE", entity = "SUPPLIER", captureDetails = true)
   public void deleteAllById(List<Long> ids) {
     ids.forEach(id -> {
       if (!supplierRepository.existsById(id)) {
         throw new EntityNotFoundException(
-          "Supplier with id " + id + " not found"
-        );
+            "Supplier with id " + id + " not found");
       }
     });
     supplierRepository.deleteAllById(ids);

@@ -33,47 +33,32 @@ public class SaleExportController {
   /**
    * Generate a flat file with sales data for the specified date.
    *
-   * @param date       The date for which to generate the report (defaults to today if not provided)
-   * @param exportPath The directory path where to save the file or "AUTO" for direct download
-   * @return The path to the generated file or the file content for direct download
+   * @param date       The date for which to generate the report (defaults to
+   *                   today if not provided)
+   * @param exportPath The directory path where to save the file or "AUTO" for
+   *                   direct download
+   * @return The path to the generated file or the file content for direct
+   *         download
    */
   @GetMapping("/daily")
-  @Operation(
-    summary = "Generate daily sales report",
-    description = "Generates a flat file containing sales data for the specified date"
-  )
-  @ApiResponses(
-    value = {
-      @ApiResponse(
-        responseCode = "200",
-        description = "Report generated successfully"
-      ),
-      @ApiResponse(
-        responseCode = "500",
-        description = "Error generating report"
-      ),
-    }
-  )
+  @Operation(summary = "Generate daily sales report", description = "Generates a flat file containing sales data for the specified date")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Report generated successfully"),
+      @ApiResponse(responseCode = "500", description = "Error generating report"),
+  })
   public ResponseEntity<String> generateDailySalesReport(
-    @Parameter(description = "Date for the report (yyyy-MM-dd)") @RequestParam(
-      required = false
-    ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-    @Parameter(
-      description = "Directory path where to save the file or 'AUTO' for direct download"
-    ) @RequestParam String exportPath
-  ) {
+      @Parameter(description = "Date for the report (yyyy-MM-dd)") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+      @Parameter(description = "Directory path where to save the file or 'AUTO' for direct download") @RequestParam String exportPath) {
     try {
       LocalDate reportDate = date != null ? date : LocalDate.now();
 
       if ("AUTO".equalsIgnoreCase(exportPath)) {
         String formattedDate = reportDate.format(
-          DateTimeFormatter.ofPattern("dd-MM-yy")
-        );
-        String filename = "PAPELERIA020_" + formattedDate + ".txt";
+            DateTimeFormatter.ofPattern("dd-MM-yy"));
+        String filename = "STATIONERY020_" + formattedDate + ".txt";
 
         String fileContent = saleExportService.generateDailySalesReportContent(
-          reportDate
-        );
+            reportDate);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_PLAIN);
@@ -82,14 +67,13 @@ public class SaleExportController {
         return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
       } else {
         String filePath = saleExportService.generateDailySalesReport(
-          reportDate,
-          exportPath
-        );
+            reportDate,
+            exportPath);
         return ResponseEntity.ok(filePath);
       }
     } catch (IOException e) {
       return ResponseEntity.internalServerError()
-        .body("Error generating report: " + e.getMessage());
+          .body("Error generating report: " + e.getMessage());
     }
   }
 }

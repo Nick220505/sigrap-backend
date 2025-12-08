@@ -28,27 +28,26 @@ public class SaleExportService {
 
   /**
    * Generates a flat file containing all sales for a specific date.
-   * The file includes customer ID, sale date, total amount, and total with IVA for each sale.
+   * The file includes customer ID, sale date, total amount, and total with IVA
+   * for each sale.
    *
-   * @param date The date for which to generate the report
+   * @param date       The date for which to generate the report
    * @param exportPath The directory path where to save the generated file
    * @return The path of the generated file
    * @throws IOException If an error occurs while writing the file
    */
   @Transactional(readOnly = true)
   public String generateDailySalesReport(LocalDate date, String exportPath)
-    throws IOException {
+      throws IOException {
     LocalDateTime startOfDay = date.atStartOfDay();
     LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
 
     List<SaleInfo> sales = saleService.findByCreatedDateRange(
-      startOfDay,
-      endOfDay
-    );
+        startOfDay,
+        endOfDay);
 
     String formattedDate = date.format(DateTimeFormatter.ofPattern("dd-MM-yy"));
-    String filename =
-      "PAPELERIA" + BUSINESS_CODE + "_" + formattedDate + ".txt";
+    String filename = "STATIONERY" + BUSINESS_CODE + "_" + formattedDate + ".txt";
 
     File directory = new File(exportPath);
     if (!directory.exists()) {
@@ -65,7 +64,8 @@ public class SaleExportService {
 
   /**
    * Generates the content of a daily sales report as a String.
-   * The report includes customer ID, sale date, total amount, and total with IVA for each sale.
+   * The report includes customer ID, sale date, total amount, and total with IVA
+   * for each sale.
    * This method is used for direct downloads without saving to disk.
    *
    * @param date The date for which to generate the report
@@ -74,14 +74,13 @@ public class SaleExportService {
    */
   @Transactional(readOnly = true)
   public String generateDailySalesReportContent(LocalDate date)
-    throws IOException {
+      throws IOException {
     LocalDateTime startOfDay = date.atStartOfDay();
     LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
 
     List<SaleInfo> sales = saleService.findByCreatedDateRange(
-      startOfDay,
-      endOfDay
-    );
+        startOfDay,
+        endOfDay);
 
     StringWriter stringWriter = new StringWriter();
     try (BufferedWriter writer = new BufferedWriter(stringWriter)) {
@@ -94,24 +93,23 @@ public class SaleExportService {
   /**
    * Helper method to write sales data to a writer.
    *
-   * @param sales The list of sales to write
+   * @param sales  The list of sales to write
    * @param writer The writer to write to
    * @throws IOException If an error occurs while writing
    */
   private void writeSalesData(List<SaleInfo> sales, BufferedWriter writer)
-    throws IOException {
-    writer.write("CÉDULA_CLIENTE|FECHA_VENTA|VALOR_TOTAL|VALOR_TOTAL_CON_IVA");
+      throws IOException {
+    writer.write("CUSTOMER_ID|SALE_DATE|TOTAL_AMOUNT|TOTAL_AMOUNT_WITH_TAX");
     writer.newLine();
 
     for (SaleInfo sale : sales) {
       if (sale.getCustomer().getDocumentId() != null) {
         String line = String.format(
-          "%s|%s|%d|%d",
-          sale.getCustomer().getDocumentId(),
-          sale.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-          sale.getTotalAmount().intValue(),
-          sale.getFinalAmount().intValue()
-        );
+            "%s|%s|%d|%d",
+            sale.getCustomer().getDocumentId(),
+            sale.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+            sale.getTotalAmount().intValue(),
+            sale.getFinalAmount().intValue());
 
         writer.write(line);
         writer.newLine();
@@ -123,18 +121,16 @@ public class SaleExportService {
    * Exports sales data to Excel format for a specified date range.
    *
    * @param startDate The start date of the report period
-   * @param endDate The end date of the report period
+   * @param endDate   The end date of the report period
    * @return Excel file as byte array
    */
   @Transactional(readOnly = true)
   public byte[] exportSalesToExcel(
-    LocalDateTime startDate,
-    LocalDateTime endDate
-  ) throws IOException {
+      LocalDateTime startDate,
+      LocalDateTime endDate) throws IOException {
     List<SaleInfo> sales = saleService.findByCreatedDateRange(
-      startDate,
-      endDate
-    );
+        startDate,
+        endDate);
     return generateExcelFile(sales);
   }
 
@@ -163,18 +159,16 @@ public class SaleExportService {
    * Exports sales data to CSV format for a specified date range.
    *
    * @param startDate The start date of the report period
-   * @param endDate The end date of the report period
+   * @param endDate   The end date of the report period
    * @return CSV content as string
    */
   @Transactional(readOnly = true)
   public String exportSalesToCsv(
-    LocalDateTime startDate,
-    LocalDateTime endDate
-  ) {
+      LocalDateTime startDate,
+      LocalDateTime endDate) {
     List<SaleInfo> sales = saleService.findByCreatedDateRange(
-      startDate,
-      endDate
-    );
+        startDate,
+        endDate);
     return generateCsvContent(sales);
   }
 

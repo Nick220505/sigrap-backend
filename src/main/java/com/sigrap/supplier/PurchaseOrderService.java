@@ -13,8 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service class for managing purchase order operations.
- * Handles business logic for creating, reading, updating, and deleting purchase orders.
- * Also manages order status transitions and relationships with suppliers and products.
+ * Handles business logic for creating, reading, updating, and deleting purchase
+ * orders.
+ * Also manages order status transitions and relationships with suppliers and
+ * products.
  */
 @Service
 @RequiredArgsConstructor
@@ -58,10 +60,10 @@ public class PurchaseOrderService {
   @Transactional(readOnly = true)
   public List<PurchaseOrderInfo> findAll() {
     return purchaseOrderRepository
-      .findAll()
-      .stream()
-      .map(purchaseOrderMapper::toInfo)
-      .toList();
+        .findAll()
+        .stream()
+        .map(purchaseOrderMapper::toInfo)
+        .toList();
   }
 
   /**
@@ -74,10 +76,8 @@ public class PurchaseOrderService {
   @Transactional(readOnly = true)
   public PurchaseOrderInfo findById(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Purchase order not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Purchase order not found with id: " + id));
     return purchaseOrderMapper.toInfo(purchaseOrder);
   }
 
@@ -89,8 +89,7 @@ public class PurchaseOrderService {
    */
   @Transactional(readOnly = true)
   public List<PurchaseOrderInfo> findBySupplierId(Integer supplierId) {
-    List<PurchaseOrder> purchaseOrders =
-      purchaseOrderRepository.findBySupplier_Id(supplierId);
+    List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findBySupplier_Id(supplierId);
     return purchaseOrderMapper.toInfoList(purchaseOrders);
   }
 
@@ -103,8 +102,7 @@ public class PurchaseOrderService {
   @Transactional(readOnly = true)
   public List<PurchaseOrderInfo> findByStatus(PurchaseOrderStatus status) {
     List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findByStatus(
-      status
-    );
+        status);
     return purchaseOrderMapper.toInfoList(purchaseOrders);
   }
 
@@ -113,48 +111,39 @@ public class PurchaseOrderService {
    *
    * @param purchaseOrderData The data for creating the purchase order
    * @return The created purchase order mapped to PurchaseOrderInfo
-   * @throws EntityNotFoundException if the specified supplier or any product is not found
+   * @throws EntityNotFoundException if the specified supplier or any product is
+   *                                 not found
    */
   @Transactional
-  @Auditable(action = "CREAR", entity = "ORDEN_COMPRA", captureDetails = true)
+  @Auditable(action = "CREATE", entity = "PURCHASE_ORDER", captureDetails = true)
   public PurchaseOrderInfo create(PurchaseOrderData purchaseOrderData) {
     PurchaseOrder purchaseOrder = purchaseOrderMapper.toEntity(
-      purchaseOrderData
-    );
+        purchaseOrderData);
 
     Supplier supplier = supplierRepository
-      .findById(purchaseOrderData.getSupplierId().longValue())
-      .orElseThrow(() ->
-        new EntityNotFoundException(
-          "Supplier not found with id: " + purchaseOrderData.getSupplierId()
-        )
-      );
+        .findById(purchaseOrderData.getSupplierId().longValue())
+        .orElseThrow(() -> new EntityNotFoundException(
+            "Supplier not found with id: " + purchaseOrderData.getSupplierId()));
     purchaseOrder.setSupplier(supplier);
 
     PurchaseOrder savedOrder = purchaseOrderRepository.save(purchaseOrder);
 
-    if (
-      purchaseOrderData.getItems() != null &&
-      !purchaseOrderData.getItems().isEmpty()
-    ) {
+    if (purchaseOrderData.getItems() != null &&
+        !purchaseOrderData.getItems().isEmpty()) {
       List<PurchaseOrderItem> items = new ArrayList<>();
 
       for (PurchaseOrderItemData itemData : purchaseOrderData.getItems()) {
         PurchaseOrderItem item = purchaseOrderItemMapper.toEntity(itemData);
 
         Product product = productRepository
-          .findById(itemData.getProductId())
-          .orElseThrow(() ->
-            new EntityNotFoundException(
-              "Product not found with id: " + itemData.getProductId()
-            )
-          );
+            .findById(itemData.getProductId())
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Product not found with id: " + itemData.getProductId()));
 
         item.setProduct(product);
         item.setPurchaseOrder(savedOrder);
         item.setTotalPrice(
-          product.getCostPrice().multiply(new BigDecimal(item.getQuantity()))
-        );
+            product.getCostPrice().multiply(new BigDecimal(item.getQuantity())));
         items.add(item);
       }
 
@@ -170,60 +159,45 @@ public class PurchaseOrderService {
   /**
    * Updates an existing purchase order.
    *
-   * @param id The ID of the purchase order to update
+   * @param id                The ID of the purchase order to update
    * @param purchaseOrderData The data for updating the purchase order
    * @return The updated purchase order mapped to PurchaseOrderInfo
    * @throws EntityNotFoundException if the purchase order is not found
-   * @throws IllegalStateException if the purchase order is not in DRAFT status
+   * @throws IllegalStateException   if the purchase order is not in DRAFT status
    */
   @Transactional
-  @Auditable(
-    action = "ACTUALIZAR",
-    entity = "ORDEN_COMPRA",
-    entityIdParam = "id",
-    captureDetails = true
-  )
+  @Auditable(action = "UPDATE", entity = "PURCHASE_ORDER", entityIdParam = "id", captureDetails = true)
   public PurchaseOrderInfo update(
-    Integer id,
-    PurchaseOrderData purchaseOrderData
-  ) {
+      Integer id,
+      PurchaseOrderData purchaseOrderData) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Purchase order not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Purchase order not found with id: " + id));
 
     if (purchaseOrder.getStatus() != PurchaseOrderStatus.DRAFT) {
       throw new IllegalStateException(
-        "Only purchase orders in DRAFT status can be updated"
-      );
+          "Only purchase orders in DRAFT status can be updated");
     }
 
     purchaseOrderMapper.updateEntityFromData(purchaseOrderData, purchaseOrder);
 
     if (purchaseOrderData.getSupplierId() != null) {
       Supplier supplier = supplierRepository
-        .findById(purchaseOrderData.getSupplierId().longValue())
-        .orElseThrow(() ->
-          new EntityNotFoundException(
-            "Supplier not found with id: " + purchaseOrderData.getSupplierId()
-          )
-        );
+          .findById(purchaseOrderData.getSupplierId().longValue())
+          .orElseThrow(() -> new EntityNotFoundException(
+              "Supplier not found with id: " + purchaseOrderData.getSupplierId()));
       purchaseOrder.setSupplier(supplier);
     }
 
     if (purchaseOrderData.getItems() != null) {
       List<PurchaseOrderItem> currentItems = new ArrayList<>(
-        purchaseOrder.getItems()
-      );
+          purchaseOrder.getItems());
 
       for (PurchaseOrderItem existingItem : currentItems) {
         boolean found = false;
         for (PurchaseOrderItemData itemData : purchaseOrderData.getItems()) {
-          if (
-            itemData.getId() != null &&
-            itemData.getId().equals(existingItem.getId())
-          ) {
+          if (itemData.getId() != null &&
+              itemData.getId().equals(existingItem.getId())) {
             found = true;
             break;
           }
@@ -236,20 +210,17 @@ public class PurchaseOrderService {
 
       for (PurchaseOrderItemData itemData : purchaseOrderData.getItems()) {
         Product product = productRepository
-          .findById(itemData.getProductId())
-          .orElseThrow(() ->
-            new EntityNotFoundException(
-              "Product not found with id: " + itemData.getProductId()
-            )
-          );
+            .findById(itemData.getProductId())
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Product not found with id: " + itemData.getProductId()));
 
         if (itemData.getId() != null) {
           PurchaseOrderItem existingItem = purchaseOrder
-            .getItems()
-            .stream()
-            .filter(item -> item.getId().equals(itemData.getId()))
-            .findFirst()
-            .orElse(null);
+              .getItems()
+              .stream()
+              .filter(item -> item.getId().equals(itemData.getId()))
+              .findFirst()
+              .orElse(null);
 
           if (existingItem != null) {
             existingItem.setProduct(product);
@@ -259,8 +230,7 @@ public class PurchaseOrderService {
           }
         } else {
           PurchaseOrderItem newItem = purchaseOrderItemMapper.toEntity(
-            itemData
-          );
+              itemData);
           newItem.setProduct(product);
           newItem.setUnitPrice(itemData.getUnitPrice());
           newItem.calculateTotalPrice();
@@ -279,21 +249,18 @@ public class PurchaseOrderService {
    *
    * @param id The ID of the purchase order to delete
    * @throws EntityNotFoundException if the purchase order is not found
-   * @throws IllegalStateException if the order is not in DRAFT status
+   * @throws IllegalStateException   if the order is not in DRAFT status
    */
   @Transactional
-  @Auditable(action = "ELIMINAR", entity = "ORDEN_COMPRA", entityIdParam = "id")
+  @Auditable(action = "DELETE", entity = "PURCHASE_ORDER", entityIdParam = "id")
   public void delete(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Purchase order not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Purchase order not found with id: " + id));
 
     if (purchaseOrder.getStatus() != PurchaseOrderStatus.DRAFT) {
       throw new IllegalStateException(
-        "Only purchase orders in DRAFT status can be deleted"
-      );
+          "Only purchase orders in DRAFT status can be deleted");
     }
 
     purchaseOrderRepository.delete(purchaseOrder);
@@ -305,21 +272,18 @@ public class PurchaseOrderService {
    * @param id The ID of the purchase order to submit
    * @return The updated purchase order mapped to PurchaseOrderInfo
    * @throws EntityNotFoundException if the purchase order is not found
-   * @throws IllegalStateException if the order is not in DRAFT status
+   * @throws IllegalStateException   if the order is not in DRAFT status
    */
   @Transactional
   @Auditable(action = "ENVIAR", entity = "ORDEN_COMPRA", entityIdParam = "id")
   public PurchaseOrderInfo submitOrder(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Purchase order not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Purchase order not found with id: " + id));
 
     if (purchaseOrder.getStatus() != PurchaseOrderStatus.DRAFT) {
       throw new IllegalStateException(
-        "Only purchase orders in DRAFT status can be submitted"
-      );
+          "Only purchase orders in DRAFT status can be submitted");
     }
 
     purchaseOrder.setStatus(PurchaseOrderStatus.SUBMITTED);
@@ -334,25 +298,18 @@ public class PurchaseOrderService {
    * @param id The ID of the purchase order to confirm
    * @return The updated purchase order mapped to PurchaseOrderInfo
    * @throws EntityNotFoundException if the purchase order is not found
-   * @throws IllegalStateException if the order is not in SUBMITTED status
+   * @throws IllegalStateException   if the order is not in SUBMITTED status
    */
   @Transactional
-  @Auditable(
-    action = "CONFIRMAR",
-    entity = "ORDEN_COMPRA",
-    entityIdParam = "id"
-  )
+  @Auditable(action = "CONFIRMAR", entity = "ORDEN_COMPRA", entityIdParam = "id")
   public PurchaseOrderInfo confirmOrder(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Purchase order not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Purchase order not found with id: " + id));
 
     if (purchaseOrder.getStatus() != PurchaseOrderStatus.SUBMITTED) {
       throw new IllegalStateException(
-        "Cannot confirm order in " + purchaseOrder.getStatus() + " status"
-      );
+          "Cannot confirm order in " + purchaseOrder.getStatus() + " status");
     }
 
     purchaseOrder.setStatus(PurchaseOrderStatus.CONFIRMED);
@@ -367,30 +324,21 @@ public class PurchaseOrderService {
    * @param id The ID of the purchase order to mark as shipped
    * @return The updated purchase order mapped to PurchaseOrderInfo
    * @throws EntityNotFoundException if the purchase order is not found
-   * @throws IllegalStateException if the order is not in CONFIRMED status
+   * @throws IllegalStateException   if the order is not in CONFIRMED status
    */
   @Transactional
-  @Auditable(
-    action = "MARCAR_ENVIADO",
-    entity = "ORDEN_COMPRA",
-    entityIdParam = "id"
-  )
+  @Auditable(action = "MARCAR_ENVIADO", entity = "ORDEN_COMPRA", entityIdParam = "id")
   public PurchaseOrderInfo markAsShipped(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Purchase order not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Purchase order not found with id: " + id));
 
-    if (
-      purchaseOrder.getStatus() != PurchaseOrderStatus.CONFIRMED &&
-      purchaseOrder.getStatus() != PurchaseOrderStatus.IN_PROCESS
-    ) {
+    if (purchaseOrder.getStatus() != PurchaseOrderStatus.CONFIRMED &&
+        purchaseOrder.getStatus() != PurchaseOrderStatus.IN_PROCESS) {
       throw new IllegalStateException(
-        "Cannot mark as shipped order in " +
-        purchaseOrder.getStatus() +
-        " status"
-      );
+          "Cannot mark as shipped order in " +
+              purchaseOrder.getStatus() +
+              " status");
     }
 
     purchaseOrder.setStatus(PurchaseOrderStatus.SHIPPED);
@@ -405,27 +353,20 @@ public class PurchaseOrderService {
    * @param id The ID of the purchase order to mark as delivered
    * @return The updated purchase order mapped to PurchaseOrderInfo
    * @throws EntityNotFoundException if the purchase order is not found
-   * @throws IllegalStateException if the order is not in SHIPPED status
+   * @throws IllegalStateException   if the order is not in SHIPPED status
    */
   @Transactional
-  @Auditable(
-    action = "MARCAR_ENTREGADO",
-    entity = "ORDEN_COMPRA",
-    entityIdParam = "id"
-  )
+  @Auditable(action = "MARCAR_ENTREGADO", entity = "ORDEN_COMPRA", entityIdParam = "id")
   public PurchaseOrderInfo markAsDelivered(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Purchase order not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Purchase order not found with id: " + id));
 
     if (purchaseOrder.getStatus() != PurchaseOrderStatus.SHIPPED) {
       throw new IllegalStateException(
-        "Cannot mark as delivered order in " +
-        purchaseOrder.getStatus() +
-        " status"
-      );
+          "Cannot mark as delivered order in " +
+              purchaseOrder.getStatus() +
+              " status");
     }
 
     purchaseOrder.setStatus(PurchaseOrderStatus.DELIVERED);
@@ -440,24 +381,19 @@ public class PurchaseOrderService {
    * @param id The ID of the purchase order to cancel
    * @return The updated purchase order mapped to PurchaseOrderInfo
    * @throws EntityNotFoundException if the purchase order is not found
-   * @throws IllegalStateException if the order is in DELIVERED status
+   * @throws IllegalStateException   if the order is in DELIVERED status
    */
   @Transactional
-  @Auditable(action = "CANCELAR", entity = "ORDEN_COMPRA", entityIdParam = "id")
+  @Auditable(action = "CANCEL", entity = "PURCHASE_ORDER", entityIdParam = "id")
   public PurchaseOrderInfo cancelOrder(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Purchase order not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Purchase order not found with id: " + id));
 
-    if (
-      purchaseOrder.getStatus() == PurchaseOrderStatus.DELIVERED ||
-      purchaseOrder.getStatus() == PurchaseOrderStatus.CANCELLED
-    ) {
+    if (purchaseOrder.getStatus() == PurchaseOrderStatus.DELIVERED ||
+        purchaseOrder.getStatus() == PurchaseOrderStatus.CANCELLED) {
       throw new IllegalStateException(
-        "Cannot cancel order in " + purchaseOrder.getStatus() + " status"
-      );
+          "Cannot cancel order in " + purchaseOrder.getStatus() + " status");
     }
 
     purchaseOrder.setStatus(PurchaseOrderStatus.CANCELLED);
@@ -472,25 +408,18 @@ public class PurchaseOrderService {
    * @param id The ID of the purchase order to mark as paid
    * @return The updated purchase order mapped to PurchaseOrderInfo
    * @throws EntityNotFoundException if the purchase order is not found
-   * @throws IllegalStateException if the order is not in DELIVERED status
+   * @throws IllegalStateException   if the order is not in DELIVERED status
    */
   @Transactional
-  @Auditable(
-    action = "MARCAR_PAGADO",
-    entity = "ORDEN_COMPRA",
-    entityIdParam = "id"
-  )
+  @Auditable(action = "MARCAR_PAGADO", entity = "ORDEN_COMPRA", entityIdParam = "id")
   public PurchaseOrderInfo markAsPaid(Integer id) {
     PurchaseOrder purchaseOrder = purchaseOrderRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Purchase order not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Purchase order not found with id: " + id));
 
     if (purchaseOrder.getStatus() != PurchaseOrderStatus.DELIVERED) {
       throw new IllegalStateException(
-        "Cannot mark as paid order in " + purchaseOrder.getStatus() + " status"
-      );
+          "Cannot mark as paid order in " + purchaseOrder.getStatus() + " status");
     }
 
     purchaseOrder.setStatus(PurchaseOrderStatus.PAID);
@@ -506,10 +435,10 @@ public class PurchaseOrderService {
    */
   private void calculateTotalAmount(PurchaseOrder purchaseOrder) {
     BigDecimal total = purchaseOrder
-      .getItems()
-      .stream()
-      .map(PurchaseOrderItem::getTotalPrice)
-      .reduce(BigDecimal.ZERO, BigDecimal::add);
+        .getItems()
+        .stream()
+        .map(PurchaseOrderItem::getTotalPrice)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     purchaseOrder.setTotalAmount(total);
   }

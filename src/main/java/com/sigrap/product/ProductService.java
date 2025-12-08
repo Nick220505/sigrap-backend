@@ -11,7 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service class for managing product operations.
- * Handles business logic for creating, reading, updating, and deleting products.
+ * Handles business logic for creating, reading, updating, and deleting
+ * products.
  * Also manages product-category relationships.
  */
 @Service
@@ -44,10 +45,10 @@ public class ProductService {
   @Transactional(readOnly = true)
   public List<ProductInfo> findAll() {
     return productRepository
-      .findAll()
-      .stream()
-      .map(productMapper::toInfo)
-      .toList();
+        .findAll()
+        .stream()
+        .map(productMapper::toInfo)
+        .toList();
   }
 
   /**
@@ -60,10 +61,8 @@ public class ProductService {
   @Transactional(readOnly = true)
   public ProductInfo findById(Integer id) {
     Product product = productRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Product not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + id));
     return productMapper.toInfo(product);
   }
 
@@ -75,17 +74,15 @@ public class ProductService {
    * @throws EntityNotFoundException if the specified category is not found
    */
   @Transactional
-  @Auditable(action = "CREAR", entity = "PRODUCTO", captureDetails = true)
+  @Auditable(action = "CREATE", entity = "PRODUCT", captureDetails = true)
   public ProductInfo create(ProductData productData) {
     Product product = productMapper.toEntity(productData);
 
     if (productData.getCategoryId() != null) {
       Long categoryId = Long.valueOf(productData.getCategoryId());
       Category category = categoryRepository
-        .findById(categoryId)
-        .orElseThrow(() ->
-          new EntityNotFoundException("Category not found: " + categoryId)
-        );
+          .findById(categoryId)
+          .orElseThrow(() -> new EntityNotFoundException("Category not found: " + categoryId));
       product.setCategory(category);
     }
 
@@ -96,33 +93,25 @@ public class ProductService {
   /**
    * Updates an existing product.
    *
-   * @param id The ID of the product to update
+   * @param id          The ID of the product to update
    * @param productData The new data for the product
    * @return The updated product mapped to ProductInfo
-   * @throws EntityNotFoundException if the product or specified category is not found
+   * @throws EntityNotFoundException if the product or specified category is not
+   *                                 found
    */
   @Transactional
-  @Auditable(
-    action = "ACTUALIZAR",
-    entity = "PRODUCTO",
-    entityIdParam = "id",
-    captureDetails = true
-  )
+  @Auditable(action = "UPDATE", entity = "PRODUCT", entityIdParam = "id", captureDetails = true)
   public ProductInfo update(Integer id, ProductData productData) {
     Product product = productRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Product not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + id));
     productMapper.updateEntityFromData(productData, product);
 
     if (productData.getCategoryId() != null) {
       Long categoryId = Long.valueOf(productData.getCategoryId());
       Category category = categoryRepository
-        .findById(categoryId)
-        .orElseThrow(() ->
-          new EntityNotFoundException("Category not found: " + categoryId)
-        );
+          .findById(categoryId)
+          .orElseThrow(() -> new EntityNotFoundException("Category not found: " + categoryId));
       product.setCategory(category);
     } else {
       product.setCategory(null);
@@ -139,13 +128,11 @@ public class ProductService {
    * @throws EntityNotFoundException if the product is not found
    */
   @Transactional
-  @Auditable(action = "ELIMINAR", entity = "PRODUCTO", entityIdParam = "id")
+  @Auditable(action = "DELETE", entity = "PRODUCT", entityIdParam = "id")
   public void delete(Integer id) {
     Product product = productRepository
-      .findById(id)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Product not found with id: " + id)
-      );
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + id));
     productRepository.delete(product);
   }
 
@@ -157,17 +144,12 @@ public class ProductService {
    * @throws EntityNotFoundException if any of the products is not found
    */
   @Transactional
-  @Auditable(
-    action = "ELIMINAR_LOTE",
-    entity = "PRODUCTO",
-    captureDetails = true
-  )
+  @Auditable(action = "BATCH_DELETE", entity = "PRODUCT", captureDetails = true)
   public void deleteAllById(List<Integer> ids) {
     ids.forEach(id -> {
       if (!productRepository.existsById(id)) {
         throw new EntityNotFoundException(
-          "Product with id " + id + " not found"
-        );
+            "Product with id " + id + " not found");
       }
     });
     productRepository.deleteAllById(ids);

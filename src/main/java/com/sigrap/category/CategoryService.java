@@ -9,7 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service class for managing category operations.
- * Handles business logic for creating, reading, updating, and deleting categories.
+ * Handles business logic for creating, reading, updating, and deleting
+ * categories.
  */
 @Service
 @RequiredArgsConstructor
@@ -35,10 +36,10 @@ public class CategoryService {
   @Transactional(readOnly = true)
   public List<CategoryInfo> findAll() {
     return categoryRepository
-      .findAll()
-      .stream()
-      .map(categoryMapper::toInfo)
-      .toList();
+        .findAll()
+        .stream()
+        .map(categoryMapper::toInfo)
+        .toList();
   }
 
   /**
@@ -51,8 +52,8 @@ public class CategoryService {
   @Transactional(readOnly = true)
   public CategoryInfo findById(Long id) {
     Category category = categoryRepository
-      .findById(id)
-      .orElseThrow(EntityNotFoundException::new);
+        .findById(id)
+        .orElseThrow(EntityNotFoundException::new);
     return categoryMapper.toInfo(category);
   }
 
@@ -63,7 +64,7 @@ public class CategoryService {
    * @return The created category mapped to CategoryInfo
    */
   @Transactional
-  @Auditable(action = "CREAR", entity = "CATEGORIA", captureDetails = true)
+  @Auditable(action = "CREATE", entity = "CATEGORY", captureDetails = true)
   public CategoryInfo create(CategoryData categoryData) {
     Category category = categoryMapper.toEntity(categoryData);
     Category savedCategory = categoryRepository.save(category);
@@ -73,22 +74,17 @@ public class CategoryService {
   /**
    * Updates an existing category.
    *
-   * @param id The ID of the category to update
+   * @param id           The ID of the category to update
    * @param categoryData The new data for the category
    * @return The updated category mapped to CategoryInfo
    * @throws EntityNotFoundException if the category is not found
    */
   @Transactional
-  @Auditable(
-    action = "ACTUALIZAR",
-    entity = "CATEGORIA",
-    entityIdParam = "id",
-    captureDetails = true
-  )
+  @Auditable(action = "UPDATE", entity = "CATEGORY", entityIdParam = "id", captureDetails = true)
   public CategoryInfo update(Long id, CategoryData categoryData) {
     Category category = categoryRepository
-      .findById(id)
-      .orElseThrow(EntityNotFoundException::new);
+        .findById(id)
+        .orElseThrow(EntityNotFoundException::new);
     categoryMapper.updateEntityFromData(categoryData, category);
     Category updatedCategory = categoryRepository.save(category);
     return categoryMapper.toInfo(updatedCategory);
@@ -101,11 +97,11 @@ public class CategoryService {
    * @throws EntityNotFoundException if the category is not found
    */
   @Transactional
-  @Auditable(action = "ELIMINAR", entity = "CATEGORIA", entityIdParam = "id")
+  @Auditable(action = "DELETE", entity = "CATEGORY", entityIdParam = "id")
   public void delete(Long id) {
     Category category = categoryRepository
-      .findById(id)
-      .orElseThrow(EntityNotFoundException::new);
+        .findById(id)
+        .orElseThrow(EntityNotFoundException::new);
     categoryRepository.delete(category);
   }
 
@@ -117,17 +113,12 @@ public class CategoryService {
    * @throws EntityNotFoundException if any of the categories is not found
    */
   @Transactional
-  @Auditable(
-    action = "ELIMINAR_LOTE",
-    entity = "CATEGORIA",
-    captureDetails = true
-  )
+  @Auditable(action = "BATCH_DELETE", entity = "CATEGORY", captureDetails = true)
   public void deleteAllById(List<Long> ids) {
     ids.forEach(id -> {
       if (!categoryRepository.existsById(id)) {
         throw new EntityNotFoundException(
-          "Category with id " + id + " not found"
-        );
+            "Category with id " + id + " not found");
       }
     });
     categoryRepository.deleteAllById(ids);

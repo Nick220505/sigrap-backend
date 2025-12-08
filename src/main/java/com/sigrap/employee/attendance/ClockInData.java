@@ -12,18 +12,23 @@ import lombok.NoArgsConstructor;
  * Data Transfer Object (DTO) for clock-in requests.
  * Contains validated data for recording user clock-ins.
  *
- * <p>This class:
+ * <p>
+ * This class:
  * <ul>
- *   <li>Validates clock-in input data</li>
- *   <li>Supports clock-in operations</li>
- *   <li>Manages clock-in information</li>
- * </ul></p>
+ * <li>Validates clock-in input data</li>
+ * <li>Supports clock-in operations</li>
+ * <li>Manages clock-in information</li>
+ * </ul>
+ * </p>
  *
- * <p>Validation Rules:
+ * <p>
+ * Validation Rules:
  * <ul>
- *   <li>User ID must not be null</li>
- *   <li>Timestamp is optional - if not provided, current time in Bogotá will be used</li>
- * </ul></p>
+ * <li>User ID must not be null</li>
+ * <li>Timestamp is optional - if not provided, current time in Bogota will be
+ * used</li>
+ * </ul>
+ * </p>
  */
 @Data
 @Builder
@@ -42,11 +47,8 @@ public class ClockInData {
 
   /**
    * Timestamp of the clock-in.
-   * If null, current time in Bogotá, Colombia will be used.
+   * If null, current time in Bogota, Colombia will be used.
    */
-  @Schema(
-    description = "Timestamp of the clock-in (optional - server time will be used if not provided)",
-    example = "2024-01-15T09:00:00"
-  )
+  @Schema(description = "Timestamp of the clock-in (optional - server time will be used if not provided)", example = "2024-01-15T09:00:00")
   private LocalDateTime timestamp;
 }
