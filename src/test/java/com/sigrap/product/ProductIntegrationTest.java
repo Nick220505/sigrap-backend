@@ -7,8 +7,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -92,7 +92,7 @@ class ProductIntegrationTest {
           .contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsString(testProductData))
       )
-      .andExpect(status().isOk());
+      .andExpect(status().isCreated());
 
     mockMvc
       .perform(get("/api/products/{id}", testProduct.getId()))
@@ -113,12 +113,14 @@ class ProductIntegrationTest {
 
     mockMvc
       .perform(delete("/api/products/{id}", testProduct.getId()))
-      .andExpect(status().isOk());
+      .andExpect(status().isNoContent());
   }
 
   @Test
   void getNonExistentProduct_shouldReturnNotFound() throws Exception {
-    mockMvc.perform(get("/api/products/{id}", 999L)).andExpect(status().isOk());
+    mockMvc
+      .perform(get("/api/products/{id}", 999L))
+      .andExpect(status().isNotFound());
   }
 
   @Test
@@ -129,14 +131,14 @@ class ProductIntegrationTest {
           .contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsString(testProductData))
       )
-      .andExpect(status().isOk());
+      .andExpect(status().isNotFound());
   }
 
   @Test
   void deleteNonExistentProduct_shouldReturnNotFound() throws Exception {
     mockMvc
       .perform(delete("/api/products/{id}", 999L))
-      .andExpect(status().isOk());
+      .andExpect(status().isNotFound());
   }
 
   @Test
@@ -148,7 +150,7 @@ class ProductIntegrationTest {
           .contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsString(testProductData))
       )
-      .andExpect(status().isOk());
+      .andExpect(status().isNotFound());
   }
 
   @Test
@@ -160,6 +162,6 @@ class ProductIntegrationTest {
           .contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsString(productIds))
       )
-      .andExpect(status().isOk());
+      .andExpect(status().isNoContent());
   }
 }

@@ -2,7 +2,6 @@ package com.sigrap.config;
 
 import com.sigrap.auth.JwtAuthenticationFilter;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,6 +10,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @TestConfiguration
 @EnableWebSecurity
@@ -19,7 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 )
 public class BaseTestConfiguration {
 
-  @MockBean
+  @MockitoBean
   private JwtAuthenticationFilter jwtAuthFilter;
 
   @Bean

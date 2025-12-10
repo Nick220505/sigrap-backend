@@ -7,7 +7,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Test configuration to disable the main security configuration during tests.
@@ -31,9 +30,7 @@ public class TestSecurityConfig {
   SecurityFilterChain testSecurityFilterChain(HttpSecurity http)
     throws Exception {
     http
-      .securityMatchers(matchers ->
-        matchers.requestMatchers(new AntPathRequestMatcher("/**"))
-      )
+      .securityMatcher("/api/**")
       .csrf(AbstractHttpConfigurer::disable)
       .cors(AbstractHttpConfigurer::disable)
       .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
