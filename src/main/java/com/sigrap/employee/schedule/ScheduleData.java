@@ -52,7 +52,7 @@ public class ScheduleData {
    * Must not be blank.
    */
   @NotBlank(message = "Day cannot be blank")
-  @Schema(description = "Day of the week", example = "Lunes")
+  @Schema(description = "Day of the week", example = "Monday")
   private String day;
 
   /**

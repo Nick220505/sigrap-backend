@@ -18,19 +18,19 @@ SIGRAP is a comprehensive management system designed specifically to streamline 
 - 📊 **Detailed Reports**: Report generation and analysis
 - 🔔 **Notification System**: Stock and order alerts
 
-## 🚀 Tecnologías
+## 🚀 Technologies
 
 - **Java 21**
 - **Spring Boot 3.4.5**
-- **Spring Security** - Autenticación y autorización
-- **Spring Data JPA** - Persistencia de datos
-- **PostgreSQL** - Base de datos principal
-- **H2** - Base de datos para pruebas
-- **JWT** - Gestión de tokens de autenticación
-- **MapStruct** - Mapeo de objetos
-- **Lombok** - Reducción de código boilerplate
-- **SpringDoc OpenAPI** - Documentación de API
-- **JaCoCo** - Cobertura de código
+- **Spring Security** - Authentication and authorization
+- **Spring Data JPA** - Data persistence
+- **PostgreSQL** - Main database
+- **H2** - Test database
+- **JWT** - Authentication token management
+- **MapStruct** - Object mapping
+- **Lombok** - Boilerplate code reduction
+- **SpringDoc OpenAPI** - API documentation
+- **JaCoCo** - Code coverage
 
 ## 🛠️ Prerequisites
 

@@ -50,7 +50,7 @@ public class ScheduleInfo {
   /**
    * Day of the week for this schedule.
    */
-  @Schema(description = "Day of the week", example = "Lunes")
+  @Schema(description = "Day of the week", example = "Monday")
   private String day;
 
   /**

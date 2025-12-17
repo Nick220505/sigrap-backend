@@ -1,5 +1,5 @@
 /**
- * Sale management package for handling transactions in the papeleria system.
+ * Sale management package for handling transactions in the stationery store system.
  *
  * <p>This package contains components for managing sales transactions, including:
  * <ul>
