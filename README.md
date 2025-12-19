@@ -1,7 +1,7 @@
 # SIGRAP - Stationery Store Management System
 
 [![Java Version](https://img.shields.io/badge/Java-21-orange)](https://www.oracle.com/java/technologies/downloads/#java21)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-brightgreen)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.1-brightgreen)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## 📝 Description
@@ -21,7 +21,7 @@ SIGRAP is a comprehensive management system designed specifically to streamline 
 ## 🚀 Technologies
 
 - **Java 21**
-- **Spring Boot 3.4.5**
+- **Spring Boot 4.0.1**
 - **Spring Security** - Authentication and authorization
 - **Spring Data JPA** - Data persistence
 - **PostgreSQL** - Main database
