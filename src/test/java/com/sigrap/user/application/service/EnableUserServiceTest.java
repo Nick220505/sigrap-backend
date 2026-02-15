@@ -1,0 +1,81 @@
+package com.sigrap.user.application.service;
+
+import com.sigrap.user.domain.model.User;
+import com.sigrap.user.domain.model.UserEmail;
+import com.sigrap.user.domain.model.UserId;
+import com.sigrap.user.domain.model.Username;
+import com.sigrap.user.domain.port.UserRepositoryPort;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class EnableUserServiceTest {
+    
+    @Mock
+    private UserRepositoryPort userRepository;
+    
+    @InjectMocks
+    private EnableUserService enableUserService;
+    
+    @BeforeEach
+    void setUp() {
+        reset(userRepository);
+    }
+    
+    @Test
+    void shouldEnableDisabledUser() {
+        // Given
+        User disabledUser = new User(
+            new UserId(1L),
+            new Username("john_doe"),
+            new UserEmail("john@example.com"),
+            "hashed_password",
+            new HashSet<>(),
+            false,  // disabled
+            LocalDateTime.now(),
+            LocalDateTime.now()
+        );
+        
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(disabledUser));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        
+        // When
+        User result = enableUserService.enable(1L);
+        
+        // Then
+        assertNotNull(result);
+        assertTrue(result.isEnabled());
+        
+        verify(userRepository).findById(any(UserId.class));
+        verify(userRepository).save(any(User.class));
+    }
+    
+    @Test
+    void shouldThrowExceptionWhenUserNotFound() {
+        // Given
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.empty());
+        
+        // When & Then
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> enableUserService.enable(999L)
+        );
+        
+        assertTrue(exception.getMessage().contains("not found"));
+        
+        verify(userRepository).findById(any(UserId.class));
+        verify(userRepository, never()).save(any(User.class));
+    }
+}
