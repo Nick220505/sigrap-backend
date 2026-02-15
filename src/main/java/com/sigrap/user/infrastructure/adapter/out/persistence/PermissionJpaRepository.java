@@ -3,6 +3,7 @@ package com.sigrap.user.infrastructure.adapter.out.persistence;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -27,4 +28,12 @@ public interface PermissionJpaRepository extends JpaRepository<PermissionJpaEnti
      * @return true if a permission with this name exists
      */
     boolean existsByName(String name);
+    
+    /**
+     * Finds all permissions for a specific resource.
+     *
+     * @param resource the resource name
+     * @return a list of permissions for the resource
+     */
+    List<PermissionJpaEntity> findByResource(String resource);
 }

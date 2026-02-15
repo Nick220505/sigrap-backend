@@ -110,9 +110,15 @@ public interface RolePersistenceMapper {
         if (permissions == null) {
             return Set.of();
         }
-        PermissionPersistenceMapper permissionMapper = getPermissionMapper();
         return permissions.stream()
-            .map(permissionMapper::toJpaEntity)
+            .map(permission -> {
+                PermissionJpaEntity entity = new PermissionJpaEntity();
+                entity.setId(permission.getId() != null ? permission.getId().value() : null);
+                entity.setName(permission.getName().value());
+                entity.setResource(permission.getResource());
+                entity.setAction(permission.getAction());
+                return entity;
+            })
             .collect(Collectors.toSet());
     }
 
@@ -127,17 +133,12 @@ public interface RolePersistenceMapper {
         if (entities == null) {
             return Set.of();
         }
-        PermissionPersistenceMapper permissionMapper = getPermissionMapper();
         return entities.stream()
-            .map(permissionMapper::toDomain)
+            .map(entity -> {
+                PermissionId id = entity.getId() != null ? new PermissionId(entity.getId()) : null;
+                PermissionName name = new PermissionName(entity.getName());
+                return new Permission(id, name, entity.getResource(), entity.getAction());
+            })
             .collect(Collectors.toSet());
     }
-
-    /**
-     * Gets the PermissionPersistenceMapper instance.
-     * This method should be implemented by MapStruct to inject the mapper.
-     *
-     * @return the permission persistence mapper
-     */
-    PermissionPersistenceMapper getPermissionMapper();
 }

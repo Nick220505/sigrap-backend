@@ -93,6 +93,19 @@ public class PermissionPersistenceAdapter implements PermissionRepositoryPort {
     }
 
     /**
+     * Finds all permissions for a specific resource.
+     *
+     * @param resource the resource name
+     * @return a list of permissions for the resource
+     */
+    @Override
+    public List<Permission> findByResource(String resource) {
+        return jpaRepository.findByResource(resource).stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    /**
      * Checks if a permission with the given name exists.
      *
      * @param name the permission name to check

@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -138,9 +139,17 @@ public interface UserPersistenceMapper {
         if (roles == null) {
             return Set.of();
         }
-        RolePersistenceMapper roleMapper = getRoleMapper();
+        // Manual conversion to avoid circular dependency
         return roles.stream()
-            .map(roleMapper::toJpaEntity)
+            .map(role -> {
+                RoleJpaEntity entity = new RoleJpaEntity();
+                entity.setId(role.getId() != null ? role.getId().value() : null);
+                entity.setName(role.getName().value());
+                entity.setDescription(role.getDescription());
+                // Don't map permissions here to avoid deep nesting
+                entity.setPermissions(new HashSet<>());
+                return entity;
+            })
             .collect(Collectors.toSet());
     }
 
@@ -155,17 +164,24 @@ public interface UserPersistenceMapper {
         if (entities == null) {
             return Set.of();
         }
-        RolePersistenceMapper roleMapper = getRoleMapper();
+        // Manual conversion to avoid circular dependency
         return entities.stream()
-            .map(roleMapper::toDomain)
+            .map(entity -> {
+                RoleId id = entity.getId() != null ? new RoleId(entity.getId()) : null;
+                RoleName name = new RoleName(entity.getName());
+                // Convert permissions
+                Set<Permission> permissions = entity.getPermissions() != null
+                    ? entity.getPermissions().stream()
+                        .map(permEntity -> new Permission(
+                            permEntity.getId() != null ? new PermissionId(permEntity.getId()) : null,
+                            new PermissionName(permEntity.getName()),
+                            permEntity.getResource(),
+                            permEntity.getAction()
+                        ))
+                        .collect(Collectors.toSet())
+                    : new HashSet<>();
+                return new Role(id, name, permissions, entity.getDescription());
+            })
             .collect(Collectors.toSet());
     }
-
-    /**
-     * Gets the RolePersistenceMapper instance.
-     * This method should be implemented by MapStruct to inject the mapper.
-     *
-     * @return the role persistence mapper
-     */
-    RolePersistenceMapper getRoleMapper();
 }
