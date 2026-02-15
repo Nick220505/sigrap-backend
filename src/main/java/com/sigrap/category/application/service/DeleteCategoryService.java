@@ -1,12 +1,19 @@
 package com.sigrap.category.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+import com.sigrap.audit.domain.event.BulkEntityDeletedEvent;
+import com.sigrap.audit.domain.event.EntityDeletedEvent;
+import com.sigrap.audit.domain.model.EntityType;
 import com.sigrap.category.application.port.in.DeleteCategoryUseCase;
 import com.sigrap.category.domain.model.CategoryId;
 import com.sigrap.category.domain.port.CategoryRepositoryPort;
 import com.sigrap.exception.ResourceNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -30,14 +37,17 @@ import java.util.List;
 public class DeleteCategoryService implements DeleteCategoryUseCase {
     
     private final CategoryRepositoryPort categoryRepository;
+    private final EventPublisherPort eventPublisher;
     
     /**
      * Constructor for dependency injection.
      *
      * @param categoryRepository the repository port for category persistence
+     * @param eventPublisher the event publisher port for publishing domain events
      */
-    public DeleteCategoryService(CategoryRepositoryPort categoryRepository) {
+    public DeleteCategoryService(CategoryRepositoryPort categoryRepository, EventPublisherPort eventPublisher) {
         this.categoryRepository = categoryRepository;
+        this.eventPublisher = eventPublisher;
     }
     
     /**
@@ -53,6 +63,8 @@ public class DeleteCategoryService implements DeleteCategoryUseCase {
      */
     @Override
     public void delete(CategoryId id) {
+        long startTime = System.currentTimeMillis();
+        
         // Verify category exists
         if (!categoryRepository.findById(id).isPresent()) {
             throw new ResourceNotFoundException(
@@ -62,6 +74,19 @@ public class DeleteCategoryService implements DeleteCategoryUseCase {
         
         // Delete through port
         categoryRepository.deleteById(id);
+        
+        // Publish domain event for audit logging
+        long durationMs = System.currentTimeMillis() - startTime;
+        eventPublisher.publish(new EntityDeletedEvent(
+            EntityType.CATEGORY,
+            id.value().toString(),
+            getCurrentUsername(),
+            LocalDateTime.now(),
+            null, // sourceIp - can be added via request context if needed
+            null, // userAgent - can be added via request context if needed
+            "Category deleted",
+            durationMs
+        ));
     }
     
     /**
@@ -77,6 +102,8 @@ public class DeleteCategoryService implements DeleteCategoryUseCase {
      */
     @Override
     public void deleteAll(List<CategoryId> ids) {
+        long startTime = System.currentTimeMillis();
+        
         // Verify all categories exist
         for (CategoryId id : ids) {
             if (!categoryRepository.findById(id).isPresent()) {
@@ -88,5 +115,25 @@ public class DeleteCategoryService implements DeleteCategoryUseCase {
         
         // Delete all through port
         categoryRepository.deleteAllById(ids);
+        
+        // Publish domain event for audit logging
+        long durationMs = System.currentTimeMillis() - startTime;
+        List<String> entityIds = ids.stream()
+            .map(id -> id.value().toString())
+            .toList();
+        eventPublisher.publish(new BulkEntityDeletedEvent(
+            EntityType.CATEGORY,
+            entityIds,
+            getCurrentUsername(),
+            LocalDateTime.now(),
+            null, // sourceIp - can be added via request context if needed
+            null, // userAgent - can be added via request context if needed
+            durationMs
+        ));
+    }
+    
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getName() : "system";
     }
 }

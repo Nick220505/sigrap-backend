@@ -1,12 +1,19 @@
 package com.sigrap.product.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+import com.sigrap.audit.domain.event.BulkEntityDeletedEvent;
+import com.sigrap.audit.domain.event.EntityDeletedEvent;
+import com.sigrap.audit.domain.model.EntityType;
 import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.product.application.port.in.DeleteProductUseCase;
 import com.sigrap.product.domain.model.ProductId;
 import com.sigrap.product.domain.port.ProductRepositoryPort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -30,14 +37,17 @@ import java.util.List;
 public class DeleteProductService implements DeleteProductUseCase {
     
     private final ProductRepositoryPort productRepository;
+    private final EventPublisherPort eventPublisher;
     
     /**
      * Constructor for dependency injection.
      *
      * @param productRepository the repository port for product deletion
+     * @param eventPublisher the event publisher port for publishing domain events
      */
-    public DeleteProductService(ProductRepositoryPort productRepository) {
+    public DeleteProductService(ProductRepositoryPort productRepository, EventPublisherPort eventPublisher) {
         this.productRepository = productRepository;
+        this.eventPublisher = eventPublisher;
     }
     
     /**
@@ -53,6 +63,8 @@ public class DeleteProductService implements DeleteProductUseCase {
      */
     @Override
     public void delete(ProductId id) {
+        long startTime = System.currentTimeMillis();
+        
         // Verify product exists
         if (productRepository.findById(id).isEmpty()) {
             throw new ResourceNotFoundException(
@@ -62,6 +74,19 @@ public class DeleteProductService implements DeleteProductUseCase {
         
         // Delete through port
         productRepository.deleteById(id);
+        
+        // Publish domain event for audit logging
+        long durationMs = System.currentTimeMillis() - startTime;
+        eventPublisher.publish(new EntityDeletedEvent(
+            EntityType.PRODUCT,
+            id.value().toString(),
+            getCurrentUsername(),
+            LocalDateTime.now(),
+            null,
+            null,
+            "Product deleted",
+            durationMs
+        ));
     }
     
     /**
@@ -77,6 +102,8 @@ public class DeleteProductService implements DeleteProductUseCase {
      */
     @Override
     public void deleteAll(List<ProductId> ids) {
+        long startTime = System.currentTimeMillis();
+        
         // Verify all products exist
         for (ProductId id : ids) {
             if (productRepository.findById(id).isEmpty()) {
@@ -88,5 +115,25 @@ public class DeleteProductService implements DeleteProductUseCase {
         
         // Delete all through port
         productRepository.deleteAllById(ids);
+        
+        // Publish domain event for audit logging
+        long durationMs = System.currentTimeMillis() - startTime;
+        List<String> entityIds = ids.stream()
+            .map(id -> id.value().toString())
+            .toList();
+        eventPublisher.publish(new BulkEntityDeletedEvent(
+            EntityType.PRODUCT,
+            entityIds,
+            getCurrentUsername(),
+            LocalDateTime.now(),
+            null,
+            null,
+            durationMs
+        ));
+    }
+    
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getName() : "system";
     }
 }

@@ -1,5 +1,8 @@
 package com.sigrap.product.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+import com.sigrap.audit.domain.event.EntityCreatedEvent;
+import com.sigrap.audit.domain.model.EntityType;
 import com.sigrap.category.domain.model.CategoryId;
 import com.sigrap.category.domain.port.CategoryRepositoryPort;
 import com.sigrap.exception.ResourceNotFoundException;
@@ -10,8 +13,12 @@ import com.sigrap.product.domain.model.ProductName;
 import com.sigrap.product.domain.model.ProductPrice;
 import com.sigrap.product.domain.model.ProductStock;
 import com.sigrap.product.domain.port.ProductRepositoryPort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * Service implementing the CreateProductUseCase.
@@ -36,18 +43,22 @@ public class CreateProductService implements CreateProductUseCase {
     
     private final ProductRepositoryPort productRepository;
     private final CategoryRepositoryPort categoryRepository;
+    private final EventPublisherPort eventPublisher;
     
     /**
      * Constructor for dependency injection.
      *
      * @param productRepository the repository port for product persistence
      * @param categoryRepository the repository port for category validation
+     * @param eventPublisher the event publisher port for publishing domain events
      */
     public CreateProductService(
             ProductRepositoryPort productRepository,
-            CategoryRepositoryPort categoryRepository) {
+            CategoryRepositoryPort categoryRepository,
+            EventPublisherPort eventPublisher) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.eventPublisher = eventPublisher;
     }
     
     /**
@@ -70,6 +81,8 @@ public class CreateProductService implements CreateProductUseCase {
      */
     @Override
     public Product create(CreateProductCommand command) {
+        long startTime = System.currentTimeMillis();
+        
         // Create value objects (validates format)
         ProductName name = new ProductName(command.name());
         ProductPrice costPrice = new ProductPrice(command.costPrice());
@@ -104,6 +117,26 @@ public class CreateProductService implements CreateProductUseCase {
         );
         
         // Persist through port and return with generated ID
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        
+        // Publish domain event for audit logging
+        long durationMs = System.currentTimeMillis() - startTime;
+        eventPublisher.publish(new EntityCreatedEvent(
+            EntityType.PRODUCT,
+            savedProduct.getId().value().toString(),
+            getCurrentUsername(),
+            LocalDateTime.now(),
+            null,
+            null,
+            "Product created: " + savedProduct.getName().value(),
+            durationMs
+        ));
+        
+        return savedProduct;
+    }
+    
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getName() : "system";
     }
 }

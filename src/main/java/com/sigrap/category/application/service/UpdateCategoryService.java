@@ -1,5 +1,8 @@
 package com.sigrap.category.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+import com.sigrap.audit.domain.event.EntityUpdatedEvent;
+import com.sigrap.audit.domain.model.EntityType;
 import com.sigrap.category.application.port.in.UpdateCategoryUseCase;
 import com.sigrap.category.application.port.in.command.UpdateCategoryCommand;
 import com.sigrap.category.domain.model.Category;
@@ -7,8 +10,12 @@ import com.sigrap.category.domain.model.CategoryId;
 import com.sigrap.category.domain.model.CategoryName;
 import com.sigrap.category.domain.port.CategoryRepositoryPort;
 import com.sigrap.exception.ResourceNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * Service implementing the UpdateCategoryUseCase.
@@ -33,14 +40,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class UpdateCategoryService implements UpdateCategoryUseCase {
     
     private final CategoryRepositoryPort categoryRepository;
+    private final EventPublisherPort eventPublisher;
     
     /**
      * Constructor for dependency injection.
      *
      * @param categoryRepository the repository port for category persistence
+     * @param eventPublisher the event publisher port for publishing domain events
      */
-    public UpdateCategoryService(CategoryRepositoryPort categoryRepository) {
+    public UpdateCategoryService(CategoryRepositoryPort categoryRepository, EventPublisherPort eventPublisher) {
         this.categoryRepository = categoryRepository;
+        this.eventPublisher = eventPublisher;
     }
     
     /**
@@ -62,6 +72,8 @@ public class UpdateCategoryService implements UpdateCategoryUseCase {
      */
     @Override
     public Category update(CategoryId id, UpdateCategoryCommand command) {
+        long startTime = System.currentTimeMillis();
+        
         // Retrieve existing category
         Category category = categoryRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
@@ -71,6 +83,8 @@ public class UpdateCategoryService implements UpdateCategoryUseCase {
         // Create value object for new name (validates name format)
         CategoryName newName = new CategoryName(command.name());
         
+        StringBuilder changes = new StringBuilder();
+        
         // Business rule: if name is changing, ensure new name is unique
         if (!category.getName().equals(newName)) {
             if (categoryRepository.existsByName(newName)) {
@@ -78,14 +92,39 @@ public class UpdateCategoryService implements UpdateCategoryUseCase {
                     "Category with name '" + newName.value() + "' already exists"
                 );
             }
+            changes.append("Name changed from '").append(category.getName().value())
+                   .append("' to '").append(newName.value()).append("'; ");
             // Update name through domain method
             category.updateName(newName);
         }
         
         // Update description through domain method
+        if (!java.util.Objects.equals(category.getDescription(), command.description())) {
+            changes.append("Description updated; ");
+        }
         category.updateDescription(command.description());
         
         // Persist through port and return updated entity
-        return categoryRepository.save(category);
+        Category updatedCategory = categoryRepository.save(category);
+        
+        // Publish domain event for audit logging
+        long durationMs = System.currentTimeMillis() - startTime;
+        eventPublisher.publish(new EntityUpdatedEvent(
+            EntityType.CATEGORY,
+            updatedCategory.getId().value().toString(),
+            getCurrentUsername(),
+            LocalDateTime.now(),
+            null, // sourceIp - can be added via request context if needed
+            null, // userAgent - can be added via request context if needed
+            changes.length() > 0 ? changes.toString() : "Category updated",
+            durationMs
+        ));
+        
+        return updatedCategory;
+    }
+    
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getName() : "system";
     }
 }

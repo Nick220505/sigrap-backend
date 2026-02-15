@@ -1,5 +1,8 @@
 package com.sigrap.customer.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+import com.sigrap.audit.domain.event.EntityCreatedEvent;
+import com.sigrap.audit.domain.model.EntityType;
 import com.sigrap.customer.application.port.in.CreateCustomerUseCase;
 import com.sigrap.customer.application.port.in.command.CreateCustomerCommand;
 import com.sigrap.customer.domain.model.Customer;
@@ -7,8 +10,12 @@ import com.sigrap.customer.domain.model.CustomerEmail;
 import com.sigrap.customer.domain.model.CustomerName;
 import com.sigrap.customer.domain.model.CustomerPhone;
 import com.sigrap.customer.domain.port.CustomerRepositoryPort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * Service implementing the CreateCustomerUseCase.
@@ -30,51 +37,31 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class CreateCustomerService implements CreateCustomerUseCase {
-    
+
     private final CustomerRepositoryPort customerRepository;
-    
-    /**
-     * Constructor for dependency injection.
-     *
-     * @param customerRepository the repository port for customer persistence
-     */
-    public CreateCustomerService(CustomerRepositoryPort customerRepository) {
+    private final EventPublisherPort eventPublisher;
+
+    public CreateCustomerService(CustomerRepositoryPort customerRepository, EventPublisherPort eventPublisher) {
         this.customerRepository = customerRepository;
+        this.eventPublisher = eventPublisher;
     }
-    
-    /**
-     * Creates a new customer with the provided command data.
-     * 
-     * <p>Business rules enforced:
-     * <ul>
-     *   <li>Customer email must be unique</li>
-     *   <li>Customer email must be valid (enforced by CustomerEmail value object)</li>
-     *   <li>Customer name must be valid (enforced by CustomerName value object)</li>
-     *   <li>Customer phone must be valid if provided (enforced by CustomerPhone value object)</li>
-     * </ul>
-     *
-     * @param command the command containing customer creation data
-     * @return the created customer domain entity with generated ID
-     * @throws IllegalArgumentException if a customer with the same email already exists
-     * @throws IllegalArgumentException if any value object validation fails
-     */
+
     @Override
     public Customer create(CreateCustomerCommand command) {
-        // Create value objects (validates format)
+        long startTime = System.currentTimeMillis();
+
         CustomerName fullName = new CustomerName(command.fullName());
         CustomerEmail email = new CustomerEmail(command.email());
         CustomerPhone phoneNumber = command.phoneNumber() != null && !command.phoneNumber().isBlank()
             ? new CustomerPhone(command.phoneNumber())
             : null;
-        
-        // Business rule: customer email must be unique
+
         if (customerRepository.existsByEmail(email)) {
             throw new IllegalArgumentException(
                 "Customer with email '" + email.value() + "' already exists"
             );
         }
-        
-        // Create domain entity
+
         Customer customer = new Customer(
             fullName,
             command.documentId(),
@@ -82,8 +69,27 @@ public class CreateCustomerService implements CreateCustomerUseCase {
             phoneNumber,
             command.address()
         );
-        
-        // Persist through port and return with generated ID
-        return customerRepository.save(customer);
+
+        Customer savedCustomer = customerRepository.save(customer);
+
+        long durationMs = System.currentTimeMillis() - startTime;
+        eventPublisher.publish(new EntityCreatedEvent(
+            EntityType.CUSTOMER,
+            savedCustomer.getId().value().toString(),
+            getCurrentUsername(),
+            LocalDateTime.now(),
+            null,
+            null,
+            "Customer created: " + savedCustomer.getFullName().value(),
+            durationMs
+        ));
+
+        return savedCustomer;
+    }
+
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getName() : "system";
     }
 }
+

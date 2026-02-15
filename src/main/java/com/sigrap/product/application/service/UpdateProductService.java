@@ -1,5 +1,8 @@
 package com.sigrap.product.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+import com.sigrap.audit.domain.event.EntityUpdatedEvent;
+import com.sigrap.audit.domain.model.EntityType;
 import com.sigrap.category.domain.model.CategoryId;
 import com.sigrap.category.domain.port.CategoryRepositoryPort;
 import com.sigrap.exception.ResourceNotFoundException;
@@ -11,8 +14,12 @@ import com.sigrap.product.domain.model.ProductName;
 import com.sigrap.product.domain.model.ProductPrice;
 import com.sigrap.product.domain.model.ProductStock;
 import com.sigrap.product.domain.port.ProductRepositoryPort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * Service implementing the UpdateProductUseCase.
@@ -38,18 +45,22 @@ public class UpdateProductService implements UpdateProductUseCase {
     
     private final ProductRepositoryPort productRepository;
     private final CategoryRepositoryPort categoryRepository;
+    private final EventPublisherPort eventPublisher;
     
     /**
      * Constructor for dependency injection.
      *
      * @param productRepository the repository port for product persistence
      * @param categoryRepository the repository port for category validation
+     * @param eventPublisher the event publisher port for publishing domain events
      */
     public UpdateProductService(
             ProductRepositoryPort productRepository,
-            CategoryRepositoryPort categoryRepository) {
+            CategoryRepositoryPort categoryRepository,
+            EventPublisherPort eventPublisher) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.eventPublisher = eventPublisher;
     }
     
     /**
@@ -73,6 +84,8 @@ public class UpdateProductService implements UpdateProductUseCase {
      */
     @Override
     public Product update(ProductId id, UpdateProductCommand command) {
+        long startTime = System.currentTimeMillis();
+        
         // Retrieve existing product
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
@@ -111,6 +124,26 @@ public class UpdateProductService implements UpdateProductUseCase {
         product.updateCategory(newCategoryId);
         
         // Persist changes through port
-        return productRepository.save(product);
+        Product updatedProduct = productRepository.save(product);
+        
+        // Publish domain event for audit logging
+        long durationMs = System.currentTimeMillis() - startTime;
+        eventPublisher.publish(new EntityUpdatedEvent(
+            EntityType.PRODUCT,
+            updatedProduct.getId().value().toString(),
+            getCurrentUsername(),
+            LocalDateTime.now(),
+            null,
+            null,
+            "Product updated",
+            durationMs
+        ));
+        
+        return updatedProduct;
+    }
+    
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getName() : "system";
     }
 }

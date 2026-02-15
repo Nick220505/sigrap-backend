@@ -1,12 +1,19 @@
 package com.sigrap.category.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+import com.sigrap.audit.domain.event.EntityCreatedEvent;
+import com.sigrap.audit.domain.model.EntityType;
 import com.sigrap.category.application.port.in.CreateCategoryUseCase;
 import com.sigrap.category.application.port.in.command.CreateCategoryCommand;
 import com.sigrap.category.domain.model.Category;
 import com.sigrap.category.domain.model.CategoryName;
 import com.sigrap.category.domain.port.CategoryRepositoryPort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * Service implementing the CreateCategoryUseCase.
@@ -30,14 +37,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class CreateCategoryService implements CreateCategoryUseCase {
     
     private final CategoryRepositoryPort categoryRepository;
+    private final EventPublisherPort eventPublisher;
     
     /**
      * Constructor for dependency injection.
      *
      * @param categoryRepository the repository port for category persistence
+     * @param eventPublisher the event publisher port for publishing domain events
      */
-    public CreateCategoryService(CategoryRepositoryPort categoryRepository) {
+    public CreateCategoryService(CategoryRepositoryPort categoryRepository, EventPublisherPort eventPublisher) {
         this.categoryRepository = categoryRepository;
+        this.eventPublisher = eventPublisher;
     }
     
     /**
@@ -56,6 +66,8 @@ public class CreateCategoryService implements CreateCategoryUseCase {
      */
     @Override
     public Category create(CreateCategoryCommand command) {
+        long startTime = System.currentTimeMillis();
+        
         // Create value object (validates name format)
         CategoryName name = new CategoryName(command.name());
         
@@ -70,6 +82,26 @@ public class CreateCategoryService implements CreateCategoryUseCase {
         Category category = new Category(name, command.description());
         
         // Persist through port and return with generated ID
-        return categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(category);
+        
+        // Publish domain event for audit logging
+        long durationMs = System.currentTimeMillis() - startTime;
+        eventPublisher.publish(new EntityCreatedEvent(
+            EntityType.CATEGORY,
+            savedCategory.getId().value().toString(),
+            getCurrentUsername(),
+            LocalDateTime.now(),
+            null, // sourceIp - can be added via request context if needed
+            null, // userAgent - can be added via request context if needed
+            "Category created: " + savedCategory.getName().value(),
+            durationMs
+        ));
+        
+        return savedCategory;
+    }
+    
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getName() : "system";
     }
 }
