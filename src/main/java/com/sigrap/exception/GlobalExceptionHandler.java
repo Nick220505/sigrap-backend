@@ -56,6 +56,17 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handles resource not found exceptions from hexagonal architecture.
+   * Returns 404 NOT_FOUND status.
+   */
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(
+    ResourceNotFoundException ex
+  ) {
+    return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+  }
+
+  /**
    * Handles data integrity violation exceptions.
    * Returns 409 CONFLICT status.
    */

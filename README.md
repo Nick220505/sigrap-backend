@@ -32,6 +32,126 @@ SIGRAP is a comprehensive management system designed specifically to streamline 
 - **SpringDoc OpenAPI** - API documentation
 - **JaCoCo** - Code coverage
 
+## 🏗️ Architecture
+
+SIGRAP follows **Hexagonal Architecture** (also known as Ports and Adapters pattern) to ensure clean separation of concerns, improved testability, and maintainability.
+
+### Core Principles
+
+- **Isolation of Business Logic**: Domain logic is completely independent of frameworks and infrastructure
+- **Dependency Inversion**: All dependencies point inward toward the domain layer
+- **Testability**: Core business logic can be tested without Spring context or database
+- **Flexibility**: Easy to swap implementations (e.g., different databases, REST vs GraphQL)
+
+### Layer Structure
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Infrastructure Layer                      │
+│  ┌────────────────────┐              ┌──────────────────┐  │
+│  │  Input Adapters    │              │ Output Adapters  │  │
+│  │  - REST Controller │              │ - JPA Repository │  │
+│  │  - Request/Response│              │ - JPA Entities   │  │
+│  └────────┬───────────┘              └────────┬─────────┘  │
+│           │                                    │             │
+└───────────┼────────────────────────────────────┼─────────────┘
+            │                                    │
+┌───────────▼────────────────────────────────────▼─────────────┐
+│                    Application Layer                          │
+│  ┌────────────────────┐              ┌──────────────────┐   │
+│  │   Input Ports      │              │  Output Ports    │   │
+│  │  - Use Cases       │              │  - Repository    │   │
+│  │  - Commands        │              │    Interfaces    │   │
+│  └────────────────────┘              └──────────────────┘   │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │           Use Case Implementations                    │   │
+│  └──────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────▼─────────────────────────────────┐
+│                       Domain Layer (Core)                      │
+│  ┌──────────────────────────────────────────────────────┐    │
+│  │              Domain Models                            │    │
+│  │  - Entities (POJOs)                                  │    │
+│  │  - Value Objects                                     │    │
+│  │  - Domain Services                                   │    │
+│  └──────────────────────────────────────────────────────┘    │
+│  ┌──────────────────────────────────────────────────────┐    │
+│  │              Repository Ports                         │    │
+│  │  - Repository Interfaces                             │    │
+│  └──────────────────────────────────────────────────────┘    │
+└────────────────────────────────────────────────────────────────┘
+```
+
+### Package Structure
+
+Each module follows a consistent hexagonal architecture structure:
+
+```
+com.sigrap.{module}
+├── domain                    # Domain layer (core business logic)
+│   ├── model                # Domain entities and value objects
+│   ├── port                 # Output ports (repository interfaces)
+│   └── service              # Domain services
+├── application              # Application layer (use cases)
+│   ├── port
+│   │   ├── in              # Input ports (use case interfaces)
+│   │   │   └── command     # Command DTOs
+│   │   └── out             # Output ports
+│   └── service             # Use case implementations
+└── infrastructure           # Infrastructure layer (adapters)
+    ├── adapter
+    │   ├── in
+    │   │   └── rest        # REST controllers and DTOs
+    │   └── out
+    │       └── persistence # JPA entities and repositories
+    └── config              # Spring configuration
+```
+
+### Example: Category Module
+
+The **category module** serves as the reference implementation demonstrating all hexagonal architecture patterns:
+
+**Domain Layer** (`com.sigrap.category.domain`):
+- `Category`: Pure POJO domain entity with business logic
+- `CategoryId`, `CategoryName`: Self-validating value objects
+- `CategoryRepositoryPort`: Repository interface defining domain needs
+
+**Application Layer** (`com.sigrap.category.application`):
+- `CreateCategoryUseCase`, `GetCategoryUseCase`: Input port interfaces
+- `CreateCategoryCommand`, `UpdateCategoryCommand`: Immutable command DTOs
+- `CreateCategoryService`, `GetCategoryService`: Use case implementations with transaction management
+
+**Infrastructure Layer** (`com.sigrap.category.infrastructure`):
+- `CategoryController`: REST adapter translating HTTP to use case calls
+- `CategoryRequest`, `CategoryResponse`: REST DTOs with validation
+- `CategoryJpaEntity`: JPA entity for persistence
+- `CategoryPersistenceAdapter`: Adapter implementing repository port
+- `CategoryPersistenceMapper`: MapStruct mapper for entity conversion
+
+### Key Benefits
+
+- **Framework Independence**: Business logic has no Spring or JPA dependencies
+- **Testability**: Domain and application layers can be tested without Spring context
+- **Maintainability**: Clear boundaries and responsibilities for each layer
+- **Flexibility**: Easy to swap adapters (e.g., switch from REST to GraphQL, or PostgreSQL to MongoDB)
+- **Backward Compatibility**: Existing APIs remain unchanged during migration
+
+### Migration Status
+
+The project is currently migrating from traditional layered architecture to hexagonal architecture:
+
+- ✅ **Category Module**: Fully migrated (reference implementation)
+- 🔄 **Other Modules**: Migration in progress
+
+### Documentation
+
+For detailed architecture documentation, see:
+- [Design Document](.kiro/specs/hexagonal-architecture-migration/design.md) - Complete architecture design
+- [Patterns and Conventions](.kiro/specs/hexagonal-architecture-migration/patterns-and-conventions.md) - Implementation patterns
+- [Migration Guide](.kiro/specs/hexagonal-architecture-migration/migration-guide.md) - Step-by-step migration instructions
+- [Category Module Architecture](.kiro/specs/hexagonal-architecture-migration/category-module-architecture.md) - Reference implementation details
+
 ## 🛠️ Prerequisites
 
 - Java 21 or higher

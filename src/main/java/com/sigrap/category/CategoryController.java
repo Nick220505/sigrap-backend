@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,6 +60,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @see CategoryService
  * @see Category
+ * @deprecated This is the old layered architecture controller. Use the hexagonal architecture controller instead.
  */
 @RestController
 @RequestMapping("/api/categories")
@@ -67,6 +69,8 @@ import org.springframework.web.bind.annotation.RestController;
   name = "Category Management",
   description = "Operations for managing categories"
 )
+@Profile("!test") // Exclude from test profile to avoid bean name conflicts during migration
+@Deprecated(since = "Migration to hexagonal architecture", forRemoval = true)
 public class CategoryController {
 
   /**
