@@ -9,6 +9,12 @@ import com.sigrap.employee.application.port.in.command.UpdateScheduleCommand;
 import com.sigrap.employee.domain.model.Schedule;
 import com.sigrap.employee.domain.model.ScheduleId;
 import com.sigrap.user.domain.model.UserId;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/schedules")
+@Tag(name = "Employee Management", description = "APIs for managing employee attendance and schedules")
 public class ScheduleController {
     
     private final CreateScheduleUseCase createScheduleUseCase;
@@ -62,6 +69,23 @@ public class ScheduleController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+        summary = "Create a new schedule",
+        description = "Creates a new employee work schedule with specified day, time range, and type."
+    )
+    @ApiResponse(
+        responseCode = "201",
+        description = "Schedule created successfully",
+        content = @Content(schema = @Schema(implementation = ScheduleResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public ScheduleResponse create(@Valid @RequestBody ScheduleRequest request) {
         CreateScheduleCommand command = new CreateScheduleCommand(
             request.userId(),
@@ -83,7 +107,27 @@ public class ScheduleController {
      * @throws IllegalArgumentException if the schedule is not found
      */
     @GetMapping("/{id}")
-    public ScheduleResponse getById(@PathVariable Long id) {
+    @Operation(
+        summary = "Get schedule by ID",
+        description = "Retrieves a specific schedule by its unique identifier."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Schedule found",
+        content = @Content(schema = @Schema(implementation = ScheduleResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Schedule not found"
+    )
+    public ScheduleResponse getById(
+        @Parameter(description = "Schedule unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         ScheduleId scheduleId = new ScheduleId(id);
         Schedule schedule = getScheduleUseCase.getById(scheduleId);
         return responseMapper.toResponse(schedule);
@@ -96,6 +140,19 @@ public class ScheduleController {
      * @return a list of all schedule responses with HTTP 200 status
      */
     @GetMapping
+    @Operation(
+        summary = "Get all schedules",
+        description = "Retrieves all employee schedules in the system."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of schedules",
+        content = @Content(schema = @Schema(implementation = ScheduleResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public List<ScheduleResponse> getAll() {
         return getScheduleUseCase.getAll().stream()
             .map(responseMapper::toResponse)
@@ -110,7 +167,23 @@ public class ScheduleController {
      * @return a list of schedule responses for the user with HTTP 200 status
      */
     @GetMapping("/user/{userId}")
-    public List<ScheduleResponse> getByUserId(@PathVariable Long userId) {
+    @Operation(
+        summary = "Get schedules by user ID",
+        description = "Retrieves all schedules for a specific employee."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of schedules for the user",
+        content = @Content(schema = @Schema(implementation = ScheduleResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public List<ScheduleResponse> getByUserId(
+        @Parameter(description = "User unique identifier", required = true, example = "1")
+        @PathVariable Long userId
+    ) {
         UserId userIdObj = new UserId(userId);
         return getScheduleUseCase.getByUserId(userIdObj).stream()
             .map(responseMapper::toResponse)
@@ -125,7 +198,23 @@ public class ScheduleController {
      * @return a list of schedule responses for the specified day with HTTP 200 status
      */
     @GetMapping("/day/{day}")
-    public List<ScheduleResponse> getByDay(@PathVariable String day) {
+    @Operation(
+        summary = "Get schedules by day",
+        description = "Retrieves all schedules for a specific day of the week."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of schedules for the specified day",
+        content = @Content(schema = @Schema(implementation = ScheduleResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public List<ScheduleResponse> getByDay(
+        @Parameter(description = "Day of the week", required = true, example = "MONDAY")
+        @PathVariable String day
+    ) {
         return getScheduleUseCase.getByDay(day).stream()
             .map(responseMapper::toResponse)
             .toList();
@@ -141,7 +230,29 @@ public class ScheduleController {
      * @throws IllegalArgumentException if the schedule is not found
      */
     @PutMapping("/{id}")
+    @Operation(
+        summary = "Update a schedule",
+        description = "Updates an existing employee schedule. All fields are optional - only provided fields will be updated."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Schedule updated successfully",
+        content = @Content(schema = @Schema(implementation = ScheduleResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Schedule not found"
+    )
     public ScheduleResponse update(
+            @Parameter(description = "Schedule unique identifier", required = true, example = "1")
             @PathVariable Long id,
             @Valid @RequestBody UpdateScheduleRequest request) {
         ScheduleId scheduleId = new ScheduleId(id);
@@ -166,7 +277,26 @@ public class ScheduleController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    @Operation(
+        summary = "Delete a schedule",
+        description = "Deletes an employee schedule by its unique identifier."
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Schedule deleted successfully"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Schedule not found"
+    )
+    public void delete(
+        @Parameter(description = "Schedule unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         ScheduleId scheduleId = new ScheduleId(id);
         deleteScheduleUseCase.delete(scheduleId);
     }

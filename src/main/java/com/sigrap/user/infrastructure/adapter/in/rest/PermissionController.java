@@ -4,6 +4,12 @@ import com.sigrap.user.application.port.in.*;
 import com.sigrap.user.application.port.in.command.CreatePermissionCommand;
 import com.sigrap.user.application.port.in.command.UpdatePermissionCommand;
 import com.sigrap.user.domain.model.Permission;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v2/permissions")
+@Tag(name = "User Management", description = "APIs for managing users, roles, and permissions")
 public class PermissionController {
     
     private final CreatePermissionUseCase createPermissionUseCase;
@@ -51,6 +58,24 @@ public class PermissionController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+        summary = "Create a new permission",
+        description = "Creates a new permission with the provided name, resource, and action. " +
+                      "The permission name must be unique across the system."
+    )
+    @ApiResponse(
+        responseCode = "201",
+        description = "Permission created successfully",
+        content = @Content(schema = @Schema(implementation = PermissionResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors or duplicate permission name"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public PermissionResponse create(@Valid @RequestBody PermissionRequest request) {
         CreatePermissionCommand command = new CreatePermissionCommand(
             request.name(),
@@ -69,7 +94,27 @@ public class PermissionController {
      * @return the permission response with HTTP 200 status
      */
     @GetMapping("/{id}")
-    public PermissionResponse getById(@PathVariable Long id) {
+    @Operation(
+        summary = "Get permission by ID",
+        description = "Retrieves a permission by its unique identifier."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Permission found",
+        content = @Content(schema = @Schema(implementation = PermissionResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Permission not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public PermissionResponse getById(
+        @Parameter(description = "Permission unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         Permission permission = getPermissionUseCase.getById(id);
         return responseMapper.toResponse(permission);
     }
@@ -82,7 +127,27 @@ public class PermissionController {
      * @return the permission response with HTTP 200 status
      */
     @GetMapping("/name/{name}")
-    public PermissionResponse getByName(@PathVariable String name) {
+    @Operation(
+        summary = "Get permission by name",
+        description = "Retrieves a permission by its unique name."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Permission found",
+        content = @Content(schema = @Schema(implementation = PermissionResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Permission not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public PermissionResponse getByName(
+        @Parameter(description = "Permission name", required = true, example = "USER_READ")
+        @PathVariable String name
+    ) {
         Permission permission = getPermissionUseCase.getByName(name);
         return responseMapper.toResponse(permission);
     }
@@ -95,7 +160,22 @@ public class PermissionController {
      * @return a list of permission responses with HTTP 200 status
      */
     @GetMapping("/resource/{resource}")
-    public List<PermissionResponse> getByResource(@PathVariable String resource) {
+    @Operation(
+        summary = "Get permissions by resource",
+        description = "Retrieves all permissions associated with a specific resource."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of permissions for the resource retrieved successfully"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public List<PermissionResponse> getByResource(
+        @Parameter(description = "Resource name", required = true, example = "USER")
+        @PathVariable String resource
+    ) {
         return getPermissionUseCase.getByResource(resource).stream()
             .map(responseMapper::toResponse)
             .toList();
@@ -108,6 +188,18 @@ public class PermissionController {
      * @return a list of all permission responses with HTTP 200 status
      */
     @GetMapping
+    @Operation(
+        summary = "Get all permissions",
+        description = "Retrieves a list of all permissions in the system."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of permissions retrieved successfully"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public List<PermissionResponse> getAll() {
         return getPermissionUseCase.getAll().stream()
             .map(responseMapper::toResponse)
@@ -123,7 +215,29 @@ public class PermissionController {
      * @return the updated permission response with HTTP 200 status
      */
     @PutMapping("/{id}")
+    @Operation(
+        summary = "Update an existing permission",
+        description = "Updates an existing permission with the provided name, resource, and action."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Permission updated successfully",
+        content = @Content(schema = @Schema(implementation = PermissionResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Permission not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public PermissionResponse update(
+            @Parameter(description = "Permission unique identifier", required = true, example = "1")
             @PathVariable Long id,
             @Valid @RequestBody PermissionRequest request) {
         UpdatePermissionCommand command = new UpdatePermissionCommand(
@@ -144,7 +258,26 @@ public class PermissionController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    @Operation(
+        summary = "Delete a permission",
+        description = "Permanently deletes a permission from the system."
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Permission deleted successfully"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Permission not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public void delete(
+        @Parameter(description = "Permission unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         deletePermissionUseCase.delete(id);
     }
 }

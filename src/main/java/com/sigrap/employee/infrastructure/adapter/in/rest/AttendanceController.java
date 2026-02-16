@@ -8,6 +8,12 @@ import com.sigrap.employee.application.port.in.command.ClockOutCommand;
 import com.sigrap.employee.domain.model.Attendance;
 import com.sigrap.employee.domain.model.AttendanceId;
 import com.sigrap.user.domain.model.UserId;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -24,6 +30,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/attendance")
+@Tag(name = "Employee Management", description = "APIs for managing employee attendance and schedules")
 public class AttendanceController {
     
     private final ClockInUseCase clockInUseCase;
@@ -59,6 +66,23 @@ public class AttendanceController {
      */
     @PostMapping("/clock-in")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+        summary = "Clock in an employee",
+        description = "Records the clock-in time for an employee. Creates a new attendance record for the day."
+    )
+    @ApiResponse(
+        responseCode = "201",
+        description = "Clock-in recorded successfully",
+        content = @Content(schema = @Schema(implementation = AttendanceResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors or employee already clocked in"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public AttendanceResponse clockIn(@Valid @RequestBody ClockInRequest request) {
         ClockInCommand command = new ClockInCommand(
             request.userId(),
@@ -76,6 +100,27 @@ public class AttendanceController {
      * @return the updated attendance response with HTTP 200 status
      */
     @PutMapping("/clock-out")
+    @Operation(
+        summary = "Clock out an employee",
+        description = "Records the clock-out time for an employee. Updates the existing attendance record and calculates total hours worked."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Clock-out recorded successfully",
+        content = @Content(schema = @Schema(implementation = AttendanceResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors or attendance not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Attendance record not found"
+    )
     public AttendanceResponse clockOut(@Valid @RequestBody ClockOutRequest request) {
         ClockOutCommand command = new ClockOutCommand(
             request.attendanceId(),
@@ -94,7 +139,27 @@ public class AttendanceController {
      * @throws IllegalArgumentException if the attendance is not found
      */
     @GetMapping("/{id}")
-    public AttendanceResponse getById(@PathVariable Long id) {
+    @Operation(
+        summary = "Get attendance by ID",
+        description = "Retrieves a specific attendance record by its unique identifier."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Attendance record found",
+        content = @Content(schema = @Schema(implementation = AttendanceResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Attendance record not found"
+    )
+    public AttendanceResponse getById(
+        @Parameter(description = "Attendance unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         AttendanceId attendanceId = new AttendanceId(id);
         Attendance attendance = getAttendanceUseCase.getById(attendanceId);
         return responseMapper.toResponse(attendance);
@@ -107,6 +172,19 @@ public class AttendanceController {
      * @return a list of all attendance responses with HTTP 200 status
      */
     @GetMapping
+    @Operation(
+        summary = "Get all attendance records",
+        description = "Retrieves all attendance records in the system."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of attendance records",
+        content = @Content(schema = @Schema(implementation = AttendanceResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public List<AttendanceResponse> getAll() {
         return getAttendanceUseCase.getAll().stream()
             .map(responseMapper::toResponse)
@@ -121,7 +199,23 @@ public class AttendanceController {
      * @return a list of attendance responses for the user with HTTP 200 status
      */
     @GetMapping("/user/{userId}")
-    public List<AttendanceResponse> getByUserId(@PathVariable Long userId) {
+    @Operation(
+        summary = "Get attendance by user ID",
+        description = "Retrieves all attendance records for a specific employee."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of attendance records for the user",
+        content = @Content(schema = @Schema(implementation = AttendanceResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public List<AttendanceResponse> getByUserId(
+        @Parameter(description = "User unique identifier", required = true, example = "1")
+        @PathVariable Long userId
+    ) {
         UserId userIdObj = new UserId(userId);
         return getAttendanceUseCase.getByUserId(userIdObj).stream()
             .map(responseMapper::toResponse)
@@ -137,8 +231,23 @@ public class AttendanceController {
      * @return a list of attendance responses within the date range with HTTP 200 status
      */
     @GetMapping("/date-range")
+    @Operation(
+        summary = "Get attendance by date range",
+        description = "Retrieves all attendance records within a specified date range."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of attendance records within the date range",
+        content = @Content(schema = @Schema(implementation = AttendanceResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public List<AttendanceResponse> getByDateRange(
+            @Parameter(description = "Start date (inclusive)", required = true, example = "2026-02-01T00:00:00")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @Parameter(description = "End date (inclusive)", required = true, example = "2026-02-28T23:59:59")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         return getAttendanceUseCase.getByDateRange(startDate, endDate).stream()
             .map(responseMapper::toResponse)
@@ -155,9 +264,25 @@ public class AttendanceController {
      * @return a list of attendance responses for the user within the date range with HTTP 200 status
      */
     @GetMapping("/report")
+    @Operation(
+        summary = "Generate attendance report",
+        description = "Generates an attendance report for a specific employee within a date range."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Attendance report generated successfully",
+        content = @Content(schema = @Schema(implementation = AttendanceResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public List<AttendanceResponse> generateAttendanceReport(
+            @Parameter(description = "User unique identifier", required = true, example = "1")
             @RequestParam Long userId,
+            @Parameter(description = "Report start date (inclusive)", required = true, example = "2026-02-01T00:00:00")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @Parameter(description = "Report end date (inclusive)", required = true, example = "2026-02-28T23:59:59")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         UserId userIdObj = new UserId(userId);
         return getAttendanceUseCase.getByUserId(userIdObj).stream()

@@ -7,6 +7,11 @@ import com.sigrap.auth.application.port.in.command.AuthenticateUserCommand;
 import com.sigrap.auth.application.port.in.command.RegisterUserCommand;
 import com.sigrap.auth.domain.model.AuthenticationResult;
 import com.sigrap.auth.domain.model.Email;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/v2/auth")
+@Tag(name = "Authentication", description = "APIs for user authentication and authorization")
 public class AuthController {
 
   private final AuthenticateUserUseCase authenticateUserUseCase;
@@ -55,6 +61,25 @@ public class AuthController {
    */
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
+  @Operation(
+    summary = "Authenticate user",
+    description = "Authenticates a user with email and password credentials. " +
+                  "Returns a JWT token that must be included in the Authorization header " +
+                  "for subsequent API requests."
+  )
+  @ApiResponse(
+    responseCode = "200",
+    description = "Authentication successful - JWT token returned",
+    content = @Content(schema = @Schema(implementation = AuthResponse.class))
+  )
+  @ApiResponse(
+    responseCode = "400",
+    description = "Invalid request - validation errors or malformed credentials"
+  )
+  @ApiResponse(
+    responseCode = "401",
+    description = "Authentication failed - invalid email or password"
+  )
   public AuthResponse login(@Valid @RequestBody AuthRequest request) {
     AuthenticateUserCommand command = new AuthenticateUserCommand(
       request.email(),
@@ -73,6 +98,21 @@ public class AuthController {
    */
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+    summary = "Register new user",
+    description = "Creates a new user account with the provided name, email, and password. " +
+                  "The email must be unique. Upon successful registration, returns a JWT token " +
+                  "that can be used immediately for authentication."
+  )
+  @ApiResponse(
+    responseCode = "201",
+    description = "User registered successfully - JWT token returned",
+    content = @Content(schema = @Schema(implementation = AuthResponse.class))
+  )
+  @ApiResponse(
+    responseCode = "400",
+    description = "Invalid request - validation errors or email already exists"
+  )
   public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
     RegisterUserCommand command = new RegisterUserCommand(
       request.name(),
@@ -92,6 +132,20 @@ public class AuthController {
    */
   @GetMapping("/validate")
   @ResponseStatus(HttpStatus.OK)
+  @Operation(
+    summary = "Validate JWT token",
+    description = "Validates a JWT token and returns the associated user email. " +
+                  "The token should be provided in the Authorization header with 'Bearer ' prefix."
+  )
+  @ApiResponse(
+    responseCode = "200",
+    description = "Token is valid - returns user email",
+    content = @Content(schema = @Schema(implementation = TokenValidationResponse.class))
+  )
+  @ApiResponse(
+    responseCode = "401",
+    description = "Token is invalid or expired"
+  )
   public TokenValidationResponse validateToken(
     @RequestHeader("Authorization") String token
   ) {

@@ -4,6 +4,12 @@ import com.sigrap.user.application.port.in.*;
 import com.sigrap.user.application.port.in.command.CreateRoleCommand;
 import com.sigrap.user.application.port.in.command.UpdateRoleCommand;
 import com.sigrap.user.domain.model.Role;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v2/roles")
+@Tag(name = "User Management", description = "APIs for managing users, roles, and permissions")
 public class RoleController {
     
     private final CreateRoleUseCase createRoleUseCase;
@@ -57,6 +64,24 @@ public class RoleController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+        summary = "Create a new role",
+        description = "Creates a new role with the provided name and description. " +
+                      "The role name must be unique across the system."
+    )
+    @ApiResponse(
+        responseCode = "201",
+        description = "Role created successfully",
+        content = @Content(schema = @Schema(implementation = RoleResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors or duplicate role name"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public RoleResponse create(@Valid @RequestBody RoleRequest request) {
         CreateRoleCommand command = new CreateRoleCommand(
             request.name(),
@@ -74,7 +99,27 @@ public class RoleController {
      * @return the role response with HTTP 200 status
      */
     @GetMapping("/{id}")
-    public RoleResponse getById(@PathVariable Long id) {
+    @Operation(
+        summary = "Get role by ID",
+        description = "Retrieves a role by its unique identifier."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Role found",
+        content = @Content(schema = @Schema(implementation = RoleResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Role not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public RoleResponse getById(
+        @Parameter(description = "Role unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         Role role = getRoleUseCase.getById(id);
         return responseMapper.toResponse(role);
     }
@@ -87,7 +132,27 @@ public class RoleController {
      * @return the role response with HTTP 200 status
      */
     @GetMapping("/name/{name}")
-    public RoleResponse getByName(@PathVariable String name) {
+    @Operation(
+        summary = "Get role by name",
+        description = "Retrieves a role by its unique name."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Role found",
+        content = @Content(schema = @Schema(implementation = RoleResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Role not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public RoleResponse getByName(
+        @Parameter(description = "Role name", required = true, example = "ADMIN")
+        @PathVariable String name
+    ) {
         Role role = getRoleUseCase.getByName(name);
         return responseMapper.toResponse(role);
     }
@@ -99,6 +164,18 @@ public class RoleController {
      * @return a list of all role responses with HTTP 200 status
      */
     @GetMapping
+    @Operation(
+        summary = "Get all roles",
+        description = "Retrieves a list of all roles in the system."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of roles retrieved successfully"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public List<RoleResponse> getAll() {
         return getRoleUseCase.getAll().stream()
             .map(responseMapper::toResponse)
@@ -114,7 +191,29 @@ public class RoleController {
      * @return the updated role response with HTTP 200 status
      */
     @PutMapping("/{id}")
+    @Operation(
+        summary = "Update an existing role",
+        description = "Updates an existing role with the provided name and description."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Role updated successfully",
+        content = @Content(schema = @Schema(implementation = RoleResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Role not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public RoleResponse update(
+            @Parameter(description = "Role unique identifier", required = true, example = "1")
             @PathVariable Long id,
             @Valid @RequestBody RoleRequest request) {
         UpdateRoleCommand command = new UpdateRoleCommand(
@@ -134,8 +233,27 @@ public class RoleController {
      * @return the updated role response with HTTP 200 status
      */
     @PostMapping("/{roleId}/permissions/{permissionId}")
+    @Operation(
+        summary = "Assign a permission to a role",
+        description = "Assigns a specific permission to a role, granting that permission to all users with this role."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Permission assigned successfully",
+        content = @Content(schema = @Schema(implementation = RoleResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Role or permission not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public RoleResponse assignPermission(
+            @Parameter(description = "Role unique identifier", required = true, example = "1")
             @PathVariable Long roleId,
+            @Parameter(description = "Permission unique identifier", required = true, example = "5")
             @PathVariable Long permissionId) {
         Role role = assignPermissionUseCase.assignPermission(roleId, permissionId);
         return responseMapper.toResponse(role);
@@ -150,8 +268,27 @@ public class RoleController {
      * @return the updated role response with HTTP 200 status
      */
     @DeleteMapping("/{roleId}/permissions/{permissionId}")
+    @Operation(
+        summary = "Remove a permission from a role",
+        description = "Removes a specific permission from a role, revoking that permission from all users with this role."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Permission removed successfully",
+        content = @Content(schema = @Schema(implementation = RoleResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Role or permission not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public RoleResponse removePermission(
+            @Parameter(description = "Role unique identifier", required = true, example = "1")
             @PathVariable Long roleId,
+            @Parameter(description = "Permission unique identifier", required = true, example = "5")
             @PathVariable Long permissionId) {
         Role role = removePermissionUseCase.removePermission(roleId, permissionId);
         return responseMapper.toResponse(role);
@@ -166,7 +303,26 @@ public class RoleController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    @Operation(
+        summary = "Delete a role",
+        description = "Permanently deletes a role from the system."
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Role deleted successfully"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Role not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public void delete(
+        @Parameter(description = "Role unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         deleteRoleUseCase.delete(id);
     }
 }
