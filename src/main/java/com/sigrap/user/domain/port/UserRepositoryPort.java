@@ -82,4 +82,22 @@ public interface UserRepositoryPort {
      * @param id the user identifier
      */
     void deleteById(UserId id);
+
+
+    /**
+     * Counts the total number of users.
+     *
+     * @return the total count of users
+     */
+    long count();
+
+    /**
+     * Saves multiple users at once.
+     * Useful for batch operations.
+     *
+     * @param users the list of users to save
+     * @return the list of saved users
+     */
+    List<User> saveAll(List<User> users);
+
 }

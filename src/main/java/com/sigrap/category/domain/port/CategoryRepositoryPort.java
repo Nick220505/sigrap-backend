@@ -70,4 +70,22 @@ public interface CategoryRepositoryPort {
      * @param ids the list of category identifiers to delete
      */
     void deleteAllById(List<CategoryId> ids);
+
+
+    /**
+     * Counts the total number of categories.
+     *
+     * @return the total count of categories
+     */
+    long count();
+
+    /**
+     * Saves multiple categories at once.
+     * Useful for batch operations.
+     *
+     * @param categories the list of categories to save
+     * @return the list of saved categories
+     */
+    List<Category> saveAll(List<Category> categories);
+
 }

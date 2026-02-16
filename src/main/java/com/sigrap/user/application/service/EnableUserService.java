@@ -1,5 +1,7 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
+
 import com.sigrap.user.application.port.in.EnableUserUseCase;
 import com.sigrap.user.domain.model.User;
 import com.sigrap.user.domain.model.UserId;
@@ -25,7 +27,7 @@ public class EnableUserService implements EnableUserUseCase {
     public User enable(Long id) {
         UserId userId = new UserId(id);
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User with ID " + id + " not found"));
         
         user.enable();
         return userRepository.save(user);

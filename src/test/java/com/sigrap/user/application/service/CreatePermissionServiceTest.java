@@ -1,5 +1,7 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+
 import com.sigrap.user.application.port.in.command.CreatePermissionCommand;
 import com.sigrap.user.domain.model.Permission;
 import com.sigrap.user.domain.model.PermissionId;
@@ -22,12 +24,15 @@ class CreatePermissionServiceTest {
     @Mock
     private PermissionRepositoryPort permissionRepository;
     
+        @Mock
+    private EventPublisherPort eventPublisher;
+
     @InjectMocks
     private CreatePermissionService createPermissionService;
     
     @BeforeEach
     void setUp() {
-        reset(permissionRepository);
+        reset(permissionRepository, eventPublisher);
     }
     
     @Test
@@ -130,3 +135,4 @@ class CreatePermissionServiceTest {
         verify(permissionRepository, never()).save(any(Permission.class));
     }
 }
+

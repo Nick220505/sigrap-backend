@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +52,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn saleReturn = new SaleReturn(
             new SaleReturnNumber("RET-2024-001"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Defective product",
             new BigDecimal("50.00"),
             "Customer requested refund"
@@ -66,7 +66,7 @@ class SaleReturnPersistenceAdapterTest {
         assertNotNull(saved.getId());
         assertEquals("RET-2024-001", saved.getReturnNumber().value());
         assertEquals(1L, saved.getSaleId().value());
-        assertEquals(LocalDate.of(2024, 1, 15), saved.getReturnDate());
+        assertEquals(LocalDateTime.of(2024, 1, 15, 0, 0), saved.getReturnDate());
         assertEquals("Defective product", saved.getReason());
         assertEquals(0, new BigDecimal("50.00").compareTo(saved.getRefundAmount()));
         assertEquals("Customer requested refund", saved.getNotes());
@@ -81,7 +81,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn saleReturn = new SaleReturn(
             new SaleReturnNumber("RET-2024-002"),
             new SaleId(2L),
-            LocalDate.of(2024, 1, 20),
+            LocalDateTime.of(2024, 1, 20, 0, 0),
             "Wrong item",
             new BigDecimal("75.00"),
             "Original notes"
@@ -116,7 +116,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn saleReturn = new SaleReturn(
             new SaleReturnNumber("RET-2024-003"),
             new SaleId(3L),
-            LocalDate.of(2024, 1, 25),
+            LocalDateTime.of(2024, 1, 25, 0, 0),
             "Damaged",
             new BigDecimal("100.00"),
             "Test return"
@@ -151,7 +151,7 @@ class SaleReturnPersistenceAdapterTest {
         adapter.save(new SaleReturn(
             new SaleReturnNumber("RET-001"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
             "Reason 1",
             new BigDecimal("50.00"),
             "Return 1"
@@ -159,7 +159,7 @@ class SaleReturnPersistenceAdapterTest {
         adapter.save(new SaleReturn(
             new SaleReturnNumber("RET-002"),
             new SaleId(2L),
-            LocalDate.of(2024, 1, 2),
+            LocalDateTime.of(2024, 1, 2, 0, 0),
             "Reason 2",
             new BigDecimal("75.00"),
             "Return 2"
@@ -167,7 +167,7 @@ class SaleReturnPersistenceAdapterTest {
         adapter.save(new SaleReturn(
             new SaleReturnNumber("RET-003"),
             new SaleId(3L),
-            LocalDate.of(2024, 1, 3),
+            LocalDateTime.of(2024, 1, 3, 0, 0),
             "Reason 3",
             new BigDecimal("100.00"),
             null
@@ -203,7 +203,7 @@ class SaleReturnPersistenceAdapterTest {
         adapter.save(new SaleReturn(
             new SaleReturnNumber("RET-S1-001"),
             saleId1,
-            LocalDate.of(2024, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
             "Reason 1",
             new BigDecimal("50.00"),
             "Sale 1 return 1"
@@ -211,7 +211,7 @@ class SaleReturnPersistenceAdapterTest {
         adapter.save(new SaleReturn(
             new SaleReturnNumber("RET-S1-002"),
             saleId1,
-            LocalDate.of(2024, 1, 2),
+            LocalDateTime.of(2024, 1, 2, 0, 0),
             "Reason 2",
             new BigDecimal("75.00"),
             "Sale 1 return 2"
@@ -219,7 +219,7 @@ class SaleReturnPersistenceAdapterTest {
         adapter.save(new SaleReturn(
             new SaleReturnNumber("RET-S2-001"),
             saleId2,
-            LocalDate.of(2024, 1, 3),
+            LocalDateTime.of(2024, 1, 3, 0, 0),
             "Reason 3",
             new BigDecimal("100.00"),
             "Sale 2 return 1"
@@ -256,7 +256,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn pending1 = adapter.save(new SaleReturn(
             new SaleReturnNumber("RET-PENDING-001"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
             "Reason 1",
             new BigDecimal("50.00"),
             "Pending return 1"
@@ -265,7 +265,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn pending2 = adapter.save(new SaleReturn(
             new SaleReturnNumber("RET-PENDING-002"),
             new SaleId(2L),
-            LocalDate.of(2024, 1, 2),
+            LocalDateTime.of(2024, 1, 2, 0, 0),
             "Reason 2",
             new BigDecimal("75.00"),
             "Pending return 2"
@@ -304,7 +304,7 @@ class SaleReturnPersistenceAdapterTest {
         adapter.save(new SaleReturn(
             new SaleReturnNumber("RET-001"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
             "Reason",
             new BigDecimal("50.00"),
             "Pending return"
@@ -324,7 +324,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn saleReturn = new SaleReturn(
             new SaleReturnNumber("RET-TEMP"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
             "Reason",
             new BigDecimal("50.00"),
             "Temporary return"
@@ -346,7 +346,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn saleReturn = new SaleReturn(
             new SaleReturnNumber("RET-TEST"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
             "Reason",
             new BigDecimal("50.00"),
             "Test return"
@@ -366,7 +366,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn saleReturn = new SaleReturn(
             new SaleReturnNumber("RET-NO-NOTES"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
             "Reason",
             new BigDecimal("50.00"),
             null
@@ -388,7 +388,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn saleReturn = new SaleReturn(
             new SaleReturnNumber("RET-COMPLETE"),
             new SaleId(5L),
-            LocalDate.of(2024, 3, 15),
+            LocalDateTime.of(2024, 3, 15, 0, 0),
             "Complete reason",
             new BigDecimal("150.50"),
             "Complete return with all fields"
@@ -419,7 +419,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn saleReturn = adapter.save(new SaleReturn(
             new SaleReturnNumber("RET-STATUS-TEST"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
             "Reason",
             new BigDecimal("50.00"),
             "Status transition test"
@@ -464,7 +464,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn saleReturn = adapter.save(new SaleReturn(
             new SaleReturnNumber("RET-REJECT-TEST"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
             "Reason",
             new BigDecimal("50.00"),
             "To be rejected"
@@ -500,7 +500,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn saleReturn = new SaleReturn(
             new SaleReturnNumber("RET-LARGE"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
             "Reason",
             new BigDecimal("999999.99"),
             "Large refund amount"
@@ -518,7 +518,7 @@ class SaleReturnPersistenceAdapterTest {
     @Test
     void shouldHandleFutureDates() {
         // Given
-        LocalDate futureDate = LocalDate.now().plusDays(30);
+        LocalDateTime futureDate = LocalDateTime.now().plusDays(30);
         
         SaleReturn saleReturn = new SaleReturn(
             new SaleReturnNumber("RET-FUTURE"),
@@ -553,7 +553,7 @@ class SaleReturnPersistenceAdapterTest {
             SaleReturn saleReturn = new SaleReturn(
                 new SaleReturnNumber("RET-REASON-" + i),
                 new SaleId(1L),
-                LocalDate.of(2024, 1, 1),
+                LocalDateTime.of(2024, 1, 1, 0, 0),
                 reasons[i],
                 new BigDecimal("50.00"),
                 "Return reason test"
@@ -576,7 +576,7 @@ class SaleReturnPersistenceAdapterTest {
             adapter.save(new SaleReturn(
                 new SaleReturnNumber("RET-MULTI-" + i),
                 saleId,
-                LocalDate.of(2024, 1, i),
+                LocalDateTime.of(2024, 1, i, 0, 0),
                 "Reason " + i,
                 new BigDecimal("50.00"),
                 "Return " + i
@@ -597,7 +597,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn saleReturn = new SaleReturn(
             new SaleReturnNumber("RET-ZERO"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
             "Exchange only",
             BigDecimal.ZERO,
             "No refund, exchange only"
@@ -616,7 +616,7 @@ class SaleReturnPersistenceAdapterTest {
         SaleReturn saleReturn = new SaleReturn(
             new SaleReturnNumber("RET-DECIMAL"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 1),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
             "Reason",
             new BigDecimal("123.45"),
             "Decimal refund amount"

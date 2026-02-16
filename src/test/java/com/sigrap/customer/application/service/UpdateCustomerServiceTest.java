@@ -1,5 +1,6 @@
 package com.sigrap.customer.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
 import com.sigrap.customer.application.port.in.command.UpdateCustomerCommand;
 import com.sigrap.customer.domain.model.*;
 import com.sigrap.customer.domain.port.CustomerRepositoryPort;
@@ -26,6 +27,9 @@ class UpdateCustomerServiceTest {
     
     @Mock
     private CustomerRepositoryPort customerRepository;
+    
+    @Mock
+    private EventPublisherPort eventPublisher;
     
     @InjectMocks
     private UpdateCustomerService updateCustomerService;

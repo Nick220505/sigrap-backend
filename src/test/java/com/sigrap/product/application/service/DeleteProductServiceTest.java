@@ -1,5 +1,6 @@
 package com.sigrap.product.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
 import com.sigrap.category.domain.model.CategoryId;
 import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.product.domain.model.*;
@@ -27,6 +28,9 @@ class DeleteProductServiceTest {
     
     @Mock
     private ProductRepositoryPort productRepository;
+    
+    @Mock
+    private EventPublisherPort eventPublisher;
     
     @InjectMocks
     private DeleteProductService deleteProductService;

@@ -1,5 +1,7 @@
 package com.sigrap.customer.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+
 import com.sigrap.customer.domain.model.*;
 import com.sigrap.customer.domain.port.CustomerRepositoryPort;
 import com.sigrap.exception.ResourceNotFoundException;
@@ -27,6 +29,9 @@ class DeleteCustomerServiceTest {
     @Mock
     private CustomerRepositoryPort customerRepository;
     
+        @Mock
+    private EventPublisherPort eventPublisher;
+
     @InjectMocks
     private DeleteCustomerService deleteCustomerService;
     
@@ -34,7 +39,7 @@ class DeleteCustomerServiceTest {
     
     @BeforeEach
     void setUp() {
-        reset(customerRepository);
+        reset(customerRepository, eventPublisher);
         
         testCustomer = new Customer(
             new CustomerId(1L),
@@ -151,3 +156,4 @@ class DeleteCustomerServiceTest {
         verify(customerRepository).deleteAllById(ids);
     }
 }
+

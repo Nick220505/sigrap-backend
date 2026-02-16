@@ -1,7 +1,9 @@
 package com.sigrap.config;
 
-import com.sigrap.user.UserRepository;
-import com.sigrap.user.UserRole;
+import com.sigrap.user.domain.model.Role;
+import com.sigrap.user.domain.model.User;
+import com.sigrap.user.domain.model.UserEmail;
+import com.sigrap.user.domain.port.UserRepositoryPort;
 import java.io.Serializable;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CustomPermissionEvaluator implements PermissionEvaluator {
 
-  private final UserRepository userRepository;
+  private final UserRepositoryPort userRepository;
 
   /**
    * Evaluates if the authenticated user has permission to perform an action on a target object.
@@ -33,7 +35,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
    * while specific permissions for employees are determined by the hasResourcePermission method.
    *
    * @param authentication The authentication object containing the user's credentials
-   * @param targetDomainObject The target domain object to check permissions against
+   * @param targetDomainObject The target domain object to check permissions against (can be a String resource name)
    * @param permission The permission to check for (e.g., "READ", "WRITE")
    * @return true if the user has the permission, false otherwise
    */
@@ -50,7 +52,10 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     }
 
     String username = authentication.getName();
-    String resource = targetDomainObject.getClass().getSimpleName();
+    // Handle both String resource names and actual domain objects
+    String resource = targetDomainObject instanceof String 
+        ? (String) targetDomainObject 
+        : targetDomainObject.getClass().getSimpleName();
     String action = permission.toString();
 
     return hasResourcePermission(username, resource, action);
@@ -106,13 +111,15 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     String action
   ) {
     return userRepository
-      .findByEmail(username)
+      .findByEmail(new UserEmail(username))
       .map(user -> {
-        if (user.getRole() == UserRole.ADMINISTRATOR) {
+        // Check if user has ADMINISTRATOR role
+        if (hasRoleByName(user, "ADMINISTRATOR")) {
           return true;
         }
 
-        if (user.getRole() == UserRole.EMPLOYEE) {
+        // Check if user has EMPLOYEE role
+        if (hasRoleByName(user, "EMPLOYEE")) {
           if (action.equalsIgnoreCase("READ")) {
             return true;
           }
@@ -138,6 +145,18 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return false;
       })
       .orElse(false);
+  }
+
+  /**
+   * Helper method to check if a user has a role with a specific name.
+   *
+   * @param user The user to check
+   * @param roleName The role name to check for
+   * @return true if the user has the role, false otherwise
+   */
+  private boolean hasRoleByName(User user, String roleName) {
+    return user.getRoles().stream()
+      .anyMatch(role -> role.getName().value().equalsIgnoreCase(roleName));
   }
 
   /**

@@ -1,5 +1,6 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.user.domain.model.User;
 import com.sigrap.user.domain.model.UserEmail;
 import com.sigrap.user.domain.model.UserId;
@@ -68,8 +69,8 @@ class EnableUserServiceTest {
         when(userRepository.findById(any(UserId.class))).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> enableUserService.enable(999L)
         );
         

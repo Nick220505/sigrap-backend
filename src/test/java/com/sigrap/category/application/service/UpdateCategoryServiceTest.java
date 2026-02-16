@@ -1,10 +1,12 @@
 package com.sigrap.category.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
 import com.sigrap.category.application.port.in.command.UpdateCategoryCommand;
 import com.sigrap.category.domain.model.Category;
 import com.sigrap.category.domain.model.CategoryId;
 import com.sigrap.category.domain.model.CategoryName;
 import com.sigrap.category.domain.port.CategoryRepositoryPort;
+import com.sigrap.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +38,9 @@ class UpdateCategoryServiceTest {
     
     @Mock
     private CategoryRepositoryPort categoryRepository;
+    
+    @Mock
+    private EventPublisherPort eventPublisher;
     
     @InjectMocks
     private UpdateCategoryService updateCategoryService;
@@ -144,8 +149,8 @@ class UpdateCategoryServiceTest {
         when(categoryRepository.findById(nonExistentId)).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> updateCategoryService.update(nonExistentId, command),
             "Should throw exception when category not found"
         );

@@ -1,5 +1,7 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
+
 import com.sigrap.user.application.port.in.DeletePermissionUseCase;
 import com.sigrap.user.domain.model.PermissionId;
 import com.sigrap.user.domain.port.PermissionRepositoryPort;
@@ -26,7 +28,7 @@ public class DeletePermissionService implements DeletePermissionUseCase {
         
         // Verify permission exists before deletion
         if (!permissionRepository.findById(permissionId).isPresent()) {
-            throw new IllegalArgumentException("Permission with ID " + id + " not found");
+            throw new ResourceNotFoundException("Permission with ID " + id + " not found");
         }
         
         permissionRepository.deleteById(permissionId);

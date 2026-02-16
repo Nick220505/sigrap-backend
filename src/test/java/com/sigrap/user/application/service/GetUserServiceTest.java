@@ -1,5 +1,6 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.user.domain.model.User;
 import com.sigrap.user.domain.model.UserEmail;
 import com.sigrap.user.domain.model.UserId;
@@ -70,8 +71,8 @@ class GetUserServiceTest {
         when(userRepository.findById(any(UserId.class))).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> getUserService.getById(999L)
         );
         
@@ -102,8 +103,8 @@ class GetUserServiceTest {
         when(userRepository.findByUsername(any(Username.class))).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> getUserService.getByUsername("nonexistent")
         );
         
@@ -134,8 +135,8 @@ class GetUserServiceTest {
         when(userRepository.findByEmail(any(UserEmail.class))).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> getUserService.getByEmail("nonexistent@example.com")
         );
         

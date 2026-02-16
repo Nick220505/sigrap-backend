@@ -148,4 +148,31 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
     public void deleteById(UserId id) {
         jpaRepository.deleteById(id.value());
     }
+
+    /**
+     * Counts the total number of users.
+     *
+     * @return the total count of users
+     */
+    @Override
+    public long count() {
+        return jpaRepository.count();
+    }
+
+    /**
+     * Saves multiple users at once.
+     *
+     * @param users the list of users to save
+     * @return the list of saved users
+     */
+    @Override
+    public List<User> saveAll(List<User> users) {
+        List<UserJpaEntity> entities = users.stream()
+                .map(mapper::toJpaEntity)
+                .toList();
+        List<UserJpaEntity> savedEntities = jpaRepository.saveAll(entities);
+        return savedEntities.stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }

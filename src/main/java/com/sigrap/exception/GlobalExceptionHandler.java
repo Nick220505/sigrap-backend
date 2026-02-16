@@ -12,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
@@ -134,7 +135,7 @@ public class GlobalExceptionHandler {
 
   /**
    * Handles illegal argument exceptions.
-   * Returns 409 CONFLICT for email conflicts, 400 BAD_REQUEST for others.
+   * Returns 409 CONFLICT for email conflicts, 404 NOT_FOUND for "not found" messages, 400 BAD_REQUEST for others.
    */
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(
@@ -143,7 +144,37 @@ public class GlobalExceptionHandler {
     if (ex.getMessage().contains("Email already exists")) {
       return createErrorResponse(HttpStatus.CONFLICT, "Email already exists");
     }
+    if (ex.getMessage().contains("not found")) {
+      return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
     return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+  }
+
+  /**
+   * Handles illegal state exceptions.
+   * Returns 400 BAD_REQUEST status.
+   */
+  @ExceptionHandler(IllegalStateException.class)
+  public ResponseEntity<Map<String, Object>> handleIllegalStateException(
+    IllegalStateException ex
+  ) {
+    return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+  }
+
+  /**
+   * Handles method argument type mismatch exceptions (e.g., invalid enum values).
+   * Returns 400 BAD_REQUEST status.
+   */
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<Map<String, Object>> handleMethodArgumentTypeMismatch(
+    MethodArgumentTypeMismatchException ex
+  ) {
+    String message = String.format(
+      "Invalid value '%s' for parameter '%s'",
+      ex.getValue(),
+      ex.getName()
+    );
+    return createErrorResponse(HttpStatus.BAD_REQUEST, message);
   }
 
   /**

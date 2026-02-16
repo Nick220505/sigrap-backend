@@ -1,18 +1,19 @@
 /**
  * Authentication and authorization package for SIGRAP.
  *
- * <p>This package handles all security-related functionality including:
+ * <p>This package follows hexagonal architecture with clear separation between:
  * <ul>
- *   <li>User authentication via JWT tokens</li>
- *   <li>Security filters and configurations</li>
- *   <li>Login and registration endpoints</li>
+ *   <li>Domain layer - Core authentication models and ports</li>
+ *   <li>Application layer - Authentication use cases</li>
+ *   <li>Infrastructure layer - JWT adapters, REST controllers, and security filters</li>
  * </ul></p>
  *
  * <p>Key components:
  * <ul>
- *   <li>{@link com.sigrap.auth.AuthService} - Core authentication service</li>
- *   <li>{@link com.sigrap.auth.JwtUtil} - JWT token generation and validation</li>
- *   <li>{@link com.sigrap.auth.JwtAuthenticationFilter} - Security filter for JWT processing</li>
+ *   <li>{@link com.sigrap.auth.application.service.AuthenticateUserService} - Core authentication service</li>
+ *   <li>{@link com.sigrap.auth.infrastructure.adapter.out.jwt.JwtUtil} - JWT token generation and validation</li>
+ *   <li>{@link com.sigrap.auth.infrastructure.adapter.in.security.JwtAuthenticationFilter} - Security filter for JWT processing</li>
+ *   <li>{@link com.sigrap.auth.infrastructure.adapter.out.security.UserDetailsServiceAdapter} - Spring Security integration</li>
  * </ul></p>
  */
 package com.sigrap.auth;

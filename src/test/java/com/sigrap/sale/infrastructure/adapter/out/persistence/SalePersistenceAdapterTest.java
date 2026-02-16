@@ -4,6 +4,7 @@ import com.sigrap.sale.domain.model.Sale;
 import com.sigrap.sale.domain.model.SaleId;
 import com.sigrap.sale.domain.model.SaleNumber;
 import com.sigrap.sale.domain.model.SaleStatus;
+import com.sigrap.sale.domain.model.PaymentMethod;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,8 +53,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-2024-001"),
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            "CASH",
+            LocalDateTime.of(2024, 1, 15, 10, 0),
+            PaymentMethod.CASH,
             "Test sale"
         );
 
@@ -66,8 +67,8 @@ class SalePersistenceAdapterTest {
         assertEquals("SALE-2024-001", saved.getSaleNumber().value());
         assertEquals(1L, saved.getCustomerId());
         assertEquals(1L, saved.getEmployeeId());
-        assertEquals(LocalDate.of(2024, 1, 15), saved.getSaleDate());
-        assertEquals("CASH", saved.getPaymentMethod());
+        assertEquals(LocalDateTime.of(2024, 1, 15, 10, 0), saved.getSaleDate());
+        assertEquals(PaymentMethod.CASH, saved.getPaymentMethod());
         assertEquals("Test sale", saved.getNotes());
         assertEquals(SaleStatus.PENDING, saved.getStatus());
         assertEquals(0, BigDecimal.ZERO.compareTo(saved.getTotalAmount()));
@@ -82,8 +83,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-2024-002"),
             2L,
             2L,
-            LocalDate.of(2024, 1, 20),
-            "CREDIT_CARD",
+            LocalDateTime.of(2024, 1, 20, 10, 0),
+            PaymentMethod.CREDIT_CARD,
             "Original notes"
         );
         Sale saved = adapter.save(sale);
@@ -95,9 +96,9 @@ class SalePersistenceAdapterTest {
             saved.getCustomerId(),
             saved.getEmployeeId(),
             saved.getSaleDate(),
-            SaleStatus.COMPLETED,
-            "DEBIT_CARD",
             new BigDecimal("150.00"),
+            PaymentMethod.DEBIT_CARD,
+            SaleStatus.COMPLETED,
             "Updated notes",
             saved.getCreatedAt(),
             saved.getUpdatedAt()
@@ -107,7 +108,7 @@ class SalePersistenceAdapterTest {
         // Then
         assertNotNull(result);
         assertEquals(saved.getId(), result.getId());
-        assertEquals("DEBIT_CARD", result.getPaymentMethod());
+        assertEquals(PaymentMethod.DEBIT_CARD, result.getPaymentMethod());
         assertEquals("Updated notes", result.getNotes());
         assertEquals(SaleStatus.COMPLETED, result.getStatus());
         assertEquals(0, new BigDecimal("150.00").compareTo(result.getTotalAmount()));
@@ -120,8 +121,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-2024-003"),
             3L,
             3L,
-            LocalDate.of(2024, 1, 25),
-            "CASH",
+            LocalDateTime.of(2024, 1, 25, 10, 0),
+            PaymentMethod.CASH,
             "Test sale"
         );
         Sale saved = adapter.save(sale);
@@ -155,24 +156,24 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-001"),
             1L,
             1L,
-            LocalDate.of(2024, 1, 1),
-            "CASH",
+            LocalDateTime.of(2024, 1, 1, 10, 0),
+            PaymentMethod.CASH,
             "Sale 1"
         ));
         adapter.save(new Sale(
             new SaleNumber("SALE-002"),
             2L,
             2L,
-            LocalDate.of(2024, 1, 2),
-            "CREDIT_CARD",
+            LocalDateTime.of(2024, 1, 2, 10, 0),
+            PaymentMethod.CREDIT_CARD,
             "Sale 2"
         ));
         adapter.save(new Sale(
             new SaleNumber("SALE-003"),
             3L,
             3L,
-            LocalDate.of(2024, 1, 3),
-            "DEBIT_CARD",
+            LocalDateTime.of(2024, 1, 3, 10, 0),
+            PaymentMethod.DEBIT_CARD,
             null
         ));
 
@@ -207,24 +208,24 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-C1-001"),
             customerId1,
             1L,
-            LocalDate.of(2024, 1, 1),
-            "CASH",
+            LocalDateTime.of(2024, 1, 1, 10, 0),
+            PaymentMethod.CASH,
             "Customer 1 sale 1"
         ));
         adapter.save(new Sale(
             new SaleNumber("SALE-C1-002"),
             customerId1,
             1L,
-            LocalDate.of(2024, 1, 2),
-            "CREDIT_CARD",
+            LocalDateTime.of(2024, 1, 2, 10, 0),
+            PaymentMethod.CREDIT_CARD,
             "Customer 1 sale 2"
         ));
         adapter.save(new Sale(
             new SaleNumber("SALE-C2-001"),
             customerId2,
             2L,
-            LocalDate.of(2024, 1, 3),
-            "CASH",
+            LocalDateTime.of(2024, 1, 3, 10, 0),
+            PaymentMethod.CASH,
             "Customer 2 sale 1"
         ));
 
@@ -260,8 +261,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-PENDING-001"),
             1L,
             1L,
-            LocalDate.of(2024, 1, 1),
-            "CASH",
+            LocalDateTime.of(2024, 1, 1, 10, 0),
+            PaymentMethod.CASH,
             "Pending sale 1"
         ));
         
@@ -269,8 +270,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-PENDING-002"),
             2L,
             2L,
-            LocalDate.of(2024, 1, 2),
-            "CREDIT_CARD",
+            LocalDateTime.of(2024, 1, 2, 10, 0),
+            PaymentMethod.CREDIT_CARD,
             "Pending sale 2"
         ));
         
@@ -281,9 +282,9 @@ class SalePersistenceAdapterTest {
             pending1.getCustomerId(),
             pending1.getEmployeeId(),
             pending1.getSaleDate(),
-            SaleStatus.COMPLETED,
-            pending1.getPaymentMethod(),
             pending1.getTotalAmount(),
+            pending1.getPaymentMethod(),
+            SaleStatus.COMPLETED,
             pending1.getNotes(),
             pending1.getCreatedAt(),
             pending1.getUpdatedAt()
@@ -309,8 +310,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-001"),
             1L,
             1L,
-            LocalDate.of(2024, 1, 1),
-            "CASH",
+            LocalDateTime.of(2024, 1, 1, 10, 0),
+            PaymentMethod.CASH,
             "Pending sale"
         ));
 
@@ -329,8 +330,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-TEMP"),
             1L,
             1L,
-            LocalDate.of(2024, 1, 1),
-            "CASH",
+            LocalDateTime.of(2024, 1, 1, 10, 0),
+            PaymentMethod.CASH,
             "Temporary sale"
         );
         Sale saved = adapter.save(sale);
@@ -351,8 +352,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-TEST"),
             1L,
             1L,
-            LocalDate.of(2024, 1, 1),
-            "CASH",
+            LocalDateTime.of(2024, 1, 1, 10, 0),
+            PaymentMethod.CASH,
             "Test sale"
         );
 
@@ -371,8 +372,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-NO-NOTES"),
             1L,
             1L,
-            LocalDate.of(2024, 1, 1),
-            "CASH",
+            LocalDateTime.of(2024, 1, 1, 10, 0),
+            PaymentMethod.CASH,
             null
         );
 
@@ -393,8 +394,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-COMPLETE"),
             5L,
             5L,
-            LocalDate.of(2024, 3, 15),
-            "CREDIT_CARD",
+            LocalDateTime.of(2024, 3, 15, 10, 0),
+            PaymentMethod.CREDIT_CARD,
             "Complete sale with all fields"
         );
 
@@ -425,8 +426,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-STATUS-TEST"),
             1L,
             1L,
-            LocalDate.of(2024, 1, 1),
-            "CASH",
+            LocalDateTime.of(2024, 1, 1, 10, 0),
+            PaymentMethod.CASH,
             "Status transition test"
         ));
 
@@ -437,9 +438,9 @@ class SalePersistenceAdapterTest {
             sale.getCustomerId(),
             sale.getEmployeeId(),
             sale.getSaleDate(),
-            SaleStatus.COMPLETED,
-            sale.getPaymentMethod(),
             sale.getTotalAmount(),
+            sale.getPaymentMethod(),
+            SaleStatus.COMPLETED,
             sale.getNotes(),
             sale.getCreatedAt(),
             sale.getUpdatedAt()
@@ -454,9 +455,9 @@ class SalePersistenceAdapterTest {
             savedCompleted.getCustomerId(),
             savedCompleted.getEmployeeId(),
             savedCompleted.getSaleDate(),
-            SaleStatus.CANCELLED,
-            savedCompleted.getPaymentMethod(),
             savedCompleted.getTotalAmount(),
+            savedCompleted.getPaymentMethod(),
+            SaleStatus.CANCELLED,
             savedCompleted.getNotes(),
             savedCompleted.getCreatedAt(),
             savedCompleted.getUpdatedAt()
@@ -472,8 +473,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-CANCEL-TEST"),
             1L,
             1L,
-            LocalDate.of(2024, 1, 1),
-            "CASH",
+            LocalDateTime.of(2024, 1, 1, 10, 0),
+            PaymentMethod.CASH,
             "To be cancelled"
         ));
 
@@ -484,9 +485,9 @@ class SalePersistenceAdapterTest {
             sale.getCustomerId(),
             sale.getEmployeeId(),
             sale.getSaleDate(),
-            SaleStatus.CANCELLED,
-            sale.getPaymentMethod(),
             sale.getTotalAmount(),
+            sale.getPaymentMethod(),
+            SaleStatus.CANCELLED,
             sale.getNotes(),
             sale.getCreatedAt(),
             sale.getUpdatedAt()
@@ -509,8 +510,8 @@ class SalePersistenceAdapterTest {
             new SaleNumber("SALE-LARGE"),
             1L,
             1L,
-            LocalDate.of(2024, 1, 1),
-            "CREDIT_CARD",
+            LocalDateTime.of(2024, 1, 1, 10, 0),
+            PaymentMethod.CREDIT_CARD,
             "Large amount sale"
         );
         Sale saved = adapter.save(sale);
@@ -522,9 +523,9 @@ class SalePersistenceAdapterTest {
             saved.getCustomerId(),
             saved.getEmployeeId(),
             saved.getSaleDate(),
-            saved.getStatus(),
-            saved.getPaymentMethod(),
             new BigDecimal("999999.99"),
+            saved.getPaymentMethod(),
+            saved.getStatus(),
             saved.getNotes(),
             saved.getCreatedAt(),
             saved.getUpdatedAt()
@@ -542,14 +543,14 @@ class SalePersistenceAdapterTest {
     @Test
     void shouldHandleFutureDates() {
         // Given
-        LocalDate futureDate = LocalDate.now().plusDays(30);
+        LocalDateTime futureDate = LocalDateTime.now().plusDays(30);
         
         Sale sale = new Sale(
             new SaleNumber("SALE-FUTURE"),
             1L,
             1L,
             futureDate,
-            "CASH",
+            PaymentMethod.CASH,
             "Future dated sale"
         );
 
@@ -565,14 +566,14 @@ class SalePersistenceAdapterTest {
     @Test
     void shouldHandleDifferentPaymentMethods() {
         // Given
-        String[] paymentMethods = {"CASH", "CREDIT_CARD", "DEBIT_CARD", "BANK_TRANSFER", "CHECK"};
+        PaymentMethod[] paymentMethods = {PaymentMethod.CASH, PaymentMethod.CREDIT_CARD, PaymentMethod.DEBIT_CARD, PaymentMethod.BANK_TRANSFER, PaymentMethod.OTHER};
         
         for (int i = 0; i < paymentMethods.length; i++) {
             Sale sale = new Sale(
                 new SaleNumber("SALE-PM-" + i),
                 1L,
                 1L,
-                LocalDate.of(2024, 1, 1),
+                LocalDateTime.of(2024, 1, 1, 10, 0),
                 paymentMethods[i],
                 "Payment method test"
             );
@@ -595,8 +596,8 @@ class SalePersistenceAdapterTest {
                 new SaleNumber("SALE-MULTI-" + i),
                 customerId,
                 1L,
-                LocalDate.of(2024, 1, i),
-                "CASH",
+                LocalDateTime.of(2024, 1, i, 10, 0),
+                PaymentMethod.CASH,
                 "Sale " + i
             ));
         }

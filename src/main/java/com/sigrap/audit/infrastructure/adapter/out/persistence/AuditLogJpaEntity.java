@@ -2,7 +2,6 @@ package com.sigrap.audit.infrastructure.adapter.out.persistence;
 
 import com.sigrap.audit.domain.model.AuditAction;
 import com.sigrap.audit.domain.model.AuditStatus;
-import com.sigrap.audit.domain.model.EntityType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,9 +44,8 @@ public class AuditLogJpaEntity {
     @Column(nullable = false, length = 50)
     private AuditAction action;
     
-    @Enumerated(EnumType.STRING)
     @Column(name = "entity_type", nullable = false, length = 50)
-    private EntityType entityType;
+    private String entityType;
     
     @Column(name = "entity_id", length = 100)
     private String entityId;

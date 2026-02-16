@@ -1,6 +1,7 @@
 package com.sigrap.supplier.infrastructure.adapter.in.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sigrap.exception.GlobalExceptionHandler;
 import com.sigrap.supplier.application.port.in.*;
 import com.sigrap.supplier.application.port.in.command.CreateSupplierCommand;
 import com.sigrap.supplier.application.port.in.command.UpdateSupplierCommand;
@@ -61,7 +62,9 @@ class SupplierControllerTest {
             responseMapper
         );
 
-        mockMvc = standaloneSetup(controller).build();
+        mockMvc = standaloneSetup(controller)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
 
         testSupplier = new Supplier(
             new SupplierId(1L),
@@ -181,7 +184,7 @@ class SupplierControllerTest {
 
         // When & Then
         mockMvc.perform(get("/api/v2/suppliers/999"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isNotFound());
 
         verify(getSupplierUseCase).getById(any(SupplierId.class));
     }
@@ -331,7 +334,7 @@ class SupplierControllerTest {
         mockMvc.perform(put("/api/v2/suppliers/999")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isNotFound());
 
         verify(updateSupplierUseCase).update(any(SupplierId.class), any(UpdateSupplierCommand.class));
     }
@@ -356,7 +359,7 @@ class SupplierControllerTest {
 
         // When & Then
         mockMvc.perform(delete("/api/v2/suppliers/999"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isNotFound());
 
         verify(deleteSupplierUseCase).delete(any(SupplierId.class));
     }

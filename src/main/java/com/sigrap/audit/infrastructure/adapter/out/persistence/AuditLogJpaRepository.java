@@ -1,6 +1,5 @@
 package com.sigrap.audit.infrastructure.adapter.out.persistence;
 
-import com.sigrap.audit.domain.model.EntityType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -30,11 +29,11 @@ public interface AuditLogJpaRepository extends JpaRepository<AuditLogJpaEntity, 
     /**
      * Finds audit logs by entity type and ID.
      * 
-     * @param entityType The entity type
+     * @param entityType The entity type as a string
      * @param entityId The entity ID
      * @return List of audit log entities
      */
-    List<AuditLogJpaEntity> findByEntityTypeAndEntityId(EntityType entityType, String entityId);
+    List<AuditLogJpaEntity> findByEntityTypeAndEntityId(String entityType, String entityId);
     
     /**
      * Finds audit logs within a time range.

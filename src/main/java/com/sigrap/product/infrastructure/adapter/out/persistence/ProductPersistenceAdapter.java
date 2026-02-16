@@ -141,4 +141,31 @@ public class ProductPersistenceAdapter implements ProductRepositoryPort {
         // Delete one by one to ensure proper transaction handling
         longIds.forEach(jpaRepository::deleteById);
     }
+
+    /**
+     * Counts the total number of products.
+     *
+     * @return the total count of products
+     */
+    @Override
+    public long count() {
+        return jpaRepository.count();
+    }
+
+    /**
+     * Saves multiple products at once.
+     *
+     * @param products the list of products to save
+     * @return the list of saved products
+     */
+    @Override
+    public List<Product> saveAll(List<Product> products) {
+        List<ProductJpaEntity> entities = products.stream()
+                .map(mapper::toJpaEntity)
+                .toList();
+        List<ProductJpaEntity> savedEntities = jpaRepository.saveAll(entities);
+        return savedEntities.stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }

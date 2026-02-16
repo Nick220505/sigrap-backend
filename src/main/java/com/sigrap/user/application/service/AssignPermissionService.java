@@ -1,5 +1,7 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
+
 import com.sigrap.user.application.port.in.AssignPermissionUseCase;
 import com.sigrap.user.domain.model.Permission;
 import com.sigrap.user.domain.model.PermissionId;
@@ -32,10 +34,10 @@ public class AssignPermissionService implements AssignPermissionUseCase {
         PermissionId permissionIdObj = new PermissionId(permissionId);
         
         Role role = roleRepository.findById(roleIdObj)
-            .orElseThrow(() -> new IllegalArgumentException("Role with ID " + roleId + " not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Role with ID " + roleId + " not found"));
         
         Permission permission = permissionRepository.findById(permissionIdObj)
-            .orElseThrow(() -> new IllegalArgumentException("Permission with ID " + permissionId + " not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Permission with ID " + permissionId + " not found"));
         
         role.addPermission(permission);
         return roleRepository.save(role);

@@ -113,4 +113,31 @@ public class CategoryPersistenceAdapter implements CategoryRepositoryPort {
                 .toList();
         jpaRepository.deleteAllById(longIds);
     }
+
+    /**
+     * Counts the total number of categories.
+     *
+     * @return the total count of categories
+     */
+    @Override
+    public long count() {
+        return jpaRepository.count();
+    }
+
+    /**
+     * Saves multiple categories at once.
+     *
+     * @param categories the list of categories to save
+     * @return the list of saved categories
+     */
+    @Override
+    public List<Category> saveAll(List<Category> categories) {
+        List<CategoryJpaEntity> entities = categories.stream()
+                .map(mapper::toJpaEntity)
+                .toList();
+        List<CategoryJpaEntity> savedEntities = jpaRepository.saveAll(entities);
+        return savedEntities.stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }

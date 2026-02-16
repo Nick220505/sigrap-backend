@@ -1,8 +1,12 @@
 package com.sigrap.config;
 
-import com.sigrap.user.User;
-import com.sigrap.user.UserRepository;
-import com.sigrap.user.UserRole;
+import com.sigrap.user.domain.model.Permission;
+import com.sigrap.user.domain.model.PermissionName;
+import com.sigrap.user.domain.model.Role;
+import com.sigrap.user.domain.model.RoleName;
+import com.sigrap.user.domain.model.User;
+import com.sigrap.user.domain.model.UserEmail;
+import com.sigrap.user.domain.port.UserRepositoryPort;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -17,7 +21,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SecurityUtils {
 
-  private final UserRepository userRepository;
+  private final UserRepositoryPort userRepository;
 
   /**
    * Gets the current authentication object from the security context.
@@ -46,7 +50,7 @@ public class SecurityUtils {
   public Optional<User> getCurrentUser() {
     String username = getCurrentUsername();
     return username != null
-      ? userRepository.findByEmail(username)
+      ? userRepository.findByEmail(new UserEmail(username))
       : Optional.empty();
   }
 
@@ -61,13 +65,16 @@ public class SecurityUtils {
   }
 
   /**
-   * Checks if the current user has the specified role.
+   * Checks if the current user has the specified role by role name.
    *
-   * @param role The role to check
+   * @param roleName The role name to check
    * @return true if the user has the role, false otherwise
    */
-  public boolean hasRole(UserRole role) {
-    return getCurrentUser().map(user -> user.getRole() == role).orElse(false);
+  public boolean hasRole(String roleName) {
+    return getCurrentUser()
+      .map(user -> user.getRoles().stream()
+        .anyMatch(role -> role.getName().value().equalsIgnoreCase(roleName)))
+      .orElse(false);
   }
 
   /**
@@ -79,7 +86,7 @@ public class SecurityUtils {
    */
   public boolean isOwner(Long entityId, Long userId) {
     return getCurrentUser()
-      .map(user -> user.getId().equals(userId))
+      .map(user -> user.getId() != null && user.getId().value().equals(userId))
       .orElse(false);
   }
 
@@ -96,11 +103,19 @@ public class SecurityUtils {
   public boolean hasPermission(String resource, String action) {
     return getCurrentUser()
       .map(user -> {
-        if (user.getRole() == UserRole.ADMINISTRATOR) {
+        // Check if user has ADMINISTRATOR role
+        boolean isAdmin = user.getRoles().stream()
+          .anyMatch(role -> role.getName().value().equalsIgnoreCase("ADMINISTRATOR"));
+        
+        if (isAdmin) {
           return true;
         }
 
-        if (user.getRole() == UserRole.EMPLOYEE) {
+        // Check if user has EMPLOYEE role
+        boolean isEmployee = user.getRoles().stream()
+          .anyMatch(role -> role.getName().value().equalsIgnoreCase("EMPLOYEE"));
+        
+        if (isEmployee) {
           if (action.equalsIgnoreCase("READ")) {
             return true;
           }

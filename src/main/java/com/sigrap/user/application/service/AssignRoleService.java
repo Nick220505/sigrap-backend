@@ -1,5 +1,7 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
+
 import com.sigrap.user.application.port.in.AssignRoleUseCase;
 import com.sigrap.user.domain.model.Role;
 import com.sigrap.user.domain.model.RoleId;
@@ -32,10 +34,10 @@ public class AssignRoleService implements AssignRoleUseCase {
         RoleId roleIdObj = new RoleId(roleId);
         
         User user = userRepository.findById(userIdObj)
-            .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User with ID " + userId + " not found"));
         
         Role role = roleRepository.findById(roleIdObj)
-            .orElseThrow(() -> new IllegalArgumentException("Role with ID " + roleId + " not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Role with ID " + roleId + " not found"));
         
         user.addRole(role);
         return userRepository.save(user);

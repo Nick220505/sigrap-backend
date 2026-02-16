@@ -47,7 +47,7 @@ public class RoleControllerIntegrationTest extends BaseIntegrationTest {
 
         testPermission = new Permission(
             new PermissionName("READ_USERS"),
-            "Read users permission",
+            
             "USER",
             "READ"
         );
@@ -151,7 +151,7 @@ public class RoleControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void shouldRemovePermissionFromRole() throws Exception {
-        testRole.assignPermission(testPermission);
+        testRole.addPermission(testPermission);
         roleRepository.save(testRole);
 
         mockMvc.perform(delete("/api/v2/roles/{roleId}/permissions/{permissionId}",

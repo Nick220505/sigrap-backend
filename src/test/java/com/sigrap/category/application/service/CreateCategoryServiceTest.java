@@ -1,5 +1,6 @@
 package com.sigrap.category.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
 import com.sigrap.category.application.port.in.command.CreateCategoryCommand;
 import com.sigrap.category.domain.model.Category;
 import com.sigrap.category.domain.model.CategoryId;
@@ -34,13 +35,16 @@ class CreateCategoryServiceTest {
     @Mock
     private CategoryRepositoryPort categoryRepository;
     
+    @Mock
+    private EventPublisherPort eventPublisher;
+    
     @InjectMocks
     private CreateCategoryService createCategoryService;
     
     @BeforeEach
     void setUp() {
         // Reset mocks before each test
-        reset(categoryRepository);
+        reset(categoryRepository, eventPublisher);
     }
     
     @Test

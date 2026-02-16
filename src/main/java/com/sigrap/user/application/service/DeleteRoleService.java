@@ -1,5 +1,7 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
+
 import com.sigrap.user.application.port.in.DeleteRoleUseCase;
 import com.sigrap.user.domain.model.RoleId;
 import com.sigrap.user.domain.port.RoleRepositoryPort;
@@ -26,7 +28,7 @@ public class DeleteRoleService implements DeleteRoleUseCase {
         
         // Verify role exists before deletion
         if (!roleRepository.findById(roleId).isPresent()) {
-            throw new IllegalArgumentException("Role with ID " + id + " not found");
+            throw new ResourceNotFoundException("Role with ID " + id + " not found");
         }
         
         roleRepository.deleteById(roleId);

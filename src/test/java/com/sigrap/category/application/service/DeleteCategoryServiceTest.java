@@ -1,9 +1,11 @@
 package com.sigrap.category.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
 import com.sigrap.category.domain.model.Category;
 import com.sigrap.category.domain.model.CategoryId;
 import com.sigrap.category.domain.model.CategoryName;
 import com.sigrap.category.domain.port.CategoryRepositoryPort;
+import com.sigrap.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,13 +39,16 @@ class DeleteCategoryServiceTest {
     @Mock
     private CategoryRepositoryPort categoryRepository;
     
+    @Mock
+    private EventPublisherPort eventPublisher;
+    
     @InjectMocks
     private DeleteCategoryService deleteCategoryService;
     
     @BeforeEach
     void setUp() {
         // Reset mocks before each test
-        reset(categoryRepository);
+        reset(categoryRepository, eventPublisher);
     }
     
     @Test
@@ -77,8 +82,8 @@ class DeleteCategoryServiceTest {
         when(categoryRepository.findById(id)).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> deleteCategoryService.delete(id),
             "Should throw exception when category is not found"
         );
@@ -140,8 +145,8 @@ class DeleteCategoryServiceTest {
         when(categoryRepository.findById(id2)).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> deleteCategoryService.deleteAll(ids),
             "Should throw exception when any category is not found"
         );

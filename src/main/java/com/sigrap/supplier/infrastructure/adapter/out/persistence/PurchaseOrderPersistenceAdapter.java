@@ -119,6 +119,33 @@ public class PurchaseOrderPersistenceAdapter implements PurchaseOrderRepositoryP
     }
 
     /**
+     * Counts the total number of purchase orders.
+     *
+     * @return the total count of purchase orders
+     */
+    @Override
+    public long count() {
+        return jpaRepository.count();
+    }
+
+    /**
+     * Saves multiple purchase orders at once.
+     *
+     * @param purchaseOrders the list of purchase orders to save
+     * @return the list of saved purchase orders
+     */
+    @Override
+    public List<PurchaseOrder> saveAll(List<PurchaseOrder> purchaseOrders) {
+        List<PurchaseOrderJpaEntity> entities = purchaseOrders.stream()
+                .map(mapper::toJpaEntity)
+                .toList();
+        List<PurchaseOrderJpaEntity> savedEntities = jpaRepository.saveAll(entities);
+        return savedEntities.stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    /**
      * Helper method to map domain status to JPA status.
      *
      * @param status the domain status

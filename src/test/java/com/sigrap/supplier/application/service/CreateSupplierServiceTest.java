@@ -1,5 +1,7 @@
 package com.sigrap.supplier.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+
 import com.sigrap.supplier.application.port.in.command.CreateSupplierCommand;
 import com.sigrap.supplier.domain.model.Supplier;
 import com.sigrap.supplier.domain.model.SupplierEmail;
@@ -23,6 +25,9 @@ class CreateSupplierServiceTest {
     @Mock
     private SupplierRepositoryPort supplierRepository;
     
+    @Mock
+    private EventPublisherPort eventPublisher;
+
     @InjectMocks
     private CreateSupplierService createSupplierService;
     
@@ -231,3 +236,4 @@ class CreateSupplierServiceTest {
         verify(supplierRepository).save(any(Supplier.class));
     }
 }
+

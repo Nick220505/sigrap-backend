@@ -70,4 +70,22 @@ public interface PurchaseOrderRepositoryPort {
      * @param id the purchase order identifier
      */
     void deleteById(PurchaseOrderId id);
+
+
+    /**
+     * Counts the total number of purchase orders.
+     *
+     * @return the total count of purchase orders
+     */
+    long count();
+
+    /**
+     * Saves multiple purchase orders at once.
+     * Useful for batch operations.
+     *
+     * @param purchaseOrders the list of purchase orders to save
+     * @return the list of saved purchase orders
+     */
+    List<PurchaseOrder> saveAll(List<PurchaseOrder> purchaseOrders);
+
 }

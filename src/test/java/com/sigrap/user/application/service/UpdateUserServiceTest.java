@@ -1,5 +1,6 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.user.application.port.in.command.UpdateUserCommand;
 import com.sigrap.user.application.port.out.PasswordHasherPort;
 import com.sigrap.user.domain.model.User;
@@ -128,8 +129,8 @@ class UpdateUserServiceTest {
         when(userRepository.findById(any(UserId.class))).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> updateUserService.update(999L, command)
         );
         

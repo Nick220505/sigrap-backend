@@ -1,6 +1,7 @@
 package com.sigrap.sale.infrastructure.adapter.in.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sigrap.exception.GlobalExceptionHandler;
 import com.sigrap.sale.application.port.in.*;
 import com.sigrap.sale.application.port.in.command.CreateSaleCommand;
 import com.sigrap.sale.application.port.in.command.UpdateSaleCommand;
@@ -70,17 +71,19 @@ class SaleControllerTest {
             responseMapper
         );
 
-        mockMvc = standaloneSetup(controller).build();
+        mockMvc = standaloneSetup(controller)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
 
         testSale = new Sale(
             new SaleId(1L),
             new SaleNumber("SALE-2024-001"),
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            SaleStatus.PENDING,
-            "CASH",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             new BigDecimal("150.00"),
+            PaymentMethod.CASH,
+            SaleStatus.PENDING,
             "Test sale",
             LocalDateTime.of(2024, 1, 15, 10, 0),
             LocalDateTime.of(2024, 1, 15, 10, 0)
@@ -91,10 +94,10 @@ class SaleControllerTest {
             "SALE-2024-001",
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            "PENDING",
-            "CASH",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             new BigDecimal("150.00"),
+            PaymentMethod.CASH,
+            SaleStatus.PENDING,
             "Test sale",
             LocalDateTime.of(2024, 1, 15, 10, 0),
             LocalDateTime.of(2024, 1, 15, 10, 0)
@@ -108,8 +111,8 @@ class SaleControllerTest {
             "SALE-2024-001",
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            "CASH",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
+            PaymentMethod.CASH,
             "Test sale"
         );
 
@@ -140,8 +143,8 @@ class SaleControllerTest {
             "",
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            "CASH",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
+            PaymentMethod.CASH,
             "Test sale"
         );
 
@@ -179,7 +182,7 @@ class SaleControllerTest {
 
         // When & Then
         mockMvc.perform(get("/api/v2/sales/999"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isNotFound()); // 404 for "not found" messages
 
         verify(getSaleUseCase).getById(any(SaleId.class));
     }
@@ -192,10 +195,10 @@ class SaleControllerTest {
             new SaleNumber("SALE-2024-002"),
             2L,
             2L,
-            LocalDate.of(2024, 1, 20),
-            SaleStatus.COMPLETED,
-            "CREDIT_CARD",
+            LocalDateTime.of(2024, 1, 20, 0, 0),
             new BigDecimal("200.00"),
+            PaymentMethod.CREDIT_CARD,
+            SaleStatus.COMPLETED,
             "Second sale",
             LocalDateTime.of(2024, 1, 20, 10, 0),
             LocalDateTime.of(2024, 1, 20, 10, 0)
@@ -206,10 +209,10 @@ class SaleControllerTest {
             "SALE-2024-002",
             2L,
             2L,
-            LocalDate.of(2024, 1, 20),
-            "COMPLETED",
-            "CREDIT_CARD",
+            LocalDateTime.of(2024, 1, 20, 0, 0),
             new BigDecimal("200.00"),
+            PaymentMethod.CREDIT_CARD,
+            SaleStatus.COMPLETED,
             "Second sale",
             LocalDateTime.of(2024, 1, 20, 10, 0),
             LocalDateTime.of(2024, 1, 20, 10, 0)
@@ -296,7 +299,7 @@ class SaleControllerTest {
     void shouldUpdateSale() throws Exception {
         // Given
         UpdateSaleRequest request = new UpdateSaleRequest(
-            "DEBIT_CARD",
+            PaymentMethod.DEBIT_CARD,
             "Updated notes"
         );
 
@@ -306,9 +309,9 @@ class SaleControllerTest {
             testSale.getCustomerId(),
             testSale.getEmployeeId(),
             testSale.getSaleDate(),
-            testSale.getStatus(),
-            "DEBIT_CARD",
             testSale.getTotalAmount(),
+            PaymentMethod.DEBIT_CARD,
+            testSale.getStatus(),
             "Updated notes",
             testSale.getCreatedAt(),
             LocalDateTime.of(2024, 1, 16, 10, 0)
@@ -319,10 +322,10 @@ class SaleControllerTest {
             "SALE-2024-001",
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            "PENDING",
-            "DEBIT_CARD",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             new BigDecimal("150.00"),
+            PaymentMethod.DEBIT_CARD,
+            SaleStatus.PENDING,
             "Updated notes",
             LocalDateTime.of(2024, 1, 15, 10, 0),
             LocalDateTime.of(2024, 1, 16, 10, 0)
@@ -353,9 +356,9 @@ class SaleControllerTest {
             testSale.getCustomerId(),
             testSale.getEmployeeId(),
             testSale.getSaleDate(),
-            SaleStatus.COMPLETED,
-            testSale.getPaymentMethod(),
             testSale.getTotalAmount(),
+            testSale.getPaymentMethod(),
+            SaleStatus.COMPLETED,
             testSale.getNotes(),
             testSale.getCreatedAt(),
             LocalDateTime.of(2024, 1, 16, 10, 0)
@@ -366,10 +369,10 @@ class SaleControllerTest {
             "SALE-2024-001",
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            "COMPLETED",
-            "CASH",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             new BigDecimal("150.00"),
+            PaymentMethod.CASH,
+            SaleStatus.COMPLETED,
             "Test sale",
             LocalDateTime.of(2024, 1, 15, 10, 0),
             LocalDateTime.of(2024, 1, 16, 10, 0)
@@ -409,9 +412,9 @@ class SaleControllerTest {
             testSale.getCustomerId(),
             testSale.getEmployeeId(),
             testSale.getSaleDate(),
-            SaleStatus.CANCELLED,
-            testSale.getPaymentMethod(),
             testSale.getTotalAmount(),
+            testSale.getPaymentMethod(),
+            SaleStatus.CANCELLED,
             testSale.getNotes(),
             testSale.getCreatedAt(),
             LocalDateTime.of(2024, 1, 16, 10, 0)
@@ -422,10 +425,10 @@ class SaleControllerTest {
             "SALE-2024-001",
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            "CANCELLED",
-            "CASH",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             new BigDecimal("150.00"),
+            PaymentMethod.CASH,
+            SaleStatus.CANCELLED,
             "Test sale",
             LocalDateTime.of(2024, 1, 15, 10, 0),
             LocalDateTime.of(2024, 1, 16, 10, 0)
@@ -476,7 +479,7 @@ class SaleControllerTest {
 
         // When & Then
         mockMvc.perform(delete("/api/v2/sales/999"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isNotFound()); // 404 for "not found" messages
 
         verify(deleteSaleUseCase).delete(any(SaleId.class));
     }
@@ -488,8 +491,8 @@ class SaleControllerTest {
             "SALE-2024-MIN",
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            "CASH",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
+            PaymentMethod.CASH,
             null
         );
 
@@ -498,10 +501,10 @@ class SaleControllerTest {
             new SaleNumber("SALE-2024-MIN"),
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            SaleStatus.PENDING,
-            "CASH",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             BigDecimal.ZERO,
+            PaymentMethod.CASH,
+            SaleStatus.PENDING,
             null,
             LocalDateTime.of(2024, 1, 15, 10, 0),
             LocalDateTime.of(2024, 1, 15, 10, 0)
@@ -512,10 +515,10 @@ class SaleControllerTest {
             "SALE-2024-MIN",
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            "PENDING",
-            "CASH",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             BigDecimal.ZERO,
+            PaymentMethod.CASH,
+            SaleStatus.PENDING,
             null,
             LocalDateTime.of(2024, 1, 15, 10, 0),
             LocalDateTime.of(2024, 1, 15, 10, 0)
@@ -544,8 +547,8 @@ class SaleControllerTest {
             longSaleNumber,
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            "CASH",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
+            PaymentMethod.CASH,
             "Test sale"
         );
 
@@ -566,8 +569,8 @@ class SaleControllerTest {
             "SALE-2024-001",
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            "CASH",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
+            PaymentMethod.CASH,
             longNotes
         );
 
@@ -613,8 +616,8 @@ class SaleControllerTest {
                 "SALE-PM-" + paymentMethod,
                 1L,
                 1L,
-                LocalDate.of(2024, 1, 15),
-                paymentMethod,
+                LocalDateTime.of(2024, 1, 15, 0, 0),
+                PaymentMethod.valueOf(paymentMethod),
                 "Payment method test"
             );
 
@@ -623,10 +626,10 @@ class SaleControllerTest {
                 new SaleNumber("SALE-PM-" + paymentMethod),
                 1L,
                 1L,
-                LocalDate.of(2024, 1, 15),
-                SaleStatus.PENDING,
-                paymentMethod,
+                LocalDateTime.of(2024, 1, 15, 0, 0),
                 BigDecimal.ZERO,
+                PaymentMethod.valueOf(paymentMethod),
+                SaleStatus.PENDING,
                 "Payment method test",
                 LocalDateTime.of(2024, 1, 15, 10, 0),
                 LocalDateTime.of(2024, 1, 15, 10, 0)
@@ -637,10 +640,10 @@ class SaleControllerTest {
                 "SALE-PM-" + paymentMethod,
                 1L,
                 1L,
-                LocalDate.of(2024, 1, 15),
-                "PENDING",
-                paymentMethod,
+                LocalDateTime.of(2024, 1, 15, 0, 0),
                 BigDecimal.ZERO,
+                PaymentMethod.valueOf(paymentMethod),
+                SaleStatus.PENDING,
                 "Payment method test",
                 LocalDateTime.of(2024, 1, 15, 10, 0),
                 LocalDateTime.of(2024, 1, 15, 10, 0)
@@ -676,7 +679,7 @@ class SaleControllerTest {
     void shouldUpdateSaleWithNullNotes() throws Exception {
         // Given
         UpdateSaleRequest request = new UpdateSaleRequest(
-            "CREDIT_CARD",
+            PaymentMethod.CREDIT_CARD,
             null
         );
 
@@ -686,9 +689,9 @@ class SaleControllerTest {
             testSale.getCustomerId(),
             testSale.getEmployeeId(),
             testSale.getSaleDate(),
-            testSale.getStatus(),
-            "CREDIT_CARD",
             testSale.getTotalAmount(),
+            PaymentMethod.CREDIT_CARD,
+            testSale.getStatus(),
             null,
             testSale.getCreatedAt(),
             LocalDateTime.of(2024, 1, 16, 10, 0)
@@ -699,10 +702,10 @@ class SaleControllerTest {
             "SALE-2024-001",
             1L,
             1L,
-            LocalDate.of(2024, 1, 15),
-            "PENDING",
-            "CREDIT_CARD",
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             new BigDecimal("150.00"),
+            PaymentMethod.CREDIT_CARD,
+            SaleStatus.PENDING,
             null,
             LocalDateTime.of(2024, 1, 15, 10, 0),
             LocalDateTime.of(2024, 1, 16, 10, 0)

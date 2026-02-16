@@ -55,6 +55,11 @@ public class DeleteCustomerService implements DeleteCustomerUseCase {
     
     @Override
     public void deleteAll(List<CustomerId> ids) {
+        if (ids == null || ids.isEmpty()) {
+            customerRepository.deleteAllById(List.of());
+            return;
+        }
+        
         long startTime = System.currentTimeMillis();
         
         for (CustomerId id : ids) {

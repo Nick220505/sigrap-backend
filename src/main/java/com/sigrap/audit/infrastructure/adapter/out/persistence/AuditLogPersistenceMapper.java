@@ -22,6 +22,7 @@ public interface AuditLogPersistenceMapper {
      * @return The JPA entity
      */
     @Mapping(target = "id", source = "id", qualifiedByName = "auditLogIdToLong")
+    @Mapping(target = "entityType", source = "entityType", qualifiedByName = "entityTypeToString")
     AuditLogJpaEntity toJpaEntity(AuditLog auditLog);
     
     /**
@@ -42,7 +43,7 @@ public interface AuditLogPersistenceMapper {
             id,
             entity.getUsername(),
             entity.getAction(),
-            entity.getEntityType(),
+            stringToEntityType(entity.getEntityType()),
             entity.getEntityId(),
             entity.getTimestamp(),
             entity.getSourceIp(),
@@ -73,5 +74,27 @@ public interface AuditLogPersistenceMapper {
     @Named("longToAuditLogId")
     default AuditLogId longToAuditLogId(Long id) {
         return id != null ? new AuditLogId(id) : null;
+    }
+    
+    /**
+     * Converts an EntityType to a String for JPA persistence.
+     * 
+     * @param entityType The entity type
+     * @return The String value, or null if entityType is null
+     */
+    @Named("entityTypeToString")
+    default String entityTypeToString(com.sigrap.audit.domain.model.EntityType entityType) {
+        return entityType != null ? entityType.value() : null;
+    }
+    
+    /**
+     * Converts a String to an EntityType.
+     * 
+     * @param value The String value
+     * @return The EntityType, or null if value is null
+     */
+    @Named("stringToEntityType")
+    default com.sigrap.audit.domain.model.EntityType stringToEntityType(String value) {
+        return value != null ? new com.sigrap.audit.domain.model.EntityType(value) : null;
     }
 }

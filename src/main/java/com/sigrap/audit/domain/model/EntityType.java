@@ -24,4 +24,6 @@ public record EntityType(String value) {
     public static final EntityType USER = new EntityType("User");
     public static final EntityType PURCHASE_ORDER = new EntityType("PurchaseOrder");
     public static final EntityType SALE_RETURN = new EntityType("SaleReturn");
+    public static final EntityType ATTENDANCE = new EntityType("Attendance");
+    public static final EntityType SCHEDULE = new EntityType("Schedule");
 }

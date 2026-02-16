@@ -1,6 +1,10 @@
 package com.sigrap.product.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+import com.sigrap.category.domain.model.Category;
 import com.sigrap.category.domain.model.CategoryId;
+import com.sigrap.category.domain.model.CategoryName;
+import com.sigrap.category.domain.port.CategoryRepositoryPort;
 import com.sigrap.product.application.port.in.command.CreateProductCommand;
 import com.sigrap.product.domain.model.*;
 import com.sigrap.product.domain.port.ProductRepositoryPort;
@@ -12,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +32,12 @@ class CreateProductServiceTest {
     @Mock
     private ProductRepositoryPort productRepository;
     
+    @Mock
+    private CategoryRepositoryPort categoryRepository;
+    
+    @Mock
+    private EventPublisherPort eventPublisher;
+
     @InjectMocks
     private CreateProductService createProductService;
     
@@ -44,6 +55,7 @@ class CreateProductServiceTest {
         );
         
         when(productRepository.existsByName(any(ProductName.class))).thenReturn(false);
+        when(categoryRepository.findById(new CategoryId(1L))).thenReturn(Optional.of(createTestCategory(1L)));
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
             Product product = invocation.getArgument(0);
             return new Product(
@@ -195,5 +207,15 @@ class CreateProductServiceTest {
         // When/Then
         assertThrows(IllegalArgumentException.class, () -> createProductService.create(command));
         verify(productRepository, never()).save(any(Product.class));
+    }
+    
+    private Category createTestCategory(Long id) {
+        return new Category(
+            new CategoryId(id),
+            new CategoryName("Test Category"),
+            "Test Description",
+            LocalDateTime.now(),
+            LocalDateTime.now()
+        );
     }
 }

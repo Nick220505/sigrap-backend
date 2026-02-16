@@ -1,5 +1,7 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
+
 import com.sigrap.user.application.port.in.UpdateUserUseCase;
 import com.sigrap.user.application.port.in.command.UpdateUserCommand;
 import com.sigrap.user.application.port.out.PasswordHasherPort;
@@ -30,7 +32,7 @@ public class UpdateUserService implements UpdateUserUseCase {
     public User update(Long id, UpdateUserCommand command) {
         UserId userId = new UserId(id);
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User with ID " + id + " not found"));
         
         // Update email if provided
         if (command.email() != null && !command.email().isBlank()) {

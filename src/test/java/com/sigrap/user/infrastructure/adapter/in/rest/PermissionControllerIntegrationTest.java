@@ -36,7 +36,6 @@ public class PermissionControllerIntegrationTest extends BaseIntegrationTest {
     void setUp() {
         testPermission = new Permission(
             new PermissionName("READ_USERS"),
-            "Read users permission",
             "USER",
             "READ"
         );
@@ -89,18 +88,20 @@ public class PermissionControllerIntegrationTest extends BaseIntegrationTest {
     void shouldGetPermissionsByResource() throws Exception {
         Permission permission2 = new Permission(
             new PermissionName("WRITE_USERS"),
-            "Write users permission",
+            
             "USER",
             "WRITE"
         );
-        permissionRepository.save(permission2);
+        permission2 = permissionRepository.save(permission2);
 
         mockMvc.perform(get("/api/v2/permissions/resource/{resource}", "USER"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$.length()").value(2));
 
-        permissionRepository.deleteById(permission2.getId());
+        if (permission2 != null && permission2.getId() != null) {
+            permissionRepository.deleteById(permission2.getId());
+        }
     }
 
     @Test
@@ -148,7 +149,7 @@ public class PermissionControllerIntegrationTest extends BaseIntegrationTest {
     void shouldDeletePermission() throws Exception {
         Permission permissionToDelete = new Permission(
             new PermissionName("TEMP"),
-            "Temporary permission",
+            
             "TEMP",
             "TEMP"
         );
@@ -263,13 +264,13 @@ public class PermissionControllerIntegrationTest extends BaseIntegrationTest {
     void shouldHandleMultiplePermissionsForSameResource() throws Exception {
         Permission perm2 = permissionRepository.save(new Permission(
             new PermissionName("WRITE_USERS"),
-            "Write users",
+            
             "USER",
             "WRITE"
         ));
         Permission perm3 = permissionRepository.save(new Permission(
             new PermissionName("DELETE_USERS_PERM"),
-            "Delete users",
+            
             "USER",
             "DELETE"
         ));

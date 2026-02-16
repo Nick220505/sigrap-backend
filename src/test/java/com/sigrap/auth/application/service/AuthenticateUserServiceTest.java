@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
 import com.sigrap.auth.application.port.in.command.AuthenticateUserCommand;
 import com.sigrap.auth.domain.model.AuthenticationResult;
 import com.sigrap.auth.domain.model.Email;
@@ -27,6 +28,9 @@ class AuthenticateUserServiceTest {
 
   @Mock
   private TokenGeneratorPort tokenGeneratorPort;
+
+  @Mock
+  private EventPublisherPort eventPublisher;
 
   @InjectMocks
   private AuthenticateUserService authenticateUserService;

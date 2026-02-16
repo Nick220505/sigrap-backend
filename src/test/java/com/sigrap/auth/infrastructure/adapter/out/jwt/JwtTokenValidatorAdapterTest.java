@@ -1,6 +1,6 @@
 package com.sigrap.auth.infrastructure.adapter.out.jwt;
 
-import com.sigrap.auth.JwtUtil;
+import com.sigrap.auth.infrastructure.adapter.out.jwt.JwtUtil;
 import com.sigrap.auth.domain.model.Email;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

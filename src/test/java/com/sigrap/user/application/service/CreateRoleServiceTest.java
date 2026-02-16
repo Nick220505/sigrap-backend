@@ -1,5 +1,7 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+
 import com.sigrap.user.application.port.in.command.CreateRoleCommand;
 import com.sigrap.user.domain.model.Role;
 import com.sigrap.user.domain.model.RoleId;
@@ -24,12 +26,15 @@ class CreateRoleServiceTest {
     @Mock
     private RoleRepositoryPort roleRepository;
     
+    @Mock
+    private EventPublisherPort eventPublisher;
+
     @InjectMocks
     private CreateRoleService createRoleService;
     
     @BeforeEach
     void setUp() {
-        reset(roleRepository);
+        reset(roleRepository, eventPublisher);
     }
     
     @Test
@@ -107,3 +112,4 @@ class CreateRoleServiceTest {
         verify(roleRepository).save(any(Role.class));
     }
 }
+

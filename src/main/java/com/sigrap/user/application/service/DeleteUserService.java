@@ -1,5 +1,7 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
+
 import com.sigrap.user.application.port.in.DeleteUserUseCase;
 import com.sigrap.user.domain.model.UserId;
 import com.sigrap.user.domain.port.UserRepositoryPort;
@@ -26,7 +28,7 @@ public class DeleteUserService implements DeleteUserUseCase {
         
         // Verify user exists before deletion
         if (!userRepository.findById(userId).isPresent()) {
-            throw new IllegalArgumentException("User with ID " + id + " not found");
+            throw new ResourceNotFoundException("User with ID " + id + " not found");
         }
         
         userRepository.deleteById(userId);

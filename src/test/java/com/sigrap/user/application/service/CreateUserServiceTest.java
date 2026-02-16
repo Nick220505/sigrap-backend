@@ -1,5 +1,6 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
 import com.sigrap.user.application.port.in.command.CreateUserCommand;
 import com.sigrap.user.application.port.out.PasswordHasherPort;
 import com.sigrap.user.domain.model.User;
@@ -31,12 +32,15 @@ class CreateUserServiceTest {
     @Mock
     private PasswordHasherPort passwordHasher;
     
+    @Mock
+    private EventPublisherPort eventPublisher;
+    
     @InjectMocks
     private CreateUserService createUserService;
     
     @BeforeEach
     void setUp() {
-        reset(userRepository, passwordHasher);
+        reset(userRepository, passwordHasher, eventPublisher);
     }
     
     @Test

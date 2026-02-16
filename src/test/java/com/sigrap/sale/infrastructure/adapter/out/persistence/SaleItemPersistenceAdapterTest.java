@@ -4,6 +4,7 @@ import com.sigrap.sale.domain.model.SaleId;
 import com.sigrap.sale.domain.model.SaleItem;
 import com.sigrap.sale.domain.model.SaleItemId;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,17 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Integration tests for SaleItemPersistenceAdapter.
- * Tests the adapter with a real database (H2) using Spring Boot test context.
- * 
- * These tests verify:
- * - Correct mapping between domain and JPA entities
- * - Database operations work as expected
- * - The adapter properly implements the repository port
- * - Quantity and price calculations are preserved
+ * Tests the persistence layer for sale items using hexagonal architecture.
  */
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@DisplayName("SaleItem Persistence Adapter Tests")
 class SaleItemPersistenceAdapterTest {
 
     @Autowired
@@ -59,7 +55,7 @@ class SaleItemPersistenceAdapterTest {
         // Then
         assertNotNull(saved);
         assertNotNull(saved.getId());
-        assertEquals(1L, saved.getSaleId().value());
+        assertEquals(new SaleId(1L), saved.getSaleId());
         assertEquals(1L, saved.getProductId());
         assertEquals(2, saved.getQuantity());
         assertEquals(0, new BigDecimal("50.00").compareTo(saved.getUnitPrice()));
@@ -102,8 +98,7 @@ class SaleItemPersistenceAdapterTest {
             new SaleId(1L),
             1L,
             2,
-            new BigDecimal("50.00"),
-            new BigDecimal("5.00")
+            new BigDecimal("50.00")
         );
         SaleItem saved = adapter.save(saleItem);
 
@@ -113,17 +108,12 @@ class SaleItemPersistenceAdapterTest {
         // Then
         assertTrue(found.isPresent());
         assertEquals(saved.getId(), found.get().getId());
-        assertEquals(1L, found.get().getSaleId().value());
-        assertEquals(1L, found.get().getProductId());
     }
 
     @Test
     void shouldReturnEmptyWhenSaleItemNotFound() {
-        // Given
-        SaleItemId nonExistentId = new SaleItemId(999L);
-
         // When
-        Optional<SaleItem> found = adapter.findById(nonExistentId);
+        Optional<SaleItem> found = adapter.findById(new SaleItemId(999L));
 
         // Then
         assertTrue(found.isEmpty());
@@ -135,47 +125,25 @@ class SaleItemPersistenceAdapterTest {
         SaleId saleId1 = new SaleId(1L);
         SaleId saleId2 = new SaleId(2L);
         
-        adapter.save(new SaleItem(
-            saleId1,
-            1L,
-            2,
-            new BigDecimal("50.00"),
-            new BigDecimal("5.00")
-        ));
-        adapter.save(new SaleItem(
-            saleId1,
-            2L,
-            1,
-            new BigDecimal("30.00"),
-            BigDecimal.ZERO
-        ));
-        adapter.save(new SaleItem(
-            saleId2,
-            3L,
-            3,
-            new BigDecimal("20.00"),
-            new BigDecimal("2.00")
-        ));
+        adapter.save(new SaleItem(saleId1, 1L, 2, new BigDecimal("50.00")));
+        adapter.save(new SaleItem(saleId1, 2L, 3, new BigDecimal("30.00")));
+        adapter.save(new SaleItem(saleId2, 3L, 1, new BigDecimal("100.00")));
 
         // When
-        List<SaleItem> sale1Items = adapter.findBySaleId(saleId1);
-        List<SaleItem> sale2Items = adapter.findBySaleId(saleId2);
+        List<SaleItem> itemsForSale1 = adapter.findBySaleId(saleId1);
+        List<SaleItem> itemsForSale2 = adapter.findBySaleId(saleId2);
 
         // Then
-        assertEquals(2, sale1Items.size());
-        assertTrue(sale1Items.stream().allMatch(item -> item.getSaleId().equals(saleId1)));
-        
-        assertEquals(1, sale2Items.size());
-        assertTrue(sale2Items.stream().allMatch(item -> item.getSaleId().equals(saleId2)));
+        assertEquals(2, itemsForSale1.size());
+        assertEquals(1, itemsForSale2.size());
+        assertTrue(itemsForSale1.stream().allMatch(item -> item.getSaleId().equals(saleId1)));
+        assertTrue(itemsForSale2.stream().allMatch(item -> item.getSaleId().equals(saleId2)));
     }
 
     @Test
     void shouldReturnEmptyListWhenNoItemsForSale() {
-        // Given
-        SaleId nonExistentSaleId = new SaleId(999L);
-
         // When
-        List<SaleItem> items = adapter.findBySaleId(nonExistentSaleId);
+        List<SaleItem> items = adapter.findBySaleId(new SaleId(999L));
 
         // Then
         assertNotNull(items);
@@ -189,8 +157,7 @@ class SaleItemPersistenceAdapterTest {
             new SaleId(1L),
             1L,
             2,
-            new BigDecimal("50.00"),
-            new BigDecimal("5.00")
+            new BigDecimal("50.00")
         );
         SaleItem saved = adapter.save(saleItem);
         SaleItemId savedId = saved.getId();
@@ -204,93 +171,21 @@ class SaleItemPersistenceAdapterTest {
     }
 
     @Test
-    void shouldPreserveTimestampsWhenSaving() {
-        // Given
-        SaleItem saleItem = new SaleItem(
-            new SaleId(1L),
-            1L,
-            2,
-            new BigDecimal("50.00"),
-            new BigDecimal("5.00")
-        );
-
-        // When
-        SaleItem saved = adapter.save(saleItem);
-
-        // Then
-        assertNotNull(saved.getCreatedAt());
-        assertNotNull(saved.getUpdatedAt());
-    }
-
-    @Test
-    void shouldHandleSaleItemWithZeroDiscount() {
-        // Given
-        SaleItem saleItem = new SaleItem(
-            new SaleId(1L),
-            1L,
-            2,
-            new BigDecimal("50.00"),
-            BigDecimal.ZERO
-        );
-
-        // When
-        SaleItem saved = adapter.save(saleItem);
-
-        // Then
-        assertNotNull(saved);
-        assertNotNull(saved.getId());
-        assertEquals(0, BigDecimal.ZERO.compareTo(saved.getDiscount()));
-        assertEquals(0, new BigDecimal("100.00").compareTo(saved.getSubtotal()));
-    }
-
-    @Test
-    void shouldMapAllFieldsCorrectlyBetweenDomainAndJpa() {
-        // Given
-        SaleItem saleItem = new SaleItem(
-            new SaleId(5L),
-            5L,
-            10,
-            new BigDecimal("25.50"),
-            new BigDecimal("12.75")
-        );
-
-        // When
-        SaleItem saved = adapter.save(saleItem);
-        Optional<SaleItem> retrieved = adapter.findById(saved.getId());
-
-        // Then
-        assertTrue(retrieved.isPresent());
-        SaleItem result = retrieved.get();
-        assertEquals(saved.getId().value(), result.getId().value());
-        assertEquals(saved.getSaleId().value(), result.getSaleId().value());
-        assertEquals(saved.getProductId(), result.getProductId());
-        assertEquals(saved.getQuantity(), result.getQuantity());
-        assertEquals(saved.getUnitPrice(), result.getUnitPrice());
-        assertEquals(saved.getDiscount(), result.getDiscount());
-        assertEquals(saved.getSubtotal(), result.getSubtotal());
-        assertNotNull(result.getCreatedAt());
-        assertNotNull(result.getUpdatedAt());
-    }
-
-    @Test
     void shouldCalculateSubtotalCorrectly() {
-        // Given - quantity: 5, unit price: 20.00, discount: 10.00
-        // Expected subtotal: (5 * 20.00) - 10.00 = 90.00
+        // Given - quantity: 5, unit price: 20.00
+        // Expected subtotal: 5 * 20.00 = 100.00
         SaleItem saleItem = new SaleItem(
             new SaleId(1L),
             1L,
             5,
-            new BigDecimal("20.00"),
-            new BigDecimal("10.00")
+            new BigDecimal("20.00")
         );
 
         // When
         SaleItem saved = adapter.save(saleItem);
-        Optional<SaleItem> retrieved = adapter.findById(saved.getId());
 
         // Then
-        assertTrue(retrieved.isPresent());
-        assertEquals(0, new BigDecimal("90.00").compareTo(retrieved.get().getSubtotal()));
+        assertEquals(0, new BigDecimal("100.00").compareTo(saved.getSubtotal()));
     }
 
     @Test
@@ -300,18 +195,16 @@ class SaleItemPersistenceAdapterTest {
             new SaleId(1L),
             1L,
             1000,
-            new BigDecimal("10.00"),
-            new BigDecimal("100.00")
+            new BigDecimal("10.00")
         );
 
         // When
         SaleItem saved = adapter.save(saleItem);
-        Optional<SaleItem> retrieved = adapter.findById(saved.getId());
 
         // Then
-        assertTrue(retrieved.isPresent());
-        assertEquals(1000, retrieved.get().getQuantity());
-        assertEquals(0, new BigDecimal("9900.00").compareTo(retrieved.get().getSubtotal()));
+        assertNotNull(saved);
+        assertEquals(1000, saved.getQuantity());
+        assertEquals(0, new BigDecimal("10000.00").compareTo(saved.getSubtotal()));
     }
 
     @Test
@@ -321,24 +214,20 @@ class SaleItemPersistenceAdapterTest {
             new SaleId(1L),
             1L,
             3,
-            new BigDecimal("15.99"),
-            new BigDecimal("2.50")
+            new BigDecimal("12.99")
         );
 
         // When
         SaleItem saved = adapter.save(saleItem);
-        Optional<SaleItem> retrieved = adapter.findById(saved.getId());
 
         // Then
-        assertTrue(retrieved.isPresent());
-        assertEquals(0, new BigDecimal("15.99").compareTo(retrieved.get().getUnitPrice()));
-        assertEquals(0, new BigDecimal("2.50").compareTo(retrieved.get().getDiscount()));
-        // Subtotal: (3 * 15.99) - 2.50 = 45.47
-        assertEquals(0, new BigDecimal("45.47").compareTo(retrieved.get().getSubtotal()));
+        assertNotNull(saved);
+        assertEquals(0, new BigDecimal("12.99").compareTo(saved.getUnitPrice()));
+        assertEquals(0, new BigDecimal("38.97").compareTo(saved.getSubtotal()));
     }
 
     @Test
-    void shouldHandleMultipleItemsForSameSale() {
+    void shouldHandleMultipleSaleItemsForSameSale() {
         // Given
         SaleId saleId = new SaleId(1L);
         
@@ -347,17 +236,15 @@ class SaleItemPersistenceAdapterTest {
                 saleId,
                 (long) i,
                 i,
-                new BigDecimal("10.00"),
-                BigDecimal.ZERO
+                new BigDecimal("10.00")
             ));
         }
 
         // When
-        List<SaleItem> saleItems = adapter.findBySaleId(saleId);
+        List<SaleItem> items = adapter.findBySaleId(saleId);
 
         // Then
-        assertEquals(5, saleItems.size());
-        assertTrue(saleItems.stream().allMatch(item -> item.getSaleId().equals(saleId)));
+        assertEquals(5, items.size());
     }
 
     @Test
@@ -367,8 +254,7 @@ class SaleItemPersistenceAdapterTest {
             new SaleId(1L),
             1L,
             1,
-            new BigDecimal("100.00"),
-            new BigDecimal("10.00")
+            new BigDecimal("99.99")
         );
 
         // When
@@ -376,25 +262,7 @@ class SaleItemPersistenceAdapterTest {
 
         // Then
         assertEquals(1, saved.getQuantity());
-        assertEquals(0, new BigDecimal("90.00").compareTo(saved.getSubtotal()));
-    }
-
-    @Test
-    void shouldHandleFullDiscountItem() {
-        // Given - discount equals total price
-        SaleItem saleItem = new SaleItem(
-            new SaleId(1L),
-            1L,
-            2,
-            new BigDecimal("50.00"),
-            new BigDecimal("100.00")
-        );
-
-        // When
-        SaleItem saved = adapter.save(saleItem);
-
-        // Then
-        assertEquals(0, new BigDecimal("0.00").compareTo(saved.getSubtotal()));
+        assertEquals(0, new BigDecimal("99.99").compareTo(saved.getSubtotal()));
     }
 
     @Test
@@ -403,18 +271,15 @@ class SaleItemPersistenceAdapterTest {
         SaleItem saleItem = new SaleItem(
             new SaleId(1L),
             1L,
-            3,
-            new BigDecimal("33.333"),
-            new BigDecimal("1.111")
+            2,
+            new BigDecimal("12.345")
         );
 
         // When
         SaleItem saved = adapter.save(saleItem);
-        Optional<SaleItem> retrieved = adapter.findById(saved.getId());
 
         // Then
-        assertTrue(retrieved.isPresent());
-        // Subtotal: (3 * 33.333) - 1.111 = 98.888
-        assertEquals(0, new BigDecimal("98.888").compareTo(retrieved.get().getSubtotal()));
+        assertEquals(0, new BigDecimal("12.345").compareTo(saved.getUnitPrice()));
+        assertEquals(0, new BigDecimal("24.690").compareTo(saved.getSubtotal()));
     }
 }

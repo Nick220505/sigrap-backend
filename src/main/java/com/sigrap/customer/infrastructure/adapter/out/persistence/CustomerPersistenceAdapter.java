@@ -126,4 +126,31 @@ public class CustomerPersistenceAdapter implements CustomerRepositoryPort {
                 .toList();
         jpaRepository.deleteAllById(longIds);
     }
+
+    /**
+     * Counts the total number of customers.
+     *
+     * @return the total count of customers
+     */
+    @Override
+    public long count() {
+        return jpaRepository.count();
+    }
+
+    /**
+     * Saves multiple customers at once.
+     *
+     * @param customers the list of customers to save
+     * @return the list of saved customers
+     */
+    @Override
+    public List<Customer> saveAll(List<Customer> customers) {
+        List<CustomerJpaEntity> entities = customers.stream()
+                .map(mapper::toJpaEntity)
+                .toList();
+        List<CustomerJpaEntity> savedEntities = jpaRepository.saveAll(entities);
+        return savedEntities.stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }

@@ -36,7 +36,7 @@ class PermissionPersistenceAdapterTest {
     void shouldSaveNewPermission() {
         Permission permission = new Permission(
             new PermissionName("READ_USERS"),
-            "Read users permission",
+            
             "USER",
             "READ"
         );
@@ -46,7 +46,6 @@ class PermissionPersistenceAdapterTest {
         assertNotNull(saved);
         assertNotNull(saved.getId());
         assertEquals("READ_USERS", saved.getName().value());
-        assertEquals("Read users permission", saved.getDescription());
         assertEquals("USER", saved.getResource());
         assertEquals("READ", saved.getAction());
     }
@@ -55,7 +54,7 @@ class PermissionPersistenceAdapterTest {
     void shouldUpdateExistingPermission() {
         Permission permission = new Permission(
             new PermissionName("WRITE_USERS"),
-            "Write users permission",
+            
             "USER",
             "WRITE"
         );
@@ -64,7 +63,7 @@ class PermissionPersistenceAdapterTest {
         Permission updated = new Permission(
             saved.getId(),
             new PermissionName("WRITE_USERS"),
-            "Updated write users permission",
+            
             "USER",
             "WRITE"
         );
@@ -72,14 +71,14 @@ class PermissionPersistenceAdapterTest {
 
         assertNotNull(result);
         assertEquals(saved.getId(), result.getId());
-        assertEquals("Updated write users permission", result.getDescription());
+        assertEquals("WRITE_USERS", result.getName().value());
     }
 
     @Test
     void shouldFindPermissionById() {
         Permission permission = new Permission(
             new PermissionName("DELETE_USERS"),
-            "Delete users permission",
+            
             "USER",
             "DELETE"
         );
@@ -105,7 +104,7 @@ class PermissionPersistenceAdapterTest {
     void shouldFindPermissionByName() {
         Permission permission = new Permission(
             new PermissionName("UPDATE_USERS"),
-            "Update users permission",
+            
             "USER",
             "UPDATE"
         );
@@ -128,19 +127,19 @@ class PermissionPersistenceAdapterTest {
     void shouldFindAllPermissions() {
         adapter.save(new Permission(
             new PermissionName("PERM1"),
-            "Permission 1",
+            
             "RESOURCE1",
             "ACTION1"
         ));
         adapter.save(new Permission(
             new PermissionName("PERM2"),
-            "Permission 2",
+            
             "RESOURCE2",
             "ACTION2"
         ));
         adapter.save(new Permission(
             new PermissionName("PERM3"),
-            "Permission 3",
+            
             "RESOURCE3",
             "ACTION3"
         ));
@@ -163,19 +162,19 @@ class PermissionPersistenceAdapterTest {
     void shouldFindPermissionsByResource() {
         adapter.save(new Permission(
             new PermissionName("READ_PRODUCTS"),
-            "Read products",
+            
             "PRODUCT",
             "READ"
         ));
         adapter.save(new Permission(
             new PermissionName("WRITE_PRODUCTS"),
-            "Write products",
+            
             "PRODUCT",
             "WRITE"
         ));
         adapter.save(new Permission(
             new PermissionName("READ_USERS"),
-            "Read users",
+            
             "USER",
             "READ"
         ));
@@ -200,7 +199,7 @@ class PermissionPersistenceAdapterTest {
     void shouldReturnTrueWhenPermissionNameExists() {
         adapter.save(new Permission(
             new PermissionName("EXISTING"),
-            "Existing permission",
+            
             "RESOURCE",
             "ACTION"
         ));
@@ -221,7 +220,7 @@ class PermissionPersistenceAdapterTest {
     void shouldDeletePermissionById() {
         Permission permission = new Permission(
             new PermissionName("TEMP"),
-            "Temporary permission",
+            
             "TEMP",
             "TEMP"
         );
@@ -237,7 +236,7 @@ class PermissionPersistenceAdapterTest {
     void shouldMapAllFieldsCorrectlyBetweenDomainAndJpa() {
         Permission permission = new Permission(
             new PermissionName("COMPLETE"),
-            "Complete permission description",
+            
             "COMPLETE_RESOURCE",
             "COMPLETE_ACTION"
         );
@@ -249,7 +248,6 @@ class PermissionPersistenceAdapterTest {
         Permission result = retrieved.get();
         assertEquals(saved.getId().value(), result.getId().value());
         assertEquals(saved.getName().value(), result.getName().value());
-        assertEquals(saved.getDescription(), result.getDescription());
         assertEquals(saved.getResource(), result.getResource());
         assertEquals(saved.getAction(), result.getAction());
     }
@@ -258,7 +256,7 @@ class PermissionPersistenceAdapterTest {
     void shouldEnforceUniquePermissionNameConstraint() {
         adapter.save(new Permission(
             new PermissionName("UNIQUE"),
-            "Unique permission",
+            
             "RESOURCE",
             "ACTION"
         ));
@@ -266,7 +264,7 @@ class PermissionPersistenceAdapterTest {
         assertThrows(Exception.class, () -> {
             adapter.save(new Permission(
                 new PermissionName("UNIQUE"),
-                "Another unique permission",
+                
                 "RESOURCE",
                 "ACTION"
             ));
@@ -277,7 +275,6 @@ class PermissionPersistenceAdapterTest {
     void shouldHandlePermissionWithNullDescription() {
         Permission permission = new Permission(
             new PermissionName("NODESC"),
-            null,
             "RESOURCE",
             "ACTION"
         );
@@ -287,32 +284,31 @@ class PermissionPersistenceAdapterTest {
         assertNotNull(saved);
         assertNotNull(saved.getId());
         assertEquals("NODESC", saved.getName().value());
-        assertNull(saved.getDescription());
     }
 
     @Test
     void shouldHandleMultiplePermissionsForSameResource() {
         adapter.save(new Permission(
             new PermissionName("CREATE_CATEGORY"),
-            "Create category",
+            
             "CATEGORY",
             "CREATE"
         ));
         adapter.save(new Permission(
             new PermissionName("READ_CATEGORY"),
-            "Read category",
+            
             "CATEGORY",
             "READ"
         ));
         adapter.save(new Permission(
             new PermissionName("UPDATE_CATEGORY"),
-            "Update category",
+            
             "CATEGORY",
             "UPDATE"
         ));
         adapter.save(new Permission(
             new PermissionName("DELETE_CATEGORY"),
-            "Delete category",
+            
             "CATEGORY",
             "DELETE"
         ));

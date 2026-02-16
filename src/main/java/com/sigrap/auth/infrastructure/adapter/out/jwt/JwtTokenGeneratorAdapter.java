@@ -1,6 +1,6 @@
 package com.sigrap.auth.infrastructure.adapter.out.jwt;
 
-import com.sigrap.auth.JwtUtil;
+import com.sigrap.auth.infrastructure.adapter.out.jwt.JwtUtil;
 import com.sigrap.auth.domain.model.Email;
 import com.sigrap.auth.domain.model.JwtToken;
 import com.sigrap.auth.domain.port.TokenGeneratorPort;

@@ -16,6 +16,9 @@ public record Username(String value) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Username cannot be blank");
         }
+        if (value.length() < 3) {
+            throw new IllegalArgumentException("Username must be at least 3 characters");
+        }
         if (value.length() > 100) {
             throw new IllegalArgumentException("Username cannot exceed 100 characters");
         }

@@ -1,6 +1,10 @@
 package com.sigrap.product.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+import com.sigrap.category.domain.model.Category;
 import com.sigrap.category.domain.model.CategoryId;
+import com.sigrap.category.domain.model.CategoryName;
+import com.sigrap.category.domain.port.CategoryRepositoryPort;
 import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.product.application.port.in.command.UpdateProductCommand;
 import com.sigrap.product.domain.model.*;
@@ -29,6 +33,12 @@ class UpdateProductServiceTest {
     @Mock
     private ProductRepositoryPort productRepository;
     
+    @Mock
+    private CategoryRepositoryPort categoryRepository;
+    
+    @Mock
+    private EventPublisherPort eventPublisher;
+    
     @InjectMocks
     private UpdateProductService updateProductService;
     
@@ -42,6 +52,16 @@ class UpdateProductServiceTest {
             new ProductStock(20),
             new ProductStock(5),
             new CategoryId(1L),
+            LocalDateTime.now(),
+            LocalDateTime.now()
+        );
+    }
+    
+    private Category createTestCategory(Long id) {
+        return new Category(
+            new CategoryId(id),
+            new CategoryName("Test Category"),
+            "Test Description",
             LocalDateTime.now(),
             LocalDateTime.now()
         );
@@ -64,6 +84,7 @@ class UpdateProductServiceTest {
         
         when(productRepository.findById(id)).thenReturn(Optional.of(existingProduct));
         when(productRepository.existsByNameAndIdNot(any(ProductName.class), eq(id))).thenReturn(false);
+        when(categoryRepository.findById(new CategoryId(2L))).thenReturn(Optional.of(createTestCategory(2L)));
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
         
         // When
@@ -100,6 +121,7 @@ class UpdateProductServiceTest {
         );
         
         when(productRepository.findById(id)).thenReturn(Optional.of(existingProduct));
+        when(categoryRepository.findById(new CategoryId(1L))).thenReturn(Optional.of(createTestCategory(1L)));
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
         
         // When

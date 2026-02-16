@@ -38,9 +38,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest {
         testUser = new User(
             new Username("johndoe"),
             new UserEmail("john.doe@example.com"),
-            "hashedPassword123",
-            "John",
-            "Doe"
+            "hashedPassword123"
         );
         testUser = userRepository.save(testUser);
     }
@@ -75,8 +73,6 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest {
             .andExpect(jsonPath("$.id").value(testUser.getId().value()))
             .andExpect(jsonPath("$.username").value("johndoe"))
             .andExpect(jsonPath("$.email").value("john.doe@example.com"))
-            .andExpect(jsonPath("$.firstName").value("John"))
-            .andExpect(jsonPath("$.lastName").value("Doe"))
             .andExpect(jsonPath("$.enabled").value(true));
     }
 
@@ -104,12 +100,10 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest {
         User disabledUser = new User(
             new Username("disabled"),
             new UserEmail("disabled@example.com"),
-            "password",
-            "Disabled",
-            "User"
+            "password"
         );
         disabledUser.disable();
-        userRepository.save(disabledUser);
+        disabledUser = userRepository.save(disabledUser);
 
         mockMvc.perform(get("/api/v2/users/enabled"))
             .andExpect(status().isOk())
@@ -117,7 +111,9 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest {
             .andExpect(jsonPath("$[?(@.username == 'johndoe')]").exists())
             .andExpect(jsonPath("$[?(@.username == 'disabled')]").doesNotExist());
 
-        userRepository.deleteById(disabledUser.getId());
+        if (disabledUser != null && disabledUser.getId() != null) {
+            userRepository.deleteById(disabledUser.getId());
+        }
     }
 
     @Test
@@ -184,9 +180,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest {
         User userToDelete = new User(
             new Username("deleteme"),
             new UserEmail("delete.me@example.com"),
-            "password",
-            "Delete",
-            "Me"
+            "password"
         );
         userToDelete = userRepository.save(userToDelete);
 
@@ -441,9 +435,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest {
         User anotherUser = new User(
             new Username("anotheruser"),
             new UserEmail("another@example.com"),
-            "password",
-            "Another",
-            "User"
+            "password"
         );
         anotherUser = userRepository.save(anotherUser);
 

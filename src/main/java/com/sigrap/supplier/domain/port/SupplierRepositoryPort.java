@@ -80,4 +80,22 @@ public interface SupplierRepositoryPort {
      * @param ids the list of supplier identifiers to delete
      */
     void deleteAllById(List<SupplierId> ids);
+
+
+    /**
+     * Counts the total number of suppliers.
+     *
+     * @return the total count of suppliers
+     */
+    long count();
+
+    /**
+     * Saves multiple suppliers at once.
+     * Useful for batch operations.
+     *
+     * @param suppliers the list of suppliers to save
+     * @return the list of saved suppliers
+     */
+    List<Supplier> saveAll(List<Supplier> suppliers);
+
 }

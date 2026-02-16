@@ -1,5 +1,7 @@
 package com.sigrap.customer.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+
 import com.sigrap.customer.application.port.in.command.CreateCustomerCommand;
 import com.sigrap.customer.domain.model.*;
 import com.sigrap.customer.domain.port.CustomerRepositoryPort;
@@ -34,12 +36,15 @@ class CreateCustomerServiceTest {
     @Mock
     private CustomerRepositoryPort customerRepository;
     
+        @Mock
+    private EventPublisherPort eventPublisher;
+
     @InjectMocks
     private CreateCustomerService createCustomerService;
     
     @BeforeEach
     void setUp() {
-        reset(customerRepository);
+        reset(customerRepository, eventPublisher);
     }
     
     @Test
@@ -294,3 +299,4 @@ class CreateCustomerServiceTest {
         verifyNoInteractions(customerRepository);
     }
 }
+

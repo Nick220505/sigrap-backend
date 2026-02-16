@@ -1,5 +1,6 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.user.application.port.in.GetPermissionUseCase;
 import com.sigrap.user.domain.model.Permission;
 import com.sigrap.user.domain.model.PermissionId;
@@ -27,14 +28,14 @@ public class GetPermissionService implements GetPermissionUseCase {
     public Permission getById(Long id) {
         PermissionId permissionId = new PermissionId(id);
         return permissionRepository.findById(permissionId)
-            .orElseThrow(() -> new IllegalArgumentException("Permission with ID " + id + " not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Permission with ID " + id + " not found"));
     }
     
     @Override
     public Permission getByName(String name) {
         PermissionName permissionName = new PermissionName(name);
         return permissionRepository.findByName(permissionName)
-            .orElseThrow(() -> new IllegalArgumentException("Permission with name '" + name + "' not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Permission with name '" + name + "' not found"));
     }
     
     @Override

@@ -110,7 +110,7 @@ class UserAuthenticationAdapterTest {
     void shouldThrowExceptionForIncorrectPassword() {
         // Given
         Email email = new Email("user@example.com");
-        Password password = new Password("WrongPassword!");
+        Password password = new Password("WrongPassword123!");
         Credentials credentials = new Credentials(email, password);
 
         UserJpaEntity user = createEnabledUser(email.value(), "hashedPassword");

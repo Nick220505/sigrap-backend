@@ -102,6 +102,12 @@ public class DeleteCategoryService implements DeleteCategoryUseCase {
      */
     @Override
     public void deleteAll(List<CategoryId> ids) {
+        // Handle empty list gracefully
+        if (ids == null || ids.isEmpty()) {
+            categoryRepository.deleteAllById(List.of());
+            return;
+        }
+        
         long startTime = System.currentTimeMillis();
         
         // Verify all categories exist

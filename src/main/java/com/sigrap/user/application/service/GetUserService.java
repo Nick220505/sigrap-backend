@@ -1,5 +1,6 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.user.application.port.in.GetUserUseCase;
 import com.sigrap.user.domain.model.User;
 import com.sigrap.user.domain.model.UserEmail;
@@ -28,21 +29,21 @@ public class GetUserService implements GetUserUseCase {
     public User getById(Long id) {
         UserId userId = new UserId(id);
         return userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User with ID " + id + " not found"));
     }
     
     @Override
     public User getByUsername(String username) {
         Username usernameObj = new Username(username);
         return userRepository.findByUsername(usernameObj)
-            .orElseThrow(() -> new IllegalArgumentException("User with username '" + username + "' not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User with username '" + username + "' not found"));
     }
     
     @Override
     public User getByEmail(String email) {
         UserEmail emailObj = new UserEmail(email);
         return userRepository.findByEmail(emailObj)
-            .orElseThrow(() -> new IllegalArgumentException("User with email '" + email + "' not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User with email '" + email + "' not found"));
     }
     
     @Override

@@ -1,6 +1,7 @@
 package com.sigrap.supplier.infrastructure.adapter.in.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sigrap.exception.GlobalExceptionHandler;
 import com.sigrap.supplier.application.port.in.*;
 import com.sigrap.supplier.application.port.in.command.CreatePurchaseOrderCommand;
 import com.sigrap.supplier.application.port.in.command.UpdatePurchaseOrderCommand;
@@ -73,7 +74,9 @@ class PurchaseOrderControllerTest {
             responseMapper
         );
 
-        mockMvc = standaloneSetup(controller).build();
+        mockMvc = standaloneSetup(controller)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
 
         testPurchaseOrder = new PurchaseOrder(
             new PurchaseOrderId(1L),
@@ -200,7 +203,7 @@ class PurchaseOrderControllerTest {
 
         // When & Then
         mockMvc.perform(get("/api/v2/purchase-orders/999"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isNotFound());
 
         verify(getPurchaseOrderUseCase).getById(any(PurchaseOrderId.class));
     }
@@ -547,7 +550,7 @@ class PurchaseOrderControllerTest {
 
         // When & Then
         mockMvc.perform(delete("/api/v2/purchase-orders/999"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isNotFound());
 
         verify(deletePurchaseOrderUseCase).delete(any(PurchaseOrderId.class));
     }

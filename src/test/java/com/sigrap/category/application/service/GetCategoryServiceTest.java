@@ -4,6 +4,7 @@ import com.sigrap.category.domain.model.Category;
 import com.sigrap.category.domain.model.CategoryId;
 import com.sigrap.category.domain.model.CategoryName;
 import com.sigrap.category.domain.port.CategoryRepositoryPort;
+import com.sigrap.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -85,8 +86,8 @@ class GetCategoryServiceTest {
         when(categoryRepository.findById(nonExistentId)).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> getCategoryService.getById(nonExistentId),
             "Should throw exception when category is not found"
         );

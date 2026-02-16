@@ -70,7 +70,7 @@ public class AuditLogPersistenceAdapter implements AuditLogRepositoryPort {
     @Override
     public List<AuditLog> findByEntity(EntityType entityType, String entityId) {
         log.debug("Finding audit logs by entity: {} - {}", entityType, entityId);
-        return jpaRepository.findByEntityTypeAndEntityId(entityType, entityId).stream()
+        return jpaRepository.findByEntityTypeAndEntityId(entityType.value(), entityId).stream()
                 .map(mapper::toDomain)
                 .toList();
     }

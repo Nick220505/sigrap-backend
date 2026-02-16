@@ -125,4 +125,31 @@ public class SupplierPersistenceAdapter implements SupplierRepositoryPort {
                 .toList();
         jpaRepository.deleteAllById(longIds);
     }
+
+    /**
+     * Counts the total number of suppliers.
+     *
+     * @return the total count of suppliers
+     */
+    @Override
+    public long count() {
+        return jpaRepository.count();
+    }
+
+    /**
+     * Saves multiple suppliers at once.
+     *
+     * @param suppliers the list of suppliers to save
+     * @return the list of saved suppliers
+     */
+    @Override
+    public List<Supplier> saveAll(List<Supplier> suppliers) {
+        List<SupplierJpaEntity> entities = suppliers.stream()
+                .map(mapper::toJpaEntity)
+                .toList();
+        List<SupplierJpaEntity> savedEntities = jpaRepository.saveAll(entities);
+        return savedEntities.stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }

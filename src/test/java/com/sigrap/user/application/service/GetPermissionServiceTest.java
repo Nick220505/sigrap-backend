@@ -1,5 +1,6 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.user.domain.model.Permission;
 import com.sigrap.user.domain.model.PermissionId;
 import com.sigrap.user.domain.model.PermissionName;
@@ -64,8 +65,8 @@ class GetPermissionServiceTest {
         when(permissionRepository.findById(any(PermissionId.class))).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> getPermissionService.getById(999L)
         );
         
@@ -95,8 +96,8 @@ class GetPermissionServiceTest {
         when(permissionRepository.findByName(any(PermissionName.class))).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> getPermissionService.getByName("NONEXISTENT")
         );
         

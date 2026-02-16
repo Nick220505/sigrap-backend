@@ -1,5 +1,7 @@
 package com.sigrap.sale.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+
 import com.sigrap.sale.application.port.in.command.CreateSaleCommand;
 import com.sigrap.sale.domain.model.*;
 import com.sigrap.sale.domain.port.SaleRepositoryPort;
@@ -23,12 +25,15 @@ class CreateSaleServiceTest {
     @Mock
     private SaleRepositoryPort saleRepository;
     
+        @Mock
+    private EventPublisherPort eventPublisher;
+
     @InjectMocks
     private CreateSaleService createSaleService;
     
     @BeforeEach
     void setUp() {
-        reset(saleRepository);
+        reset(saleRepository, eventPublisher);
     }
     
     @Test
@@ -154,3 +159,4 @@ class CreateSaleServiceTest {
         verifyNoInteractions(saleRepository);
     }
 }
+

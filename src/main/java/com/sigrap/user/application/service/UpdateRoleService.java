@@ -1,5 +1,7 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
+
 import com.sigrap.user.application.port.in.UpdateRoleUseCase;
 import com.sigrap.user.application.port.in.command.UpdateRoleCommand;
 import com.sigrap.user.domain.model.Role;
@@ -27,7 +29,7 @@ public class UpdateRoleService implements UpdateRoleUseCase {
     public Role update(Long id, UpdateRoleCommand command) {
         RoleId roleId = new RoleId(id);
         Role role = roleRepository.findById(roleId)
-            .orElseThrow(() -> new IllegalArgumentException("Role with ID " + id + " not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Role with ID " + id + " not found"));
         
         // Update name if provided
         if (command.name() != null && !command.name().isBlank()) {

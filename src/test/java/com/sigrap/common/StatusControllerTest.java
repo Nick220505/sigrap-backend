@@ -1,5 +1,6 @@
 package com.sigrap.common;
 
+import com.sigrap.common.infrastructure.adapter.in.rest.StatusController;
 import java.time.Instant;
 
 import org.junit.jupiter.api.BeforeEach;

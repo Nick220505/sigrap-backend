@@ -70,7 +70,6 @@ public class SaleReturnJpaEntity {
      * Current status of the return.
      * Cannot be null.
      */
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private String status;
 

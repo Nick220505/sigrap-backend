@@ -1,5 +1,6 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.user.application.port.in.GetRoleUseCase;
 import com.sigrap.user.domain.model.Role;
 import com.sigrap.user.domain.model.RoleId;
@@ -27,14 +28,14 @@ public class GetRoleService implements GetRoleUseCase {
     public Role getById(Long id) {
         RoleId roleId = new RoleId(id);
         return roleRepository.findById(roleId)
-            .orElseThrow(() -> new IllegalArgumentException("Role with ID " + id + " not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Role with ID " + id + " not found"));
     }
     
     @Override
     public Role getByName(String name) {
         RoleName roleName = new RoleName(name);
         return roleRepository.findByName(roleName)
-            .orElseThrow(() -> new IllegalArgumentException("Role with name '" + name + "' not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Role with name '" + name + "' not found"));
     }
     
     @Override

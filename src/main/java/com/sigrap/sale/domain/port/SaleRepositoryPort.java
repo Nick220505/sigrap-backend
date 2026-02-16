@@ -58,4 +58,22 @@ public interface SaleRepositoryPort {
      * @param id the sale identifier
      */
     void deleteById(SaleId id);
+
+
+    /**
+     * Counts the total number of sales.
+     *
+     * @return the total count of sales
+     */
+    long count();
+
+    /**
+     * Saves multiple sales at once.
+     * Useful for batch operations.
+     *
+     * @param sales the list of sales to save
+     * @return the list of saved sales
+     */
+    List<Sale> saveAll(List<Sale> sales);
+
 }

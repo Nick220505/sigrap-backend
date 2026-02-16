@@ -20,12 +20,9 @@ import java.util.List;
  * This is an input adapter that translates HTTP requests to use case calls.
  * It handles HTTP concerns (validation, status codes, request/response mapping)
  * and delegates business logic to use cases.
- * 
- * This controller uses the hexagonal architecture pattern and is mapped to /api/v2/products
- * to coexist with the legacy controller during migration.
  */
-@RestController("productHexagonalController")
-@RequestMapping("/api/v2/products")
+@RestController
+@RequestMapping("/api/products")
 public class ProductController {
     
     private final CreateProductUseCase createProductUseCase;

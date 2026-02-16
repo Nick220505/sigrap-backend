@@ -63,8 +63,8 @@ class RolePersistenceAdapterTest {
         Role updated = new Role(
             saved.getId(),
             new RoleName("USER"),
-            "Updated user role",
-            saved.getPermissions()
+            saved.getPermissions(),
+            "Updated user role"
         );
         Role result = adapter.save(updated);
 
@@ -169,7 +169,6 @@ class RolePersistenceAdapterTest {
     void shouldHandleRoleWithPermissions() {
         PermissionJpaEntity permEntity = new PermissionJpaEntity();
         permEntity.setName("READ_USERS");
-        permEntity.setDescription("Read users");
         permEntity.setResource("USER");
         permEntity.setAction("READ");
         permEntity = permissionJpaRepository.save(permEntity);
@@ -177,7 +176,6 @@ class RolePersistenceAdapterTest {
         Permission permission = new Permission(
             new PermissionId(permEntity.getId()),
             new PermissionName(permEntity.getName()),
-            permEntity.getDescription(),
             permEntity.getResource(),
             permEntity.getAction()
         );
@@ -186,7 +184,7 @@ class RolePersistenceAdapterTest {
             new RoleName("ADMIN"),
             "Admin with permissions"
         );
-        role.assignPermission(permission);
+        role.addPermission(permission);
         Role saved = adapter.save(role);
 
         Optional<Role> found = adapter.findById(saved.getId());

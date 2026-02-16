@@ -67,4 +67,22 @@ public interface CustomerRepositoryPort {
      * @param ids the list of customer identifiers to delete
      */
     void deleteAllById(List<CustomerId> ids);
+
+
+    /**
+     * Counts the total number of customers.
+     *
+     * @return the total count of customers
+     */
+    long count();
+
+    /**
+     * Saves multiple customers at once.
+     * Useful for batch operations.
+     *
+     * @param customers the list of customers to save
+     * @return the list of saved customers
+     */
+    List<Customer> saveAll(List<Customer> customers);
+
 }

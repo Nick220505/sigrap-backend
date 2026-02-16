@@ -1,6 +1,7 @@
 package com.sigrap.sale.infrastructure.adapter.in.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sigrap.exception.GlobalExceptionHandler;
 import com.sigrap.sale.application.port.in.*;
 import com.sigrap.sale.application.port.in.command.CreateSaleReturnCommand;
 import com.sigrap.sale.domain.model.*;
@@ -66,13 +67,15 @@ class SaleReturnControllerTest {
             responseMapper
         );
 
-        mockMvc = standaloneSetup(controller).build();
+        mockMvc = standaloneSetup(controller)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
 
         testSaleReturn = new SaleReturn(
             new SaleReturnId(1L),
             new SaleReturnNumber("RET-2024-001"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Defective product",
             SaleReturnStatus.PENDING,
             new BigDecimal("50.00"),
@@ -85,9 +88,9 @@ class SaleReturnControllerTest {
             1L,
             "RET-2024-001",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Defective product",
-            "PENDING",
+            SaleReturnStatus.PENDING,
             new BigDecimal("50.00"),
             "Test return",
             LocalDateTime.of(2024, 1, 15, 10, 0),
@@ -101,7 +104,7 @@ class SaleReturnControllerTest {
         SaleReturnRequest request = new SaleReturnRequest(
             "RET-2024-001",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Defective product",
             new BigDecimal("50.00"),
             "Test return"
@@ -133,7 +136,7 @@ class SaleReturnControllerTest {
         SaleReturnRequest request = new SaleReturnRequest(
             "",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Defective product",
             new BigDecimal("50.00"),
             "Test return"
@@ -154,7 +157,7 @@ class SaleReturnControllerTest {
         SaleReturnRequest request = new SaleReturnRequest(
             "RET-2024-001",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Defective product",
             new BigDecimal("-50.00"),
             "Test return"
@@ -194,7 +197,7 @@ class SaleReturnControllerTest {
 
         // When & Then
         mockMvc.perform(get("/api/v2/sale-returns/999"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isNotFound());
 
         verify(getSaleReturnUseCase).getById(any(SaleReturnId.class));
     }
@@ -206,7 +209,7 @@ class SaleReturnControllerTest {
             new SaleReturnId(2L),
             new SaleReturnNumber("RET-2024-002"),
             new SaleId(2L),
-            LocalDate.of(2024, 1, 20),
+            LocalDateTime.of(2024, 1, 20, 0, 0),
             "Wrong item",
             SaleReturnStatus.APPROVED,
             new BigDecimal("75.00"),
@@ -219,9 +222,9 @@ class SaleReturnControllerTest {
             2L,
             "RET-2024-002",
             2L,
-            LocalDate.of(2024, 1, 20),
+            LocalDateTime.of(2024, 1, 20, 0, 0),
             "Wrong item",
-            "APPROVED",
+            SaleReturnStatus.APPROVED,
             new BigDecimal("75.00"),
             "Second return",
             LocalDateTime.of(2024, 1, 20, 10, 0),
@@ -329,9 +332,9 @@ class SaleReturnControllerTest {
             1L,
             "RET-2024-001",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Defective product",
-            "APPROVED",
+            SaleReturnStatus.APPROVED,
             new BigDecimal("50.00"),
             "Test return",
             LocalDateTime.of(2024, 1, 15, 10, 0),
@@ -383,9 +386,9 @@ class SaleReturnControllerTest {
             1L,
             "RET-2024-001",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Defective product",
-            "REJECTED",
+            SaleReturnStatus.REJECTED,
             new BigDecimal("50.00"),
             "Test return",
             LocalDateTime.of(2024, 1, 15, 10, 0),
@@ -437,9 +440,9 @@ class SaleReturnControllerTest {
             1L,
             "RET-2024-001",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Defective product",
-            "COMPLETED",
+            SaleReturnStatus.COMPLETED,
             new BigDecimal("50.00"),
             "Test return",
             LocalDateTime.of(2024, 1, 15, 10, 0),
@@ -477,7 +480,7 @@ class SaleReturnControllerTest {
         SaleReturnRequest request = new SaleReturnRequest(
             "RET-2024-MIN",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Reason",
             new BigDecimal("50.00"),
             null
@@ -487,7 +490,7 @@ class SaleReturnControllerTest {
             new SaleReturnId(1L),
             new SaleReturnNumber("RET-2024-MIN"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Reason",
             SaleReturnStatus.PENDING,
             new BigDecimal("50.00"),
@@ -500,9 +503,9 @@ class SaleReturnControllerTest {
             1L,
             "RET-2024-MIN",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Reason",
-            "PENDING",
+            SaleReturnStatus.PENDING,
             new BigDecimal("50.00"),
             null,
             LocalDateTime.of(2024, 1, 15, 10, 0),
@@ -531,7 +534,7 @@ class SaleReturnControllerTest {
         SaleReturnRequest request = new SaleReturnRequest(
             longReturnNumber,
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Reason",
             new BigDecimal("50.00"),
             "Test return"
@@ -553,7 +556,7 @@ class SaleReturnControllerTest {
         SaleReturnRequest request = new SaleReturnRequest(
             "RET-2024-001",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             longReason,
             new BigDecimal("50.00"),
             "Test return"
@@ -575,7 +578,7 @@ class SaleReturnControllerTest {
         SaleReturnRequest request = new SaleReturnRequest(
             "RET-2024-001",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Reason",
             new BigDecimal("50.00"),
             longNotes
@@ -633,7 +636,7 @@ class SaleReturnControllerTest {
         SaleReturnRequest request = new SaleReturnRequest(
             "RET-2024-ZERO",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Exchange only",
             BigDecimal.ZERO,
             "No refund"
@@ -643,7 +646,7 @@ class SaleReturnControllerTest {
             new SaleReturnId(1L),
             new SaleReturnNumber("RET-2024-ZERO"),
             new SaleId(1L),
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Exchange only",
             SaleReturnStatus.PENDING,
             BigDecimal.ZERO,
@@ -656,9 +659,9 @@ class SaleReturnControllerTest {
             1L,
             "RET-2024-ZERO",
             1L,
-            LocalDate.of(2024, 1, 15),
+            LocalDateTime.of(2024, 1, 15, 0, 0),
             "Exchange only",
-            "PENDING",
+            SaleReturnStatus.PENDING,
             BigDecimal.ZERO,
             "No refund",
             LocalDateTime.of(2024, 1, 15, 10, 0),
@@ -693,7 +696,7 @@ class SaleReturnControllerTest {
             SaleReturnRequest request = new SaleReturnRequest(
                 "RET-REASON-" + reason.hashCode(),
                 1L,
-                LocalDate.of(2024, 1, 15),
+                LocalDateTime.of(2024, 1, 15, 0, 0),
                 reason,
                 new BigDecimal("50.00"),
                 "Return reason test"
@@ -703,7 +706,7 @@ class SaleReturnControllerTest {
                 new SaleReturnId(1L),
                 new SaleReturnNumber("RET-REASON-" + reason.hashCode()),
                 new SaleId(1L),
-                LocalDate.of(2024, 1, 15),
+                LocalDateTime.of(2024, 1, 15, 0, 0),
                 reason,
                 SaleReturnStatus.PENDING,
                 new BigDecimal("50.00"),
@@ -716,9 +719,9 @@ class SaleReturnControllerTest {
                 1L,
                 "RET-REASON-" + reason.hashCode(),
                 1L,
-                LocalDate.of(2024, 1, 15),
+                LocalDateTime.of(2024, 1, 15, 0, 0),
                 reason,
-                "PENDING",
+                SaleReturnStatus.PENDING,
                 new BigDecimal("50.00"),
                 "Return reason test",
                 LocalDateTime.of(2024, 1, 15, 10, 0),

@@ -1,5 +1,7 @@
 package com.sigrap.sale.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+
 import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.sale.application.port.in.command.CreateSaleReturnCommand;
 import com.sigrap.sale.domain.model.*;
@@ -29,6 +31,9 @@ class CreateSaleReturnServiceTest {
     @Mock
     private SaleRepositoryPort saleRepository;
     
+    @Mock
+    private EventPublisherPort eventPublisher;
+
     @InjectMocks
     private CreateSaleReturnService createSaleReturnService;
     
@@ -36,7 +41,7 @@ class CreateSaleReturnServiceTest {
     
     @BeforeEach
     void setUp() {
-        reset(saleReturnRepository, saleRepository);
+        reset(saleReturnRepository, saleRepository, eventPublisher);
         testSale = new Sale(
             new SaleId(1L),
             new SaleNumber("SALE-001"),
@@ -136,3 +141,4 @@ class CreateSaleReturnServiceTest {
         verify(saleReturnRepository, never()).save(any(SaleReturn.class));
     }
 }
+

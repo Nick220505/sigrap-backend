@@ -76,4 +76,22 @@ public interface ProductRepositoryPort {
      * @param ids the list of product identifiers to delete
      */
     void deleteAllById(List<ProductId> ids);
+
+
+    /**
+     * Counts the total number of products.
+     *
+     * @return the total count of products
+     */
+    long count();
+
+    /**
+     * Saves multiple products at once.
+     * Useful for batch operations.
+     *
+     * @param products the list of products to save
+     * @return the list of saved products
+     */
+    List<Product> saveAll(List<Product> products);
+
 }

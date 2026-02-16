@@ -102,6 +102,11 @@ public class DeleteProductService implements DeleteProductUseCase {
      */
     @Override
     public void deleteAll(List<ProductId> ids) {
+        if (ids == null || ids.isEmpty()) {
+            productRepository.deleteAllById(List.of());
+            return;
+        }
+        
         long startTime = System.currentTimeMillis();
         
         // Verify all products exist

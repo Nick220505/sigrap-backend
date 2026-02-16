@@ -43,9 +43,7 @@ class UserPersistenceAdapterTest {
         User user = new User(
             new Username("johndoe"),
             new UserEmail("john.doe@example.com"),
-            "hashedPassword123",
-            "John",
-            "Doe"
+            "hashedPassword123"
         );
 
         User saved = adapter.save(user);
@@ -54,8 +52,6 @@ class UserPersistenceAdapterTest {
         assertNotNull(saved.getId());
         assertEquals("johndoe", saved.getUsername().value());
         assertEquals("john.doe@example.com", saved.getEmail().value());
-        assertEquals("John", saved.getFirstName());
-        assertEquals("Doe", saved.getLastName());
         assertTrue(saved.isEnabled());
         assertNotNull(saved.getCreatedAt());
         assertNotNull(saved.getUpdatedAt());
@@ -66,9 +62,7 @@ class UserPersistenceAdapterTest {
         User user = new User(
             new Username("janedoe"),
             new UserEmail("jane.doe@example.com"),
-            "hashedPassword456",
-            "Jane",
-            "Doe"
+            "hashedPassword456"
         );
         User saved = adapter.save(user);
 
@@ -77,10 +71,8 @@ class UserPersistenceAdapterTest {
             saved.getUsername(),
             new UserEmail("jane.smith@example.com"),
             "newHashedPassword",
-            "Jane",
-            "Smith",
-            saved.isEnabled(),
             saved.getRoles(),
+            saved.isEnabled(),
             saved.getCreatedAt(),
             saved.getUpdatedAt()
         );
@@ -89,7 +81,6 @@ class UserPersistenceAdapterTest {
         assertNotNull(result);
         assertEquals(saved.getId(), result.getId());
         assertEquals("jane.smith@example.com", result.getEmail().value());
-        assertEquals("Smith", result.getLastName());
     }
 
     @Test
@@ -97,9 +88,7 @@ class UserPersistenceAdapterTest {
         User user = new User(
             new Username("bobwilson"),
             new UserEmail("bob.wilson@example.com"),
-            "hashedPassword789",
-            "Bob",
-            "Wilson"
+            "hashedPassword789"
         );
         User saved = adapter.save(user);
 
@@ -124,9 +113,7 @@ class UserPersistenceAdapterTest {
         User user = new User(
             new Username("alicebrown"),
             new UserEmail("alice.brown@example.com"),
-            "hashedPassword",
-            "Alice",
-            "Brown"
+            "hashedPassword"
         );
         adapter.save(user);
 
@@ -149,9 +136,7 @@ class UserPersistenceAdapterTest {
         User user = new User(
             new Username("charlie"),
             new UserEmail("charlie@example.com"),
-            "hashedPassword",
-            "Charlie",
-            "Brown"
+            "hashedPassword"
         );
         adapter.save(user);
 
@@ -173,23 +158,17 @@ class UserPersistenceAdapterTest {
         adapter.save(new User(
             new Username("user1"),
             new UserEmail("user1@example.com"),
-            "password1",
-            "User",
-            "One"
+            "password1"
         ));
         adapter.save(new User(
             new Username("user2"),
             new UserEmail("user2@example.com"),
-            "password2",
-            "User",
-            "Two"
+            "password2"
         ));
         adapter.save(new User(
             new Username("user3"),
             new UserEmail("user3@example.com"),
-            "password3",
-            "User",
-            "Three"
+            "password3"
         ));
 
         List<User> users = adapter.findAll();
@@ -211,25 +190,19 @@ class UserPersistenceAdapterTest {
         User enabledUser1 = adapter.save(new User(
             new Username("enabled1"),
             new UserEmail("enabled1@example.com"),
-            "password",
-            "Enabled",
-            "One"
+            "password"
         ));
         
         User enabledUser2 = adapter.save(new User(
             new Username("enabled2"),
             new UserEmail("enabled2@example.com"),
-            "password",
-            "Enabled",
-            "Two"
+            "password"
         ));
         
         User disabledUser = adapter.save(new User(
             new Username("disabled"),
             new UserEmail("disabled@example.com"),
-            "password",
-            "Disabled",
-            "User"
+            "password"
         ));
         disabledUser.disable();
         adapter.save(disabledUser);
@@ -246,9 +219,7 @@ class UserPersistenceAdapterTest {
         adapter.save(new User(
             new Username("existinguser"),
             new UserEmail("existing@example.com"),
-            "password",
-            "Existing",
-            "User"
+            "password"
         ));
 
         boolean exists = adapter.existsByUsername(new Username("existinguser"));
@@ -268,9 +239,7 @@ class UserPersistenceAdapterTest {
         adapter.save(new User(
             new Username("testuser"),
             new UserEmail("test@example.com"),
-            "password",
-            "Test",
-            "User"
+            "password"
         ));
 
         boolean exists = adapter.existsByEmail(new UserEmail("test@example.com"));
@@ -290,9 +259,7 @@ class UserPersistenceAdapterTest {
         User user = new User(
             new Username("tempuser"),
             new UserEmail("temp@example.com"),
-            "password",
-            "Temp",
-            "User"
+            "password"
         );
         User saved = adapter.save(user);
 
@@ -313,18 +280,16 @@ class UserPersistenceAdapterTest {
         Role savedRole = new Role(
             new RoleId(roleEntity.getId()),
             new RoleName(roleEntity.getName()),
-            roleEntity.getDescription(),
-            Set.of()
+            Set.of(),
+            roleEntity.getDescription()
         );
 
         User user = new User(
             new Username("adminuser"),
             new UserEmail("admin@example.com"),
-            "password",
-            "Admin",
-            "User"
+            "password"
         );
-        user.assignRole(savedRole);
+        user.addRole(savedRole);
         User saved = adapter.save(user);
 
         Optional<User> found = adapter.findById(saved.getId());
@@ -337,9 +302,7 @@ class UserPersistenceAdapterTest {
         User user = new User(
             new Username("timestampuser"),
             new UserEmail("timestamp@example.com"),
-            "password",
-            "Timestamp",
-            "User"
+            "password"
         );
 
         User saved = adapter.save(user);
@@ -353,9 +316,7 @@ class UserPersistenceAdapterTest {
         User user = new User(
             new Username("completeuser"),
             new UserEmail("complete@example.com"),
-            "hashedPassword123",
-            "Complete",
-            "User"
+            "hashedPassword123"
         );
 
         User saved = adapter.save(user);
@@ -366,9 +327,7 @@ class UserPersistenceAdapterTest {
         assertEquals(saved.getId().value(), result.getId().value());
         assertEquals(saved.getUsername().value(), result.getUsername().value());
         assertEquals(saved.getEmail().value(), result.getEmail().value());
-        assertEquals(saved.getPasswordHash(), result.getPasswordHash());
-        assertEquals(saved.getFirstName(), result.getFirstName());
-        assertEquals(saved.getLastName(), result.getLastName());
+        assertEquals(saved.getHashedPassword(), result.getHashedPassword());
         assertEquals(saved.isEnabled(), result.isEnabled());
     }
 
@@ -377,18 +336,14 @@ class UserPersistenceAdapterTest {
         adapter.save(new User(
             new Username("uniqueuser"),
             new UserEmail("unique1@example.com"),
-            "password",
-            "Unique",
-            "One"
+            "password"
         ));
 
         assertThrows(Exception.class, () -> {
             adapter.save(new User(
                 new Username("uniqueuser"),
                 new UserEmail("unique2@example.com"),
-                "password",
-                "Unique",
-                "Two"
+                "password"
             ));
         });
     }
@@ -398,18 +353,14 @@ class UserPersistenceAdapterTest {
         adapter.save(new User(
             new Username("user1"),
             new UserEmail("unique@example.com"),
-            "password",
-            "User",
-            "One"
+            "password"
         ));
 
         assertThrows(Exception.class, () -> {
             adapter.save(new User(
                 new Username("user2"),
                 new UserEmail("unique@example.com"),
-                "password",
-                "User",
-                "Two"
+                "password"
             ));
         });
     }

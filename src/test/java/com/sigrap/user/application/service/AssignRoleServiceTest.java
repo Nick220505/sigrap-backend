@@ -1,5 +1,6 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.user.domain.model.*;
 import com.sigrap.user.domain.port.RoleRepositoryPort;
 import com.sigrap.user.domain.port.UserRepositoryPort;
@@ -78,8 +79,8 @@ class AssignRoleServiceTest {
         when(userRepository.findById(any(UserId.class))).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> assignRoleService.assignRole(999L, 1L)
         );
         
@@ -109,8 +110,8 @@ class AssignRoleServiceTest {
         when(roleRepository.findById(any(RoleId.class))).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> assignRoleService.assignRole(1L, 999L)
         );
         

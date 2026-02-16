@@ -1,357 +1,196 @@
 package com.sigrap.config;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.lenient;
-
-import com.sigrap.user.User;
-import com.sigrap.user.UserRepository;
-import com.sigrap.user.UserRole;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import com.sigrap.user.domain.model.*;
+import com.sigrap.user.domain.port.UserRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+/**
+ * Unit test for CustomPermissionEvaluator after hexagonal architecture migration.
+ * 
+ * Tests that the permission evaluator correctly:
+ * - Grants administrators access to all resources
+ * - Grants employees read access to all resources
+ * - Grants employees create/update access to specific resources
+ * - Denies access when appropriate
+ */
 @ExtendWith(MockitoExtension.class)
 class CustomPermissionEvaluatorTest {
 
-  @Mock
-  private UserRepository userRepository;
+    @Mock
+    private UserRepositoryPort userRepository;
 
-  @InjectMocks
-  private CustomPermissionEvaluator permissionEvaluator;
+    @Mock
+    private Authentication authentication;
 
-  private Authentication adminAuthentication;
-  private Authentication employeeAuthentication;
-  private Authentication invalidAuthentication;
+    private CustomPermissionEvaluator permissionEvaluator;
 
-  @BeforeEach
-  void setUp() {
-    Collection<GrantedAuthority> adminAuthorities = List.of(
-      new SimpleGrantedAuthority("ROLE_ADMINISTRATOR")
-    );
-    adminAuthentication = new UsernamePasswordAuthenticationToken(
-      "admin@example.com",
-      "password",
-      adminAuthorities
-    );
+    @BeforeEach
+    void setUp() {
+        permissionEvaluator = new CustomPermissionEvaluator(userRepository);
+    }
 
-    Collection<GrantedAuthority> employeeAuthorities = List.of(
-      new SimpleGrantedAuthority("ROLE_EMPLOYEE")
-    );
-    employeeAuthentication = new UsernamePasswordAuthenticationToken(
-      "employee@example.com",
-      "password",
-      employeeAuthorities
-    );
+    @Test
+    void shouldGrantAdministratorAccessToAllResources() {
+        // Given: An administrator user
+        User adminUser = createUserWithRole("ADMINISTRATOR");
+        when(authentication.getName()).thenReturn("admin@example.com");
+        when(userRepository.findByEmail(new UserEmail("admin@example.com")))
+                .thenReturn(Optional.of(adminUser));
 
-    invalidAuthentication = new UsernamePasswordAuthenticationToken(
-      "invalid@example.com",
-      "password"
-    );
+        // When/Then: Administrator has access to all resources and actions
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Product", "READ"));
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Product", "CREATE"));
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Product", "UPDATE"));
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Product", "DELETE"));
+        assertTrue(permissionEvaluator.hasPermission(authentication, "User", "DELETE"));
+    }
 
-    User adminUser = User.builder()
-      .email("admin@example.com")
-      .role(UserRole.ADMINISTRATOR)
-      .build();
+    @Test
+    void shouldGrantEmployeeReadAccessToAllResources() {
+        // Given: An employee user
+        User employeeUser = createUserWithRole("EMPLOYEE");
+        when(authentication.getName()).thenReturn("employee@example.com");
+        when(userRepository.findByEmail(new UserEmail("employee@example.com")))
+                .thenReturn(Optional.of(employeeUser));
 
-    User employeeUser = User.builder()
-      .email("employee@example.com")
-      .role(UserRole.EMPLOYEE)
-      .build();
+        // When/Then: Employee has read access to all resources
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Product", "READ"));
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Category", "READ"));
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Customer", "READ"));
+        assertTrue(permissionEvaluator.hasPermission(authentication, "User", "READ"));
+    }
 
-    lenient()
-      .when(userRepository.findByEmail("admin@example.com"))
-      .thenReturn(Optional.of(adminUser));
-    lenient()
-      .when(userRepository.findByEmail("employee@example.com"))
-      .thenReturn(Optional.of(employeeUser));
-    lenient()
-      .when(userRepository.findByEmail("invalid@example.com"))
-      .thenReturn(Optional.empty());
-  }
+    @Test
+    void shouldGrantEmployeeCreateUpdateAccessToProducts() {
+        // Given: An employee user
+        User employeeUser = createUserWithRole("EMPLOYEE");
+        when(authentication.getName()).thenReturn("employee@example.com");
+        when(userRepository.findByEmail(new UserEmail("employee@example.com")))
+                .thenReturn(Optional.of(employeeUser));
 
-  @Test
-  void hasPermission_withNullAuthentication_returnsFalse() {
-    boolean result = permissionEvaluator.hasPermission(
-      null,
-      "targetObject",
-      "READ"
-    );
-    assertFalse(result);
-  }
+        // When/Then: Employee has create/update access to products
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Product", "CREATE"));
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Product", "UPDATE"));
+    }
 
-  @Test
-  void hasPermission_withNullTargetObject_returnsFalse() {
-    boolean result = permissionEvaluator.hasPermission(
-      adminAuthentication,
-      null,
-      "READ"
-    );
-    assertFalse(result);
-  }
+    @Test
+    void shouldGrantEmployeeCreateUpdateAccessToCategories() {
+        // Given: An employee user
+        User employeeUser = createUserWithRole("EMPLOYEE");
+        when(authentication.getName()).thenReturn("employee@example.com");
+        when(userRepository.findByEmail(new UserEmail("employee@example.com")))
+                .thenReturn(Optional.of(employeeUser));
 
-  @Test
-  void hasPermission_withNullPermission_returnsFalse() {
-    boolean result = permissionEvaluator.hasPermission(
-      adminAuthentication,
-      "targetObject",
-      null
-    );
-    assertFalse(result);
-  }
+        // When/Then: Employee has create/update access to categories
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Category", "CREATE"));
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Category", "UPDATE"));
+    }
 
-  @Test
-  void hasPermission_withAdminUser_returnsTrue() {
-    boolean result = permissionEvaluator.hasPermission(
-      adminAuthentication,
-      new DummyEntity(),
-      "READ"
-    );
-    assertTrue(result);
-  }
+    @Test
+    void shouldGrantEmployeeCreateUpdateAccessToCustomers() {
+        // Given: An employee user
+        User employeeUser = createUserWithRole("EMPLOYEE");
+        when(authentication.getName()).thenReturn("employee@example.com");
+        when(userRepository.findByEmail(new UserEmail("employee@example.com")))
+                .thenReturn(Optional.of(employeeUser));
 
-  @Test
-  void hasPermission_withEmployeeUserAndReadPermission_returnsTrue() {
-    boolean result = permissionEvaluator.hasPermission(
-      employeeAuthentication,
-      new DummyEntity(),
-      "READ"
-    );
-    assertTrue(result);
-  }
+        // When/Then: Employee has create/update access to customers
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Customer", "CREATE"));
+        assertTrue(permissionEvaluator.hasPermission(authentication, "Customer", "UPDATE"));
+    }
 
-  @Test
-  void hasPermission_withEmployeeUserAndProductCreatePermission_returnsTrue() {
-    boolean result = permissionEvaluator.hasPermission(
-      employeeAuthentication,
-      new Product(),
-      "CREATE"
-    );
-    assertTrue(result);
-  }
+    @Test
+    void shouldDenyEmployeeDeleteAccessToProducts() {
+        // Given: An employee user
+        User employeeUser = createUserWithRole("EMPLOYEE");
+        when(authentication.getName()).thenReturn("employee@example.com");
+        when(userRepository.findByEmail(new UserEmail("employee@example.com")))
+                .thenReturn(Optional.of(employeeUser));
 
-  @Test
-  void hasPermission_withEmployeeUserAndProductUpdatePermission_returnsTrue() {
-    boolean result = permissionEvaluator.hasPermission(
-      employeeAuthentication,
-      new Product(),
-      "UPDATE"
-    );
-    assertTrue(result);
-  }
+        // When/Then: Employee does not have delete access to products
+        assertFalse(permissionEvaluator.hasPermission(authentication, "Product", "DELETE"));
+    }
 
-  @Test
-  void hasPermission_withEmployeeUserAndCategoryCreatePermission_returnsTrue() {
-    boolean result = permissionEvaluator.hasPermission(
-      employeeAuthentication,
-      new Category(),
-      "CREATE"
-    );
-    assertTrue(result);
-  }
+    @Test
+    void shouldDenyEmployeeAccessToUserManagement() {
+        // Given: An employee user
+        User employeeUser = createUserWithRole("EMPLOYEE");
+        when(authentication.getName()).thenReturn("employee@example.com");
+        when(userRepository.findByEmail(new UserEmail("employee@example.com")))
+                .thenReturn(Optional.of(employeeUser));
 
-  @Test
-  void hasPermission_withEmployeeUserAndCategoryUpdatePermission_returnsTrue() {
-    boolean result = permissionEvaluator.hasPermission(
-      employeeAuthentication,
-      new Category(),
-      "UPDATE"
-    );
-    assertTrue(result);
-  }
+        // When/Then: Employee does not have create/update/delete access to users
+        assertFalse(permissionEvaluator.hasPermission(authentication, "User", "CREATE"));
+        assertFalse(permissionEvaluator.hasPermission(authentication, "User", "UPDATE"));
+        assertFalse(permissionEvaluator.hasPermission(authentication, "User", "DELETE"));
+    }
 
-  @Test
-  void hasPermission_withEmployeeUserAndCustomerCreatePermission_returnsTrue() {
-    boolean result = permissionEvaluator.hasPermission(
-      employeeAuthentication,
-      new Customer(),
-      "CREATE"
-    );
-    assertTrue(result);
-  }
+    @Test
+    void shouldDenyAccessWhenUserNotFound() {
+        // Given: User not found in repository
+        when(authentication.getName()).thenReturn("nonexistent@example.com");
+        when(userRepository.findByEmail(new UserEmail("nonexistent@example.com")))
+                .thenReturn(Optional.empty());
 
-  @Test
-  void hasPermission_withEmployeeUserAndCustomerUpdatePermission_returnsTrue() {
-    boolean result = permissionEvaluator.hasPermission(
-      employeeAuthentication,
-      new Customer(),
-      "UPDATE"
-    );
-    assertTrue(result);
-  }
+        // When/Then: Access is denied
+        assertFalse(permissionEvaluator.hasPermission(authentication, "Product", "READ"));
+    }
 
-  @Test
-  void hasPermission_withEmployeeUserAndInvalidPermission_returnsFalse() {
-    boolean result = permissionEvaluator.hasPermission(
-      employeeAuthentication,
-      new DummyEntity(),
-      "DELETE"
-    );
-    assertFalse(result);
-  }
+    @Test
+    void shouldDenyAccessWhenAuthenticationIsNull() {
+        // When/Then: Access is denied when authentication is null
+        assertFalse(permissionEvaluator.hasPermission(null, "Product", "READ"));
+    }
 
-  @Test
-  void hasPermission_withInvalidUser_returnsFalse() {
-    boolean result = permissionEvaluator.hasPermission(
-      invalidAuthentication,
-      new DummyEntity(),
-      "READ"
-    );
-    assertFalse(result);
-  }
+    @Test
+    void shouldDenyAccessWhenTargetIsNull() {
+        // When/Then: Access is denied when target is null
+        assertFalse(permissionEvaluator.hasPermission(authentication, null, "READ"));
+        
+        // Verify no repository interaction when target is null
+        verify(userRepository, never()).findByEmail(any());
+        verify(authentication, never()).getName();
+    }
 
-  @Test
-  void hasPermission_withNullAuthenticationAndTargetId_returnsFalse() {
-    boolean result = permissionEvaluator.hasPermission(
-      null,
-      1L,
-      "Product",
-      "READ"
-    );
-    assertFalse(result);
-  }
+    @Test
+    void shouldDenyAccessWhenPermissionIsNull() {
+        // When/Then: Access is denied when permission is null
+        assertFalse(permissionEvaluator.hasPermission(authentication, "Product", null));
+        
+        // Verify no repository interaction when permission is null
+        verify(userRepository, never()).findByEmail(any());
+        verify(authentication, never()).getName();
+    }
 
-  @Test
-  void hasPermission_withNullTargetId_returnsFalse() {
-    boolean result = permissionEvaluator.hasPermission(
-      adminAuthentication,
-      null,
-      "Product",
-      "READ"
-    );
-    assertFalse(result);
-  }
+    /**
+     * Helper method to create a user with a specific role.
+     */
+    private User createUserWithRole(String roleName) {
+        UserId userId = new UserId(1L);
+        Username username = new Username("testuser");
+        UserEmail email = new UserEmail("test@example.com");
+        String hashedPassword = "$2a$10$dummyHashedPassword";
 
-  @Test
-  void hasPermission_withNullTargetType_returnsFalse() {
-    boolean result = permissionEvaluator.hasPermission(
-      adminAuthentication,
-      1L,
-      null,
-      "READ"
-    );
-    assertFalse(result);
-  }
+        Set<Role> roles = new HashSet<>();
+        RoleId roleId = new RoleId(1L);
+        RoleName roleNameObj = new RoleName(roleName);
+        Role role = new Role(roleId, roleNameObj, new HashSet<>(), roleName + " role");
+        roles.add(role);
 
-  @Test
-  void hasPermission_withNullPermissionAndTargetId_returnsFalse() {
-    boolean result = permissionEvaluator.hasPermission(
-      adminAuthentication,
-      1L,
-      "Product",
-      null
-    );
-    assertFalse(result);
-  }
-
-  @Test
-  void hasPermission_withAdminUserAndTargetId_returnsTrue() {
-    boolean result = permissionEvaluator.hasPermission(
-      adminAuthentication,
-      1L,
-      "Product",
-      "READ"
-    );
-    assertTrue(result);
-  }
-
-  @Test
-  void hasPermission_withEmployeeUserAndReadPermissionAndTargetId_returnsTrue() {
-    boolean result = permissionEvaluator.hasPermission(
-      employeeAuthentication,
-      1L,
-      "Product",
-      "READ"
-    );
-    assertTrue(result);
-  }
-
-  @Test
-  void hasPermission_withEmployeeUserAndProductCreatePermissionAndTargetId_returnsTrue() {
-    boolean result = permissionEvaluator.hasPermission(
-      employeeAuthentication,
-      1L,
-      "Product",
-      "CREATE"
-    );
-    assertTrue(result);
-  }
-
-  @Test
-  void hasPermission_withEmployeeUserAndInvalidPermissionAndTargetId_returnsFalse() {
-    boolean result = permissionEvaluator.hasPermission(
-      employeeAuthentication,
-      1L,
-      "Product",
-      "DELETE"
-    );
-    assertFalse(result);
-  }
-
-  @Test
-  void hasAnyRole_withNullAuthentication_returnsFalse() {
-    boolean result = permissionEvaluator.hasAnyRole(null, "ADMINISTRATOR");
-    assertFalse(result);
-  }
-
-  @Test
-  void hasAnyRole_withNullRoles_returnsFalse() {
-    boolean result = permissionEvaluator.hasAnyRole(
-      adminAuthentication,
-      (String[]) null
-    );
-    assertFalse(result);
-  }
-
-  @Test
-  void hasAnyRole_withEmptyRoles_returnsFalse() {
-    boolean result = permissionEvaluator.hasAnyRole(adminAuthentication);
-    assertFalse(result);
-  }
-
-  @Test
-  void hasAnyRole_withMatchingRole_returnsTrue() {
-    boolean result = permissionEvaluator.hasAnyRole(
-      adminAuthentication,
-      "ADMINISTRATOR"
-    );
-    assertTrue(result);
-  }
-
-  @Test
-  void hasAnyRole_withNonMatchingRole_returnsFalse() {
-    boolean result = permissionEvaluator.hasAnyRole(
-      adminAuthentication,
-      "USER"
-    );
-    assertFalse(result);
-  }
-
-  @Test
-  void hasAnyRole_withMultipleRolesIncludingMatch_returnsTrue() {
-    boolean result = permissionEvaluator.hasAnyRole(
-      adminAuthentication,
-      "USER",
-      "ADMINISTRATOR"
-    );
-    assertTrue(result);
-  }
-
-  private static class DummyEntity {}
-
-  private static class Product {}
-
-  private static class Category {}
-
-  private static class Customer {}
+        return new User(userId, username, email, hashedPassword, roles, true,
+                LocalDateTime.now(), LocalDateTime.now());
+    }
 }

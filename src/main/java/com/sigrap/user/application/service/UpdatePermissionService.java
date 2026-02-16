@@ -1,5 +1,7 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
+
 import com.sigrap.user.application.port.in.UpdatePermissionUseCase;
 import com.sigrap.user.application.port.in.command.UpdatePermissionCommand;
 import com.sigrap.user.domain.model.Permission;
@@ -27,7 +29,7 @@ public class UpdatePermissionService implements UpdatePermissionUseCase {
     public Permission update(Long id, UpdatePermissionCommand command) {
         PermissionId permissionId = new PermissionId(id);
         Permission permission = permissionRepository.findById(permissionId)
-            .orElseThrow(() -> new IllegalArgumentException("Permission with ID " + id + " not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Permission with ID " + id + " not found"));
         
         // Update name if provided
         if (command.name() != null && !command.name().isBlank()) {

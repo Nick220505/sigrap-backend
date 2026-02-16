@@ -61,6 +61,11 @@ public class DeleteSupplierService implements DeleteSupplierUseCase {
      */
     @Override
     public void deleteAll(List<SupplierId> ids) {
+        if (ids == null || ids.isEmpty()) {
+            supplierRepository.deleteAllById(List.of());
+            return;
+        }
+        
         supplierRepository.deleteAllById(ids);
     }
 }

@@ -328,7 +328,7 @@ class SupplierPersistenceAdapterTest {
             new SupplierName("Test Supplier"),
             "Test Contact",
             new SupplierEmail("test@example.com"),
-            new SupplierPhone("555-TEST"),
+            new SupplierPhone("555-1234"),
             "Test Address"
         );
 
@@ -371,7 +371,7 @@ class SupplierPersistenceAdapterTest {
             new SupplierName("Complete Supplier"),
             "Complete Contact",
             new SupplierEmail("complete@example.com"),
-            new SupplierPhone("555-COMPLETE"),
+            new SupplierPhone("555-123-4567"),
             "123 Complete Street, City, State 12345"
         );
 

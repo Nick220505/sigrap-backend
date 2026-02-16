@@ -1,5 +1,6 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.user.domain.model.Role;
 import com.sigrap.user.domain.model.RoleId;
 import com.sigrap.user.domain.model.RoleName;
@@ -64,8 +65,8 @@ class GetRoleServiceTest {
         when(roleRepository.findById(any(RoleId.class))).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> getRoleService.getById(999L)
         );
         
@@ -95,8 +96,8 @@ class GetRoleServiceTest {
         when(roleRepository.findByName(any(RoleName.class))).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> getRoleService.getByName("NONEXISTENT")
         );
         

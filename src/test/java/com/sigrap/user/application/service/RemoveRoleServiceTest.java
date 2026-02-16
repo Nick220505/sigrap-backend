@@ -1,5 +1,6 @@
 package com.sigrap.user.application.service;
 
+import com.sigrap.exception.ResourceNotFoundException;
 import com.sigrap.user.domain.model.*;
 import com.sigrap.user.domain.port.RoleRepositoryPort;
 import com.sigrap.user.domain.port.UserRepositoryPort;
@@ -82,8 +83,8 @@ class RemoveRoleServiceTest {
         when(userRepository.findById(any(UserId.class))).thenReturn(Optional.empty());
         
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> removeRoleService.removeRole(999L, 1L)
         );
         

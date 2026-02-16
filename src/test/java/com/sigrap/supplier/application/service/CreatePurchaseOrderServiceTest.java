@@ -1,5 +1,7 @@
 package com.sigrap.supplier.application.service;
 
+import com.sigrap.audit.application.port.out.EventPublisherPort;
+
 import com.sigrap.supplier.application.port.in.command.CreatePurchaseOrderCommand;
 import com.sigrap.supplier.domain.model.*;
 import com.sigrap.supplier.domain.port.PurchaseOrderRepositoryPort;
@@ -28,6 +30,9 @@ class CreatePurchaseOrderServiceTest {
     @Mock
     private SupplierRepositoryPort supplierRepository;
     
+    @Mock
+    private EventPublisherPort eventPublisher;
+
     @InjectMocks
     private CreatePurchaseOrderService createPurchaseOrderService;
     
@@ -201,3 +206,4 @@ class CreatePurchaseOrderServiceTest {
         verify(purchaseOrderRepository, never()).save(any());
     }
 }
+

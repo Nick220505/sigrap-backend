@@ -115,4 +115,31 @@ public class SalePersistenceAdapter implements SaleRepositoryPort {
     public void deleteById(SaleId id) {
         jpaRepository.deleteById(id.value());
     }
+
+    /**
+     * Counts the total number of sales.
+     *
+     * @return the total count of sales
+     */
+    @Override
+    public long count() {
+        return jpaRepository.count();
+    }
+
+    /**
+     * Saves multiple sales at once.
+     *
+     * @param sales the list of sales to save
+     * @return the list of saved sales
+     */
+    @Override
+    public List<Sale> saveAll(List<Sale> sales) {
+        List<SaleJpaEntity> entities = sales.stream()
+                .map(mapper::toJpaEntity)
+                .toList();
+        List<SaleJpaEntity> savedEntities = jpaRepository.saveAll(entities);
+        return savedEntities.stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }
