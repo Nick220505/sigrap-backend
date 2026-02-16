@@ -8,6 +8,12 @@ import com.sigrap.customer.application.port.in.command.CreateCustomerCommand;
 import com.sigrap.customer.application.port.in.command.UpdateCustomerCommand;
 import com.sigrap.customer.domain.model.Customer;
 import com.sigrap.customer.domain.model.CustomerId;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +30,7 @@ import java.util.List;
  */
 @RestController("customerControllerV2")
 @RequestMapping("/api/v2/customers")
+@Tag(name = "Customer Management", description = "APIs for managing customer information including contact details and addresses")
 public class CustomerController {
     
     private final CreateCustomerUseCase createCustomerUseCase;
@@ -63,6 +70,24 @@ public class CustomerController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+        summary = "Create a new customer",
+        description = "Creates a new customer with full name, document ID, email, phone number, and address. " +
+                      "The email must be unique across the system."
+    )
+    @ApiResponse(
+        responseCode = "201",
+        description = "Customer created successfully",
+        content = @Content(schema = @Schema(implementation = CustomerResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors or duplicate email"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public CustomerResponse create(@Valid @RequestBody CustomerRequest request) {
         CreateCustomerCommand command = new CreateCustomerCommand(
             request.fullName(),
@@ -84,7 +109,27 @@ public class CustomerController {
      * @throws com.sigrap.exception.ResourceNotFoundException if the customer is not found
      */
     @GetMapping("/{id}")
-    public CustomerResponse getById(@PathVariable Long id) {
+    @Operation(
+        summary = "Get customer by ID",
+        description = "Retrieves a single customer by their unique identifier including all contact details"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Customer found successfully",
+        content = @Content(schema = @Schema(implementation = CustomerResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Customer not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public CustomerResponse getById(
+        @Parameter(description = "Customer unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         CustomerId customerId = new CustomerId(id);
         Customer customer = getCustomerUseCase.getById(customerId);
         return responseMapper.toResponse(customer);
@@ -97,6 +142,19 @@ public class CustomerController {
      * @return a list of all customer responses with HTTP 200 status
      */
     @GetMapping
+    @Operation(
+        summary = "Get all customers",
+        description = "Retrieves a list of all customers in the system with their complete information"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of customers retrieved successfully",
+        content = @Content(schema = @Schema(implementation = CustomerResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public List<CustomerResponse> getAll() {
         return getCustomerUseCase.getAll().stream()
             .map(responseMapper::toResponse)
@@ -114,7 +172,30 @@ public class CustomerController {
      * @throws IllegalArgumentException if the new email conflicts with an existing customer
      */
     @PutMapping("/{id}")
+    @Operation(
+        summary = "Update an existing customer",
+        description = "Updates a customer's information including name, document ID, email, phone, and address. " +
+                      "The email must remain unique."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Customer updated successfully",
+        content = @Content(schema = @Schema(implementation = CustomerResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors or duplicate email"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Customer not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public CustomerResponse update(
+            @Parameter(description = "Customer unique identifier", required = true, example = "1")
             @PathVariable Long id,
             @Valid @RequestBody CustomerRequest request) {
         CustomerId customerId = new CustomerId(id);
@@ -139,7 +220,26 @@ public class CustomerController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    @Operation(
+        summary = "Delete a customer",
+        description = "Deletes a customer by their unique identifier. This operation cannot be undone."
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Customer deleted successfully"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Customer not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public void delete(
+        @Parameter(description = "Customer unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         CustomerId customerId = new CustomerId(id);
         deleteCustomerUseCase.delete(customerId);
     }
@@ -154,7 +254,26 @@ public class CustomerController {
      */
     @DeleteMapping("/batch")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAll(@RequestBody List<Long> ids) {
+    @Operation(
+        summary = "Delete multiple customers",
+        description = "Deletes multiple customers in a single operation. All specified customers must exist."
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Customers deleted successfully"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "One or more customers not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public void deleteAll(
+        @Parameter(description = "List of customer IDs to delete", required = true)
+        @RequestBody List<Long> ids
+    ) {
         List<CustomerId> customerIds = ids.stream()
             .map(CustomerId::new)
             .toList();

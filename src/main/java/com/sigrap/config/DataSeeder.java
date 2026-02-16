@@ -1,7 +1,10 @@
 package com.sigrap.config;
 
 // Audit module - hexagonal architecture
+import com.sigrap.audit.domain.model.AuditAction;
 import com.sigrap.audit.domain.model.AuditLog;
+import com.sigrap.audit.domain.model.AuditStatus;
+import com.sigrap.audit.domain.model.EntityType;
 import com.sigrap.audit.domain.port.AuditLogRepositoryPort;
 
 // Category module - hexagonal architecture
@@ -18,8 +21,12 @@ import com.sigrap.customer.domain.model.CustomerEmail;
 import com.sigrap.customer.domain.model.CustomerPhone;
 import com.sigrap.customer.domain.port.CustomerRepositoryPort;
 
-// Employee module - hexagonal architecture (migrated in Task 24-27)
-// Note: Employee seeding methods removed as they are no longer needed
+// Employee module - hexagonal architecture
+import com.sigrap.employee.domain.model.Attendance;
+import com.sigrap.employee.domain.model.AttendanceStatus;
+import com.sigrap.employee.domain.model.Schedule;
+import com.sigrap.employee.domain.port.AttendanceRepositoryPort;
+import com.sigrap.employee.domain.port.ScheduleRepositoryPort;
 
 // Product module - hexagonal architecture
 import com.sigrap.product.domain.model.Product;
@@ -30,12 +37,16 @@ import com.sigrap.product.domain.model.ProductStock;
 import com.sigrap.product.domain.port.ProductRepositoryPort;
 
 // Sale module - hexagonal architecture
+import com.sigrap.sale.domain.model.PaymentMethod;
 import com.sigrap.sale.domain.model.Sale;
 import com.sigrap.sale.domain.model.SaleId;
 import com.sigrap.sale.domain.model.SaleItem;
 import com.sigrap.sale.domain.model.SaleItemId;
+import com.sigrap.sale.domain.model.SaleNumber;
 import com.sigrap.sale.domain.model.SaleReturn;
 import com.sigrap.sale.domain.model.SaleReturnId;
+import com.sigrap.sale.domain.model.SaleReturnNumber;
+import com.sigrap.sale.domain.port.SaleItemRepositoryPort;
 import com.sigrap.sale.domain.port.SaleRepositoryPort;
 import com.sigrap.sale.domain.port.SaleReturnRepositoryPort;
 
@@ -112,10 +123,13 @@ public class DataSeeder implements CommandLineRunner {
   private final UserRepositoryPort userRepository;
   private final RoleRepositoryPort roleRepository;
   private final PasswordEncoder passwordEncoder;
+  private final ScheduleRepositoryPort scheduleRepository;
+  private final AttendanceRepositoryPort attendanceRepository;
   private final SupplierRepositoryPort supplierRepository;
   private final PurchaseOrderRepositoryPort purchaseOrderRepository;
   private final CustomerRepositoryPort customerRepository;
   private final SaleRepositoryPort saleRepository;
+  private final SaleItemRepositoryPort saleItemRepository;
   private final SaleReturnRepositoryPort saleReturnRepository;
 
   private final Random random = new Random();
@@ -131,18 +145,38 @@ public class DataSeeder implements CommandLineRunner {
   @Transactional
   public void run(String... args) throws Exception {
     log.info("Starting data seeding...");
+    seedRoles();
     seedCategories();
     seedProducts();
     seedUsers();
-    // seedSchedules(); // TODO: Re-enable after Task 24 (Employee module migration)
-    // seedAttendance(); // TODO: Re-enable after Task 24 (Employee module migration)
+    seedSchedules();
+    seedAttendance();
     seedSuppliers();
     seedPurchaseOrders();
     seedCustomers();
-    // seedSales(); // TODO: Re-enable after Task 24 (Sale module uses old entity patterns)
-    // seedSaleReturns(); // TODO: Re-enable after Task 24 (SaleReturn module uses old entity patterns)
-    // seedAuditLogs(); // TODO: Re-enable after Task 24 (AuditLog needs proper domain constructor usage)
+    seedSales();
+    seedSaleReturns();
+    seedAuditLogs();
     log.info("Data seeding completed.");
+  }
+
+  /**
+   * Seeds initial roles into the database.
+   * Creates default roles (ADMINISTRATOR and EMPLOYEE) with their permissions.
+   * Only executes if the roles table is empty.
+   */
+  private void seedRoles() {
+    List<Role> existingRoles = roleRepository.findAll();
+    if (existingRoles.isEmpty()) {
+      log.info("Seeding roles...");
+
+      roleRepository.save(new Role(new RoleName("ADMINISTRATOR"), "Full system access with all permissions"));
+      roleRepository.save(new Role(new RoleName("EMPLOYEE"), "Standard employee access with limited permissions"));
+      
+      log.info("Roles seeded successfully.");
+    } else {
+      log.info("Roles already exist, skipping seeding.");
+    }
   }
 
   /**
@@ -311,17 +345,8 @@ public class DataSeeder implements CommandLineRunner {
    * Seeds initial schedules into the database.
    * Creates weekly schedules for employees.
    * Only executes if the schedules table is empty.
-   * 
-   * NOTE: Employee module has NOT been migrated to hexagonal architecture yet (Task 24).
-   * This method still uses old entity builders until the employee module migration is complete.
-   * 
-   * TODO: Re-enable after Task 24 (Employee module migration)
    */
-  @SuppressWarnings("unused")
   private void seedSchedules() {
-    // DISABLED: Employee module not yet migrated to hexagonal architecture
-    // This method will be re-enabled in Task 24
-    /*
     if (scheduleRepository.count() > 0) {
       log.info("Schedules already seeded.");
       return;
@@ -344,103 +369,44 @@ public class DataSeeder implements CommandLineRunner {
       }
 
       schedules.add(
-        Schedule.builder()
-          .user(user)
-          .day("Monday")
-          .startTime(defaultStartTime)
-          .endTime(defaultEndTime)
-          .type("Regular")
-          .isActive(true)
-          .build()
+        new Schedule(user.getId(), "Monday", defaultStartTime, defaultEndTime, "Regular")
       );
 
       schedules.add(
-        Schedule.builder()
-          .user(user)
-          .day("Tuesday")
-          .startTime(defaultStartTime)
-          .endTime(defaultEndTime)
-          .type("Regular")
-          .isActive(true)
-          .build()
+        new Schedule(user.getId(), "Tuesday", defaultStartTime, defaultEndTime, "Regular")
       );
 
       schedules.add(
-        Schedule.builder()
-          .user(user)
-          .day("Wednesday")
-          .startTime(defaultStartTime)
-          .endTime(defaultEndTime)
-          .type("Regular")
-          .isActive(true)
-          .build()
+        new Schedule(user.getId(), "Wednesday", defaultStartTime, defaultEndTime, "Regular")
       );
 
       schedules.add(
-        Schedule.builder()
-          .user(user)
-          .day("Thursday")
-          .startTime(defaultStartTime)
-          .endTime(defaultEndTime)
-          .type("Regular")
-          .isActive(true)
-          .build()
+        new Schedule(user.getId(), "Thursday", defaultStartTime, defaultEndTime, "Regular")
       );
 
       schedules.add(
-        Schedule.builder()
-          .user(user)
-          .day("Friday")
-          .startTime(defaultStartTime)
-          .endTime(defaultEndTime)
-          .type("Regular")
-          .isActive(true)
-          .build()
+        new Schedule(user.getId(), "Friday", defaultStartTime, defaultEndTime, "Regular")
       );
 
       schedules.add(
-        Schedule.builder()
-          .user(user)
-          .day("Saturday")
-          .startTime(defaultStartTime)
-          .endTime(saturdayEndTime)
-          .type("Weekend")
-          .isActive(true)
-          .build()
+        new Schedule(user.getId(), "Saturday", defaultStartTime, saturdayEndTime, "Weekend")
       );
 
       schedules.add(
-        Schedule.builder()
-          .user(user)
-          .day("Wednesday")
-          .startTime(extraHoursStartTime)
-          .endTime(extraHoursEndTime)
-          .type("Overtime")
-          .isActive(true)
-          .build()
+        new Schedule(user.getId(), "Wednesday", extraHoursStartTime, extraHoursEndTime, "Overtime")
       );
     }
 
     scheduleRepository.saveAll(schedules);
     log.info("Schedules seeded successfully.");
-    */
   }
 
   /**
    * Seeds initial attendance records into the database.
    * Creates sample attendance records for the past week.
    * Only executes if the attendance table is empty.
-   * 
-   * NOTE: Employee module has NOT been migrated to hexagonal architecture yet (Task 24).
-   * This method still uses old entity builders until the employee module migration is complete.
-   * 
-   * TODO: Re-enable after Task 24 (Employee module migration)
    */
-  @SuppressWarnings("unused")
   private void seedAttendance() {
-    // DISABLED: Employee module not yet migrated to hexagonal architecture
-    // This method will be re-enabled in Task 24
-    /*
     if (attendanceRepository.count() > 0) {
       log.info("Attendance records already seeded.");
       return;
@@ -467,85 +433,74 @@ public class DataSeeder implements CommandLineRunner {
       .minusWeeks(1)
       .with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
 
+    // Monday - Present
     LocalDateTime mondayClockIn = lastWeekMonday.withHour(8).withMinute(5);
     LocalDateTime mondayClockOut = lastWeekMonday.withHour(17).withMinute(10);
     double mondayHours = calculateHoursWorked(mondayClockIn, mondayClockOut);
 
-    attendanceRecords.add(
-      Attendance.builder()
-        .user(targetEmployee)
-        .date(lastWeekMonday.toLocalDate().atStartOfDay())
-        .clockInTime(mondayClockIn)
-        .clockOutTime(mondayClockOut)
-        .totalHours(mondayHours)
-        .status(AttendanceStatus.PRESENT)
-        .build()
+    Attendance mondayAttendance = new Attendance(
+      targetEmployee.getId(),
+      lastWeekMonday.toLocalDate().atStartOfDay(),
+      AttendanceStatus.PRESENT
     );
+    mondayAttendance.clockIn(mondayClockIn);
+    mondayAttendance.clockOut(mondayClockOut);
+    attendanceRecords.add(mondayAttendance);
 
+    // Tuesday - Late
     LocalDateTime lastWeekTuesday = lastWeekMonday.plusDays(1);
     LocalDateTime tuesdayClockIn = lastWeekTuesday.withHour(8).withMinute(45);
     LocalDateTime tuesdayClockOut = lastWeekTuesday.withHour(17).withMinute(15);
-    double tuesdayHours = calculateHoursWorked(tuesdayClockIn, tuesdayClockOut);
 
-    attendanceRecords.add(
-      Attendance.builder()
-        .user(targetEmployee)
-        .date(lastWeekTuesday.toLocalDate().atStartOfDay())
-        .clockInTime(tuesdayClockIn)
-        .clockOutTime(tuesdayClockOut)
-        .totalHours(tuesdayHours)
-        .status(AttendanceStatus.LATE)
-        .build()
+    Attendance tuesdayAttendance = new Attendance(
+      targetEmployee.getId(),
+      lastWeekTuesday.toLocalDate().atStartOfDay(),
+      AttendanceStatus.LATE
     );
+    tuesdayAttendance.clockIn(tuesdayClockIn);
+    tuesdayAttendance.clockOut(tuesdayClockOut);
+    attendanceRecords.add(tuesdayAttendance);
 
+    // Wednesday - Early Departure
     LocalDateTime lastWeekWednesday = lastWeekTuesday.plusDays(1);
     LocalDateTime wednesdayClockIn = lastWeekWednesday.withHour(8).withMinute(0);
     LocalDateTime wednesdayClockOut = lastWeekWednesday.withHour(15).withMinute(30);
-    double wednesdayHours = calculateHoursWorked(wednesdayClockIn, wednesdayClockOut);
 
-    attendanceRecords.add(
-      Attendance.builder()
-        .user(targetEmployee)
-        .date(lastWeekWednesday.toLocalDate().atStartOfDay())
-        .clockInTime(wednesdayClockIn)
-        .clockOutTime(wednesdayClockOut)
-        .totalHours(wednesdayHours)
-        .status(AttendanceStatus.EARLY_DEPARTURE)
-        .build()
+    Attendance wednesdayAttendance = new Attendance(
+      targetEmployee.getId(),
+      lastWeekWednesday.toLocalDate().atStartOfDay(),
+      AttendanceStatus.EARLY_DEPARTURE
     );
+    wednesdayAttendance.clockIn(wednesdayClockIn);
+    wednesdayAttendance.clockOut(wednesdayClockOut);
+    attendanceRecords.add(wednesdayAttendance);
 
+    // Thursday - Present
     LocalDateTime lastWeekThursday = lastWeekWednesday.plusDays(1);
     LocalDateTime thursdayClockIn = lastWeekThursday.withHour(7).withMinute(55);
     LocalDateTime thursdayClockOut = lastWeekThursday.withHour(17).withMinute(5);
-    double thursdayHours = calculateHoursWorked(thursdayClockIn, thursdayClockOut);
 
-    attendanceRecords.add(
-      Attendance.builder()
-        .user(targetEmployee)
-        .date(lastWeekThursday.toLocalDate().atStartOfDay())
-        .clockInTime(thursdayClockIn)
-        .clockOutTime(thursdayClockOut)
-        .totalHours(thursdayHours)
-        .status(AttendanceStatus.PRESENT)
-        .build()
+    Attendance thursdayAttendance = new Attendance(
+      targetEmployee.getId(),
+      lastWeekThursday.toLocalDate().atStartOfDay(),
+      AttendanceStatus.PRESENT
     );
+    thursdayAttendance.clockIn(thursdayClockIn);
+    thursdayAttendance.clockOut(thursdayClockOut);
+    attendanceRecords.add(thursdayAttendance);
 
+    // Friday - On Leave
     LocalDateTime lastWeekFriday = lastWeekThursday.plusDays(1);
 
-    attendanceRecords.add(
-      Attendance.builder()
-        .user(targetEmployee)
-        .date(lastWeekFriday.toLocalDate().atStartOfDay())
-        .clockInTime(null)
-        .clockOutTime(null)
-        .totalHours(null)
-        .status(AttendanceStatus.ON_LEAVE)
-        .build()
+    Attendance fridayAttendance = new Attendance(
+      targetEmployee.getId(),
+      lastWeekFriday.toLocalDate().atStartOfDay(),
+      AttendanceStatus.ON_LEAVE
     );
+    attendanceRecords.add(fridayAttendance);
 
     attendanceRepository.saveAll(attendanceRecords);
     log.info("Attendance records seeded successfully ({} records).", attendanceRecords.size());
-    */
   }
 
   /**
@@ -849,18 +804,8 @@ public class DataSeeder implements CommandLineRunner {
    * Seeds initial sales into the database.
    * Creates a variety of sales with different customers, employees, products, and dates.
    * Only executes if the sales table is empty.
-   * 
-   * NOTE: This method uses Sale.builder() pattern which may need refactoring
-   * to use domain constructors in a future iteration.
-   * 
-   * TODO: Re-enable after Task 24 (Sale module needs proper domain constructor usage)
    */
-  @SuppressWarnings("unused")
   private void seedSales() {
-    // DISABLED: Sale module uses old entity patterns with builders
-    // This method needs to be refactored to use domain constructors
-    // Will be re-enabled in Task 24
-    /*
     if (saleRepository.count() > 0) {
       log.info("Sales already exist, skipping seeding.");
       return;
@@ -886,111 +831,108 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     List<Sale> salesToCreate = new ArrayList<>();
-    int numberOfSales = random.nextInt(151) + 50;
+    int numberOfSales = Math.min(20, random.nextInt(31) + 10); // Create 10-40 sales
 
     for (int i = 0; i < numberOfSales; i++) {
-      Sale.SaleBuilder saleBuilder = Sale.builder();
-
       User assignedEmployee = employees.get(random.nextInt(employees.size()));
-      saleBuilder.employee(assignedEmployee);
-
-      saleBuilder.customer(customers.get(random.nextInt(customers.size())));
+      Customer customer = customers.get(random.nextInt(customers.size()));
 
       LocalDateTime saleDateTime = LocalDateTime.now()
         .minusDays(random.nextInt(180))
         .minusHours(random.nextInt(24))
         .minusMinutes(random.nextInt(60));
-      saleBuilder
-        .createdAt(saleDateTime)
-        .updatedAt(saleDateTime.plusMinutes(random.nextInt(30)));
 
-      List<SaleItem> saleItems = new ArrayList<>();
-      BigDecimal totalAmount = BigDecimal.ZERO;
-      int numberOfItemsInSale = random.nextInt(8) + 1;
+      // Generate sale number
+      String saleNumberStr = String.format("SALE-%d-%05d", 
+        saleDateTime.getYear(), 
+        i + 1);
+      SaleNumber saleNumber = new SaleNumber(saleNumberStr);
 
-      for (int j = 0; j < numberOfItemsInSale; j++) {
-        Product product = products.get(random.nextInt(products.size()));
-        int quantity = random.nextInt(5) + 1;
+      // Randomly select payment method
+      PaymentMethod[] paymentMethods = PaymentMethod.values();
+      PaymentMethod paymentMethod = paymentMethods[random.nextInt(paymentMethods.length)];
 
-        if (product.getStock().value() < quantity) {
-          if (product.getStock().value() > 0) {
-            quantity = product.getStock().value();
-          } else {
-            continue;
-          }
-        }
+      // Create sale
+      Sale sale = new Sale(
+        saleNumber,
+        customer.getId().value(),
+        assignedEmployee.getId().value(),
+        saleDateTime,
+        paymentMethod,
+        "Seeded sale"
+      );
 
-        product.decreaseStock(quantity);
-
-        SaleItem saleItem = SaleItem.builder()
-          .product(product)
-          .quantity(quantity)
-          .unitPrice(product.getSalePrice().value())
-          .build();
-        saleItem.calculateSubtotal();
-        saleItems.add(saleItem);
-        totalAmount = totalAmount.add(saleItem.getSubtotal());
-      }
-
-      if (saleItems.isEmpty()) {
-        continue;
-      }
-
-      saleBuilder.items(saleItems);
-      saleBuilder.totalAmount(totalAmount);
-
-      BigDecimal discountAmount = BigDecimal.ZERO;
-      double discountChance = random.nextDouble() * 0.4 + 0.1;
-      if (random.nextDouble() < discountChance) {
-        double discountPercentage = (random.nextInt(20) + 1) / 100.0;
-        discountAmount = totalAmount.multiply(BigDecimal.valueOf(discountPercentage));
-        discountAmount = discountAmount.setScale(2, java.math.RoundingMode.HALF_UP);
-      }
-      saleBuilder.discountAmount(discountAmount);
-
-      BigDecimal taxableAmount = totalAmount.subtract(discountAmount);
-      BigDecimal taxAmount = taxableAmount.multiply(BigDecimal.valueOf(0.19));
-      taxAmount = taxAmount.setScale(2, java.math.RoundingMode.HALF_UP);
-      saleBuilder.taxAmount(taxAmount);
-
-      BigDecimal finalAmount = taxableAmount.add(taxAmount);
-      saleBuilder.finalAmount(finalAmount);
-
-      Sale sale = saleBuilder.build();
-
-      for (SaleItem item : saleItems) {
-        item.setSale(sale);
-      }
       salesToCreate.add(sale);
     }
 
     if (!salesToCreate.isEmpty()) {
-      saleRepository.saveAll(salesToCreate);
-      productRepository.saveAll(products);
-      log.info("Successfully seeded {} sales.", salesToCreate.size());
+      // Save sales first
+      List<Sale> savedSales = saleRepository.saveAll(salesToCreate);
+      
+      // Now create and save sale items with the saved sale's ID
+      List<Product> productsToUpdate = new ArrayList<>();
+      for (Sale savedSale : savedSales) {
+        int numberOfItemsInSale = random.nextInt(5) + 1;
+
+        for (int j = 0; j < numberOfItemsInSale; j++) {
+          Product product = products.get(random.nextInt(products.size()));
+          int quantity = random.nextInt(5) + 1;
+
+          if (product.getStock().value() < quantity) {
+            if (product.getStock().value() > 0) {
+              quantity = product.getStock().value();
+            } else {
+              continue;
+            }
+          }
+
+          // Decrease product stock
+          product.decreaseStock(quantity);
+
+          // Create sale item with the saved sale's ID
+          SaleItem itemWithSaleId = new SaleItem(
+            savedSale.getId(),
+            product.getId().value(),
+            quantity,
+            product.getSalePrice().value()
+          );
+          saleItemRepository.save(itemWithSaleId);
+          
+          // Add item to sale for total calculation
+          savedSale.addItem(itemWithSaleId);
+          
+          // Collect products that need stock update
+          if (!productsToUpdate.contains(product)) {
+            productsToUpdate.add(product);
+          }
+        }
+        
+        // Complete the sale
+        if (!savedSale.getItems().isEmpty()) {
+          savedSale.complete();
+        }
+      }
+
+      // Save updated sales with completed status and totals
+      saleRepository.saveAll(savedSales);
+
+      // Save updated product stocks
+      productRepository.saveAll(productsToUpdate);
+
+      log.info("Successfully seeded {} sales (with items).", savedSales.size());
     } else {
       log.info("No sales were generated to seed.");
     }
-    */
   }
 
   /**
    * Seeds initial sales returns into the database.
-   * Creates a few sample returns based on existing sales and products.
+   * Creates a few sample returns based on existing sales.
    * Only executes if the sales_returns table is empty and sales exist.
-   * 
-   * NOTE: This method uses SaleReturn.builder() pattern which may need refactoring
-   * to use domain constructors in a future iteration.
-   * 
-   * TODO: Re-enable after Task 24 (SaleReturn module needs proper domain constructor usage)
    */
-  @SuppressWarnings("unused")
   private void seedSaleReturns() {
-    // DISABLED: SaleReturn module uses old entity patterns with builders
-    // This method needs to be refactored to use domain constructors
-    // Will be re-enabled in Task 24
-    /*
-    if (saleReturnRepository.count() > 0) {
+    List<SaleReturn> existingReturns = saleReturnRepository.findAll();
+    if (!existingReturns.isEmpty()) {
       log.info("Sale returns already exist, skipping seeding.");
       return;
     }
@@ -1001,62 +943,63 @@ public class DataSeeder implements CommandLineRunner {
       return;
     }
 
-    List<User> employees = userRepository.findAll();
-    if (employees.isEmpty()) {
-      log.warn("No employees found for seeding returns, skipping.");
-      return;
-    }
-
     log.info("Seeding sales returns...");
     List<SaleReturn> returnsToCreate = new ArrayList<>();
     int numberOfReturnsToSeed = Math.min(sales.size(), 5);
 
     for (int i = 0; i < numberOfReturnsToSeed; i++) {
       Sale originalSale = sales.get(random.nextInt(sales.size()));
+      
+      // Only create returns for completed sales
       if (originalSale.getItems().isEmpty()) {
         continue;
       }
 
-      SaleItem itemToReturn = originalSale.getItems().get(random.nextInt(originalSale.getItems().size()));
+      // Generate return number
+      String returnNumberStr = String.format("RET-%d-%05d", 
+        LocalDateTime.now().getYear(), 
+        i + 1);
+      SaleReturnNumber returnNumber = new SaleReturnNumber(returnNumberStr);
+
+      // Get a random item from the sale to calculate refund
+      List<SaleItem> items = new ArrayList<>(originalSale.getItems());
+      if (items.isEmpty()) {
+        continue;
+      }
+      
+      SaleItem itemToReturn = items.get(random.nextInt(items.size()));
       int quantityToReturn = 1;
       if (itemToReturn.getQuantity() > 1) {
         quantityToReturn = random.nextInt(itemToReturn.getQuantity()) + 1;
       }
 
-      Product productBeingReturned = itemToReturn.getProduct();
+      // Calculate refund amount based on item
+      BigDecimal refundAmount = itemToReturn.getUnitPrice()
+        .multiply(BigDecimal.valueOf(quantityToReturn))
+        .setScale(2, java.math.RoundingMode.HALF_UP);
 
-      SaleReturn.SaleReturnBuilder returnBuilder = SaleReturn.builder();
-      returnBuilder.originalSale(originalSale);
-      returnBuilder.customer(originalSale.getCustomer());
-      returnBuilder.employee(employees.get(random.nextInt(employees.size())));
-      returnBuilder.reason(getRandomReturnReason());
-      returnBuilder.createdAt(originalSale.getCreatedAt().plusDays(random.nextInt(5) + 1));
+      LocalDateTime returnDate = originalSale.getCreatedAt().plusDays(random.nextInt(5) + 1);
 
-      BigDecimal itemSubtotal = itemToReturn.getUnitPrice().multiply(BigDecimal.valueOf(quantityToReturn));
-      returnBuilder.totalReturnAmount(itemSubtotal);
-
-      SaleReturn saleReturn = returnBuilder.build();
-
-      SaleReturnItem returnItem = SaleReturnItem.builder()
-        .saleReturn(saleReturn)
-        .product(productBeingReturned)
-        .quantity(quantityToReturn)
-        .unitPrice(itemToReturn.getUnitPrice())
-        .subtotal(itemSubtotal)
-        .build();
-
-      saleReturn.addItem(returnItem);
+      SaleReturn saleReturn = new SaleReturn(
+        returnNumber,
+        originalSale.getId(),
+        returnDate,
+        getRandomReturnReason(),
+        refundAmount,
+        "Seeded return for product quantity: " + quantityToReturn
+      );
 
       returnsToCreate.add(saleReturn);
     }
 
     if (!returnsToCreate.isEmpty()) {
-      saleReturnRepository.saveAll(returnsToCreate);
+      for (SaleReturn saleReturn : returnsToCreate) {
+        saleReturnRepository.save(saleReturn);
+      }
       log.info("Successfully seeded {} sales returns.", returnsToCreate.size());
     } else {
       log.info("No sales returns were generated to seed.");
     }
-    */
   }
 
   private String getRandomReturnReason() {
@@ -1074,16 +1017,10 @@ public class DataSeeder implements CommandLineRunner {
    * Seeds initial audit logs into the database.
    * Creates a historical record of user actions.
    * Only executes if the audit_logs table is empty.
-   * 
-   * TODO: Re-enable after Task 24 (AuditLog needs proper domain constructor usage)
    */
-  @SuppressWarnings("unused")
   private void seedAuditLogs() {
-    // DISABLED: AuditLog constructor needs proper enum types (AuditAction, EntityType, AuditStatus)
-    // This method needs to be refactored to use proper domain constructors
-    // Will be re-enabled in Task 24
-    /*
-    if (auditLogRepository.count() > 0) {
+    List<AuditLog> existingLogs = auditLogRepository.findAll();
+    if (!existingLogs.isEmpty()) {
       log.info("Audit logs already exist, skipping seeding.");
       return;
     }
@@ -1112,34 +1049,46 @@ public class DataSeeder implements CommandLineRunner {
     if (adminUser != null) {
       auditLogs.add(
         new AuditLog(
-          null,
           adminUser.getEmail().value(),
-          "LOGIN",
-          "USER",
+          AuditAction.LOGIN,
+          EntityType.USER,
           null,
-          LocalDateTime.now().minusDays(7).withHour(8).withMinute(0)
+          LocalDateTime.now().minusDays(7).withHour(8).withMinute(0),
+          "192.168.1.100",
+          "Mozilla/5.0",
+          "Admin user logged in",
+          AuditStatus.SUCCESS,
+          150L
         )
       );
 
       auditLogs.add(
         new AuditLog(
-          null,
           adminUser.getEmail().value(),
-          "CREATE",
-          "PRODUCT",
+          AuditAction.CREATE,
+          EntityType.PRODUCT,
           null,
-          LocalDateTime.now().minusDays(7).withHour(9).withMinute(15)
+          LocalDateTime.now().minusDays(7).withHour(9).withMinute(15),
+          "192.168.1.100",
+          "Mozilla/5.0",
+          "Created new product",
+          AuditStatus.SUCCESS,
+          250L
         )
       );
 
       auditLogs.add(
         new AuditLog(
-          null,
           adminUser.getEmail().value(),
-          "UPDATE",
-          "SUPPLIER",
+          AuditAction.UPDATE,
+          EntityType.SUPPLIER,
           null,
-          LocalDateTime.now().minusDays(6).withHour(10).withMinute(30)
+          LocalDateTime.now().minusDays(6).withHour(10).withMinute(30),
+          "192.168.1.100",
+          "Mozilla/5.0",
+          "Updated supplier information",
+          AuditStatus.SUCCESS,
+          180L
         )
       );
     }
@@ -1147,40 +1096,53 @@ public class DataSeeder implements CommandLineRunner {
     if (employeeUser != null) {
       auditLogs.add(
         new AuditLog(
-          null,
           employeeUser.getEmail().value(),
-          "LOGIN",
-          "USER",
+          AuditAction.LOGIN,
+          EntityType.USER,
           null,
-          LocalDateTime.now().minusDays(7).withHour(8).withMinute(30)
+          LocalDateTime.now().minusDays(7).withHour(8).withMinute(30),
+          "192.168.1.101",
+          "Mozilla/5.0",
+          "Employee user logged in",
+          AuditStatus.SUCCESS,
+          120L
         )
       );
 
       auditLogs.add(
         new AuditLog(
-          null,
           employeeUser.getEmail().value(),
-          "CREATE",
-          "SALE",
+          AuditAction.CREATE,
+          EntityType.SALE,
           null,
-          LocalDateTime.now().minusDays(7).withHour(9).withMinute(45)
+          LocalDateTime.now().minusDays(7).withHour(9).withMinute(45),
+          "192.168.1.101",
+          "Mozilla/5.0",
+          "Created new sale",
+          AuditStatus.SUCCESS,
+          300L
         )
       );
 
       auditLogs.add(
         new AuditLog(
-          null,
           employeeUser.getEmail().value(),
-          "UPDATE",
-          "PRODUCT",
+          AuditAction.UPDATE,
+          EntityType.PRODUCT,
           null,
-          LocalDateTime.now().minusDays(7).withHour(9).withMinute(45)
+          LocalDateTime.now().minusDays(7).withHour(9).withMinute(45),
+          "192.168.1.101",
+          "Mozilla/5.0",
+          "Updated product stock",
+          AuditStatus.SUCCESS,
+          200L
         )
       );
     }
 
-    auditLogRepository.saveAll(auditLogs);
+    for (AuditLog auditLog : auditLogs) {
+      auditLogRepository.save(auditLog);
+    }
     log.info("Successfully seeded {} audit logs.", auditLogs.size());
-    */
   }
 }

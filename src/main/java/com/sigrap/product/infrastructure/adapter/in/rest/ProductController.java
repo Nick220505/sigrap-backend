@@ -9,6 +9,12 @@ import com.sigrap.product.application.port.in.command.CreateProductCommand;
 import com.sigrap.product.application.port.in.command.UpdateProductCommand;
 import com.sigrap.product.domain.model.Product;
 import com.sigrap.product.domain.model.ProductId;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/products")
+@Tag(name = "Product Management", description = "APIs for managing products including inventory, pricing, and categorization")
 public class ProductController {
     
     private final CreateProductUseCase createProductUseCase;
@@ -62,6 +69,24 @@ public class ProductController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+        summary = "Create a new product",
+        description = "Creates a new product with name, description, pricing, stock levels, and optional category assignment. " +
+                      "The product name must be unique across the system."
+    )
+    @ApiResponse(
+        responseCode = "201",
+        description = "Product created successfully",
+        content = @Content(schema = @Schema(implementation = ProductResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors or duplicate product name"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public ProductResponse create(@Valid @RequestBody ProductRequest request) {
         CreateProductCommand command = new CreateProductCommand(
             request.name(),
@@ -85,7 +110,27 @@ public class ProductController {
      * @throws IllegalArgumentException if the product is not found
      */
     @GetMapping("/{id}")
-    public ProductResponse getById(@PathVariable Long id) {
+    @Operation(
+        summary = "Get product by ID",
+        description = "Retrieves a single product by its unique identifier including all details like pricing, stock, and category"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Product found successfully",
+        content = @Content(schema = @Schema(implementation = ProductResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Product not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public ProductResponse getById(
+        @Parameter(description = "Product unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         ProductId productId = new ProductId(id);
         Product product = getProductUseCase.getById(productId);
         return responseMapper.toResponse(product);
@@ -98,6 +143,19 @@ public class ProductController {
      * @return a list of all product responses with HTTP 200 status
      */
     @GetMapping
+    @Operation(
+        summary = "Get all products",
+        description = "Retrieves a list of all products in the system with their complete details"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of products retrieved successfully",
+        content = @Content(schema = @Schema(implementation = ProductResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public List<ProductResponse> getAll() {
         return getProductUseCase.getAll().stream()
             .map(responseMapper::toResponse)
@@ -112,7 +170,23 @@ public class ProductController {
      * @return a list of product responses in the category with HTTP 200 status
      */
     @GetMapping("/category/{categoryId}")
-    public List<ProductResponse> getByCategoryId(@PathVariable Long categoryId) {
+    @Operation(
+        summary = "Get products by category",
+        description = "Retrieves all products that belong to a specific category"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of products in category retrieved successfully",
+        content = @Content(schema = @Schema(implementation = ProductResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public List<ProductResponse> getByCategoryId(
+        @Parameter(description = "Category unique identifier", required = true, example = "1")
+        @PathVariable Long categoryId
+    ) {
         CategoryId catId = new CategoryId(categoryId);
         return getProductUseCase.getByCategoryId(catId).stream()
             .map(responseMapper::toResponse)
@@ -129,7 +203,30 @@ public class ProductController {
      * @throws IllegalArgumentException if the product is not found or name conflicts
      */
     @PutMapping("/{id}")
+    @Operation(
+        summary = "Update an existing product",
+        description = "Updates a product's details including name, description, pricing, stock levels, and category. " +
+                      "The product name must remain unique."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Product updated successfully",
+        content = @Content(schema = @Schema(implementation = ProductResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors or duplicate product name"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Product not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public ProductResponse update(
+            @Parameter(description = "Product unique identifier", required = true, example = "1")
             @PathVariable Long id,
             @Valid @RequestBody ProductRequest request) {
         ProductId productId = new ProductId(id);
@@ -156,7 +253,26 @@ public class ProductController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    @Operation(
+        summary = "Delete a product",
+        description = "Deletes a product by its unique identifier. This operation cannot be undone."
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Product deleted successfully"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Product not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public void delete(
+        @Parameter(description = "Product unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         ProductId productId = new ProductId(id);
         deleteProductUseCase.delete(productId);
     }
@@ -171,7 +287,26 @@ public class ProductController {
      */
     @DeleteMapping("/batch")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAll(@RequestBody List<Long> ids) {
+    @Operation(
+        summary = "Delete multiple products",
+        description = "Deletes multiple products in a single operation. All specified products must exist."
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Products deleted successfully"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "One or more products not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public void deleteAll(
+        @Parameter(description = "List of product IDs to delete", required = true)
+        @RequestBody List<Long> ids
+    ) {
         List<ProductId> productIds = ids.stream()
             .map(ProductId::new)
             .toList();
@@ -192,7 +327,27 @@ public class ProductController {
     @Deprecated(since = "Hexagonal architecture migration", forRemoval = true)
     @DeleteMapping("/delete-many")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAllByIdLegacy(@RequestBody List<Long> ids) {
+    @Operation(
+        summary = "Delete multiple products (deprecated)",
+        description = "Legacy endpoint for batch deletion. Use /batch endpoint instead.",
+        deprecated = true
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Products deleted successfully"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "One or more products not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public void deleteAllByIdLegacy(
+        @Parameter(description = "List of product IDs to delete", required = true)
+        @RequestBody List<Long> ids
+    ) {
         // Delegate to the new endpoint implementation
         deleteAll(ids);
     }

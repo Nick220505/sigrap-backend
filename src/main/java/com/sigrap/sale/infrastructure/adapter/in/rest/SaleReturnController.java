@@ -10,22 +10,21 @@ import com.sigrap.sale.domain.model.SaleId;
 import com.sigrap.sale.domain.model.SaleReturn;
 import com.sigrap.sale.domain.model.SaleReturnId;
 import com.sigrap.sale.domain.model.SaleReturnStatus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * REST controller for sale return operations (Hexagonal Architecture).
- * This is an input adapter that translates HTTP requests to use case calls.
- * It handles HTTP concerns (validation, status codes, request/response mapping)
- * and delegates business logic to use cases.
- * 
- * <p>Mapped to /api/v2/sale-returns for coexistence with legacy endpoints.
- */
 @RestController("saleReturnControllerV2")
 @RequestMapping("/api/v2/sale-returns")
+@Tag(name = "Sale Return Management", description = "APIs for managing sale returns including approval, rejection, and completion")
 public class SaleReturnController {
     
     private final CreateSaleReturnUseCase createSaleReturnUseCase;
@@ -35,16 +34,6 @@ public class SaleReturnController {
     private final CompleteSaleReturnUseCase completeSaleReturnUseCase;
     private final SaleReturnResponseMapper responseMapper;
     
-    /**
-     * Constructor injection of use cases and mapper.
-     *
-     * @param createSaleReturnUseCase use case for creating sale returns
-     * @param getSaleReturnUseCase use case for retrieving sale returns
-     * @param approveSaleReturnUseCase use case for approving sale returns
-     * @param rejectSaleReturnUseCase use case for rejecting sale returns
-     * @param completeSaleReturnUseCase use case for completing sale returns
-     * @param responseMapper mapper for converting domain entities to response DTOs
-     */
     public SaleReturnController(
             CreateSaleReturnUseCase createSaleReturnUseCase,
             GetSaleReturnUseCase getSaleReturnUseCase,
@@ -60,16 +49,14 @@ public class SaleReturnController {
         this.responseMapper = responseMapper;
     }
     
-    /**
-     * Creates a new sale return.
-     * POST /api/v2/sale-returns
-     *
-     * @param request the sale return creation request
-     * @return the created sale return response with HTTP 201 status
-     * @throws com.sigrap.exception.ResourceNotFoundException if the sale is not found
-     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create a new sale return", description = "Creates a new sale return request with refund details")
+    @ApiResponse(responseCode = "201", description = "Sale return created successfully",
+        content = @Content(schema = @Schema(implementation = SaleReturnResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid request - validation errors")
+    @ApiResponse(responseCode = "404", description = "Sale not found")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     public SaleReturnResponse create(@Valid @RequestBody SaleReturnRequest request) {
         CreateSaleReturnCommand command = new CreateSaleReturnCommand(
             request.returnNumber(),
@@ -83,106 +70,98 @@ public class SaleReturnController {
         return responseMapper.toResponse(saleReturn);
     }
     
-    /**
-     * Retrieves a sale return by its ID.
-     * GET /api/v2/sale-returns/{id}
-     *
-     * @param id the sale return identifier
-     * @return the sale return response with HTTP 200 status
-     * @throws com.sigrap.exception.ResourceNotFoundException if the sale return is not found
-     */
     @GetMapping("/{id}")
-    public SaleReturnResponse getById(@PathVariable Long id) {
+    @Operation(summary = "Get sale return by ID", description = "Retrieves a single sale return by its unique identifier")
+    @ApiResponse(responseCode = "200", description = "Sale return found successfully",
+        content = @Content(schema = @Schema(implementation = SaleReturnResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Sale return not found")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    public SaleReturnResponse getById(
+        @Parameter(description = "Sale return unique identifier", required = true, example = "1")
+        @PathVariable Long id) {
         SaleReturnId saleReturnId = new SaleReturnId(id);
         SaleReturn saleReturn = getSaleReturnUseCase.getById(saleReturnId);
         return responseMapper.toResponse(saleReturn);
     }
     
-    /**
-     * Retrieves all sale returns.
-     * GET /api/v2/sale-returns
-     *
-     * @return a list of all sale return responses with HTTP 200 status
-     */
     @GetMapping
+    @Operation(summary = "Get all sale returns", description = "Retrieves a list of all sale returns in the system")
+    @ApiResponse(responseCode = "200", description = "List of sale returns retrieved successfully",
+        content = @Content(schema = @Schema(implementation = SaleReturnResponse.class)))
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     public List<SaleReturnResponse> getAll() {
         return getSaleReturnUseCase.getAll().stream()
             .map(responseMapper::toResponse)
             .toList();
     }
     
-    /**
-     * Retrieves all sale returns for a specific sale.
-     * GET /api/v2/sale-returns/sale/{saleId}
-     *
-     * @param saleId the sale identifier
-     * @return a list of sale return responses for the sale with HTTP 200 status
-     */
     @GetMapping("/sale/{saleId}")
-    public List<SaleReturnResponse> getBySaleId(@PathVariable Long saleId) {
+    @Operation(summary = "Get sale returns by sale", description = "Retrieves all returns for a specific sale")
+    @ApiResponse(responseCode = "200", description = "List of sale returns retrieved successfully",
+        content = @Content(schema = @Schema(implementation = SaleReturnResponse.class)))
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    public List<SaleReturnResponse> getBySaleId(
+        @Parameter(description = "Sale unique identifier", required = true, example = "1")
+        @PathVariable Long saleId) {
         SaleId id = new SaleId(saleId);
         return getSaleReturnUseCase.getBySaleId(id).stream()
             .map(responseMapper::toResponse)
             .toList();
     }
     
-    /**
-     * Retrieves all sale returns with a specific status.
-     * GET /api/v2/sale-returns/status/{status}
-     *
-     * @param status the sale return status
-     * @return a list of sale return responses with the given status with HTTP 200 status
-     */
     @GetMapping("/status/{status}")
-    public List<SaleReturnResponse> getByStatus(@PathVariable SaleReturnStatus status) {
+    @Operation(summary = "Get sale returns by status", description = "Retrieves all sale returns with a specific status")
+    @ApiResponse(responseCode = "200", description = "List of sale returns with status retrieved successfully",
+        content = @Content(schema = @Schema(implementation = SaleReturnResponse.class)))
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    public List<SaleReturnResponse> getByStatus(
+        @Parameter(description = "Sale return status", required = true, example = "PENDING")
+        @PathVariable SaleReturnStatus status) {
         return getSaleReturnUseCase.getByStatus(status).stream()
             .map(responseMapper::toResponse)
             .toList();
     }
     
-    /**
-     * Approves a sale return.
-     * POST /api/v2/sale-returns/{id}/approve
-     *
-     * @param id the sale return identifier
-     * @return the approved sale return response with HTTP 200 status
-     * @throws com.sigrap.exception.ResourceNotFoundException if the sale return is not found
-     * @throws IllegalStateException if the sale return cannot be approved
-     */
     @PostMapping("/{id}/approve")
-    public SaleReturnResponse approve(@PathVariable Long id) {
+    @Operation(summary = "Approve a sale return", description = "Changes the sale return status to APPROVED")
+    @ApiResponse(responseCode = "200", description = "Sale return approved successfully",
+        content = @Content(schema = @Schema(implementation = SaleReturnResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Sale return not found")
+    @ApiResponse(responseCode = "400", description = "Sale return cannot be approved in current state")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    public SaleReturnResponse approve(
+        @Parameter(description = "Sale return unique identifier", required = true, example = "1")
+        @PathVariable Long id) {
         SaleReturnId saleReturnId = new SaleReturnId(id);
         SaleReturn saleReturn = approveSaleReturnUseCase.approve(saleReturnId);
         return responseMapper.toResponse(saleReturn);
     }
     
-    /**
-     * Rejects a sale return.
-     * POST /api/v2/sale-returns/{id}/reject
-     *
-     * @param id the sale return identifier
-     * @return the rejected sale return response with HTTP 200 status
-     * @throws com.sigrap.exception.ResourceNotFoundException if the sale return is not found
-     * @throws IllegalStateException if the sale return cannot be rejected
-     */
     @PostMapping("/{id}/reject")
-    public SaleReturnResponse reject(@PathVariable Long id) {
+    @Operation(summary = "Reject a sale return", description = "Changes the sale return status to REJECTED")
+    @ApiResponse(responseCode = "200", description = "Sale return rejected successfully",
+        content = @Content(schema = @Schema(implementation = SaleReturnResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Sale return not found")
+    @ApiResponse(responseCode = "400", description = "Sale return cannot be rejected in current state")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    public SaleReturnResponse reject(
+        @Parameter(description = "Sale return unique identifier", required = true, example = "1")
+        @PathVariable Long id) {
         SaleReturnId saleReturnId = new SaleReturnId(id);
         SaleReturn saleReturn = rejectSaleReturnUseCase.reject(saleReturnId);
         return responseMapper.toResponse(saleReturn);
     }
     
-    /**
-     * Completes a sale return.
-     * POST /api/v2/sale-returns/{id}/complete
-     *
-     * @param id the sale return identifier
-     * @return the completed sale return response with HTTP 200 status
-     * @throws com.sigrap.exception.ResourceNotFoundException if the sale return is not found
-     * @throws IllegalStateException if the sale return cannot be completed
-     */
     @PostMapping("/{id}/complete")
-    public SaleReturnResponse complete(@PathVariable Long id) {
+    @Operation(summary = "Complete a sale return", description = "Changes the sale return status to COMPLETED and processes the refund")
+    @ApiResponse(responseCode = "200", description = "Sale return completed successfully",
+        content = @Content(schema = @Schema(implementation = SaleReturnResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Sale return not found")
+    @ApiResponse(responseCode = "400", description = "Sale return cannot be completed in current state")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    public SaleReturnResponse complete(
+        @Parameter(description = "Sale return unique identifier", required = true, example = "1")
+        @PathVariable Long id) {
         SaleReturnId saleReturnId = new SaleReturnId(id);
         SaleReturn saleReturn = completeSaleReturnUseCase.complete(saleReturnId);
         return responseMapper.toResponse(saleReturn);

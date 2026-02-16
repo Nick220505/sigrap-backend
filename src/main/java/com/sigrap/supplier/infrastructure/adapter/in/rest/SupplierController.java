@@ -8,6 +8,12 @@ import com.sigrap.supplier.application.port.in.command.CreateSupplierCommand;
 import com.sigrap.supplier.application.port.in.command.UpdateSupplierCommand;
 import com.sigrap.supplier.domain.model.Supplier;
 import com.sigrap.supplier.domain.model.SupplierId;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v2/suppliers")
+@Tag(name = "Supplier Management", description = "APIs for managing suppliers and their contact information")
 public class SupplierController {
     
     private final CreateSupplierUseCase createSupplierUseCase;
@@ -61,6 +68,14 @@ public class SupplierController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+        summary = "Create a new supplier",
+        description = "Creates a new supplier with company name, contact information, and address"
+    )
+    @ApiResponse(responseCode = "201", description = "Supplier created successfully",
+        content = @Content(schema = @Schema(implementation = SupplierResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid request - validation errors")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     public SupplierResponse create(@Valid @RequestBody SupplierRequest request) {
         CreateSupplierCommand command = new CreateSupplierCommand(
             request.name(),
@@ -82,7 +97,14 @@ public class SupplierController {
      * @throws IllegalArgumentException if the supplier is not found
      */
     @GetMapping("/{id}")
-    public SupplierResponse getById(@PathVariable Long id) {
+    @Operation(summary = "Get supplier by ID", description = "Retrieves a single supplier by its unique identifier")
+    @ApiResponse(responseCode = "200", description = "Supplier found successfully",
+        content = @Content(schema = @Schema(implementation = SupplierResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Supplier not found")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    public SupplierResponse getById(
+        @Parameter(description = "Supplier unique identifier", required = true, example = "1")
+        @PathVariable Long id) {
         SupplierId supplierId = new SupplierId(id);
         Supplier supplier = getSupplierUseCase.getById(supplierId);
         return responseMapper.toResponse(supplier);
@@ -95,6 +117,10 @@ public class SupplierController {
      * @return a list of all supplier responses with HTTP 200 status
      */
     @GetMapping
+    @Operation(summary = "Get all suppliers", description = "Retrieves a list of all suppliers in the system")
+    @ApiResponse(responseCode = "200", description = "List of suppliers retrieved successfully",
+        content = @Content(schema = @Schema(implementation = SupplierResponse.class)))
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     public List<SupplierResponse> getAll() {
         return getSupplierUseCase.getAll().stream()
             .map(responseMapper::toResponse)
@@ -111,7 +137,14 @@ public class SupplierController {
      * @throws IllegalArgumentException if the supplier is not found or email conflicts
      */
     @PutMapping("/{id}")
+    @Operation(summary = "Update an existing supplier", description = "Updates a supplier's information")
+    @ApiResponse(responseCode = "200", description = "Supplier updated successfully",
+        content = @Content(schema = @Schema(implementation = SupplierResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid request - validation errors")
+    @ApiResponse(responseCode = "404", description = "Supplier not found")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     public SupplierResponse update(
+            @Parameter(description = "Supplier unique identifier", required = true, example = "1")
             @PathVariable Long id,
             @Valid @RequestBody SupplierRequest request) {
         SupplierId supplierId = new SupplierId(id);
@@ -136,7 +169,13 @@ public class SupplierController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    @Operation(summary = "Delete a supplier", description = "Deletes a supplier by its unique identifier")
+    @ApiResponse(responseCode = "204", description = "Supplier deleted successfully")
+    @ApiResponse(responseCode = "404", description = "Supplier not found")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    public void delete(
+        @Parameter(description = "Supplier unique identifier", required = true, example = "1")
+        @PathVariable Long id) {
         SupplierId supplierId = new SupplierId(id);
         deleteSupplierUseCase.delete(supplierId);
     }
@@ -151,7 +190,13 @@ public class SupplierController {
      */
     @DeleteMapping("/batch")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAll(@RequestBody List<Long> ids) {
+    @Operation(summary = "Delete multiple suppliers", description = "Deletes multiple suppliers in a single operation")
+    @ApiResponse(responseCode = "204", description = "Suppliers deleted successfully")
+    @ApiResponse(responseCode = "404", description = "One or more suppliers not found")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    public void deleteAll(
+        @Parameter(description = "List of supplier IDs to delete", required = true)
+        @RequestBody List<Long> ids) {
         List<SupplierId> supplierIds = ids.stream()
             .map(SupplierId::new)
             .toList();

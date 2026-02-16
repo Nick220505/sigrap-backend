@@ -8,6 +8,12 @@ import com.sigrap.category.application.port.in.command.CreateCategoryCommand;
 import com.sigrap.category.application.port.in.command.UpdateCategoryCommand;
 import com.sigrap.category.domain.model.Category;
 import com.sigrap.category.domain.model.CategoryId;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/categories")
+@Tag(name = "Category Management", description = "APIs for managing product categories")
 public class CategoryController {
     
     private final CreateCategoryUseCase createCategoryUseCase;
@@ -61,6 +68,24 @@ public class CategoryController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+        summary = "Create a new category",
+        description = "Creates a new product category with the provided name and description. " +
+                      "The category name must be unique across the system."
+    )
+    @ApiResponse(
+        responseCode = "201",
+        description = "Category created successfully",
+        content = @Content(schema = @Schema(implementation = CategoryResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors or duplicate category name"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public CategoryResponse create(@Valid @RequestBody CategoryRequest request) {
         CreateCategoryCommand command = new CreateCategoryCommand(
             request.name(),
@@ -79,7 +104,27 @@ public class CategoryController {
      * @throws IllegalArgumentException if the category is not found
      */
     @GetMapping("/{id}")
-    public CategoryResponse getById(@PathVariable Long id) {
+    @Operation(
+        summary = "Get category by ID",
+        description = "Retrieves a single category by its unique identifier"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Category found successfully",
+        content = @Content(schema = @Schema(implementation = CategoryResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Category not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public CategoryResponse getById(
+        @Parameter(description = "Category unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         CategoryId categoryId = new CategoryId(id);
         Category category = getCategoryUseCase.getById(categoryId);
         return responseMapper.toResponse(category);
@@ -92,6 +137,19 @@ public class CategoryController {
      * @return a list of all category responses with HTTP 200 status
      */
     @GetMapping
+    @Operation(
+        summary = "Get all categories",
+        description = "Retrieves a list of all product categories in the system"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of categories retrieved successfully",
+        content = @Content(schema = @Schema(implementation = CategoryResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public List<CategoryResponse> getAll() {
         return getCategoryUseCase.getAll().stream()
             .map(responseMapper::toResponse)
@@ -108,7 +166,29 @@ public class CategoryController {
      * @throws IllegalArgumentException if the category is not found or name conflicts
      */
     @PutMapping("/{id}")
+    @Operation(
+        summary = "Update an existing category",
+        description = "Updates a category's name and/or description. The category name must remain unique."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Category updated successfully",
+        content = @Content(schema = @Schema(implementation = CategoryResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - validation errors or duplicate category name"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Category not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
     public CategoryResponse update(
+            @Parameter(description = "Category unique identifier", required = true, example = "1")
             @PathVariable Long id,
             @Valid @RequestBody CategoryRequest request) {
         CategoryId categoryId = new CategoryId(id);
@@ -130,7 +210,26 @@ public class CategoryController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    @Operation(
+        summary = "Delete a category",
+        description = "Deletes a category by its unique identifier. This operation cannot be undone."
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Category deleted successfully"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Category not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public void delete(
+        @Parameter(description = "Category unique identifier", required = true, example = "1")
+        @PathVariable Long id
+    ) {
         CategoryId categoryId = new CategoryId(id);
         deleteCategoryUseCase.delete(categoryId);
     }
@@ -145,7 +244,26 @@ public class CategoryController {
      */
     @DeleteMapping("/batch")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAll(@RequestBody List<Long> ids) {
+    @Operation(
+        summary = "Delete multiple categories",
+        description = "Deletes multiple categories in a single operation. All specified categories must exist."
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Categories deleted successfully"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "One or more categories not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public void deleteAll(
+        @Parameter(description = "List of category IDs to delete", required = true)
+        @RequestBody List<Long> ids
+    ) {
         List<CategoryId> categoryIds = ids.stream()
             .map(CategoryId::new)
             .toList();
@@ -166,7 +284,27 @@ public class CategoryController {
     @Deprecated(since = "Hexagonal architecture migration", forRemoval = true)
     @DeleteMapping("/delete-many")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAllByIdLegacy(@RequestBody List<Long> ids) {
+    @Operation(
+        summary = "Delete multiple categories (deprecated)",
+        description = "Legacy endpoint for batch deletion. Use /batch endpoint instead.",
+        deprecated = true
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Categories deleted successfully"
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "One or more categories not found"
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - authentication required"
+    )
+    public void deleteAllByIdLegacy(
+        @Parameter(description = "List of category IDs to delete", required = true)
+        @RequestBody List<Long> ids
+    ) {
         // Delegate to the new endpoint implementation
         deleteAll(ids);
     }
