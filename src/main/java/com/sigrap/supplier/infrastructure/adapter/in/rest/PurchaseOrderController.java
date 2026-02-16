@@ -32,7 +32,7 @@ import java.util.List;
  * and delegates business logic to use cases.
  */
 @RestController
-@RequestMapping("/api/v2/purchase-orders")
+@RequestMapping("/api/purchase-orders")
 @Tag(name = "Purchase Order Management", description = "APIs for managing purchase orders including creation, approval, receiving, and cancellation")
 public class PurchaseOrderController {
     
@@ -78,7 +78,7 @@ public class PurchaseOrderController {
     
     /**
      * Creates a new purchase order.
-     * POST /api/v2/purchase-orders
+     * POST /api/purchase-orders
      *
      * @param request the purchase order creation request
      * @return the created purchase order response with HTTP 201 status
@@ -105,7 +105,7 @@ public class PurchaseOrderController {
     
     /**
      * Retrieves a purchase order by its ID.
-     * GET /api/v2/purchase-orders/{id}
+     * GET /api/purchase-orders/{id}
      *
      * @param id the purchase order identifier
      * @return the purchase order response with HTTP 200 status
@@ -127,7 +127,7 @@ public class PurchaseOrderController {
     
     /**
      * Retrieves all purchase orders.
-     * GET /api/v2/purchase-orders
+     * GET /api/purchase-orders
      *
      * @return a list of all purchase order responses with HTTP 200 status
      */
@@ -144,7 +144,7 @@ public class PurchaseOrderController {
     
     /**
      * Retrieves all purchase orders for a specific supplier.
-     * GET /api/v2/purchase-orders/supplier/{supplierId}
+     * GET /api/purchase-orders/supplier/{supplierId}
      *
      * @param supplierId the supplier identifier
      * @return a list of purchase order responses for the supplier with HTTP 200 status
@@ -165,7 +165,7 @@ public class PurchaseOrderController {
     
     /**
      * Retrieves all purchase orders with a specific status.
-     * GET /api/v2/purchase-orders/status/{status}
+     * GET /api/purchase-orders/status/{status}
      *
      * @param status the purchase order status (PENDING, APPROVED, RECEIVED, CANCELLED)
      * @return a list of purchase order responses with the given status with HTTP 200 status
@@ -187,7 +187,7 @@ public class PurchaseOrderController {
     
     /**
      * Updates an existing purchase order.
-     * PUT /api/v2/purchase-orders/{id}
+     * PUT /api/purchase-orders/{id}
      *
      * @param id the purchase order identifier
      * @param request the purchase order update request
@@ -216,7 +216,7 @@ public class PurchaseOrderController {
     
     /**
      * Approves a purchase order.
-     * POST /api/v2/purchase-orders/{id}/approve
+     * POST /api/purchase-orders/{id}/approve
      *
      * @param id the purchase order identifier
      * @return the approved purchase order response with HTTP 200 status
@@ -240,7 +240,7 @@ public class PurchaseOrderController {
     
     /**
      * Marks a purchase order as received.
-     * POST /api/v2/purchase-orders/{id}/receive
+     * POST /api/purchase-orders/{id}/receive
      *
      * @param id the purchase order identifier
      * @return the received purchase order response with HTTP 200 status
@@ -264,7 +264,7 @@ public class PurchaseOrderController {
     
     /**
      * Cancels a purchase order.
-     * POST /api/v2/purchase-orders/{id}/cancel
+     * POST /api/purchase-orders/{id}/cancel
      *
      * @param id the purchase order identifier
      * @return the cancelled purchase order response with HTTP 200 status
@@ -288,7 +288,7 @@ public class PurchaseOrderController {
     
     /**
      * Deletes a purchase order by its ID.
-     * DELETE /api/v2/purchase-orders/{id}
+     * DELETE /api/purchase-orders/{id}
      *
      * @param id the purchase order identifier
      * @return HTTP 204 No Content status

@@ -52,9 +52,9 @@ import org.springframework.context.annotation.Configuration;
  *         <li>{@link com.sigrap.sale.infrastructure.adapter.out.persistence.SaleReturnPersistenceAdapter}
  *             - Implements {@link com.sigrap.sale.domain.port.SaleReturnRepositoryPort}</li>
  *         <li>{@link com.sigrap.sale.infrastructure.adapter.in.rest.SaleController}
- *             - REST API endpoint for sale operations (mapped to /api/v2/sales)</li>
+ *             - REST API endpoint for sale operations (mapped to /api/sales)</li>
  *         <li>{@link com.sigrap.sale.infrastructure.adapter.in.rest.SaleReturnController}
- *             - REST API endpoint for sale return operations (mapped to /api/v2/sale-returns)</li>
+ *             - REST API endpoint for sale return operations (mapped to /api/sale-returns)</li>
  *       </ul>
  *   </li>
  *   <li><strong>Mappers</strong>: MapStruct mappers with {@code componentModel = "spring"}

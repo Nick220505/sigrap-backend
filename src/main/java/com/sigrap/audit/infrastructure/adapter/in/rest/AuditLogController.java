@@ -29,7 +29,7 @@ import java.util.List;
  * <p>All endpoints require AUDIT_VIEW permission to access.</p>
  */
 @RestController
-@RequestMapping("/api/v2/audit-logs")
+@RequestMapping("/api/audit-logs")
 @Slf4j
 @PreAuthorize("hasAuthority('AUDIT_VIEW')")
 @Tag(name = "Audit Logs", description = "APIs for viewing system audit logs")
@@ -82,7 +82,7 @@ public class AuditLogController {
                 example = "1"
             )
             @PathVariable Long id) {
-        log.debug("GET /api/v2/audit-logs/{}", id);
+        log.debug("GET /api/audit-logs/{}", id);
         AuditLogId auditLogId = new AuditLogId(id);
         AuditLog auditLog = getAuditLogUseCase.getById(auditLogId);
         return ResponseEntity.ok(responseMapper.toResponse(auditLog));
@@ -113,7 +113,7 @@ public class AuditLogController {
         description = "Forbidden - AUDIT_VIEW permission required"
     )
     public ResponseEntity<List<AuditLogResponse>> getAll() {
-        log.debug("GET /api/v2/audit-logs");
+        log.debug("GET /api/audit-logs");
         List<AuditLog> auditLogs = getAuditLogUseCase.getAll();
         List<AuditLogResponse> responses = auditLogs.stream()
                 .map(responseMapper::toResponse)
@@ -154,7 +154,7 @@ public class AuditLogController {
                 example = "john.doe"
             )
             @PathVariable String username) {
-        log.debug("GET /api/v2/audit-logs/by-username/{}", username);
+        log.debug("GET /api/audit-logs/by-username/{}", username);
         List<AuditLog> auditLogs = getAuditLogUseCase.getByUsername(username);
         List<AuditLogResponse> responses = auditLogs.stream()
                 .map(responseMapper::toResponse)
@@ -202,7 +202,7 @@ public class AuditLogController {
                 example = "123"
             )
             @PathVariable String entityId) {
-        log.debug("GET /api/v2/audit-logs/by-entity/{}/{}", entityType, entityId);
+        log.debug("GET /api/audit-logs/by-entity/{}/{}", entityType, entityId);
         List<AuditLog> auditLogs = getAuditLogUseCase.getByEntity(entityType, entityId);
         List<AuditLogResponse> responses = auditLogs.stream()
                 .map(responseMapper::toResponse)
@@ -254,7 +254,7 @@ public class AuditLogController {
                 example = "2026-12-31T23:59:59"
             )
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
-        log.debug("GET /api/v2/audit-logs/by-time-range?startTime={}&endTime={}", startTime, endTime);
+        log.debug("GET /api/audit-logs/by-time-range?startTime={}&endTime={}", startTime, endTime);
         List<AuditLog> auditLogs = getAuditLogUseCase.getByTimeRange(startTime, endTime);
         List<AuditLogResponse> responses = auditLogs.stream()
                 .map(responseMapper::toResponse)
@@ -313,7 +313,7 @@ public class AuditLogController {
                 example = "2026-12-31T23:59:59"
             )
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
-        log.debug("GET /api/v2/audit-logs/by-username-and-time-range/{}?startTime={}&endTime={}", 
+        log.debug("GET /api/audit-logs/by-username-and-time-range/{}?startTime={}&endTime={}", 
                 username, startTime, endTime);
         List<AuditLog> auditLogs = getAuditLogUseCase.getByUsernameAndTimeRange(username, startTime, endTime);
         List<AuditLogResponse> responses = auditLogs.stream()

@@ -26,10 +26,10 @@ import java.util.List;
  * It handles HTTP concerns (validation, status codes, request/response mapping)
  * and delegates business logic to use cases.
  * 
- * <p>Mapped to /api/v2/customers for coexistence with legacy endpoints.
+ * <p>Mapped to /api/customers for coexistence with legacy endpoints.
  */
-@RestController("customerControllerV2")
-@RequestMapping("/api/v2/customers")
+@RestController("customerController")
+@RequestMapping("/api/customers")
 @Tag(name = "Customer Management", description = "APIs for managing customer information including contact details and addresses")
 public class CustomerController {
     
@@ -63,7 +63,7 @@ public class CustomerController {
     
     /**
      * Creates a new customer.
-     * POST /api/v2/customers
+     * POST /api/customers
      *
      * @param request the customer creation request
      * @return the created customer response with HTTP 201 status
@@ -102,7 +102,7 @@ public class CustomerController {
     
     /**
      * Retrieves a customer by their ID.
-     * GET /api/v2/customers/{id}
+     * GET /api/customers/{id}
      *
      * @param id the customer identifier
      * @return the customer response with HTTP 200 status
@@ -137,7 +137,7 @@ public class CustomerController {
     
     /**
      * Retrieves all customers.
-     * GET /api/v2/customers
+     * GET /api/customers
      *
      * @return a list of all customer responses with HTTP 200 status
      */
@@ -163,7 +163,7 @@ public class CustomerController {
     
     /**
      * Updates an existing customer.
-     * PUT /api/v2/customers/{id}
+     * PUT /api/customers/{id}
      *
      * @param id the customer identifier
      * @param request the customer update request
@@ -212,7 +212,7 @@ public class CustomerController {
     
     /**
      * Deletes a customer by their ID.
-     * DELETE /api/v2/customers/{id}
+     * DELETE /api/customers/{id}
      *
      * @param id the customer identifier
      * @return HTTP 204 No Content status
@@ -246,7 +246,7 @@ public class CustomerController {
     
     /**
      * Deletes multiple customers by their IDs (batch delete).
-     * DELETE /api/v2/customers/batch
+     * DELETE /api/customers/batch
      *
      * @param ids the list of customer identifiers to delete
      * @return HTTP 204 No Content status

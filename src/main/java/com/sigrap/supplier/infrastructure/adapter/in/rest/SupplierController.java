@@ -27,7 +27,7 @@ import java.util.List;
  * and delegates business logic to use cases.
  */
 @RestController
-@RequestMapping("/api/v2/suppliers")
+@RequestMapping("/api/suppliers")
 @Tag(name = "Supplier Management", description = "APIs for managing suppliers and their contact information")
 public class SupplierController {
     
@@ -61,7 +61,7 @@ public class SupplierController {
     
     /**
      * Creates a new supplier.
-     * POST /api/v2/suppliers
+     * POST /api/suppliers
      *
      * @param request the supplier creation request
      * @return the created supplier response with HTTP 201 status
@@ -90,7 +90,7 @@ public class SupplierController {
     
     /**
      * Retrieves a supplier by its ID.
-     * GET /api/v2/suppliers/{id}
+     * GET /api/suppliers/{id}
      *
      * @param id the supplier identifier
      * @return the supplier response with HTTP 200 status
@@ -112,7 +112,7 @@ public class SupplierController {
     
     /**
      * Retrieves all suppliers.
-     * GET /api/v2/suppliers
+     * GET /api/suppliers
      *
      * @return a list of all supplier responses with HTTP 200 status
      */
@@ -129,7 +129,7 @@ public class SupplierController {
     
     /**
      * Updates an existing supplier.
-     * PUT /api/v2/suppliers/{id}
+     * PUT /api/suppliers/{id}
      *
      * @param id the supplier identifier
      * @param request the supplier update request
@@ -161,7 +161,7 @@ public class SupplierController {
     
     /**
      * Deletes a supplier by its ID.
-     * DELETE /api/v2/suppliers/{id}
+     * DELETE /api/suppliers/{id}
      *
      * @param id the supplier identifier
      * @return HTTP 204 No Content status
@@ -182,7 +182,7 @@ public class SupplierController {
     
     /**
      * Deletes multiple suppliers by their IDs (batch delete).
-     * DELETE /api/v2/suppliers/batch
+     * DELETE /api/suppliers/batch
      *
      * @param ids the list of supplier identifiers to delete
      * @return HTTP 204 No Content status

@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * REST controller for authentication operations.
- * Handles HTTP requests for user authentication and registration at /api/v2/auth endpoints.
+ * Handles HTTP requests for user authentication and registration at /api/auth endpoints.
  * 
  * <p>This is an input adapter in hexagonal architecture terminology.
  * It translates HTTP requests to use case calls and domain objects to HTTP responses.
  */
 @RestController
-@RequestMapping("/api/v2/auth")
+@RequestMapping("/api/auth")
 @Tag(name = "Authentication", description = "APIs for user authentication and authorization")
 public class AuthController {
 

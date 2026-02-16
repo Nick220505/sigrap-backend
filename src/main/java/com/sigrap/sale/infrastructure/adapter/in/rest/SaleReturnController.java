@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("saleReturnControllerV2")
-@RequestMapping("/api/v2/sale-returns")
+@RestController("saleReturnController")
+@RequestMapping("/api/sale-returns")
 @Tag(name = "Sale Return Management", description = "APIs for managing sale returns including approval, rejection, and completion")
 public class SaleReturnController {
     

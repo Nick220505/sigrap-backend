@@ -23,7 +23,7 @@ import java.util.List;
  * and delegates business logic to use cases.
  */
 @RestController
-@RequestMapping("/api/v2/users")
+@RequestMapping("/api/users")
 @Tag(name = "User Management", description = "APIs for managing users, roles, and permissions")
 public class UserController {
     
@@ -63,7 +63,7 @@ public class UserController {
     
     /**
      * Creates a new user.
-     * POST /api/v2/users
+     * POST /api/users
      *
      * @param request the user creation request
      * @return the created user response with HTTP 201 status
@@ -100,7 +100,7 @@ public class UserController {
     
     /**
      * Retrieves a user by its ID.
-     * GET /api/v2/users/{id}
+     * GET /api/users/{id}
      *
      * @param id the user identifier
      * @return the user response with HTTP 200 status
@@ -133,7 +133,7 @@ public class UserController {
     
     /**
      * Retrieves a user by username.
-     * GET /api/v2/users/username/{username}
+     * GET /api/users/username/{username}
      *
      * @param username the username
      * @return the user response with HTTP 200 status
@@ -166,7 +166,7 @@ public class UserController {
     
     /**
      * Retrieves a user by email.
-     * GET /api/v2/users/email/{email}
+     * GET /api/users/email/{email}
      *
      * @param email the email address
      * @return the user response with HTTP 200 status
@@ -199,7 +199,7 @@ public class UserController {
     
     /**
      * Retrieves all users.
-     * GET /api/v2/users
+     * GET /api/users
      *
      * @return a list of all user responses with HTTP 200 status
      */
@@ -224,7 +224,7 @@ public class UserController {
     
     /**
      * Retrieves all enabled users.
-     * GET /api/v2/users/enabled
+     * GET /api/users/enabled
      *
      * @return a list of enabled user responses with HTTP 200 status
      */
@@ -249,7 +249,7 @@ public class UserController {
     
     /**
      * Updates an existing user.
-     * PUT /api/v2/users/{id}
+     * PUT /api/users/{id}
      *
      * @param id the user identifier
      * @param request the user update request
@@ -291,7 +291,7 @@ public class UserController {
     
     /**
      * Enables a user account.
-     * POST /api/v2/users/{id}/enable
+     * POST /api/users/{id}/enable
      *
      * @param id the user identifier
      * @return the updated user response with HTTP 200 status
@@ -324,7 +324,7 @@ public class UserController {
     
     /**
      * Disables a user account.
-     * POST /api/v2/users/{id}/disable
+     * POST /api/users/{id}/disable
      *
      * @param id the user identifier
      * @return the updated user response with HTTP 200 status
@@ -357,7 +357,7 @@ public class UserController {
     
     /**
      * Assigns a role to a user.
-     * POST /api/v2/users/{userId}/roles/{roleId}
+     * POST /api/users/{userId}/roles/{roleId}
      *
      * @param userId the user identifier
      * @param roleId the role identifier
@@ -392,7 +392,7 @@ public class UserController {
     
     /**
      * Removes a role from a user.
-     * DELETE /api/v2/users/{userId}/roles/{roleId}
+     * DELETE /api/users/{userId}/roles/{roleId}
      *
      * @param userId the user identifier
      * @param roleId the role identifier
@@ -427,7 +427,7 @@ public class UserController {
     
     /**
      * Deletes a user by its ID.
-     * DELETE /api/v2/users/{id}
+     * DELETE /api/users/{id}
      *
      * @param id the user identifier
      * @return HTTP 204 No Content status

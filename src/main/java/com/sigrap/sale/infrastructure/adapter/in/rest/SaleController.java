@@ -29,10 +29,10 @@ import java.util.List;
  * It handles HTTP concerns (validation, status codes, request/response mapping)
  * and delegates business logic to use cases.
  * 
- * <p>Mapped to /api/v2/sales for coexistence with legacy endpoints.
+ * <p>Mapped to /api/sales for coexistence with legacy endpoints.
  */
-@RestController("saleControllerV2")
-@RequestMapping("/api/v2/sales")
+@RestController("saleController")
+@RequestMapping("/api/sales")
 @Tag(name = "Sale Management", description = "APIs for managing sales transactions including creation, completion, and cancellation")
 public class SaleController {
     

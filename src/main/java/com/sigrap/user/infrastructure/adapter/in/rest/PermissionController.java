@@ -23,7 +23,7 @@ import java.util.List;
  * and delegates business logic to use cases.
  */
 @RestController
-@RequestMapping("/api/v2/permissions")
+@RequestMapping("/api/permissions")
 @Tag(name = "User Management", description = "APIs for managing users, roles, and permissions")
 public class PermissionController {
     
@@ -51,7 +51,7 @@ public class PermissionController {
     
     /**
      * Creates a new permission.
-     * POST /api/v2/permissions
+     * POST /api/permissions
      *
      * @param request the permission creation request
      * @return the created permission response with HTTP 201 status
@@ -88,7 +88,7 @@ public class PermissionController {
     
     /**
      * Retrieves a permission by its ID.
-     * GET /api/v2/permissions/{id}
+     * GET /api/permissions/{id}
      *
      * @param id the permission identifier
      * @return the permission response with HTTP 200 status
@@ -121,7 +121,7 @@ public class PermissionController {
     
     /**
      * Retrieves a permission by name.
-     * GET /api/v2/permissions/name/{name}
+     * GET /api/permissions/name/{name}
      *
      * @param name the permission name
      * @return the permission response with HTTP 200 status
@@ -154,7 +154,7 @@ public class PermissionController {
     
     /**
      * Retrieves all permissions for a specific resource.
-     * GET /api/v2/permissions/resource/{resource}
+     * GET /api/permissions/resource/{resource}
      *
      * @param resource the resource name
      * @return a list of permission responses with HTTP 200 status
@@ -183,7 +183,7 @@ public class PermissionController {
     
     /**
      * Retrieves all permissions.
-     * GET /api/v2/permissions
+     * GET /api/permissions
      *
      * @return a list of all permission responses with HTTP 200 status
      */
@@ -208,7 +208,7 @@ public class PermissionController {
     
     /**
      * Updates an existing permission.
-     * PUT /api/v2/permissions/{id}
+     * PUT /api/permissions/{id}
      *
      * @param id the permission identifier
      * @param request the permission update request
@@ -251,7 +251,7 @@ public class PermissionController {
     
     /**
      * Deletes a permission by its ID.
-     * DELETE /api/v2/permissions/{id}
+     * DELETE /api/permissions/{id}
      *
      * @param id the permission identifier
      * @return HTTP 204 No Content status

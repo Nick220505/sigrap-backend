@@ -38,7 +38,7 @@ import org.springframework.context.annotation.Configuration;
  *         <li>{@link com.sigrap.customer.infrastructure.adapter.out.persistence.CustomerPersistenceAdapter}
  *             - Implements {@link com.sigrap.customer.domain.port.CustomerRepositoryPort}</li>
  *         <li>{@link com.sigrap.customer.infrastructure.adapter.in.rest.CustomerController}
- *             - REST API endpoint for customer operations (mapped to /api/v2/customers)</li>
+ *             - REST API endpoint for customer operations (mapped to /api/customers)</li>
  *       </ul>
  *   </li>
  *   <li><strong>Mappers</strong>: MapStruct mappers with {@code componentModel = "spring"}

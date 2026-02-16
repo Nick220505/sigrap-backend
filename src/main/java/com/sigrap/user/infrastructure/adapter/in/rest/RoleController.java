@@ -23,7 +23,7 @@ import java.util.List;
  * and delegates business logic to use cases.
  */
 @RestController
-@RequestMapping("/api/v2/roles")
+@RequestMapping("/api/roles")
 @Tag(name = "User Management", description = "APIs for managing users, roles, and permissions")
 public class RoleController {
     
@@ -57,7 +57,7 @@ public class RoleController {
     
     /**
      * Creates a new role.
-     * POST /api/v2/roles
+     * POST /api/roles
      *
      * @param request the role creation request
      * @return the created role response with HTTP 201 status
@@ -93,7 +93,7 @@ public class RoleController {
     
     /**
      * Retrieves a role by its ID.
-     * GET /api/v2/roles/{id}
+     * GET /api/roles/{id}
      *
      * @param id the role identifier
      * @return the role response with HTTP 200 status
@@ -126,7 +126,7 @@ public class RoleController {
     
     /**
      * Retrieves a role by name.
-     * GET /api/v2/roles/name/{name}
+     * GET /api/roles/name/{name}
      *
      * @param name the role name
      * @return the role response with HTTP 200 status
@@ -159,7 +159,7 @@ public class RoleController {
     
     /**
      * Retrieves all roles.
-     * GET /api/v2/roles
+     * GET /api/roles
      *
      * @return a list of all role responses with HTTP 200 status
      */
@@ -184,7 +184,7 @@ public class RoleController {
     
     /**
      * Updates an existing role.
-     * PUT /api/v2/roles/{id}
+     * PUT /api/roles/{id}
      *
      * @param id the role identifier
      * @param request the role update request
@@ -226,7 +226,7 @@ public class RoleController {
     
     /**
      * Assigns a permission to a role.
-     * POST /api/v2/roles/{roleId}/permissions/{permissionId}
+     * POST /api/roles/{roleId}/permissions/{permissionId}
      *
      * @param roleId the role identifier
      * @param permissionId the permission identifier
@@ -261,7 +261,7 @@ public class RoleController {
     
     /**
      * Removes a permission from a role.
-     * DELETE /api/v2/roles/{roleId}/permissions/{permissionId}
+     * DELETE /api/roles/{roleId}/permissions/{permissionId}
      *
      * @param roleId the role identifier
      * @param permissionId the permission identifier
@@ -296,7 +296,7 @@ public class RoleController {
     
     /**
      * Deletes a role by its ID.
-     * DELETE /api/v2/roles/{id}
+     * DELETE /api/roles/{id}
      *
      * @param id the role identifier
      * @return HTTP 204 No Content status
